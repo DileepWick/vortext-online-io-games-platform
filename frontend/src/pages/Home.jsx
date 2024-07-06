@@ -31,6 +31,7 @@ const Home = () => {
       <Header />
       <button onClick={notify}>Notify</button>
       <SayMyName providedName={propFunction}/>
+      <h1>Home Sweet Home</h1>
       <Footer />
     </div>
   );
