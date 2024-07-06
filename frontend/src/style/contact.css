@@ -1,0 +1,31 @@
+.contact-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 100svh;
+}
+.image_container {
+  /* height: 100%; */
+  width: 100%;
+}
+.image_container img {
+  height: 100%;
+  width: 100%;
+  display: block;
+  object-fit: cover;
+}
+.contact_us_container {
+  display: flex;
+  align-items: center;
+  padding: 5em;
+}
+@media(max-width:850px){
+    .image_container{
+        display: none;
+    }
+    .contact-container{
+        grid-template-columns: 1fr;
+    }
+    .contact_us_container{
+        padding: 2em;
+    }
+}
