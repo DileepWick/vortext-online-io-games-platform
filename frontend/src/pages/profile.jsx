@@ -103,6 +103,7 @@ const Profile = () => {
         transition: Flip,
         style:{fontFamily:'Rubik'}
         });
+
       
     } catch (error) {
       console.error("Error updating profile:", error);

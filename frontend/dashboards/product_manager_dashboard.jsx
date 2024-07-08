@@ -199,7 +199,6 @@ const Blogger = () => {
           <Tab key="analytics" title="Analytics" />
           <Tab key="products" title="Products" />
           <Tab key="stock" title="Stock" />
-          <Tab key="categories" title="Categories" />
         </Tabs>
       </div>
       <div className="p-4">
@@ -517,11 +516,6 @@ const Blogger = () => {
           </>
         )}
         {activeTab === "stock" && <StockTable />}
-        {activeTab === "categories" && (
-          <>
-            <h1>Categories</h1>
-          </>
-        )}
       </div>
     </div>
   );
