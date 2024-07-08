@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import axios from "axios";
+
 import {
   Table,
   TableHeader,
@@ -13,11 +14,14 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
 
+//Stock Components
+import DeleteStock from "./delete_stock";
+
 const StockTable = () => {
   const [stocks, setStocks] = useState([]);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const rowsPerPage = 1; // Adjusted rowsPerPage for more data per page
+  const rowsPerPage = 4; // Adjusted rowsPerPage for more data per page
 
   // Get All Stocks
   const getAllStocks = async () => {
@@ -102,6 +106,7 @@ const StockTable = () => {
           <TableColumn key="QUANTITY">QUANTITY</TableColumn>
           <TableColumn key="PRICE">PRICE</TableColumn>
           <TableColumn key="DISCOUNT">DISCOUNT</TableColumn>
+          <TableColumn key="ACTIONS">ACTIONS</TableColumn>
         </TableHeader>
         <TableBody>
           {items.map((stock) => (
@@ -113,9 +118,10 @@ const StockTable = () => {
                 </Chip>
               </TableCell>
               <TableCell>{stock.Edition}</TableCell>
-              <TableCell>{stock.NumberOfUnits}</TableCell>
+              <TableCell>{stock.NumberOfUnits < 5 ? <div>Low on stock</div> : stock.NumberOfUnits}</TableCell>
               <TableCell>{stock.UnitPrice}$</TableCell>
               <TableCell>{stock.discount}%</TableCell>
+              <TableCell><DeleteStock deletingStock={stock} callBackFunction={getAllStocks()}/></TableCell>
             </TableRow>
           ))}
         </TableBody>
