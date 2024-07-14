@@ -7,6 +7,7 @@ import UploadGame from "./Games_Components/add_new_game";
 import UpdateGame from "./Games_Components/update_game";
 import AddNewStock from "./Games_Components/add_new_stock";
 
+
 //Stock Components
 import StockTable from "./Stock_Components/stock_table";
 

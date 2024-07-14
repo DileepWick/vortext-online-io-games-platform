@@ -13,6 +13,8 @@ import {
   Input,
 } from "@nextui-org/react";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
+import Restock from "./restock";
+import UpdateStock from "./update_stock";
 
 //Stock Components
 import DeleteStock from "./delete_stock";
@@ -118,10 +120,29 @@ const StockTable = () => {
                 </Chip>
               </TableCell>
               <TableCell>{stock.Edition}</TableCell>
-              <TableCell>{stock.NumberOfUnits < 5 ? <div>Low on stock</div> : stock.NumberOfUnits}</TableCell>
+              <TableCell>
+                {stock.NumberOfUnits < 5 ? (
+                  <div>Low on stock</div>
+                ) : (
+                  stock.NumberOfUnits
+                )}
+              </TableCell>
               <TableCell>{stock.UnitPrice}$</TableCell>
               <TableCell>{stock.discount}%</TableCell>
-              <TableCell><DeleteStock deletingStock={stock} callBackFunction={getAllStocks()}/></TableCell>
+              <TableCell>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <UpdateStock updatingStock={stock} callBackFunction={getAllStocks}/>
+
+                  <Restock
+                    stockForRestock={stock}
+                    callBackFunction={getAllStocks}
+                  />
+                  <DeleteStock
+                    deletingStock={stock}
+                    callBackFunction={getAllStocks}
+                  />
+                </div>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

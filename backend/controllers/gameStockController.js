@@ -136,39 +136,17 @@ export const getGameStocksByAssignedGameId = async (req, res) => {
 // Update a game stock by ID
 export const updateGameStock = async (req, res) => {
   try {
-    const {
-      Platform,
-      Edition,
-      NumberOfUnits,
-      UnitPrice,
-      discount,
-      AssignedGame,
-    } = req.body;
+    const { UnitPrice, discount } = req.body;
 
     // Validate required fields
-    if (
-      !Platform ||
-      !Edition ||
-      !NumberOfUnits ||
-      !UnitPrice ||
-      !AssignedGame
-    ) {
-      return res
-        .status(400)
-        .json({ message: "All fields are required except discount" });
+    if (!UnitPrice || !discount) {
+      return res.status(400).json({ message: "All fields are required" });
     }
 
     const updatedGameStock = await GameStock.findByIdAndUpdate(
       req.params.id,
-      {
-        AssignedGame,
-        Platform,
-        Edition,
-        NumberOfUnits,
-        UnitPrice,
-        discount,
-      },
-      { new: true, runValidators: true }
+      { UnitPrice, discount },
+      { new: true } // Return the updated document
     );
 
     if (!updatedGameStock) {
@@ -176,16 +154,17 @@ export const updateGameStock = async (req, res) => {
     }
 
     return res.status(200).json({
-      message: "Game stock updated successfully",
+      message: "Pricing successful",
       updatedGameStock,
     });
   } catch (error) {
     return res.status(500).json({
-      message: "Failed to update game stock",
+      message: "Failed to change pricing",
       error: error.message,
     });
   }
 };
+
 
 // Delete a game stock by ID
 export const deleteGameStock = async (req, res) => {
@@ -229,7 +208,7 @@ export const restockUnits = async (req, res) => {
     const updatedGameStock = await gameStock.save();
 
     return res.status(200).json({
-      message: "Game stock restocked successfully",
+      message: "Successfully Restocked",
       updatedGameStock,
     });
   } catch (error) {

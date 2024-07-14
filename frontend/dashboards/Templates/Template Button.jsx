@@ -15,7 +15,6 @@ import React from "react";
 import axios from "axios";
 
 const delete_Template = ({ deletingObject, callBackFunction }) => {
-  
   //Delete Modal
   const {
     isOpen: isDeleteModalOpen,
@@ -30,7 +29,7 @@ const delete_Template = ({ deletingObject, callBackFunction }) => {
         `eg- localhost/1212/deleteBook${deletingObject._id}`
       );
 
-      if (DeletionStatus.data) {
+      if (response.status === 400) {
         toast.success(DeletionStatus.data.message, {
           theme: "dark",
           transition: Flip,
@@ -38,13 +37,31 @@ const delete_Template = ({ deletingObject, callBackFunction }) => {
         });
 
         onDeleteModalClose();
-      } else {
-        onDeleteModalClose();
-        toast.error("Error Message");
+      } else if (response.status === 400 || response.status === 404) {
+        toast.error(response.data.message, {
+          theme: "dark",
+          transition: Flip,
+          style: { fontFamily: "Rubik" },
+        });
       }
       callBackFunction();
     } catch (error) {
-        console.log(error);
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        toast.warning(error.response.data.message, {
+          theme: "dark",
+          transition: Flip,
+          style: { fontFamily: "Rubik" },
+        });
+      } else if (error.request) {
+        // The request was made but no response was received
+        toast.error("No response received from server.");
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        toast.error("Error adding new stock.");
+        console.error("Error:", error.message);
+      }
     }
   };
 
@@ -69,7 +86,7 @@ const delete_Template = ({ deletingObject, callBackFunction }) => {
           <DeleteIcon />
         </span>
       </Tooltip>
-      {/* Delete Game  */}
+      {/* Modal  */}
       <Modal
         isOpen={isDeleteModalOpen}
         onOpenChange={onDeleteModalClose}
