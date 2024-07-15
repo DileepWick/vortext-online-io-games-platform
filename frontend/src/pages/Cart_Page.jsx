@@ -15,6 +15,8 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
+  Radio,
+  RadioGroup,
 } from "@nextui-org/react";
 import { Input } from "@nextui-org/input";
 import { Select, SelectSection, SelectItem } from "@nextui-org/select";
@@ -240,7 +242,8 @@ const CartPage = () => {
                     onClick={() =>
                       handleQuantityChange(item.stockid._id, item.quantity - 1)
                     }
-                    color="danger" variant="bordered"
+                    color="danger"
+                    variant="bordered"
                   >
                     -
                   </Button>
@@ -259,14 +262,16 @@ const CartPage = () => {
                     onClick={() =>
                       handleQuantityChange(item.stockid._id, item.quantity + 1)
                     }
-                    color="success" variant="bordered"
+                    color="success"
+                    variant="bordered"
                   >
                     +
                   </Button>
                 </div>
                 <Button
                   onClick={() => handleRemoveItem(item.stockid._id)}
-                  color="danger" variant="bordered"
+                  color="danger"
+                  variant="bordered"
                 >
                   Remove
                 </Button>
@@ -277,7 +282,9 @@ const CartPage = () => {
             <h2 className="text-2xl font-bold text-gray-800">
               Subtotal: ${subtotal.toFixed(2)}
             </h2>
-            <Button onPress={onOpen}  color="primary" variant="shadow">Proceed to Payment</Button>
+            <Button onPress={onOpen} color="primary" variant="shadow">
+              Proceed to Payment
+            </Button>
             <Modal
               backdrop="opaque"
               isOpen={isOpen}
@@ -326,26 +333,17 @@ const CartPage = () => {
                         className="font-primaryRegular"
                         required
                       />
-                      <Select
-                        label="Region"
-                        placeholder="Select your region"
-                        className="max-w-xs font-primaryRegular"
-                        onChange={(e) => setRegion(e.target.value)}
-                        value={region}
-                      >
-                        <SelectItem className="max-w-xs font-primaryRegular">
-                          North
-                        </SelectItem>
-                        <SelectItem className="max-w-xs font-primaryRegular">
-                          South
-                        </SelectItem>
-                        <SelectItem className="max-w-xs font-primaryRegular">
-                          West
-                        </SelectItem>
-                        <SelectItem className="max-w-xs font-primaryRegular">
-                          East
-                        </SelectItem>
-                      </Select>
+                      <RadioGroup label="Select region" className="font-primaryRegular">
+                        <Radio value="Northern" onChange={() => setRegion("Northern")}>Northern</Radio>
+                        <Radio value="North Western" onChange={() => setRegion("North Western")}>North Western</Radio>
+                        <Radio value="Western" onChange={() => setRegion("Western")}>Western</Radio>
+                        <Radio value="North Central" onChange={() => setRegion("North Central")}>North Central</Radio>
+                        <Radio value="Central" onChange={() => setRegion("Central")}>Central</Radio>
+                        <Radio value="Sabaragamuwa" onChange={() => setRegion("Sabaragamuwa")}>Sabaragamuwa</Radio>
+                        <Radio value="Eastern" onChange={() => setRegion("Eastern")}>Eastern</Radio>
+                        <Radio value="Uva" onChange={() => setRegion("Uva")}>Uva</Radio>
+                        <Radio value="Southern" onChange={() => setRegion("Southern")}>Southern</Radio>
+                      </RadioGroup>
                       <Input
                         type="text"
                         value={`$${paymentAmount.toFixed(2)}`}

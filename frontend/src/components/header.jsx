@@ -13,7 +13,7 @@ import {
 } from "@nextui-org/react";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { useNavigate,useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 // Utils
 import { getUserIdFromToken } from "../utils/user_id_decoder";
@@ -81,7 +81,7 @@ export default function Header() {
         <NavbarItem>
           <Link
             color={location.pathname === "/" ? "primary" : "foreground"}
-            href="#"
+            href="/Testingpage"
           >
             Gaming Sessions
           </Link>
@@ -115,7 +115,6 @@ export default function Header() {
                 avatarProps={{
                   src: user.profilePic,
                 }}
-                
               />
             </DropdownTrigger>
             <DropdownMenu
@@ -136,6 +135,7 @@ export default function Header() {
               <DropdownItem key="cart" onClick={() => navigate("/cartItems")}>
                 My Cart
               </DropdownItem>
+              {/*Admin Filter*/}
               {user.role === "admin" && (
                 <DropdownItem
                   key="admin-panel"
@@ -144,6 +144,17 @@ export default function Header() {
                   Admin Panel
                 </DropdownItem>
               )}
+
+              {/*Order Manager Filter*/}
+              {user.role === "Order Manager" && (
+                <DropdownItem
+                  key="orders-panel"
+                  onClick={() => navigate("/ordersDashboard")}
+                >
+                  Order Management
+                </DropdownItem>
+              )}
+
               <DropdownItem key="logout" color="danger" onClick={handleLogout}>
                 Log Out
               </DropdownItem>

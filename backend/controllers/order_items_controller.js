@@ -35,7 +35,9 @@ export const getAllOrderItems = async (req, res) => {
     const orderItems = await OrderItems.find()
       .populate("stockid")
       .populate("order");
-    res.status(200).json(orderItems);
+    res.status(200).json({
+      orderHistory:orderItems
+    });
   } catch (error) {
     console.error("Error fetching order items:", error);
     res.status(500).json({ message: "Error fetching order items" });

@@ -22,6 +22,12 @@ const UserSchema = mongoose.Schema({
     profilePic:{
         type:String,
         default:"https://res.cloudinary.com/dhcawltsr/image/upload/v1719572309/user_swzm7h.webp"
+    },
+    workingRegion: {
+        type: String,
+        required: function() {
+            return this.role === 'courier';
+        }
     }
 });
 
