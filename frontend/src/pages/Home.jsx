@@ -31,8 +31,7 @@ const Home = () => {
       <Header />
       <button onClick={notify}>Notify</button>
       <h1>Home </h1>
-      <h1>Dileepa</h1>
-      <h1>Nimsara</h1>
+      <h1>Dileep Dilshan</h1>
       <Footer />
     </div>
   );
