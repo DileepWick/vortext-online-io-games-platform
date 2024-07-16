@@ -1,7 +1,6 @@
-// This line imports the Mongoose library, which helps us interact with MongoDB in Node.js.
 import mongoose from "mongoose";
 
-const UserSchema = mongoose.Schema({
+const UserSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
@@ -11,23 +10,32 @@ const UserSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    role:{
+    role: {
         type: String,
         required: true
     },
-    email:{
+    email: {
         type: String,
-        required:true
+        required: true
     },
-    profilePic:{
-        type:String,
-        default:"https://res.cloudinary.com/dhcawltsr/image/upload/v1719572309/user_swzm7h.webp"
+    profilePic: {
+        type: String,
+        default: "https://res.cloudinary.com/dhcawltsr/image/upload/v1719572309/user_swzm7h.webp"
     },
+    //Courier attributes
     workingRegion: {
         type: String,
         required: function() {
             return this.role === 'courier';
         }
+    },
+    status: {
+        type: String,
+        enum: ['free', 'working', 'not available'],
+        required: function() {
+            return this.role === 'courier';
+        },
+        default: 'free'
     }
 });
 

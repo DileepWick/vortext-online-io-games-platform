@@ -15,11 +15,15 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
 
+// Order Components
+import ApproveOrder from "./approveOrder";
+
+
 const CurrentOrdersTable = () => {
   const [tableData, setTableData] = useState([]);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const rowsPerPage = 2; // Adjusted rowsPerPage for more data per page
+  const rowsPerPage = 5; // Adjusted rowsPerPage for more data per page
 
   // Get All Orders
   const getTableData = async () => {
@@ -44,7 +48,7 @@ const CurrentOrdersTable = () => {
     );
   }, [tableData, searchQuery]);
 
-  //Pagination Next UI
+  // Pagination Next UI
   const items = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
@@ -54,7 +58,7 @@ const CurrentOrdersTable = () => {
   // Handle Search change
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
-    setPage(); // Reset page to 1 when search query changes
+    setPage(1); // Reset page to 1 when search query changes
   };
 
   // Clear Search
@@ -109,7 +113,7 @@ const CurrentOrdersTable = () => {
 
         <TableBody>
           {items.map((order) => (
-            <TableRow key={order.id}>
+            <TableRow key={order._id}>
               <TableCell>{order._id}</TableCell>
               <TableCell>{order.shippingAddress}</TableCell>
               <TableCell>
@@ -118,13 +122,40 @@ const CurrentOrdersTable = () => {
                 </Chip>
               </TableCell>
               <TableCell>{order.paymentAmount}$</TableCell>
-              <TableCell>{order.orderCompletionCode}</TableCell>
-              <TableCell>{order.orderPlacementDate}</TableCell>
-              <TableCell>{order.courier ? order.courier.username : "Not assigned"}</TableCell>
-              <TableCell>{order.orderStatus}</TableCell>
+              <TableCell><Chip color="warning" variant="bordered">{order.orderCompletionCode}</Chip></TableCell>
+              <TableCell>{new Date(order.orderPlacementDate).toLocaleDateString()}</TableCell>
+              <TableCell>
+                {order.courier ? order.courier.username : <Chip color="danger" variant="flat">N/A</Chip>}
+              </TableCell>
+              <TableCell>
+                {order.orderStatus === "Approved" ? (
+                  <Chip color="success" variant="dot">
+                    {order.orderStatus}
+                  </Chip>
+                ) : order.orderStatus === "Pending" ? (
+                  <Chip color="warning" variant="dot">
+                    {order.orderStatus}
+                  </Chip>
+                ) : (
+                  <Chip color="default" variant="dot">
+                    {order.orderStatus}
+                  </Chip>
+                )}
+              </TableCell>
               <TableCell>
                 <div style={{ display: "flex", gap: "10px" }}>
-                  <Button>OP1</Button>
+                  {order.orderStatus === "Approved" ? (
+                    <div>
+                      <Button isDisabled size="sm">Approve</Button>
+                    </div>
+                  ) : (
+                    <ApproveOrder
+                      approvingOrder={order}
+                      callBackFunction={getTableData}
+                    />
+                  )}
+                  <Button color="secondary" size="sm">Assign</Button>
+                  <Button color="danger" size="sm">Cancel</Button>
                 </div>
               </TableCell>
             </TableRow>

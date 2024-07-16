@@ -39,15 +39,15 @@ const orderSchema = new Schema({
   },
   orderStatus: {
     type: String,
-    enum: ["Pending", "Processing", "Shipped", "Delivered","Cancel"],
+    enum: ["Pending", "Approved", "On Delivery", "Delivered", "Cancel"],
     default: "Pending",
     required: true,
-    
-  },courier:{
-    type:mongoose.Schema.Types.ObjectId,
+  },
+  courier: {
+    type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     default: null,
-  }
+  },
 });
 
 export const Order = mongoose.model("Order", orderSchema);

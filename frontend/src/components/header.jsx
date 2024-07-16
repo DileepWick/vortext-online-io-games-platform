@@ -25,6 +25,7 @@ export default function Header() {
   const userId = getUserIdFromToken(token);
   const navigate = useNavigate();
   const location = useLocation();
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -48,15 +49,15 @@ export default function Header() {
   };
 
   return (
-    <Navbar className="font-primaryRegular" shouldHideOnScroll>
+    <Navbar className="font-primaryRegular bg-black text-white" shouldHideOnScroll>
       <NavbarBrand>
-        <p className="font-bold text-inherit">GameStore</p>
+        <p className="font-bold text-inherit">GAME STORE</p>
       </NavbarBrand>
 
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         <NavbarItem>
           <Link
-            color={location.pathname === "/" ? "primary" : "foreground"}
+            color={location.pathname === "/" ? "primary" : "white"}
             href="/"
           >
             Home
@@ -64,7 +65,7 @@ export default function Header() {
         </NavbarItem>
         <NavbarItem>
           <Link
-            color={location.pathname === "/shop" ? "primary" : "foreground"}
+            color={location.pathname === "/shop" ? "primary" : "white"}
             href="/shop"
           >
             Shop
@@ -72,7 +73,7 @@ export default function Header() {
         </NavbarItem>
         <NavbarItem>
           <Link
-            color={location.pathname === "/articles" ? "primary" : "foreground"}
+            color={location.pathname === "/articles" ? "primary" : "white"}
             href="/articles"
           >
             Articles
@@ -80,7 +81,7 @@ export default function Header() {
         </NavbarItem>
         <NavbarItem>
           <Link
-            color={location.pathname === "/" ? "primary" : "foreground"}
+            color={location.pathname === "/Testingpage" ? "primary" : "white"}
             href="/Testingpage"
           >
             Gaming Sessions
@@ -88,7 +89,7 @@ export default function Header() {
         </NavbarItem>
         <NavbarItem>
           <Link
-            color={location.pathname === "/" ? "primary" : "foreground"}
+            color={location.pathname === "/reviews" ? "primary" : "white"}
             href="#"
           >
             Reviews
@@ -96,7 +97,7 @@ export default function Header() {
         </NavbarItem>
         <NavbarItem>
           <Link
-            color={location.pathname === "/contact" ? "primary" : "foreground"}
+            color={location.pathname === "/contact" ? "primary" : "white"}
             href="/contact"
           >
             Contact
@@ -109,7 +110,7 @@ export default function Header() {
           <Dropdown placement="bottom-end">
             <DropdownTrigger>
               <User
-                className="cursor-pointer text-black"
+                className="cursor-pointer"
                 name={user.username}
                 description={user.role}
                 avatarProps={{
@@ -135,7 +136,7 @@ export default function Header() {
               <DropdownItem key="cart" onClick={() => navigate("/cartItems")}>
                 My Cart
               </DropdownItem>
-              {/*Admin Filter*/}
+              {/* Admin Filter */}
               {user.role === "admin" && (
                 <DropdownItem
                   key="admin-panel"
@@ -145,7 +146,7 @@ export default function Header() {
                 </DropdownItem>
               )}
 
-              {/*Order Manager Filter*/}
+              {/* Order Manager Filter */}
               {user.role === "Order Manager" && (
                 <DropdownItem
                   key="orders-panel"
@@ -161,7 +162,7 @@ export default function Header() {
             </DropdownMenu>
           </Dropdown>
         ) : (
-          <Link href="/login">Login</Link>
+          <Link className="text-white" href="/login">Login</Link>
         )}
       </NavbarContent>
     </Navbar>

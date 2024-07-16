@@ -31,8 +31,7 @@ export const createOrder = async (req, res) => {
     }
     await CartItems.deleteMany({ cartid: cart._id });
 
-    return res.json(savedOrder); 
-
+    return res.json(savedOrder);
   } catch (error) {
     res.status(500).json({ message: "Error creating order", error });
   }
@@ -42,11 +41,10 @@ export const createOrder = async (req, res) => {
 export const getAllOrders = async (req, res) => {
   try {
     // Populate 'user' and 'item' fields based on their references
-    const orders = await Order.find({})
-      .populate("user", "_id username");
+    const orders = await Order.find({}).populate("user", "_id username");
 
     res.status(200).json({
-      allOrders:orders
+      allOrders: orders,
     });
   } catch (error) {
     console.error("Error fetching orders:", error);
@@ -59,7 +57,7 @@ export const getOrdersByUserId = async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const orders = await Order.find({ user: userId }).populate('user');
+    const orders = await Order.find({ user: userId }).populate("user");
     res.status(200).json(orders);
   } catch (error) {
     res.status(500).json({ message: "Error fetching orders", error });
@@ -109,5 +107,25 @@ export const deleteOrder = async (req, res) => {
     res.status(200).json({ message: "Order deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error deleting order", error });
+  }
+};
+
+//Approve order
+export const approveOrder = async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    const approveOrder = await Order.updateOne(
+      { _id: orderId },
+      { $set: { orderStatus: "Approved" } }
+    );
+
+    if (approveOrder.modifiedCount === 0) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    res.status(200).json({ message: "Order Approved" });
+  } catch (error) {
+    res.status(500).json({ message: "Error approving order.", error });
   }
 };
