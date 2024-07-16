@@ -30,8 +30,8 @@ const Home = () => {
     <div className="font-primaryRegular">
       <Header />
       <button onClick={notify}>Notify</button>
-      <SayMyName providedName={propFunction}/>
       <h1>Home </h1>
+      <h1>Dileepa</h1>
       <Footer />
     </div>
   );
