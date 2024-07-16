@@ -32,6 +32,8 @@ const Home = () => {
       <button onClick={notify}>Notify</button>
       <h1>Home </h1>
       <h1>Dileep Dilshan</h1>
+      <h1>Dulshan</h1>
+
       <Footer />
     </div>
   );
