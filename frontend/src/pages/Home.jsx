@@ -31,8 +31,12 @@ const Home = () => {
       <Header />
       <button onClick={notify}>Notify</button>
       <h1>Home </h1>
+      <h1>Dasun Dushmantha</h1>
       <h1>Dileep Dilshan</h1>
       <h1>Dulshan</h1>
+      <h1>NimsaraThhenuka</h1>
+      <h1>Bandara Ranasinghe</h1>
+
 
       <Footer />
     </div>
