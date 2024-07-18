@@ -6,7 +6,7 @@ import useAuthCheck from "../utils/authCheck";
 import Header from "../components/header";
 import Footer from "../components/footer";
 
-//Next Ui
+// Next UI
 import { Chip } from "@nextui-org/chip";
 import { Button, ButtonGroup } from "@nextui-org/button";
 import {
@@ -18,9 +18,9 @@ import {
   TableCell,
 } from "@nextui-org/table";
 
-//Toast
-import { toast ,Flip} from 'react-toastify';
-
+// Toast
+import { toast, Flip } from "react-toastify";
+import CancelOrder from "../../dashboards/Orders_Components/CancelOrder";
 
 const OrderHistory = ({ userId }) => {
   // Authenticate user
@@ -48,18 +48,6 @@ const OrderHistory = ({ userId }) => {
 
     fetchOrderItems();
   }, [userId]);
-
-  const cancelOrder = async (orderId) => {
-    try {
-      await axios.delete(`http://localhost:8098/orders/${orderId}`);
-      setOrderItems(orderItems.filter((item) => item.order._id !== orderId));
-      toast.success("Order Deleted ",{
-        style: { fontFamily: 'Rubik' }
-      })
-    } catch (error) {
-      setError("Error canceling order");
-    }
-  };
 
   const groupOrderItemsByOrderId = (items) => {
     return items.reduce((acc, item) => {
@@ -93,7 +81,7 @@ const OrderHistory = ({ userId }) => {
   const groupedOrderItems = groupOrderItemsByOrderId(orderItems);
 
   return (
-    <div className=" text-white min-h-screen font-sans font-primaryRegular">
+    <div className="text-white min-h-screen font-sans font-primaryRegular">
       <Header />
       <div className="container mx-auto p-6 font-primaryRegular">
         <h2 className="text-3xl font-bold mb-8 text-black">Order History</h2>
@@ -105,9 +93,7 @@ const OrderHistory = ({ userId }) => {
               key={orderId}
               className="mb-8 p-6 bg-black border border-gray-700 rounded-lg shadow-lg transition duration-300 hover:shadow-xl"
             >
-              <h3 className="text-xl font-semibold mb-2">
-                Order ID: {orderId}
-              </h3>
+              <h3 className="text-xl font-semibold mb-2">Order ID: {orderId}</h3>
               {groupedOrderItems[orderId].length > 0 && (
                 <div className="mb-4 space-y-2">
                   <p>
@@ -147,12 +133,26 @@ const OrderHistory = ({ userId }) => {
                 >
                   Show Product Info
                 </Button>
-                <Button
-                  onClick={() => cancelOrder(orderId)}
-                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300"
-                >
-                  Cancel Order
-                </Button>
+                <CancelOrder
+                  orderForCancellation={groupedOrderItems[orderId][0].order}
+                  callBackFunction={() => {
+                    // Fetch order items again to reflect cancellation
+                    const fetchOrderItems = async () => {
+                      try {
+                        const token = getToken();
+                        const userId = getUserIdFromToken(token);
+                        const response = await axios.get(
+                          `http://localhost:8098/orderItems/useOrders/${userId}`
+                        );
+                        setOrderItems(response.data);
+                        setLoading(false);
+                      } catch (err) {
+                        setLoading(false);
+                      }
+                    };
+                    fetchOrderItems();
+                  }}
+                />
               </div>
             </div>
           ))
@@ -178,14 +178,14 @@ const OrderHistory = ({ userId }) => {
                 <TableColumn>COST</TableColumn>
               </TableHeader>
               <TableBody>
-              {selectedOrderItems.map((item) => (
-                <TableRow key={item._id}>
-                  <TableCell>{item.stockid.AssignedGame.title}</TableCell>
-                  <TableCell>{item.stockid.Edition}</TableCell>
-                  <TableCell>{item.quantity}</TableCell>
-                  <TableCell>${item.price.toFixed(2)}</TableCell>
-                </TableRow>
-                 ))}
+                {selectedOrderItems.map((item) => (
+                  <TableRow key={item._id}>
+                    <TableCell>{item.stockid.AssignedGame.title}</TableCell>
+                    <TableCell>{item.stockid.Edition}</TableCell>
+                    <TableCell>{item.quantity}</TableCell>
+                    <TableCell>${item.price.toFixed(2)}</TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </div>

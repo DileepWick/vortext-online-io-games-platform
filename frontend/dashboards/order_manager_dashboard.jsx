@@ -25,8 +25,9 @@ const OrderManager = () => {
           color="primary"
         >
           <Tab key="analytics" title="Order Analytics" />
-          <Tab key="orders" title="Current Orders" />
-          <Tab key="history" title="Order History" />
+          <Tab key="CurrentOrders" title="Current Orders" />
+          <Tab key="CompletedOrders" title="Completed Orders" />
+          <Tab key="CancelledOrders" title="Cancelled Orders" />
         </Tabs>
       </div>
       <div className="p-4">
@@ -35,8 +36,9 @@ const OrderManager = () => {
             <h1>Orders stats</h1>
           </>
         )}
-        {activeTab === "orders" && <div><CurrentOrdersTable/></div>}
-        {activeTab === "history" && <div>History</div>}
+        {activeTab === "CurrentOrders" && <div><CurrentOrdersTable/></div>}
+        {activeTab === "CompletedOrders" && <div>Completed Orders</div>}
+        {activeTab === "CancelledOrders" && <div>Cancelled Orders</div>}
       </div>
     </div>
   );

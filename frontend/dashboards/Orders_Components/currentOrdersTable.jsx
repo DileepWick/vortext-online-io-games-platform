@@ -17,6 +17,7 @@ import { SearchIcon } from "../../src/assets/icons/SearchIcon";
 
 // Order Components
 import ApproveOrder from "./approveOrder";
+import CancelOrder from "./CancelOrder";
 
 
 const CurrentOrdersTable = () => {
@@ -155,7 +156,7 @@ const CurrentOrdersTable = () => {
                     />
                   )}
                   <Button color="secondary" size="sm">Assign</Button>
-                  <Button color="danger" size="sm">Cancel</Button>
+                  <CancelOrder orderForCancellation ={order} callBackFunction={getTableData}/>
                 </div>
               </TableCell>
             </TableRow>

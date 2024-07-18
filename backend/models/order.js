@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 import { customAlphabet } from "nanoid";
 
 // Custom alphabet for generating a unique 4-length code (letters and numbers)
-const alphabet =
-  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+const alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 const nanoid = customAlphabet(alphabet, 4);
 
 const { Schema } = mongoose;
@@ -39,9 +38,15 @@ const orderSchema = new Schema({
   },
   orderStatus: {
     type: String,
-    enum: ["Pending", "Approved", "On Delivery", "Delivered", "Cancel"],
+    enum: ["Pending", "Approved", "On Delivery", "Delivered", "Canceled"],
     default: "Pending",
     required: true,
+  },
+  cancellationReason: {
+    type: String,
+    required: function () {
+      return this.orderStatus === "Canceled";
+    },
   },
   courier: {
     type: mongoose.Schema.Types.ObjectId,
@@ -49,5 +54,6 @@ const orderSchema = new Schema({
     default: null,
   },
 });
+
 
 export const Order = mongoose.model("Order", orderSchema);

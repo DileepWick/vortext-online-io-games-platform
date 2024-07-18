@@ -49,7 +49,10 @@ export default function Header() {
   };
 
   return (
-    <Navbar className="font-primaryRegular bg-black text-white" shouldHideOnScroll>
+    <Navbar
+      className="font-primaryRegular bg-black text-white"
+      shouldHideOnScroll
+    >
       <NavbarBrand>
         <p className="font-bold text-inherit">GAME STORE</p>
       </NavbarBrand>
@@ -136,11 +139,12 @@ export default function Header() {
               <DropdownItem key="cart" onClick={() => navigate("/cartItems")}>
                 My Cart
               </DropdownItem>
+
               {/* Admin Filter */}
               {user.role === "admin" && (
                 <DropdownItem
                   key="admin-panel"
-                  onClick={() => navigate("/bloggerDashboard")}
+                  onClick={() => navigate("/productDashboard")}
                 >
                   Admin Panel
                 </DropdownItem>
@@ -156,13 +160,25 @@ export default function Header() {
                 </DropdownItem>
               )}
 
+              {/* Order Manager Filter */}
+              {user.role === "Blogger" && (
+                <DropdownItem
+                  key="orders-panel"
+                  onClick={() => navigate("/bloggerDashboard")}
+                >
+                  Blogger Dashboard
+                </DropdownItem>
+              )}
+
               <DropdownItem key="logout" color="danger" onClick={handleLogout}>
                 Log Out
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
         ) : (
-          <Link className="text-white" href="/login">Login</Link>
+          <Link className="text-white" href="/login">
+            Login
+          </Link>
         )}
       </NavbarContent>
     </Navbar>

@@ -2,6 +2,8 @@ import { Order } from "../models/order.js";
 import { Cart } from "../models/cart.js";
 import { customAlphabet } from "nanoid";
 import { CartItems } from "../models/cartItems.js";
+import { OrderItems } from "../models/orderItems.js";
+import { GameStock } from "../models/gameStock.js";
 
 // Custom alphabet for generating a unique 4-length code (letters and numbers)
 const alphabet =
@@ -127,5 +129,37 @@ export const approveOrder = async (req, res) => {
     res.status(200).json({ message: "Order Approved" });
   } catch (error) {
     res.status(500).json({ message: "Error approving order.", error });
+  }
+};
+
+
+//Cancel order
+export const cancelOrder = async (req, res) => {
+  const { orderId } = req.params;
+  const { reason } = req.body;
+
+  try {
+    const approveOrder = await Order.updateOne(
+      { _id: orderId },
+      { $set: { orderStatus: "Canceled" , cancellationReason:reason}}
+    );
+
+    if (approveOrder.modifiedCount === 0) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // Find all order items for this order
+    const orderItems = await OrderItems.find({ order: orderId });
+
+    // Update stock for each order item
+    for (const item of orderItems) {
+      await GameStock.findByIdAndUpdate(item.stockid, {
+        $inc: { NumberOfUnits: item.quantity }
+      });
+    }
+
+    res.status(200).json({ message: "Order Canceled Successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error canceling order.", error });
   }
 };

@@ -18,6 +18,7 @@ import Contact from "./pages/Contact"
 //Dashboards
 import ProductManagerDashboard from "../dashboards/product_manager_dashboard";
 import OrderManagerDashboard from "../dashboards/order_manager_dashboard"
+import BloggerDashboard from "../dashboards/blogger_dashboard";
 
 const App = () => {
   return (
@@ -33,8 +34,9 @@ const App = () => {
       <Route path="/cartItems" element={<CartPage/>} />
       <Route path="/myorders" element={<OrderHistory/>}/>
       <Route path="/articles" element={<ArticleList/>} />
-      <Route path="/bloggerDashboard" element={<ProductManagerDashboard/>}/>
+      <Route path="/productDashboard" element={<ProductManagerDashboard/>}/>
       <Route path="/ordersDashboard" element={<OrderManagerDashboard/>}/>
+      <Route path="/bloggerDashboard" element={<BloggerDashboard/>}/>
       <Route path="/contact" element={<Contact/>}/>
     </Routes>
   );
