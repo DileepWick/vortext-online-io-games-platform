@@ -36,6 +36,7 @@ const Home = () => {
       <h1>Dulshan</h1>
       <h1>NimsaraThhenuka</h1>
       <h1>Bandara Ranasinghe</h1>
+      <h1>Tharindu Ariyawansha</h1>
 
 
       <Footer />
