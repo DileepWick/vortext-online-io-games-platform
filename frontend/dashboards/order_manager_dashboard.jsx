@@ -6,6 +6,8 @@ import Header from "../src/components/header";
 //Orders components
 import CurrentOrdersTable from "./Orders_Components/currentOrdersTable";
 import CanceledOrdersTable from "./Orders_Components/canceledOrderTable";
+import OnDeliveryOrdersTable from "./Orders_Components/onDeliverOrdersTable";
+import ApprovedOrdersTable from "./Orders_Components/ApprovedOrders";
 
 // Next UI
 import { Tabs, Tab } from "@nextui-org/react";
@@ -28,9 +30,11 @@ const OrderManager = () => {
           color="primary"
         >
           <Tab key="analytics" title="Order Analytics" />
-          <Tab key="CurrentOrders" title="Current Orders" />
-          <Tab key="CompletedOrders" title="Completed Orders" />
-          <Tab key="CancelledOrders" title="Cancelled Orders" />
+          <Tab key="CurrentOrders" title="Pending" />
+          <Tab key="ApprovedOrders" title="Approved" />
+          <Tab key="OnDelivery" title="On Delivery" />
+          <Tab key="CompletedOrders" title="Completed" />
+          <Tab key="CancelledOrders" title="Cancelled" />
         </Tabs>
       </div>
       <div className="p-4">
@@ -40,8 +44,11 @@ const OrderManager = () => {
           </>
         )}
         {activeTab === "CurrentOrders" && <div><CurrentOrdersTable/></div>}
+        {activeTab === "ApprovedOrders" && <div><ApprovedOrdersTable/></div>}
+        {activeTab === "OnDelivery" && <div><OnDeliveryOrdersTable/></div>}
         {activeTab === "CompletedOrders" && <div>Completed Orders</div>}
         {activeTab === "CancelledOrders" && <div><CanceledOrdersTable/></div>}
+        {activeTab === "analytics" && <div>Order Analytics</div>}
       </div>
     </div>
   );

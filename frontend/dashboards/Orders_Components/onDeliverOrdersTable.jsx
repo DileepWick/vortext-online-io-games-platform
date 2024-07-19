@@ -13,17 +13,15 @@ import {
   Input,
   Button,
   User,
+  Tooltip,
 } from "@nextui-org/react";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
 import { EyeIcon } from "../../src/assets/icons/EyeIcon";
 
-
 // Order Components
-import ApproveOrder from "./approveOrder";
 import CancelOrder from "./CancelOrder";
-import AssignCourier from "./assignCourier";
 
-const CurrentOrdersTable = () => {
+const OnDeliveryOrdersTable = () => {
   const [tableData, setTableData] = useState([]);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
@@ -32,7 +30,9 @@ const CurrentOrdersTable = () => {
   // Get All Orders
   const getTableData = async () => {
     try {
-      const response = await axios.get("http://localhost:8098/orders/all");
+      const response = await axios.get(
+        "http://localhost:8098/orders//onDeliveryOrders"
+      );
       if (response.data.allOrders) {
         setTableData(response.data.allOrders);
       }
@@ -109,6 +109,7 @@ const CurrentOrdersTable = () => {
           <TableColumn key="AMOUNT">AMOUNT</TableColumn>
           <TableColumn key="TOKEN">TOKEN</TableColumn>
           <TableColumn key="DATE">PLACEMENT DATE</TableColumn>
+          <TableColumn key="COURIER">COURIER</TableColumn>
           <TableColumn key="STATUS">STATUS</TableColumn>
           <TableColumn key="ADDRESS">ADDRESS</TableColumn>
           <TableColumn key="ACTIONS">ACTIONS</TableColumn>
@@ -132,19 +133,27 @@ const CurrentOrdersTable = () => {
                 {new Date(order.orderPlacementDate).toLocaleDateString()}
               </TableCell>
               <TableCell>
-                {order.orderStatus === "Approved" ? (
-                  <Chip color="success" variant="dot">
-                    {order.orderStatus}
-                  </Chip>
-                ) : order.orderStatus === "Pending" ? (
-                  <Chip color="warning" variant="dot">
-                    {order.orderStatus}
-                  </Chip>
+                {order.courier ? (
+                  <div>
+                    <User
+                      name={order.courier.username}
+                      description={order.courier.email}
+                      avatarProps={{
+                        src: order.courier.profilePic,
+                      }}
+                    />
+                  </div>
                 ) : (
-                  <Chip color="primary" variant="dot">
-                    {order.orderStatus}
+                  <Chip color="danger" variant="flat">
+                    N/A
                   </Chip>
                 )}
+              </TableCell>
+
+              <TableCell>
+                <Chip color="primary" variant="dot">
+                  {order.orderStatus}
+                </Chip>
               </TableCell>
               <TableCell>
                 <Button size="sm" variant="bordered" color="default">
@@ -153,17 +162,10 @@ const CurrentOrdersTable = () => {
                 </Button>
               </TableCell>
               <TableCell>
-                <div style={{ display: "flex", gap: "10px" }}>
-                  <ApproveOrder
-                    approvingOrder={order}
-                    callBackFunction={getTableData}
-                  />
-
-                  <CancelOrder
-                    orderForCancellation={order}
-                    callBackFunction={getTableData}
-                  />
-                </div>
+                <CancelOrder
+                  orderForCancellation={order}
+                  callBackFunction={getTableData}
+                />
               </TableCell>
             </TableRow>
           ))}
@@ -173,4 +175,4 @@ const CurrentOrdersTable = () => {
   );
 };
 
-export default CurrentOrdersTable;
+export default OnDeliveryOrdersTable;

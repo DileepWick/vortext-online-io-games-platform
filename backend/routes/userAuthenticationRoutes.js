@@ -14,13 +14,11 @@ const userRouter = express.Router();
 //User Registration
 userRouter.post("/register", async (request, response) => {
   try {
-    const { username, password, role, email } = request.body;
+    const { username, password, role, email, workingRegion } = request.body;
 
     // Validate input
     if (!username || !password || !role || !email) {
-      return response
-        .status(400)
-        .json({ message: "All the fields are  required" });
+      return response.status(400).json({ message: "All fields are required" });
     }
 
     // Check if the user already exists
@@ -29,7 +27,7 @@ userRouter.post("/register", async (request, response) => {
       return response.status(400).json({ message: "Username already exists" });
     }
 
-    //Check if the email already exist
+    // Check if the email already exists
     const existingEmail = await User.findOne({ email });
     if (existingEmail) {
       return response.status(400).json({ message: "Email already exists" });
@@ -38,29 +36,32 @@ userRouter.post("/register", async (request, response) => {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create a new user
-    const newUser = await User.create({
+    // Prepare new user object
+    const newUser = {
       username,
       password: hashedPassword,
       role,
       email,
-    });
-
-    //Get new user id
-    const userId = newUser._id;
-
-    //Creat cart object using values
-    const newCart = {
-      owner: userId,
     };
 
-    //Create cart for user
+    // Add courier-specific fields if the role is 'courier'
+    if (role === 'Courier') {
+      if (!workingRegion) {
+        return response.status(400).json({ message: "Working region is required for couriers" });
+      }
+      newUser.workingRegion = workingRegion;
+      newUser.status = 'Free'; // Set default status for couriers
+    }
+
+    // Create a new user
+    const createdUser = await User.create(newUser);
+
+    // Create a cart for the user (if applicable, assuming all users need a cart)
+    const newCart = { owner: createdUser._id };
     const cartCreation = await Cart.create(newCart);
 
-    if (newUser && cartCreation) {
-      return response
-        .status(201)
-        .json({ message: "User created successfully with the cart." });
+    if (createdUser && cartCreation) {
+      return response.status(201).json({ message: "User created successfully with a cart." });
     } else {
       return response.status(500).json({ message: "Failed to create account" });
     }
@@ -227,5 +228,32 @@ userRouter.put(
     }
   }
 );
+
+// Get all couriers filtered by working region
+userRouter.get("/couriers/:workingRegion", async (request, response) => {
+  try {
+    const { workingRegion } = request.params; // Get workingRegion from query params
+
+    if (!workingRegion) {
+      return response.status(400).json({ message: "Working region is required" });
+    }
+
+    // Find couriers by role and working region
+    const couriers = await User.find({ 
+      role: "Courier", 
+      workingRegion: workingRegion,
+      status: "Free" 
+    });
+
+    return response.status(200).json({
+      total_couriers: couriers.length,
+      couriers: couriers,
+    });
+  } catch (error) {
+    console.log("Error fetching couriers:", error.message);
+    return response.status(500).json({ message: "Server error" });
+  }
+});
+
 
 export default userRouter;

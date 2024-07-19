@@ -11,15 +11,16 @@ import {
   Pagination,
   Chip,
   Input,
-  Textarea,
+  Button,
 } from "@nextui-org/react";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
+import { EyeIcon } from "../../src/assets/icons/EyeIcon";
 
 const CanceledOrdersTable = () => {
   const [tableData, setTableData] = useState([]);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const rowsPerPage = 3; // Adjusted rowsPerPage for more data per page
+  const rowsPerPage = 7; // Adjusted rowsPerPage for more data per page
 
   // Get All Orders
   const getTableData = async () => {
@@ -99,11 +100,13 @@ const CanceledOrdersTable = () => {
       >
         <TableHeader>
           <TableColumn key="REF">REF NO</TableColumn>
-          <TableColumn key="ADDRESS">ADDRESS</TableColumn>
+
           <TableColumn key="REGION">REGION</TableColumn>
           <TableColumn key="AMOUNT">AMOUNT</TableColumn>
           <TableColumn key="TOKEN">TOKEN</TableColumn>
           <TableColumn key="DATE">PLACEMENT DATE</TableColumn>
+          <TableColumn key="STATUS">STATUS</TableColumn>
+          <TableColumn key="ADDRESS">ADDRESS</TableColumn>
           <TableColumn key="REASON">REASON</TableColumn>
         </TableHeader>
 
@@ -111,7 +114,7 @@ const CanceledOrdersTable = () => {
           {items.map((order) => (
             <TableRow key={order._id}>
               <TableCell>{order._id}</TableCell>
-              <TableCell>{order.shippingAddress}</TableCell>
+
               <TableCell>
                 <Chip color="default" variant="flat">
                   {order.region}
@@ -127,13 +130,21 @@ const CanceledOrdersTable = () => {
                 {new Date(order.orderPlacementDate).toLocaleDateString()}
               </TableCell>
               <TableCell>
-                <Textarea
-                  isReadOnly
-                  variant="bordered"
-                  labelPlacement="outside"
-                  defaultValue={order.cancellationReason}
-                  className="max-w-xs"
-                />
+                <Chip color="danger" variant="dot">
+                  {order.orderStatus}
+                </Chip>
+              </TableCell>
+              <TableCell>
+                <Button size="sm" variant="ghost" color="default">
+                  VIEW
+                  <EyeIcon />
+                </Button>
+              </TableCell>
+              <TableCell>
+                <Button size="sm" variant="bordered" color="default">
+                  VIEW
+                  <EyeIcon />
+                </Button>
               </TableCell>
             </TableRow>
           ))}

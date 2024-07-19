@@ -4,6 +4,7 @@ import { customAlphabet } from "nanoid";
 import { CartItems } from "../models/cartItems.js";
 import { OrderItems } from "../models/orderItems.js";
 import { GameStock } from "../models/gameStock.js";
+import {User} from "../models/user.js";
 
 // Custom alphabet for generating a unique 4-length code (letters and numbers)
 const alphabet =
@@ -39,14 +40,47 @@ export const createOrder = async (req, res) => {
   }
 };
 
-// Get All Orders (pending and approved )
+// Get All Orders (pending)
 export const getAllOrders = async (req, res) => {
   try {
-
     // Populate 'user' and 'item' fields based on their references
-    const orders = await Order.find({ 
-      orderStatus: { $in: ["Pending", "Approved"] } 
-    }).populate("user", "_id username");
+    const orders = await Order.find({
+      orderStatus: { $in: ["Pending"] },
+    }).populate("courier");
+
+    res.status(200).json({
+      allOrders: orders,
+    });
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    res.status(500).json({ message: "Error fetching orders" });
+  }
+};
+
+// Get All Orders (approved)
+export const getAllOrdersApproved = async (req, res) => {
+  try {
+    // Populate 'user' and 'item' fields based on their references
+    const orders = await Order.find({
+      orderStatus: { $in: ["Approved"] },
+    }).populate("courier");
+
+    res.status(200).json({
+      allOrders: orders,
+    });
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    res.status(500).json({ message: "Error fetching orders" });
+  }
+};
+
+//Get on delivery orders
+export const getAllOrdersOnDelivery = async (req, res) => {
+  try {
+    // Populate 'user' and 'item' fields based on their references
+    const orders = await Order.find({
+      orderStatus: { $in: ["On Delivery"] },
+    }).populate("courier");
 
     res.status(200).json({
       allOrders: orders,
@@ -60,10 +94,9 @@ export const getAllOrders = async (req, res) => {
 // Get Cancelled orders
 export const getAllCancelledOrdes = async (req, res) => {
   try {
-
     // Populate 'user' and 'item' fields based on their references
-    const orders = await Order.find({ 
-      orderStatus: { $in: ["Canceled"] } 
+    const orders = await Order.find({
+      orderStatus: { $in: ["Canceled"] },
     }).populate("user", "_id username");
 
     res.status(200).json({
@@ -153,7 +186,6 @@ export const approveOrder = async (req, res) => {
   }
 };
 
-
 //Cancel order
 export const cancelOrder = async (req, res) => {
   const { orderId } = req.params;
@@ -162,7 +194,7 @@ export const cancelOrder = async (req, res) => {
   try {
     const approveOrder = await Order.updateOne(
       { _id: orderId },
-      { $set: { orderStatus: "Canceled" , cancellationReason:reason}}
+      { $set: { orderStatus: "Canceled", cancellationReason: reason } }
     );
 
     if (approveOrder.modifiedCount === 0) {
@@ -175,12 +207,54 @@ export const cancelOrder = async (req, res) => {
     // Update stock for each order item
     for (const item of orderItems) {
       await GameStock.findByIdAndUpdate(item.stockid, {
-        $inc: { NumberOfUnits: item.quantity }
+        $inc: { NumberOfUnits: item.quantity },
       });
     }
 
     res.status(200).json({ message: "Order Canceled Successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error canceling order.", error });
+  }
+};
+
+//Assign courier
+export const assignCourierToOrder = async (req, res) => {
+  const { orderId } = req.params;
+  const { courierId } = req.body;
+
+  try {
+    // Validate the input
+    if (!orderId || !courierId) {
+      return res
+        .status(400)
+        .json({ message: "Order ID and Courier ID are required" });
+    }
+
+    // Find the order by ID
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // Find the courier by ID
+    const courier = await User.findById(courierId);
+    if (!courier || courier.role !== "Courier" || courier.status !== "Free") {
+      return res
+        .status(400)
+        .json({ message: "Invalid or unavailable courier" });
+    }
+
+    // Update the order with the courier information and change order status to 'On Delivery'
+    order.courier = courierId;
+    order.orderStatus = "On Delivery";
+
+    // Save the updated order
+    await order.save();
+
+
+    res.status(200).json({ message: "Courier assigned successfully"});
+  } catch (error) {
+    console.error("Error assigning courier:", error);
+    res.status(500).json({ message: "Server error", error });
   }
 };

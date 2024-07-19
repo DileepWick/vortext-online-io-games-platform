@@ -15,15 +15,13 @@ import {
   User,
 } from "@nextui-org/react";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
-import { EyeIcon } from "../../src/assets/icons/EyeIcon";
-
 
 // Order Components
 import ApproveOrder from "./approveOrder";
 import CancelOrder from "./CancelOrder";
 import AssignCourier from "./assignCourier";
 
-const CurrentOrdersTable = () => {
+const ApprovedOrdersTable = () => {
   const [tableData, setTableData] = useState([]);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
@@ -32,7 +30,9 @@ const CurrentOrdersTable = () => {
   // Get All Orders
   const getTableData = async () => {
     try {
-      const response = await axios.get("http://localhost:8098/orders/all");
+      const response = await axios.get(
+        "http://localhost:8098/orders/approvedOrders"
+      );
       if (response.data.allOrders) {
         setTableData(response.data.allOrders);
       }
@@ -105,18 +105,19 @@ const CurrentOrdersTable = () => {
       >
         <TableHeader>
           <TableColumn key="REF">REF NO</TableColumn>
+          <TableColumn key="ADDRESS">ADDRESS</TableColumn>
           <TableColumn key="REGION">REGION</TableColumn>
           <TableColumn key="AMOUNT">AMOUNT</TableColumn>
           <TableColumn key="TOKEN">TOKEN</TableColumn>
           <TableColumn key="DATE">PLACEMENT DATE</TableColumn>
           <TableColumn key="STATUS">STATUS</TableColumn>
-          <TableColumn key="ADDRESS">ADDRESS</TableColumn>
           <TableColumn key="ACTIONS">ACTIONS</TableColumn>
         </TableHeader>
         <TableBody>
           {items.map((order) => (
             <TableRow key={order._id}>
               <TableCell>{order._id}</TableCell>
+              <TableCell>{order.shippingAddress}</TableCell>
               <TableCell>
                 <Chip color="default" variant="flat">
                   {order.region}
@@ -131,34 +132,19 @@ const CurrentOrdersTable = () => {
               <TableCell>
                 {new Date(order.orderPlacementDate).toLocaleDateString()}
               </TableCell>
+
               <TableCell>
-                {order.orderStatus === "Approved" ? (
-                  <Chip color="success" variant="dot">
-                    {order.orderStatus}
-                  </Chip>
-                ) : order.orderStatus === "Pending" ? (
-                  <Chip color="warning" variant="dot">
-                    {order.orderStatus}
-                  </Chip>
-                ) : (
-                  <Chip color="primary" variant="dot">
-                    {order.orderStatus}
-                  </Chip>
-                )}
-              </TableCell>
-              <TableCell>
-                <Button size="sm" variant="bordered" color="default">
-                  VIEW
-                  <EyeIcon />
-                </Button>
+                <Chip color="primary" variant="dot">
+                  {order.orderStatus}
+                </Chip>
               </TableCell>
               <TableCell>
                 <div style={{ display: "flex", gap: "10px" }}>
-                  <ApproveOrder
-                    approvingOrder={order}
+                  <AssignCourier
+                    AssigningOrder={order}
                     callBackFunction={getTableData}
+                    ReleventRegion={order.region}
                   />
-
                   <CancelOrder
                     orderForCancellation={order}
                     callBackFunction={getTableData}
@@ -173,4 +159,4 @@ const CurrentOrdersTable = () => {
   );
 };
 
-export default CurrentOrdersTable;
+export default ApprovedOrdersTable;

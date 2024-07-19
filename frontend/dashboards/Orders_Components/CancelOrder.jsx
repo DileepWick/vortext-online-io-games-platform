@@ -79,8 +79,8 @@ const CancelOrder = ({ orderForCancellation, callBackFunction }) => {
 
   return (
     <div>
-      <Button variant="ghost" size="sm" color="primary" onClick={handleCancel}>
-        Cancel Order
+      <Button variant="ghost" size="sm" color="danger" onClick={handleCancel}>
+        Cancel
       </Button>
 
       {/* Modal */}

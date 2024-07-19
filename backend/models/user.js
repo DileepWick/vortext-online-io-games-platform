@@ -31,9 +31,9 @@ const UserSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['free', 'working', 'not available'],
+        enum: ['Free', 'Working', 'Not available'],
         required: function() {
-            return this.role === 'courier';
+            return this.role === 'Courier';
         },
         default: 'free'
     }

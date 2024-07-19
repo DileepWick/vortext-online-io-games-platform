@@ -60,7 +60,7 @@ const ApproveOrder = ({ approvingOrder, callBackFunction }) => {
 
   return (
     <div>
-      <Button onClick={handleApprove} size="sm">Approve</Button>
+      <Button onClick={handleApprove} size="sm" color="success" variant="bordered">Approve</Button>
 
       {/* Modal  */}
       <Modal
