@@ -2,7 +2,10 @@ import React, { useState} from "react";
 
 // Components
 import Header from "../src/components/header";
+
+//Orders components
 import CurrentOrdersTable from "./Orders_Components/currentOrdersTable";
+import CanceledOrdersTable from "./Orders_Components/canceledOrderTable";
 
 // Next UI
 import { Tabs, Tab } from "@nextui-org/react";
@@ -38,7 +41,7 @@ const OrderManager = () => {
         )}
         {activeTab === "CurrentOrders" && <div><CurrentOrdersTable/></div>}
         {activeTab === "CompletedOrders" && <div>Completed Orders</div>}
-        {activeTab === "CancelledOrders" && <div>Cancelled Orders</div>}
+        {activeTab === "CancelledOrders" && <div><CanceledOrdersTable/></div>}
       </div>
     </div>
   );

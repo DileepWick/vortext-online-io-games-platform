@@ -39,11 +39,32 @@ export const createOrder = async (req, res) => {
   }
 };
 
-// Get All Orders
+// Get All Orders (pending and approved )
 export const getAllOrders = async (req, res) => {
   try {
+
     // Populate 'user' and 'item' fields based on their references
-    const orders = await Order.find({}).populate("user", "_id username");
+    const orders = await Order.find({ 
+      orderStatus: { $in: ["Pending", "Approved"] } 
+    }).populate("user", "_id username");
+
+    res.status(200).json({
+      allOrders: orders,
+    });
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    res.status(500).json({ message: "Error fetching orders" });
+  }
+};
+
+// Get Cancelled orders
+export const getAllCancelledOrdes = async (req, res) => {
+  try {
+
+    // Populate 'user' and 'item' fields based on their references
+    const orders = await Order.find({ 
+      orderStatus: { $in: ["Canceled"] } 
+    }).populate("user", "_id username");
 
     res.status(200).json({
       allOrders: orders,

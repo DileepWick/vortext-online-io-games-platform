@@ -10,48 +10,43 @@ import {
   TableCell,
   Pagination,
   Chip,
-  Tooltip,
   Input,
+  Textarea,
 } from "@nextui-org/react";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
-import Restock from "./restock";
-import UpdateStock from "./update_stock";
 
-//Stock Components
-import DeleteStock from "./delete_stock";
-
-const StockTable = () => {
-  const [stocks, setStocks] = useState([]);
+const CanceledOrdersTable = () => {
+  const [tableData, setTableData] = useState([]);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const rowsPerPage = 4; // Adjusted rowsPerPage for more data per page
+  const rowsPerPage = 3; // Adjusted rowsPerPage for more data per page
 
-  // Get All Stocks
-  const getAllStocks = async () => {
+  // Get All Orders
+  const getTableData = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8098/gameStocks/allGameStock"
+        "http://localhost:8098/orders/allCanceledOrders"
       );
-      if (response.data.allGameStocks) {
-        setStocks(response.data.allGameStocks);
+      if (response.data.allOrders) {
+        setTableData(response.data.allOrders);
       }
     } catch (error) {
-      console.error("Error fetching games:", error);
+      console.error("Error fetching data:", error);
     }
   };
 
   useEffect(() => {
-    getAllStocks();
+    getTableData();
   }, []);
 
   // Search filter
   const filteredItems = useMemo(() => {
-    return stocks.filter((stock) =>
-      stock.AssignedGame.title.toLowerCase().includes(searchQuery.toLowerCase())
+    return tableData.filter((order) =>
+      order._id.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [stocks, searchQuery]);
+  }, [tableData, searchQuery]);
 
-  // Pagination
+  // Pagination Next UI
   const items = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
@@ -74,7 +69,7 @@ const StockTable = () => {
     <div>
       <Input
         className="ml-2 font-primaryRegular w-48 sm:w-64"
-        placeholder="Search by GAME . . ."
+        placeholder="Search by REF NO . . ."
         startContent={<SearchIcon />}
         value={searchQuery}
         onChange={handleSearchChange}
@@ -103,49 +98,42 @@ const StockTable = () => {
         }}
       >
         <TableHeader>
-          <TableColumn key="GAME">GAME</TableColumn>
-          <TableColumn key="PLATFORM">PLATFORM</TableColumn>
-          <TableColumn key="EDITION">EDITION</TableColumn>
-          <TableColumn key="QUANTITY">QUANTITY</TableColumn>
-          <TableColumn key="PRICE">PRICE</TableColumn>
-          <TableColumn key="DISCOUNT">DISCOUNT</TableColumn>
-          <TableColumn key="ACTIONS">ACTIONS</TableColumn>
+          <TableColumn key="REF">REF NO</TableColumn>
+          <TableColumn key="ADDRESS">ADDRESS</TableColumn>
+          <TableColumn key="REGION">REGION</TableColumn>
+          <TableColumn key="AMOUNT">AMOUNT</TableColumn>
+          <TableColumn key="TOKEN">TOKEN</TableColumn>
+          <TableColumn key="DATE">PLACEMENT DATE</TableColumn>
+          <TableColumn key="REASON">REASON</TableColumn>
         </TableHeader>
+
         <TableBody>
-          {items.map((stock) => (
-            <TableRow key={stock.id}>
-              <TableCell>{stock.AssignedGame.title}</TableCell>
+          {items.map((order) => (
+            <TableRow key={order._id}>
+              <TableCell>{order._id}</TableCell>
+              <TableCell>{order.shippingAddress}</TableCell>
               <TableCell>
                 <Chip color="default" variant="flat">
-                  {stock.Platform}
+                  {order.region}
                 </Chip>
               </TableCell>
-              <TableCell>{stock.Edition}</TableCell>
+              <TableCell>{order.paymentAmount}$</TableCell>
               <TableCell>
-                {stock.NumberOfUnits < 3 ? (
-                  <div>{stock.NumberOfUnits} - Low on stock !</div>
-                ) : (
-                  stock.NumberOfUnits
-                )}
+                <Chip color="warning" variant="bordered">
+                  {order.orderCompletionCode}
+                </Chip>
               </TableCell>
-              <TableCell>{stock.UnitPrice}$</TableCell>
-              <TableCell>{stock.discount}%</TableCell>
               <TableCell>
-                <div style={{ display: "flex", gap: "10px" }}>
-                  <UpdateStock
-                    updatingStock={stock}
-                    callBackFunction={getAllStocks}
-                  />
-
-                  <Restock
-                    stockForRestock={stock}
-                    callBackFunction={getAllStocks}
-                  />
-                  <DeleteStock
-                    deletingStock={stock}
-                    callBackFunction={getAllStocks}
-                  />
-                </div>
+                {new Date(order.orderPlacementDate).toLocaleDateString()}
+              </TableCell>
+              <TableCell>
+                <Textarea
+                  isReadOnly
+                  variant="bordered"
+                  labelPlacement="outside"
+                  defaultValue={order.cancellationReason}
+                  className="max-w-xs"
+                />
               </TableCell>
             </TableRow>
           ))}
@@ -155,4 +143,4 @@ const StockTable = () => {
   );
 };
 
-export default StockTable;
+export default CanceledOrdersTable;

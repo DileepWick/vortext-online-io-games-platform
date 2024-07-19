@@ -8,6 +8,7 @@ import {
   deleteOrder,
   approveOrder,
   cancelOrder,
+  getAllCancelledOrdes
 } from "../controllers/orderController.js";
 
 const orderRouter = express.Router();
@@ -17,6 +18,9 @@ orderRouter.post("/create/:userId", createOrder);
 
 // Get All Orders
 orderRouter.get("/all", getAllOrders);
+
+//Get all cancelled orders
+orderRouter.get("/allCanceledOrders",getAllCancelledOrdes);
 
 // Get Orders by User ID
 orderRouter.get("/user/:userId", getOrdersByUserId);
