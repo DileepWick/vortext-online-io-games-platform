@@ -10,7 +10,7 @@ import {
   Dropdown,
   DropdownMenu,
   User,
-  Divider
+  Divider,
 } from "@nextui-org/react";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -124,7 +124,6 @@ export default function Header() {
                 aria-label="Profile Actions"
                 variant="flat"
                 className="font-primaryRegular text-black"
-                
               >
                 <DropdownItem key="profile" className="h-14 gap-2">
                   <p className="font-semibold">Signed in as</p>
@@ -173,6 +172,15 @@ export default function Header() {
                     onClick={() => navigate("/bloggerDashboard")}
                   >
                     Blogger Dashboard
+                  </DropdownItem>
+                )}
+                {/* Courier  Filter */}
+                {user.role === "Courier" && (
+                  <DropdownItem
+                    key="orders-panel"
+                    onClick={() => navigate("/courierDashboard")}
+                  >
+                    Courier Dashboard
                   </DropdownItem>
                 )}
 

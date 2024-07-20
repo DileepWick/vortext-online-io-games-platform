@@ -38,7 +38,7 @@ const orderSchema = new Schema({
   },
   orderStatus: {
     type: String,
-    enum: ["Pending", "Approved", "On Delivery", "Delivered","Canceled"],
+    enum: ["Pending", "Approved", "On Delivery", "Delivered", "Canceled"],
     default: "Pending",
     required: true,
   },
@@ -53,7 +53,18 @@ const orderSchema = new Schema({
     ref: "User",
     default: null,
   },
+  completedDate: {
+    type: Date,
+    default: null,
+  },
 });
 
+// Update completedDate to the current date if the status is changed to 'Delivered'
+orderSchema.pre('save', function (next) {
+  if (this.isModified('orderStatus') && this.orderStatus === 'Delivered') {
+    this.completedDate = new Date();
+  }
+  next();
+});
 
 export const Order = mongoose.model("Order", orderSchema);

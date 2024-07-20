@@ -13,28 +13,29 @@ import {
   Input,
   Button,
   User,
-  Tooltip,
 } from "@nextui-org/react";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
-
-// Order Components
-import CancelOrder from "./CancelOrder";
+import { EyeIcon } from "../../src/assets/icons/EyeIcon";
+import { getUserIdFromToken } from "../../src/utils/user_id_decoder";
+import { getToken } from "../../src/utils/getToken";
 import ViewDetails from "./View_Address_Button";
 
-const OnDeliveryOrdersTable = () => {
+const CourierCompletedOrdersTable = () => {
   const [tableData, setTableData] = useState([]);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const rowsPerPage = 8; // Adjusted rowsPerPage for more data per page
+  const rowsPerPage = 3; // Adjusted rowsPerPage for more data per page
 
   // Get All Orders
   const getTableData = async () => {
     try {
+      const token = getToken();
+      const userId = getUserIdFromToken(token);
       const response = await axios.get(
-        "http://localhost:8098/orders//onDeliveryOrders"
+        `http://localhost:8098/orders/courier/CompletedOrders/${userId}`
       );
-      if (response.data.allOrders) {
-        setTableData(response.data.allOrders);
+      if (response.data.assignedOrders) {
+        setTableData(response.data.assignedOrders);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -105,64 +106,28 @@ const OnDeliveryOrdersTable = () => {
       >
         <TableHeader>
           <TableColumn key="REF">REF NO</TableColumn>
-          <TableColumn key="REGION">REGION</TableColumn>
-          <TableColumn key="AMOUNT">AMOUNT</TableColumn>
-          <TableColumn key="TOKEN">TOKEN</TableColumn>
           <TableColumn key="DATE">PLACEMENT DATE</TableColumn>
-          <TableColumn key="COURIER">COURIER</TableColumn>
+          <TableColumn key="CompleteDATE">COMPLETED DATE</TableColumn>
           <TableColumn key="STATUS">STATUS</TableColumn>
           <TableColumn key="ADDRESS">ADDRESS</TableColumn>
-          <TableColumn key="ACTIONS">ACTIONS</TableColumn>
         </TableHeader>
         <TableBody>
           {items.map((order) => (
             <TableRow key={order._id}>
               <TableCell>{order._id}</TableCell>
               <TableCell>
-                <Chip color="default" variant="flat">
-                  {order.region}
-                </Chip>
-              </TableCell>
-              <TableCell>{order.paymentAmount}$</TableCell>
-              <TableCell>
-                <Chip color="warning" variant="bordered">
-                  {order.orderCompletionCode}
-                </Chip>
+                {new Date(order.orderPlacementDate).toLocaleDateString()}
               </TableCell>
               <TableCell>
                 {new Date(order.orderPlacementDate).toLocaleDateString()}
               </TableCell>
               <TableCell>
-                {order.courier ? (
-                  <div>
-                    <User
-                      name={order.courier.username}
-                      description={order.courier.email}
-                      avatarProps={{
-                        src: order.courier.profilePic,
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <Chip color="danger" variant="flat">
-                    N/A
-                  </Chip>
-                )}
-              </TableCell>
-
-              <TableCell>
-                <Chip color="primary" variant="dot">
+                <Chip color="success" variant="dot">
                   {order.orderStatus}
                 </Chip>
               </TableCell>
               <TableCell>
-                <ViewDetails order={order}/>
-              </TableCell>
-              <TableCell>
-                <CancelOrder
-                  orderForCancellation={order}
-                  callBackFunction={getTableData}
-                />
+                <ViewDetails order={order} />
               </TableCell>
             </TableRow>
           ))}
@@ -172,4 +137,4 @@ const OnDeliveryOrdersTable = () => {
   );
 };
 
-export default OnDeliveryOrdersTable;
+export default CourierCompletedOrdersTable;

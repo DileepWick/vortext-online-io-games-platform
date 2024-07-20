@@ -13,25 +13,21 @@ import {
   Input,
   Button,
   User,
-  Tooltip,
 } from "@nextui-org/react";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
-
-// Order Components
-import CancelOrder from "./CancelOrder";
 import ViewDetails from "./View_Address_Button";
 
-const OnDeliveryOrdersTable = () => {
+const CompletedOrdersTable = () => {
   const [tableData, setTableData] = useState([]);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const rowsPerPage = 8; // Adjusted rowsPerPage for more data per page
+  const rowsPerPage = 3; // Adjusted rowsPerPage for more data per page
 
   // Get All Orders
   const getTableData = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8098/orders//onDeliveryOrders"
+        `http://localhost:8098/orders/AllCompletedOrders`
       );
       if (response.data.allOrders) {
         setTableData(response.data.allOrders);
@@ -109,10 +105,10 @@ const OnDeliveryOrdersTable = () => {
           <TableColumn key="AMOUNT">AMOUNT</TableColumn>
           <TableColumn key="TOKEN">TOKEN</TableColumn>
           <TableColumn key="DATE">PLACEMENT DATE</TableColumn>
+          <TableColumn key="CompleteDATE">COMPLETED DATE</TableColumn>
           <TableColumn key="COURIER">COURIER</TableColumn>
           <TableColumn key="STATUS">STATUS</TableColumn>
           <TableColumn key="ADDRESS">ADDRESS</TableColumn>
-          <TableColumn key="ACTIONS">ACTIONS</TableColumn>
         </TableHeader>
         <TableBody>
           {items.map((order) => (
@@ -128,6 +124,9 @@ const OnDeliveryOrdersTable = () => {
                 <Chip color="warning" variant="bordered">
                   {order.orderCompletionCode}
                 </Chip>
+              </TableCell>
+              <TableCell>
+                {new Date(order.orderPlacementDate).toLocaleDateString()}
               </TableCell>
               <TableCell>
                 {new Date(order.orderPlacementDate).toLocaleDateString()}
@@ -149,20 +148,13 @@ const OnDeliveryOrdersTable = () => {
                   </Chip>
                 )}
               </TableCell>
-
               <TableCell>
-                <Chip color="primary" variant="dot">
+                <Chip color="success" variant="dot">
                   {order.orderStatus}
                 </Chip>
               </TableCell>
               <TableCell>
-                <ViewDetails order={order}/>
-              </TableCell>
-              <TableCell>
-                <CancelOrder
-                  orderForCancellation={order}
-                  callBackFunction={getTableData}
-                />
+                <ViewDetails order={order} />
               </TableCell>
             </TableRow>
           ))}
@@ -172,4 +164,4 @@ const OnDeliveryOrdersTable = () => {
   );
 };
 
-export default OnDeliveryOrdersTable;
+export default CompletedOrdersTable;

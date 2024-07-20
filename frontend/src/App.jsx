@@ -19,6 +19,7 @@ import Contact from "./pages/Contact"
 import ProductManagerDashboard from "../dashboards/product_manager_dashboard";
 import OrderManagerDashboard from "../dashboards/order_manager_dashboard"
 import BloggerDashboard from "../dashboards/blogger_dashboard";
+import CourierDashBoard from "../dashboards/courier_dashboard";
 
 const App = () => {
   return (
@@ -37,6 +38,7 @@ const App = () => {
       <Route path="/productDashboard" element={<ProductManagerDashboard/>}/>
       <Route path="/ordersDashboard" element={<OrderManagerDashboard/>}/>
       <Route path="/bloggerDashboard" element={<BloggerDashboard/>}/>
+      <Route path="/courierDashboard" element={<CourierDashBoard/>}/>
       <Route path="/contact" element={<Contact/>}/>
     </Routes>
   );

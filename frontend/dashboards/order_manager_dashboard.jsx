@@ -8,6 +8,7 @@ import CurrentOrdersTable from "./Orders_Components/currentOrdersTable";
 import CanceledOrdersTable from "./Orders_Components/canceledOrderTable";
 import OnDeliveryOrdersTable from "./Orders_Components/onDeliverOrdersTable";
 import ApprovedOrdersTable from "./Orders_Components/ApprovedOrders";
+import CompletedOrdersTable from "./Orders_Components/completedOrdersTable";
 
 // Next UI
 import { Tabs, Tab } from "@nextui-org/react";
@@ -46,7 +47,7 @@ const OrderManager = () => {
         {activeTab === "CurrentOrders" && <div><CurrentOrdersTable/></div>}
         {activeTab === "ApprovedOrders" && <div><ApprovedOrdersTable/></div>}
         {activeTab === "OnDelivery" && <div><OnDeliveryOrdersTable/></div>}
-        {activeTab === "CompletedOrders" && <div>Completed Orders</div>}
+        {activeTab === "CompletedOrders" && <div><CompletedOrdersTable/></div>}
         {activeTab === "CancelledOrders" && <div><CanceledOrdersTable/></div>}
         {activeTab === "analytics" && <div>Order Analytics</div>}
       </div>

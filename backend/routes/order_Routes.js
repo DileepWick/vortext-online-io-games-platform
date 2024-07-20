@@ -11,7 +11,11 @@ import {
   getAllCancelledOrdes,
   assignCourierToOrder,
   getAllOrdersApproved,
-  getAllOrdersOnDelivery 
+  getAllOrdersOnDelivery,
+  getOrdersAssignedToCourier,
+  getCompletedOrdersAssignedToCourier,
+  CompleteOrder,
+  getAllOrdersCompleted
 } from "../controllers/orderController.js";
 
 const orderRouter = express.Router();
@@ -31,8 +35,17 @@ orderRouter.get("/allCanceledOrders",getAllCancelledOrdes);
 //All on deliver orders
 orderRouter.get("/onDeliveryOrders",getAllOrdersOnDelivery );
 
+//All completed Orders
+orderRouter.get("/AllCompletedOrders",getAllOrdersCompleted);
+
 // Get Orders by User ID
 orderRouter.get("/user/:userId", getOrdersByUserId);
+
+//Get orders for assigned couriers ('On Delivery')
+orderRouter.get("/courier/currentOrders/:userId",getOrdersAssignedToCourier);
+
+//Get completed orders for assigned courier
+orderRouter.get("/courier/CompletedOrders/:userId",getCompletedOrdersAssignedToCourier);
 
 // Get Order by Order ID
 orderRouter.get("/:orderId", getOrderById);
@@ -51,5 +64,8 @@ orderRouter.put("/cancelOrder/:orderId", cancelOrder);
 
 //Assign Order
 orderRouter.put("/assignCourier/:orderId", assignCourierToOrder);
+
+//Complete Order
+orderRouter.put("/completeOrder/:orderId",CompleteOrder);
 
 export default orderRouter;

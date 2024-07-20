@@ -256,4 +256,27 @@ userRouter.get("/couriers/:workingRegion", async (request, response) => {
 });
 
 
+//Change Status
+userRouter.put("/changeStatus/:id", async (request, response) => {
+  const { id } = request.params;
+  const { newStatus } = request.body;
+
+  try {
+    const updatedUser = await User.updateOne(
+      { _id: id },
+      { $set: { status: newStatus } }
+    );
+
+    if (updatedUser.nModified === 0) {
+      return response.status(404).json({ message: "User not found or status unchanged" });
+    }
+
+    response.status(200).json({ message: "Status updated successfully" });
+  } catch (error) {
+    console.error("Error updating status:", error);
+    response.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
 export default userRouter;
