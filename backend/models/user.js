@@ -35,7 +35,7 @@ const UserSchema = new mongoose.Schema({
         required: function() {
             return this.role === 'Courier';
         },
-        default: 'free'
+        default: 'Free'
     }
 });
 

@@ -15,6 +15,8 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
 import { EyeIcon } from "../../src/assets/icons/EyeIcon";
+import ViewDetails from "./View_Address_Button";
+import ViewReason from "./View_Reason_Button";
 
 const CanceledOrdersTable = () => {
   const [tableData, setTableData] = useState([]);
@@ -135,16 +137,10 @@ const CanceledOrdersTable = () => {
                 </Chip>
               </TableCell>
               <TableCell>
-                <Button size="sm" variant="ghost" color="default">
-                  VIEW
-                  <EyeIcon />
-                </Button>
+                <ViewDetails order={order} />
               </TableCell>
               <TableCell>
-                <Button size="sm" variant="bordered" color="default">
-                  VIEW
-                  <EyeIcon />
-                </Button>
+                <ViewReason order={order} />
               </TableCell>
             </TableRow>
           ))}

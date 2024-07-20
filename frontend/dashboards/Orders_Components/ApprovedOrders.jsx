@@ -17,9 +17,9 @@ import {
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
 
 // Order Components
-import ApproveOrder from "./approveOrder";
 import CancelOrder from "./CancelOrder";
 import AssignCourier from "./assignCourier";
+import ViewDetails from "./View_Address_Button";
 
 const ApprovedOrdersTable = () => {
   const [tableData, setTableData] = useState([]);
@@ -105,19 +105,19 @@ const ApprovedOrdersTable = () => {
       >
         <TableHeader>
           <TableColumn key="REF">REF NO</TableColumn>
-          <TableColumn key="ADDRESS">ADDRESS</TableColumn>
           <TableColumn key="REGION">REGION</TableColumn>
           <TableColumn key="AMOUNT">AMOUNT</TableColumn>
           <TableColumn key="TOKEN">TOKEN</TableColumn>
           <TableColumn key="DATE">PLACEMENT DATE</TableColumn>
           <TableColumn key="STATUS">STATUS</TableColumn>
+          <TableColumn key="ADDRESS">ADDRESS</TableColumn>
           <TableColumn key="ACTIONS">ACTIONS</TableColumn>
         </TableHeader>
         <TableBody>
           {items.map((order) => (
             <TableRow key={order._id}>
               <TableCell>{order._id}</TableCell>
-              <TableCell>{order.shippingAddress}</TableCell>
+
               <TableCell>
                 <Chip color="default" variant="flat">
                   {order.region}
@@ -137,6 +137,9 @@ const ApprovedOrdersTable = () => {
                 <Chip color="primary" variant="dot">
                   {order.orderStatus}
                 </Chip>
+              </TableCell>
+              <TableCell>
+                <ViewDetails order={order} />
               </TableCell>
               <TableCell>
                 <div style={{ display: "flex", gap: "10px" }}>

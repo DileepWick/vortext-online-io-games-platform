@@ -16,12 +16,11 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
 import { EyeIcon } from "../../src/assets/icons/EyeIcon";
-
+import ViewDetails from "./View_Address_Button";
 
 // Order Components
 import ApproveOrder from "./approveOrder";
 import CancelOrder from "./CancelOrder";
-import AssignCourier from "./assignCourier";
 
 const CurrentOrdersTable = () => {
   const [tableData, setTableData] = useState([]);
@@ -147,10 +146,7 @@ const CurrentOrdersTable = () => {
                 )}
               </TableCell>
               <TableCell>
-                <Button size="sm" variant="bordered" color="default">
-                  VIEW
-                  <EyeIcon />
-                </Button>
+                <ViewDetails order={order} />
               </TableCell>
               <TableCell>
                 <div style={{ display: "flex", gap: "10px" }}>
