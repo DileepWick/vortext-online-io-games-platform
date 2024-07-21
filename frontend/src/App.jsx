@@ -22,7 +22,6 @@ import OrderManagerDashboard from "../dashboards/order_manager_dashboard"
 import BloggerDashboard from "../dashboards/blogger_dashboard";
 import CourierDashBoard from "../dashboards/courier_dashboard"
 import SessionManagerDash from "../dashboards/session_manager_dashbord";
-import CourierDashBoard from "../dashboards/courier_dashboard";
 import StaffManager from "../dashboards/staff_manager_dashboard";
 
 
