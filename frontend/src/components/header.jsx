@@ -183,6 +183,15 @@ export default function Header() {
                     Courier Dashboard
                   </DropdownItem>
                 )}
+                {/* Staff Manager  Filter */}
+                {user.role === "Staff_Manager" && (
+                  <DropdownItem
+                    key="manage-staff"
+                    onClick={() => navigate("/staffManager")}
+                  >
+                    Manage Staff
+                  </DropdownItem>
+                )}
 
                 <DropdownItem
                   key="logout"

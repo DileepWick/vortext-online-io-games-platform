@@ -19,6 +19,5 @@ const useAuthCheck = (direction) => {
     }
   }, [navigate, location, direction]);
 };
-
 export default useAuthCheck;
 
