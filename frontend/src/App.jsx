@@ -14,12 +14,14 @@ import CartPage from "./pages/Cart_Page"
 import OrderHistory from "./pages/my_orders"
 import ArticleList from "./pages/articles";
 import Contact from "./pages/Contact"
+import GamingSessions from "./pages/GamingSessions";
 
 //Dashboards
 import ProductManagerDashboard from "../dashboards/product_manager_dashboard";
 import OrderManagerDashboard from "../dashboards/order_manager_dashboard"
 import BloggerDashboard from "../dashboards/blogger_dashboard";
-import CourierDashBoard from "../dashboards/courier_dashboard";
+import CourierDashBoard from "../dashboards/courier_dashboard"
+import SessionManagerDash from "../dashboards/session_manager_dashbord";
 
 const App = () => {
   return (
@@ -40,6 +42,8 @@ const App = () => {
       <Route path="/bloggerDashboard" element={<BloggerDashboard/>}/>
       <Route path="/courierDashboard" element={<CourierDashBoard/>}/>
       <Route path="/contact" element={<Contact/>}/>
+      <Route path="/sessionDashboard" element={<SessionManagerDash/>}/>
+      <Route path="/GamingSessions" element={<GamingSessions/>}/>
     </Routes>
   );
 };

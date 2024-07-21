@@ -83,8 +83,8 @@ export default function Header() {
           </NavbarItem>
           <NavbarItem>
             <Link
-              color={location.pathname === "/Testingpage" ? "primary" : "white"}
-              href="/Testingpage"
+              color={location.pathname === "/GamingSessions" ? "primary" : "white"}
+              href="/GamingSessions"
             >
               Gaming Sessions
             </Link>
@@ -174,6 +174,15 @@ export default function Header() {
                     Blogger Dashboard
                   </DropdownItem>
                 )}
+                 {/* session Manager Filter */}
+                 {user.role === "Session_Manager" && (
+                  <DropdownItem
+                    key="Session-panel"
+                    onClick={() => navigate("/sessionDashboard")}
+                  >
+                    Session Dashboard
+                  </DropdownItem>
+                )}
                 {/* Courier  Filter */}
                 {user.role === "Courier" && (
                   <DropdownItem
@@ -193,6 +202,7 @@ export default function Header() {
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
+
           ) : (
             <Link className="text-black" href="/login">
               Login
