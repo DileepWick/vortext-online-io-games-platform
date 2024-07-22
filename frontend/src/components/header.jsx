@@ -192,6 +192,13 @@ export default function Header() {
                     Courier Dashboard
                   </DropdownItem>
                 )}
+                {/* Customersuport Filter */}
+                {user.role === "customeragent" && (
+                  <DropdownItem
+                    key="suport-panel"
+                    onClick={() => navigate("/ContactDash")}
+                  >
+                  customeragent panel
                 {/* Staff Manager  Filter */}
                 {user.role === "Staff_Manager" && (
                   <DropdownItem
