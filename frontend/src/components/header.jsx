@@ -195,6 +195,16 @@ export default function Header() {
                   </DropdownItem>
                 )}
 
+                {/*Review manager*/}
+                {user.role === "Review_Manager" && (
+                  <DropdownItem
+                    key="Review-panel"
+                    onClick={() => navigate("/review_dashboard")}
+                  >
+                    Review Dashboard
+                  </DropdownItem>
+                )}
+
                 {/* Customer Support Filter */}
                 {user.role === "customeragent" && (
                   <DropdownItem
