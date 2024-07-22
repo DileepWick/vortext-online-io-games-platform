@@ -165,41 +165,47 @@ export default function Header() {
                   </DropdownItem>
                 )}
 
-                {/* Order Manager Filter */}
+                {/* Blogger Filter */}
                 {user.role === "Blogger" && (
                   <DropdownItem
-                    key="orders-panel"
+                    key="blogger-panel"
                     onClick={() => navigate("/bloggerDashboard")}
                   >
                     Blogger Dashboard
                   </DropdownItem>
                 )}
-                 {/* session Manager Filter */}
-                 {user.role === "Session_Manager" && (
+
+                {/* Session Manager Filter */}
+                {user.role === "Session_Manager" && (
                   <DropdownItem
-                    key="Session-panel"
+                    key="session-panel"
                     onClick={() => navigate("/sessionDashboard")}
                   >
                     Session Dashboard
                   </DropdownItem>
                 )}
-                {/* Courier  Filter */}
+
+                {/* Courier Filter */}
                 {user.role === "Courier" && (
                   <DropdownItem
-                    key="orders-panel"
+                    key="courier-panel"
                     onClick={() => navigate("/courierDashboard")}
                   >
                     Courier Dashboard
                   </DropdownItem>
                 )}
-                {/* Customersuport Filter */}
+
+                {/* Customer Support Filter */}
                 {user.role === "customeragent" && (
                   <DropdownItem
-                    key="suport-panel"
+                    key="support-panel"
                     onClick={() => navigate("/ContactDash")}
                   >
-                  customeragent panel
-                {/* Staff Manager  Filter */}
+                    Customer Support Panel
+                  </DropdownItem>
+                )}
+
+                {/* Staff Manager Filter */}
                 {user.role === "Staff_Manager" && (
                   <DropdownItem
                     key="manage-staff"
@@ -218,7 +224,6 @@ export default function Header() {
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
-
           ) : (
             <Link className="text-black" href="/login">
               Login
