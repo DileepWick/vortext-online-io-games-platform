@@ -457,7 +457,7 @@ const Blogger = () => {
             {/* Update Game Details */}
             <Modal
               isOpen={isUpdateModalOpen}
-              size="3xl"
+              size="full"
               onOpenChange={onUpdateModalClose}
               classNames={{
                 backdrop:
