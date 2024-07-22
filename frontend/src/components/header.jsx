@@ -51,7 +51,7 @@ export default function Header() {
 
   return (
     <div>
-      <Navbar className="font-primaryRegular text-black" shouldHideOnScroll>
+      <Navbar className="font-primaryRegular text-black bg-opacity-60">
         <NavbarBrand>
           <p className="font-bold text-inherit">GAME STORE</p>
         </NavbarBrand>
@@ -241,7 +241,6 @@ export default function Header() {
           )}
         </NavbarContent>
       </Navbar>
-      <Divider className="my-4" />
     </div>
   );
 }

@@ -133,7 +133,7 @@ const UpdateGame = ({ updatingGame, callBackFunction1, callBackFunction2 }) => {
               onChange={(e) => setCoverPhoto(e.target.files[0])}
             />
             {coverPhoto && (
-              <img src={coverPhoto} alt="Game Cover" width="240" />
+              <img src={coverPhoto} alt="Game Cover" width="40" />
             )}
           </div>
 
@@ -146,7 +146,7 @@ const UpdateGame = ({ updatingGame, callBackFunction1, callBackFunction2 }) => {
                 onChange={(e) => setTrailerVideo(e.target.files[0])}
               />
             </label>
-            {trailerVideo && <video src={trailerVideo} controls width="300" />}
+            {trailerVideo && <video src={trailerVideo} controls width="100" />}
 
             <div>
               <h4>Current Categories</h4>

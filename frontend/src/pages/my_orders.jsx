@@ -6,6 +6,7 @@ import useAuthCheck from "../utils/authCheck";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import View_Products from "../components/Orders/View_Order_Items";
+import { Progress } from "@nextui-org/react";
 
 // Next UI
 import { Chip } from "@nextui-org/chip";
@@ -152,8 +153,12 @@ const OrderHistory = ({ userId }) => {
             onChange={(e) => setDateOrder(e.target.value)}
             className="text-black p-2 rounded"
           >
-            <option value="recent" className="p-4 m-4">Recent to Old</option>
-            <option value="old" className="p-4 m-4">Old to Recent</option>
+            <option value="recent" className="p-4 m-4">
+              Recent to Old
+            </option>
+            <option value="old" className="p-4 m-4">
+              Old to Recent
+            </option>
           </select>
 
           <Input
@@ -170,10 +175,7 @@ const OrderHistory = ({ userId }) => {
           <div className="text-center mt-10">No order items found.</div>
         ) : (
           Object.keys(searchedOrderItems).map((orderId) => (
-            <div
-              key={orderId}
-              className="mb-2 p-4 border-black" 
-            >
+            <div key={orderId} className="mb-2 p-4 border-black">
               <Card className="max-w-[full] mx-left ">
                 <CardHeader className="flex gap-4">
                   <div className="flex flex-row space-x-4">
@@ -183,131 +185,182 @@ const OrderHistory = ({ userId }) => {
 
                     {searchedOrderItems[orderId][0].order.orderStatus ===
                     "Approved" ? (
-                      <Chip color="success" variant="dot" size="lg">
-                        {searchedOrderItems[orderId][0].order.orderStatus}
-                      </Chip>
+                      <div className="flex flex-row">
+                        <Chip color="success" variant="dot" size="lg">
+                          {searchedOrderItems[orderId][0].order.orderStatus}
+                        </Chip>
+
+                        <Progress
+                          label="Progress..."
+                          size="sm"
+                          value={50}
+                          color="success"
+                          showValueLabel={true}
+                          className="w-[100px] ml-4"
+                        />
+                      </div>
                     ) : searchedOrderItems[orderId][0].order.orderStatus ===
                       "Pending" ? (
-                      <Chip color="warning" variant="dot" size="lg">
-                        {searchedOrderItems[orderId][0].order.orderStatus}
-                      </Chip>
+                      <>
+                        <Chip color="warning" variant="dot" size="lg">
+                          {searchedOrderItems[orderId][0].order.orderStatus}
+                        </Chip>
+                        <Progress
+                          label="Progress..."
+                          size="sm"
+                          value={25}
+                          color="warning"
+                          showValueLabel={true}
+                          className="w-[100px] ml-4"
+                        />
+                      </>
                     ) : searchedOrderItems[orderId][0].order.orderStatus ===
                       "On Delivery" ? (
-                      <div>
-                        {searchedOrderItems[orderId][0].order.courier ? (
-                          <Tooltip
-                            content={
-                              <div className="px-1 py-2">
-                                <Avatar
-                                  src={
-                                    searchedOrderItems[orderId][0].order.courier
-                                      .profilePic
-                                  }
-                                  size="lg"
-                                />
-                                <div className="text-small font-bold">
-                                  {
-                                    searchedOrderItems[orderId][0].order.courier
-                                      .username
-                                  }
+                      <>
+                        <div>
+                          {searchedOrderItems[orderId][0].order.courier ? (
+                            <Tooltip
+                              content={
+                                <div className="px-1 py-2">
+                                  <Avatar
+                                    src={
+                                      searchedOrderItems[orderId][0].order
+                                        .courier.profilePic
+                                    }
+                                    size="lg"
+                                  />
+                                  <div className="text-small font-bold">
+                                    {
+                                      searchedOrderItems[orderId][0].order
+                                        .courier.username
+                                    }
+                                  </div>
+                                  <div className="text-tiny">
+                                    {
+                                      searchedOrderItems[orderId][0].order
+                                        .courier.email
+                                    }
+                                  </div>
                                 </div>
-                                <div className="text-tiny">
-                                  {
-                                    searchedOrderItems[orderId][0].order.courier
-                                      .email
-                                  }
-                                </div>
-                              </div>
-                            }
-                          >
-                            <Chip
-                              variant="dot"
-                              color="primary"
-                              size="lg"
-                              avatar={
-                                <Avatar
-                                  name="JW"
-                                  src={
-                                    searchedOrderItems[orderId][0].order.courier
-                                      .profilePic
-                                  }
-                                  size="lg"
-                                />
                               }
                             >
-                              On Delivery By {" "}
-                              {
-                                searchedOrderItems[orderId][0].order.courier
-                                  .username
-                              }
-                            </Chip>
-                          </Tooltip>
-                        ) : (
-                          <div>Courier information not available</div>
-                        )}
-                      </div>
+                              <Chip
+                                variant="dot"
+                                color="primary"
+                                size="lg"
+                                avatar={
+                                  <Avatar
+                                    name="JW"
+                                    src={
+                                      searchedOrderItems[orderId][0].order
+                                        .courier.profilePic
+                                    }
+                                    size="lg"
+                                  />
+                                }
+                              >
+                                On Delivery By{" "}
+                                {
+                                  searchedOrderItems[orderId][0].order.courier
+                                    .username
+                                }
+                              </Chip>
+                            </Tooltip>
+                          ) : (
+                            <div>Courier information not available</div>
+                          )}
+                        </div>{" "}
+                        <Progress
+                          label="Progress..."
+                          size="sm"
+                          value={75}
+                          color="secondary"
+                          showValueLabel={true}
+                          className="w-[100px] ml-4"
+                        />
+                      </>
                     ) : searchedOrderItems[orderId][0].order.orderStatus ===
                       "Delivered" ? (
-                      <div>
-                        {searchedOrderItems[orderId][0].order.courier ? (
-                          <Tooltip
-                            content={
-                              <div className="px-1 py-2">
-                                <Avatar
-                                  src={
-                                    searchedOrderItems[orderId][0].order.courier
-                                      .profilePic
-                                  }
-                                  size="lg"
-                                />
-                                <div className="text-small font-bold">
-                                  {
-                                    searchedOrderItems[orderId][0].order.courier
-                                      .username
-                                  }
+                      <>
+                        <div>
+                          {searchedOrderItems[orderId][0].order.courier ? (
+                            <Tooltip
+                              content={
+                                <div className="px-1 py-2">
+                                  <Avatar
+                                    src={
+                                      searchedOrderItems[orderId][0].order
+                                        .courier.profilePic
+                                    }
+                                    size="lg"
+                                  />
+                                  <div className="text-small font-bold">
+                                    {
+                                      searchedOrderItems[orderId][0].order
+                                        .courier.username
+                                    }
+                                  </div>
+                                  <div className="text-tiny">
+                                    {
+                                      searchedOrderItems[orderId][0].order
+                                        .courier.email
+                                    }
+                                  </div>
                                 </div>
-                                <div className="text-tiny">
-                                  {
-                                    searchedOrderItems[orderId][0].order.courier
-                                      .email
-                                  }
-                                </div>
-                              </div>
-                            }
-                          >
-                            <Chip
-                              variant="dot"
-                              color="primary"
-                              size="lg"
-                              avatar={
-                                <Avatar
-                                  name="JW"
-                                  src={
-                                    searchedOrderItems[orderId][0].order.courier
-                                      .profilePic
-                                  }
-                                  size="lg"
-                                />
                               }
                             >
-                              Delivered By{" "}
-                              {
-                                searchedOrderItems[orderId][0].order.courier
-                                  .username
-                              }
-                            </Chip>
-                          </Tooltip>
-                        ) : (
-                          <div>Courier information not available</div>
-                        )}
-                      </div>
+                              <Chip
+                                variant="dot"
+                                color="primary"
+                                size="lg"
+                                avatar={
+                                  <Avatar
+                                    name="JW"
+                                    src={
+                                      searchedOrderItems[orderId][0].order
+                                        .courier.profilePic
+                                    }
+                                    size="lg"
+                                  />
+                                }
+                              >
+                                Delivered By{" "}
+                                {
+                                  searchedOrderItems[orderId][0].order.courier
+                                    .username
+                                }
+                              </Chip>
+                            </Tooltip>
+                          ) : (
+                            <div>Courier information not available</div>
+                          )}
+                        </div>{" "}
+                        <Progress
+                          label="Progress..."
+                          size="sm"
+                          value={100}
+                          color="primary"
+                          showValueLabel={true}
+                          className="w-[100px] ml-4"
+                        />
+                      </>
                     ) : (
+                      <>
                       <Chip color="danger" variant="dot" size="lg">
                         {searchedOrderItems[orderId][0].order.orderStatus}
                       </Chip>
+                      <Progress
+                          label="Progress..."
+                          size="sm"
+                          value={0}
+                          color="default"
+                          showValueLabel={true}
+                          className="w-[100px] ml-4"
+                        /></>
                     )}
                   </div>
                 </CardHeader>
+
                 <Divider />
                 <CardBody>
                   <div className="flex flex-row space-x-6">

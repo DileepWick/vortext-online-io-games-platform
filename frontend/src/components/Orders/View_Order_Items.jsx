@@ -116,19 +116,22 @@ const View_Products = ({ orderObject }) => {
                   }}
                 >
                   <TableHeader>
-                    <TableColumn>Product</TableColumn>
-                    <TableColumn>Platform</TableColumn>
-                    <TableColumn>Price</TableColumn>
-                    <TableColumn>Discount</TableColumn>
-                    <TableColumn>Quantity</TableColumn>
+                    <TableColumn>PRODUCT</TableColumn>
+                    <TableColumn>COVER</TableColumn>
+                    <TableColumn>PLATFORM</TableColumn>
+                    <TableColumn>PRICE</TableColumn>
+                    <TableColumn>DISCOUNT</TableColumn>
+                    <TableColumn>QUANTITY</TableColumn>
                   </TableHeader>
                   <TableBody>
                     {paginatedItems.map((item) => (
                       <TableRow key={item._id}>
+                        <TableCell>{item.stockid.AssignedGame.title}</TableCell>
                         <TableCell>
                           <Image
                             width={100}
                             height={100}
+                            radius="none"
                             src={item.stockid.AssignedGame.coverPhoto}
                             fallbackSrc="https://via.placeholder.com/300x200"
                             alt="NextUI Image with fallback"
