@@ -51,6 +51,10 @@ const App = () => {
       <Route path="/sessionDashboard" element={<SessionManagerDash/>}/>
       <Route path="/GamingSessions" element={<GamingSessions/>}/>
       <Route path="/staffManager" element={<StaffManager/>}/>
+      <Route path="/review_dashboard" element={<Review_manager/>}/>
+
+
+
     </Routes>
   );
 };
