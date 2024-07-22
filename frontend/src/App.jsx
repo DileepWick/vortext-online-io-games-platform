@@ -20,6 +20,8 @@ import ProductManagerDashboard from "../dashboards/product_manager_dashboard";
 import OrderManagerDashboard from "../dashboards/order_manager_dashboard"
 import BloggerDashboard from "../dashboards/blogger_dashboard";
 import CourierDashBoard from "../dashboards/courier_dashboard";
+import Review_manager from "../dashboards/review_dashboard";
+
 
 const App = () => {
   return (
@@ -40,6 +42,8 @@ const App = () => {
       <Route path="/bloggerDashboard" element={<BloggerDashboard/>}/>
       <Route path="/courierDashboard" element={<CourierDashBoard/>}/>
       <Route path="/contact" element={<Contact/>}/>
+      <Route path="/review_dashboard" element={<Review_manager/>}/>
+
     </Routes>
   );
 };
