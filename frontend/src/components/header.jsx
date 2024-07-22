@@ -194,13 +194,17 @@ export default function Header() {
                     Courier Dashboard
                   </DropdownItem>
                 )}
-                {/*Review manager*/}
+
+                {/* Review Manager Filter */}
                 {user.role === "Review_Manager" && (
                   <DropdownItem
-                    key="Review-panel"
+                    key="review-panel"
                     onClick={() => navigate("/review_dashboard")}
                   >
                     Review Dashboard
+                  </DropdownItem>
+                )}
+
                 {/* Customer Support Filter */}
                 {user.role === "customeragent" && (
                   <DropdownItem
