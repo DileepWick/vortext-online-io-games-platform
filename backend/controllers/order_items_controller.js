@@ -1,5 +1,5 @@
 import { OrderItems } from "../models/orderItems.js";
-import {Order} from "../models/order.js"
+import { Order } from "../models/order.js";
 
 // Create a new order item
 export const createOrderItem = async (req, res) => {
@@ -36,7 +36,7 @@ export const getAllOrderItems = async (req, res) => {
       .populate("stockid")
       .populate("order");
     res.status(200).json({
-      orderHistory:orderItems
+      orderHistory: orderItems,
     });
   } catch (error) {
     console.error("Error fetching order items:", error);
@@ -56,7 +56,13 @@ export const getOrderItemsByOrderId = async (req, res) => {
 
     const orderItems = await OrderItems.find({ order: orderId })
       .populate("order")
-      .populate("stockid");
+      .populate({
+        path: "stockid",
+        populate: {
+          path: "AssignedGame",
+          model: "Game",
+        },
+      });
 
     if (orderItems.length === 0) {
       return res.status(404).json({ message: "Order items not found" });
@@ -135,7 +141,7 @@ export const getOrderItemsByUserId = async (req, res) => {
     }
 
     // Extract order IDs
-    const orderIds = orders.map(order => order._id);
+    const orderIds = orders.map((order) => order._id);
 
     // Find all order items by order IDs and populate stockid and assignedGame fields
     const orderItems = await OrderItems.find({ order: { $in: orderIds } })
@@ -143,13 +149,22 @@ export const getOrderItemsByUserId = async (req, res) => {
         path: "stockid",
         populate: {
           path: "AssignedGame",
-          model: "Game"
-        }
+          model: "Game",
+        },
       })
-      .populate("order");
+      .populate("order")
+      .populate({
+        path: "order",
+        populate: {
+          path: "courier",
+          model: "User",
+        },
+      });
 
     if (orderItems.length === 0) {
-      return res.status(404).json({ message: "Order items not found for the user" });
+      return res
+        .status(404)
+        .json({ message: "Order items not found for the user" });
     }
 
     res.status(200).json(orderItems);
