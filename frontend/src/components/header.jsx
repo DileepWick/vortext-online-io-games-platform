@@ -83,8 +83,8 @@ export default function Header() {
           </NavbarItem>
           <NavbarItem>
             <Link
-              color={location.pathname === "/Testingpage" ? "primary" : "white"}
-              href="/Testingpage"
+              color={location.pathname === "/GamingSessions" ? "primary" : "white"}
+              href="/GamingSessions"
             >
               Gaming Sessions
             </Link>
@@ -165,25 +165,35 @@ export default function Header() {
                   </DropdownItem>
                 )}
 
-                {/* Order Manager Filter */}
+                {/* Blogger Filter */}
                 {user.role === "Blogger" && (
                   <DropdownItem
-                    key="orders-panel"
+                    key="blogger-panel"
                     onClick={() => navigate("/bloggerDashboard")}
                   >
                     Blogger Dashboard
                   </DropdownItem>
                 )}
-                {/* Courier  Filter */}
+
+                {/* Session Manager Filter */}
+                {user.role === "Session_Manager" && (
+                  <DropdownItem
+                    key="session-panel"
+                    onClick={() => navigate("/sessionDashboard")}
+                  >
+                    Session Dashboard
+                  </DropdownItem>
+                )}
+
+                {/* Courier Filter */}
                 {user.role === "Courier" && (
                   <DropdownItem
-                    key="orders-panel"
+                    key="courier-panel"
                     onClick={() => navigate("/courierDashboard")}
                   >
                     Courier Dashboard
                   </DropdownItem>
                 )}
-
                 {/*Review manager*/}
                 {user.role === "Review_Manager" && (
                   <DropdownItem
@@ -191,6 +201,23 @@ export default function Header() {
                     onClick={() => navigate("/review_dashboard")}
                   >
                     Review Dashboard
+                {/* Customer Support Filter */}
+                {user.role === "customeragent" && (
+                  <DropdownItem
+                    key="support-panel"
+                    onClick={() => navigate("/ContactDash")}
+                  >
+                    Customer Support Panel
+                  </DropdownItem>
+                )}
+
+                {/* Staff Manager Filter */}
+                {user.role === "Staff_Manager" && (
+                  <DropdownItem
+                    key="manage-staff"
+                    onClick={() => navigate("/staffManager")}
+                  >
+                    Manage Staff
                   </DropdownItem>
                 )}
 
