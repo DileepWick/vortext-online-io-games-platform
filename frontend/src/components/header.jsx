@@ -50,8 +50,8 @@ export default function Header() {
   };
 
   return (
-    <div className="bg-opacity-20">
-      <Navbar className="font-primaryRegular text-black bg-opacity-20">
+    <div className="bg-headerDark">
+      <Navbar className="font-primaryRegular text-black bg-headerDark">
         <NavbarBrand>
           <p className="font-bold text-inherit">GAME STORE</p>
         </NavbarBrand>
@@ -59,7 +59,7 @@ export default function Header() {
         <NavbarContent className="hidden sm:flex gap-4" justify="center">
           <NavbarItem>
             <Link
-              color={location.pathname === "/" ? "primary" : "default"}
+              color={location.pathname === "/" ? "white" : "default"}
               href="/"
             >
               Home

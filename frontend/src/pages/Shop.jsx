@@ -8,13 +8,7 @@ import { Spinner } from "@nextui-org/react";
 // NextUI
 import { Image } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  Chip,
-} from "@nextui-org/react";
+import { Card, CardBody, CardFooter, Chip } from "@nextui-org/react";
 
 const Shop = () => {
   const [gameStocks, setGameStocks] = useState([]);
@@ -42,90 +36,98 @@ const Shop = () => {
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-red-300 via-gray-500 to-red-200 text-black">
+    <div className="min-h-screen bg-customDark text-white">
       <Header />
       <div className="container mx-auto px-4 py-16">
-        <h1 className="text-4xl  text-center text-white mb-8 font-primaryRegular">
+        <h1 className="text-4xl text-center text-white mb-8 font-primaryRegular">
           Games
         </h1>
 
         {gameStocks.length === 0 ? (
           <p className="text-gray-400 text-center">No game stocks available</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {gameStocks.map((stock) => (
-              <Card
-                key={stock._id}
-                className="bg-white bg-opacity-60 rounded-lg shadow-lg"
-              >
-                <Link to={`/game/${stock._id}`}>
-                  <Image
-                    radius="none"
-                    removeWrapper
-                    alt={stock.AssignedGame.title}
-                    className="w-full h-[400px] object-cover rounded-t-lg"
-                    src={stock.AssignedGame.coverPhoto}
-                  />
-                  <CardBody className="p-4">
-                    <h2 className="text-xl font-primaryRegular text-black mb-2">
-                      {stock.AssignedGame.title}
-                      <br />
-                      <Chip>{stock.Edition}</Chip>
-                    </h2>
-                    <p className="font-primaryRegular text-black mb-2">
-                      {stock.UnitPrice}$<br/>
-                      {stock.discount > 0 && (
-                        <>
-                          <Chip
-                            color="danger"
-                            radius="none"
-                            className="font-primaryRegular"
-                          >
-                            -{stock.discount}% off
-                          </Chip>
-                        </>
-                      )}
-                    </p>
+          <div className="flex flex-wrap justify-center gap-8">
+            {gameStocks.map((stock) => {
+              const originalPrice = stock.UnitPrice;
+              const discount = stock.discount;
+              const discountedPrice =
+                discount > 0
+                  ? originalPrice - (originalPrice * discount) / 100
+                  : originalPrice;
 
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {Array.isArray(stock.AssignedGame.Genre)
-                        ? stock.AssignedGame.Genre.map((genre, index) => (
+              return (
+                <Card
+                  key={stock._id}
+                  className="bg-customDark rounded-lg shadow-lg text-white"
+                >
+                  <Link to={`/game/${stock._id}`}>
+                    <Image
+                      radius="none"
+                      removeWrapper
+                      alt={stock.AssignedGame.title}
+                      className="w-[250px] h-[350px] object-cover rounded-t-lg"
+                      src={stock.AssignedGame.coverPhoto}
+                    />
+                    <CardBody className="p-4 text-white">
+                      <p className="text-editionColor font-primaryRegular text-sm">
+                        {stock.Edition} Edition
+                      </p>
+                      <h2 className="text-xl font-primaryRegular text-white mb-2">
+                        {stock.AssignedGame.title}
+                      </h2>
+
+                      <p className="font-primaryRegular text-white mb-2 m-2">
+                        {discount > 0 && (
+                          <>
+
                             <Chip
-                              key={index}
-                              color="danger"
-                              variant="dot"
-                              className="font-primaryRegular"
+                              color="primary"
+                              radius="none"
+                              className="font-primaryRegular mr-2"
+                              size="sm"
                             >
-                              {genre}
+                              -{stock.discount}% off
                             </Chip>
-                          ))
-                        : stock.AssignedGame.Genre.split(",").map(
-                            (genre, index) => (
+                            <span className="line-through mr-2 text-editionColor">
+                              LKR.{originalPrice}
+                            </span>
+                          </>
+                        )}
+                        <span>LKR.{discountedPrice}</span>
+                      </p>
+
+                      <div className="flex flex-wrap gap-2 mb-2 text-white ">
+                        {Array.isArray(stock.AssignedGame.Genre)
+                          ? stock.AssignedGame.Genre.map((genre, index) => (
                               <Chip
                                 key={index}
-                                color="danger"
+                                color="primary"
+                                variant="flat"
+                                size="sm"
                                 radius="none"
-                                className="font-primaryRegular"
+                                className="font-primaryRegular text-white"
                               >
                                 {genre}
                               </Chip>
-                            )
-                          )}
-                    </div>
-                  </CardBody>
-                  <CardFooter className="text-center p-4">
-                    <Button
-                      color="danger"
-                      radius="none"
-                      className="font-primaryRegular w-[300px]"
-                      variant="shadow"
-                    >
-                      Buy Now
-                    </Button>
-                  </CardFooter>
-                </Link>
-              </Card>
-            ))}
+                            ))
+                          : stock.AssignedGame.Genre.split(",").map(
+                              (genre, index) => (
+                                <Chip
+                                  key={index}
+                                  color="danger"
+                                  radius="none"
+                                  className="font-primaryRegular"
+                                >
+                                  {genre}
+                                </Chip>
+                              )
+                            )}
+                      </div>
+                    </CardBody>
+                  </Link>
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>

@@ -129,10 +129,10 @@ const GameDetails = () => {
     : originalPrice;
 
   return (
-    <div className="bg-white text-black min-h-screen font-primaryRegular">
+    <div className="bg-customDark  text-black min-h-screen font-primaryRegular">
       <Header />
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow-lg p-8">
+      <div className="container mx-auto px-4 py-8  ">
+        <div className="bg-customDark rounded-lg shadow-lg p-8">
           <h1 className="text-3xl text-gray-900 mb-4 text-left">
             {gameStock.AssignedGame.title} {gameStock.Edition} Edition
             <br />
@@ -140,7 +140,7 @@ const GameDetails = () => {
               {gameStock.AssignedGame.RatingPoints} Rating Points ⭐
             </Chip>
           </h1>
-          <div className="flex flex-col md:flex-row items-start justify-start gap-8">
+          <div className="flex flex-col md:flex-row items-start justify-start gap-8 bg-customDark">
             <div className="flex flex-col">
               <VideoPlayer
                 videoUrl={gameStock.AssignedGame.TrailerVideo}
@@ -154,7 +154,7 @@ const GameDetails = () => {
 
             </div>
             <div className="flex flex-col items-center text-center md:text-left">
-              <Card className="bg-white" radius="none">
+              <Card className="bg-customDark" radius="none">
                 <Image
                   radius="none"
                   removeWrapper

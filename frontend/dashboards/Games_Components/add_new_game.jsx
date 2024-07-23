@@ -14,9 +14,9 @@ const UploadGame = ({ FunctionToCallAfterUpload }) => {
 
   // Fixed categories list
   const categoriesList = [
-    { _id: "action", categoryName: "Action" },
-    { _id: "adventure", categoryName: "Adventure" },
-    { _id: "racing", categoryName: "Racing" },
+    { _id: "Action", categoryName: "Action" },
+    { _id: "Adventure", categoryName: "Adventure" },
+    { _id: "Racing", categoryName: "Racing" },
   ];
 
   const handleFileChange = (e) => {
