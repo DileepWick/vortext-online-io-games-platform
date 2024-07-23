@@ -50,8 +50,8 @@ export default function Header() {
   };
 
   return (
-    <div>
-      <Navbar className="font-primaryRegular text-black bg-opacity-60">
+    <div className="bg-opacity-20">
+      <Navbar className="font-primaryRegular text-black bg-opacity-20">
         <NavbarBrand>
           <p className="font-bold text-inherit">GAME STORE</p>
         </NavbarBrand>

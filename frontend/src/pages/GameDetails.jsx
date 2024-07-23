@@ -184,11 +184,31 @@ const GameDetails = () => {
                       </>
                     )}
                   </h2>
-                  <p className="text-gray-400">
-                    <Chip radius="none" variant="shadow" size="lg">
-                      {gameStock.AssignedGame.Genre}⚔️
-                    </Chip>
-                  </p>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                      {Array.isArray(gameStock.AssignedGame.Genre)
+                        ? gameStock.AssignedGame.Genre.map((genre, index) => (
+                            <Chip
+                              key={index}
+                              color="danger"
+                              variant="dot"
+                              className="font-primaryRegular"
+                            >
+                              {genre}
+                            </Chip>
+                          ))
+                        : gameStock.AssignedGame.Genre.split(",").map(
+                            (genre, index) => (
+                              <Chip
+                                key={index}
+                                color="danger"
+                                radius="none"
+                                className="font-primaryRegular"
+                              >
+                                {genre}
+                              </Chip>
+                            )
+                          )}
+                    </div>
 
                   {gameStock.Platform === "Windows" ? (
                     <div>

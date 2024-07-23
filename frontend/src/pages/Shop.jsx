@@ -45,7 +45,7 @@ const Shop = () => {
     <div className="min-h-screen bg-gradient-to-r from-red-300 via-gray-500 to-red-200 text-black">
       <Header />
       <div className="container mx-auto px-4 py-16">
-        <h1 className="text-4xl font-bold text-center text-black mb-8 font-primaryRegular">
+        <h1 className="text-4xl  text-center text-white mb-8 font-primaryRegular">
           Games
         </h1>
 
@@ -54,8 +54,10 @@ const Shop = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {gameStocks.map((stock) => (
-              <Card key={stock._id} className="bg-white bg-opacity-60 rounded-lg shadow-lg">
-
+              <Card
+                key={stock._id}
+                className="bg-white bg-opacity-60 rounded-lg shadow-lg"
+              >
                 <Link to={`/game/${stock._id}`}>
                   <Image
                     radius="none"
@@ -71,14 +73,18 @@ const Shop = () => {
                       <Chip>{stock.Edition}</Chip>
                     </h2>
                     <p className="font-primaryRegular text-black mb-2">
-                      <strong>{stock.UnitPrice}$ </strong>
+                      {stock.UnitPrice}$<br/>
                       {stock.discount > 0 && (
-                      <>
-                        <Chip color="primary" radius="none" className="font-primaryRegular">
-                          -{stock.discount}% off
-                        </Chip>
-                      </>
-                    )}
+                        <>
+                          <Chip
+                            color="danger"
+                            radius="none"
+                            className="font-primaryRegular"
+                          >
+                            -{stock.discount}% off
+                          </Chip>
+                        </>
+                      )}
                     </p>
 
                     <div className="flex flex-wrap gap-2 mb-2">
@@ -109,10 +115,10 @@ const Shop = () => {
                   </CardBody>
                   <CardFooter className="text-center p-4">
                     <Button
-                      color="primary"
+                      color="danger"
                       radius="none"
                       className="font-primaryRegular w-[300px]"
-                      variant="ghost"
+                      variant="shadow"
                     >
                       Buy Now
                     </Button>
