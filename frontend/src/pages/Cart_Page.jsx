@@ -7,6 +7,7 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import { DeleteIcon } from "../assets/icons/DeleteIcon";
 import { ScrollShadow } from "@nextui-org/react";
+import { toast, Flip } from "react-toastify";
 
 //Next Ui
 import {
@@ -183,7 +184,18 @@ const CartPage = () => {
       // Clear cart and show success message
       setCartItems([]);
       setShowPaymentForm(false);
-      alert("Order placed successfully!");
+      toast.success("Order Placed Successfully !", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Flip,
+        style: { fontFamily: "Rubik" },
+      });
     } catch (err) {
       setError(err);
     }
@@ -217,6 +229,7 @@ const CartPage = () => {
                 >
                   <div className="flex flex-row p-4">
                     <Image
+                      isBlurred
                       isZoomed
                       className="w-[180px] h-[220px]"
                       radius="none"

@@ -63,8 +63,9 @@ const Shop = () => {
                   <Link to={`/game/${stock._id}`}>
                     <div className="relative">
                       <Image
-                        radius="none"
-                        removeWrapper
+                        isBlurred
+                        
+                        
                         alt={stock.AssignedGame.title}
                         className="w-[250px] h-[350px] object-cover rounded-t-lg"
                         src={stock.AssignedGame.coverPhoto}

@@ -8,6 +8,7 @@ export const SearchIcon = (props) => (
     role="presentation"
     viewBox="0 0 24 24"
     width="1em"
+    color="white"
     {...props}
   >
     <path

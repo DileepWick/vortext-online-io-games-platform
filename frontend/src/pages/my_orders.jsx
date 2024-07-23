@@ -127,10 +127,10 @@ const OrderHistory = ({ userId }) => {
     }, {});
 
   return (
-    <div className="text-black min-h-screen font-sans font-primaryRegular bg-white">
+    <div className="text-black min-h-screen font-sans font-primaryRegular bg-customDark">
       <Header />
       <div className="container mx-auto p-6 font-primaryRegular">
-        <h2 className="text-3xl font-bold mb-8 text-black">My Orders</h2>
+        <h2 className="text-5xl  mb-8 text-white">My Orders</h2>
 
         <div className="flex space-x-4 mb-8 text-black">
           <select
@@ -138,7 +138,7 @@ const OrderHistory = ({ userId }) => {
             placeholder="Filter by Status"
             defaultValue="All"
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="text-black p-2 rounded"
+            className="text-white p-2 rounded bg-customDark"
           >
             <option value="All">All</option>
             <option value="Pending">Pending</option>
@@ -152,7 +152,7 @@ const OrderHistory = ({ userId }) => {
             aria-label="Select Date Order"
             defaultValue="recent"
             onChange={(e) => setDateOrder(e.target.value)}
-            className="text-black p-2 rounded"
+            className="text-white p-2 rounded bg-customDark"
           >
             <option value="recent" className="p-4 m-4">
               Recent to Old
@@ -164,47 +164,73 @@ const OrderHistory = ({ userId }) => {
 
           <Input
             type="text"
-            size="lg"
-            placeholder="Search by Ref ID"
+            size="md"
+            placeholder=" Search by Ref ID"
+            className="w-[500px]"
+            variant="bordered"
             value={searchQuery}
             startContent={<SearchIcon />}
             onChange={handleSearchInputChange}
+            classNames={{
+              label: "text-white",
+              input: "bg-customDark text-white", // Ensure this class is applied
+              innerWrapper: "bg-customDark",
+              inputWrapper: "bg-customDark",
+              width:"100px",
+            }}
+            style={{ color: "white" }} // Inline style to ensure text color is white
           />
         </div>
-
-        {Object.keys(searchedOrderItems).length === 0 ? (
-          <div className="text-center mt-10">No order items found.</div>
-        ) : (
-          Object.keys(searchedOrderItems).map((orderId) => (
-            <ScrollShadow hideScrollBar className="w-[1200px] h-[400px]">
-              <div key={orderId} className="mb-2 p-4 border-black">
-                <Card className="max-w-[full] mx-left ">
+        <ScrollShadow
+          hideScrollBar
+          className="w-[full] h-[500px] bg-customDark overflow-auto flex-row"
+        >
+          {Object.keys(searchedOrderItems).length === 0 ? (
+            <div className="text-center mt-10 text-white">
+              No order items found.
+            </div>
+          ) : (
+            Object.keys(searchedOrderItems).map((orderId) => (
+              <div
+                key={orderId}
+                className="mb-4 p-4 border-2 border-gray-800 rounded-lg"
+              >
+                <Card className="bg-headerDark border-red">
                   <CardHeader className="flex gap-4">
                     <div className="flex flex-row space-x-4">
-                      <Chip color="primary" size="lg" variant="faded">
+                      <Chip color="default" size="lg" radius="none">
                         <strong>Ref ID </strong> - {orderId}
                       </Chip>
 
                       {searchedOrderItems[orderId][0].order.orderStatus ===
                       "Approved" ? (
                         <div className="flex flex-row">
-                          <Chip color="success" variant="dot" size="lg">
+                          <Chip
+                            color="success"
+                            variant="dot"
+                            size="lg"
+                            className="text-white bg-headerDark"
+                          >
                             {searchedOrderItems[orderId][0].order.orderStatus}
                           </Chip>
-
                           <Progress
                             label="Progress..."
                             size="sm"
                             value={50}
                             color="success"
                             showValueLabel={true}
-                            className="w-[100px] ml-4"
+                            className="w-[100px] ml-4 text-white bg-headerDark"
                           />
                         </div>
                       ) : searchedOrderItems[orderId][0].order.orderStatus ===
                         "Pending" ? (
                         <>
-                          <Chip color="warning" variant="dot" size="lg">
+                          <Chip
+                            color="warning"
+                            variant="dot"
+                            size="lg"
+                            className="text-white bg-headerDark"
+                          >
                             {searchedOrderItems[orderId][0].order.orderStatus}
                           </Chip>
                           <Progress
@@ -213,7 +239,7 @@ const OrderHistory = ({ userId }) => {
                             value={25}
                             color="warning"
                             showValueLabel={true}
-                            className="w-[100px] ml-4"
+                            className="w-[100px] ml-4 text-white bg-headerDark"
                           />
                         </>
                       ) : searchedOrderItems[orderId][0].order.orderStatus ===
@@ -248,7 +274,8 @@ const OrderHistory = ({ userId }) => {
                               >
                                 <Chip
                                   variant="dot"
-                                  color="primary"
+                                  className="text-white bg-headerDark"
+                                  color="secondary"
                                   size="lg"
                                   avatar={
                                     <Avatar
@@ -271,14 +298,14 @@ const OrderHistory = ({ userId }) => {
                             ) : (
                               <div>Courier information not available</div>
                             )}
-                          </div>{" "}
+                          </div>
                           <Progress
                             label="Progress..."
                             size="sm"
                             value={75}
                             color="secondary"
                             showValueLabel={true}
-                            className="w-[100px] ml-4"
+                            className="w-[100px] ml-4 text-white"
                           />
                         </>
                       ) : searchedOrderItems[orderId][0].order.orderStatus ===
@@ -336,7 +363,7 @@ const OrderHistory = ({ userId }) => {
                             ) : (
                               <div>Courier information not available</div>
                             )}
-                          </div>{" "}
+                          </div>
                           <Progress
                             label="Progress..."
                             size="sm"
@@ -366,57 +393,62 @@ const OrderHistory = ({ userId }) => {
 
                   <Divider />
                   <CardBody>
-                    <div className="flex flex-row space-x-6">
-                      <Input
-                        label={"Placement Date"}
-                        isReadOnly
-                        defaultValue={
-                          searchedOrderItems[orderId][0].order
-                            .orderPlacementDate
-                        }
-                        className="max-w-xs"
-                      />
-                      <Input
-                        type="text"
-                        label="Token"
-                        isReadOnly
-                        defaultValue={
-                          searchedOrderItems[orderId][0].order
-                            .orderCompletionCode
-                        }
-                        description="Use this token to receive your order"
-                        className="max-w-xs"
-                      />
-                      <Textarea
-                        type="text"
-                        label="Shipping Address"
-                        isReadOnly
-                        defaultValue={
-                          searchedOrderItems[orderId][0].order.shippingAddress
-                        }
-                        className="max-w-xs mb-4"
-                      />
-                      <Input
-                        type="text"
-                        label="Region"
-                        isReadOnly
-                        defaultValue={
-                          searchedOrderItems[orderId][0].order.region
-                        }
-                        className="max-w-xs"
-                      />
-                    </div>
-                    <Divider />
-                    <div className="flex flex-row space-x-6 mt-4">
-                      <Input
-                        type="text"
-                        label="Payment Amount"
-                        isReadOnly
-                        defaultValue={`$${searchedOrderItems[orderId][0].order.paymentAmount}`}
-                        className="max-w-xs"
-                      />
+                    <div className="bg-headerDark p-3 rounded">
+                      <div className="mb-2">
+                        <p className="text-editionColor text-sm font-medium">
+                          <strong>Placement Date:</strong>
+                        </p>
+                        <p className="text-white text-sm">
+                          {
+                            searchedOrderItems[orderId][0].order
+                              .orderPlacementDate
+                          }
+                        </p>
+                      </div>
+                      <div className="mb-2">
+                        <p className="text-editionColor text-sm font-medium">
+                          <strong>Token:</strong>
+                        </p>
+                        <Chip
+                          color="danger"
+                          size="lg"
+                          className="text-white text-sm"
+                        >
+                          {
+                            searchedOrderItems[orderId][0].order
+                              .orderCompletionCode
+                          }
+                          <br />
+                        </Chip>
+                      </div>
+                      <div className="mb-2">
+                        <p className="text-editionColor text-sm font-medium">
+                          <strong>Shipping Address:</strong>
+                        </p>
+                        <p className="text-white text-sm">
+                          {searchedOrderItems[orderId][0].order.shippingAddress}
+                        </p>
+                      </div>
+                      <div className="mb-2">
+                        <p className="text-editionColor text-sm font-medium">
+                          <strong>Region:</strong>
+                        </p>
+                        <p className="text-white text-sm">
+                          {searchedOrderItems[orderId][0].order.region}
+                        </p>
+                      </div>
+                      <Divider className="my-2" />
+                      <div>
+                        <p className="text-editionColor text-sm font-medium">
+                          <strong>Payment Amount:</strong>
+                        </p>
+                        <p className="text-white text-sm">
+                          ${searchedOrderItems[orderId][0].order.paymentAmount}
+                        </p>
+                      </div>
                     </div>
                   </CardBody>
+
                   <Divider />
                   <CardFooter className="flex justify-between">
                     <View_Products
@@ -452,9 +484,9 @@ const OrderHistory = ({ userId }) => {
                   </CardFooter>
                 </Card>
               </div>
-            </ScrollShadow>
-          ))
-        )}
+            ))
+          )}
+        </ScrollShadow>
       </div>
       <Footer />
     </div>
