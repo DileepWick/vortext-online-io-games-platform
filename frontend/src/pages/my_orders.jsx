@@ -10,6 +10,7 @@ import { Progress } from "@nextui-org/react";
 
 // Next UI
 import { Chip } from "@nextui-org/chip";
+import { ScrollShadow } from "@nextui-org/react";
 import {
   Card,
   CardHeader,
@@ -175,276 +176,283 @@ const OrderHistory = ({ userId }) => {
           <div className="text-center mt-10">No order items found.</div>
         ) : (
           Object.keys(searchedOrderItems).map((orderId) => (
-            <div key={orderId} className="mb-2 p-4 border-black">
-              <Card className="max-w-[full] mx-left ">
-                <CardHeader className="flex gap-4">
-                  <div className="flex flex-row space-x-4">
-                    <Chip color="primary" size="lg" variant="faded">
-                      <strong>Ref ID </strong> - {orderId}
-                    </Chip>
-
-                    {searchedOrderItems[orderId][0].order.orderStatus ===
-                    "Approved" ? (
-                      <div className="flex flex-row">
-                        <Chip color="success" variant="dot" size="lg">
-                          {searchedOrderItems[orderId][0].order.orderStatus}
-                        </Chip>
-
-                        <Progress
-                          label="Progress..."
-                          size="sm"
-                          value={50}
-                          color="success"
-                          showValueLabel={true}
-                          className="w-[100px] ml-4"
-                        />
-                      </div>
-                    ) : searchedOrderItems[orderId][0].order.orderStatus ===
-                      "Pending" ? (
-                      <>
-                        <Chip color="warning" variant="dot" size="lg">
-                          {searchedOrderItems[orderId][0].order.orderStatus}
-                        </Chip>
-                        <Progress
-                          label="Progress..."
-                          size="sm"
-                          value={25}
-                          color="warning"
-                          showValueLabel={true}
-                          className="w-[100px] ml-4"
-                        />
-                      </>
-                    ) : searchedOrderItems[orderId][0].order.orderStatus ===
-                      "On Delivery" ? (
-                      <>
-                        <div>
-                          {searchedOrderItems[orderId][0].order.courier ? (
-                            <Tooltip
-                              content={
-                                <div className="px-1 py-2">
-                                  <Avatar
-                                    src={
-                                      searchedOrderItems[orderId][0].order
-                                        .courier.profilePic
-                                    }
-                                    size="lg"
-                                  />
-                                  <div className="text-small font-bold">
-                                    {
-                                      searchedOrderItems[orderId][0].order
-                                        .courier.username
-                                    }
-                                  </div>
-                                  <div className="text-tiny">
-                                    {
-                                      searchedOrderItems[orderId][0].order
-                                        .courier.email
-                                    }
-                                  </div>
-                                </div>
-                              }
-                            >
-                              <Chip
-                                variant="dot"
-                                color="primary"
-                                size="lg"
-                                avatar={
-                                  <Avatar
-                                    name="JW"
-                                    src={
-                                      searchedOrderItems[orderId][0].order
-                                        .courier.profilePic
-                                    }
-                                    size="lg"
-                                  />
-                                }
-                              >
-                                On Delivery By{" "}
-                                {
-                                  searchedOrderItems[orderId][0].order.courier
-                                    .username
-                                }
-                              </Chip>
-                            </Tooltip>
-                          ) : (
-                            <div>Courier information not available</div>
-                          )}
-                        </div>{" "}
-                        <Progress
-                          label="Progress..."
-                          size="sm"
-                          value={75}
-                          color="secondary"
-                          showValueLabel={true}
-                          className="w-[100px] ml-4"
-                        />
-                      </>
-                    ) : searchedOrderItems[orderId][0].order.orderStatus ===
-                      "Delivered" ? (
-                      <>
-                        <div>
-                          {searchedOrderItems[orderId][0].order.courier ? (
-                            <Tooltip
-                              content={
-                                <div className="px-1 py-2">
-                                  <Avatar
-                                    src={
-                                      searchedOrderItems[orderId][0].order
-                                        .courier.profilePic
-                                    }
-                                    size="lg"
-                                  />
-                                  <div className="text-small font-bold">
-                                    {
-                                      searchedOrderItems[orderId][0].order
-                                        .courier.username
-                                    }
-                                  </div>
-                                  <div className="text-tiny">
-                                    {
-                                      searchedOrderItems[orderId][0].order
-                                        .courier.email
-                                    }
-                                  </div>
-                                </div>
-                              }
-                            >
-                              <Chip
-                                variant="dot"
-                                color="primary"
-                                size="lg"
-                                avatar={
-                                  <Avatar
-                                    name="JW"
-                                    src={
-                                      searchedOrderItems[orderId][0].order
-                                        .courier.profilePic
-                                    }
-                                    size="lg"
-                                  />
-                                }
-                              >
-                                Delivered By{" "}
-                                {
-                                  searchedOrderItems[orderId][0].order.courier
-                                    .username
-                                }
-                              </Chip>
-                            </Tooltip>
-                          ) : (
-                            <div>Courier information not available</div>
-                          )}
-                        </div>{" "}
-                        <Progress
-                          label="Progress..."
-                          size="sm"
-                          value={100}
-                          color="primary"
-                          showValueLabel={true}
-                          className="w-[100px] ml-4"
-                        />
-                      </>
-                    ) : (
-                      <>
-                      <Chip color="danger" variant="dot" size="lg">
-                        {searchedOrderItems[orderId][0].order.orderStatus}
+            <ScrollShadow hideScrollBar className="w-[1200px] h-[400px]">
+              <div key={orderId} className="mb-2 p-4 border-black">
+                <Card className="max-w-[full] mx-left ">
+                  <CardHeader className="flex gap-4">
+                    <div className="flex flex-row space-x-4">
+                      <Chip color="primary" size="lg" variant="faded">
+                        <strong>Ref ID </strong> - {orderId}
                       </Chip>
-                      <Progress
-                          label="Progress..."
-                          size="sm"
-                          value={0}
-                          color="default"
-                          showValueLabel={true}
-                          className="w-[100px] ml-4"
-                        /></>
-                    )}
-                  </div>
-                </CardHeader>
 
-                <Divider />
-                <CardBody>
-                  <div className="flex flex-row space-x-6">
-                    <Input
-                      label={"Placement Date"}
-                      isReadOnly
-                      defaultValue={
-                        searchedOrderItems[orderId][0].order.orderPlacementDate
-                      }
-                      className="max-w-xs"
-                    />
-                    <Input
-                      type="text"
-                      label="Token"
-                      isReadOnly
-                      defaultValue={
-                        searchedOrderItems[orderId][0].order.orderCompletionCode
-                      }
-                      description="Use this token to receive your order"
-                      className="max-w-xs"
-                    />
-                    <Textarea
-                      type="text"
-                      label="Shipping Address"
-                      isReadOnly
-                      defaultValue={
-                        searchedOrderItems[orderId][0].order.shippingAddress
-                      }
-                      className="max-w-xs mb-4"
-                    />
-                    <Input
-                      type="text"
-                      label="Region"
-                      isReadOnly
-                      defaultValue={searchedOrderItems[orderId][0].order.region}
-                      className="max-w-xs"
-                    />
-                  </div>
+                      {searchedOrderItems[orderId][0].order.orderStatus ===
+                      "Approved" ? (
+                        <div className="flex flex-row">
+                          <Chip color="success" variant="dot" size="lg">
+                            {searchedOrderItems[orderId][0].order.orderStatus}
+                          </Chip>
+
+                          <Progress
+                            label="Progress..."
+                            size="sm"
+                            value={50}
+                            color="success"
+                            showValueLabel={true}
+                            className="w-[100px] ml-4"
+                          />
+                        </div>
+                      ) : searchedOrderItems[orderId][0].order.orderStatus ===
+                        "Pending" ? (
+                        <>
+                          <Chip color="warning" variant="dot" size="lg">
+                            {searchedOrderItems[orderId][0].order.orderStatus}
+                          </Chip>
+                          <Progress
+                            label="Progress..."
+                            size="sm"
+                            value={25}
+                            color="warning"
+                            showValueLabel={true}
+                            className="w-[100px] ml-4"
+                          />
+                        </>
+                      ) : searchedOrderItems[orderId][0].order.orderStatus ===
+                        "On Delivery" ? (
+                        <>
+                          <div>
+                            {searchedOrderItems[orderId][0].order.courier ? (
+                              <Tooltip
+                                content={
+                                  <div className="px-1 py-2">
+                                    <Avatar
+                                      src={
+                                        searchedOrderItems[orderId][0].order
+                                          .courier.profilePic
+                                      }
+                                      size="lg"
+                                    />
+                                    <div className="text-small font-bold">
+                                      {
+                                        searchedOrderItems[orderId][0].order
+                                          .courier.username
+                                      }
+                                    </div>
+                                    <div className="text-tiny">
+                                      {
+                                        searchedOrderItems[orderId][0].order
+                                          .courier.email
+                                      }
+                                    </div>
+                                  </div>
+                                }
+                              >
+                                <Chip
+                                  variant="dot"
+                                  color="primary"
+                                  size="lg"
+                                  avatar={
+                                    <Avatar
+                                      name="JW"
+                                      src={
+                                        searchedOrderItems[orderId][0].order
+                                          .courier.profilePic
+                                      }
+                                      size="lg"
+                                    />
+                                  }
+                                >
+                                  On Delivery By{" "}
+                                  {
+                                    searchedOrderItems[orderId][0].order.courier
+                                      .username
+                                  }
+                                </Chip>
+                              </Tooltip>
+                            ) : (
+                              <div>Courier information not available</div>
+                            )}
+                          </div>{" "}
+                          <Progress
+                            label="Progress..."
+                            size="sm"
+                            value={75}
+                            color="secondary"
+                            showValueLabel={true}
+                            className="w-[100px] ml-4"
+                          />
+                        </>
+                      ) : searchedOrderItems[orderId][0].order.orderStatus ===
+                        "Delivered" ? (
+                        <>
+                          <div>
+                            {searchedOrderItems[orderId][0].order.courier ? (
+                              <Tooltip
+                                content={
+                                  <div className="px-1 py-2">
+                                    <Avatar
+                                      src={
+                                        searchedOrderItems[orderId][0].order
+                                          .courier.profilePic
+                                      }
+                                      size="lg"
+                                    />
+                                    <div className="text-small font-bold">
+                                      {
+                                        searchedOrderItems[orderId][0].order
+                                          .courier.username
+                                      }
+                                    </div>
+                                    <div className="text-tiny">
+                                      {
+                                        searchedOrderItems[orderId][0].order
+                                          .courier.email
+                                      }
+                                    </div>
+                                  </div>
+                                }
+                              >
+                                <Chip
+                                  variant="dot"
+                                  color="primary"
+                                  size="lg"
+                                  avatar={
+                                    <Avatar
+                                      name="JW"
+                                      src={
+                                        searchedOrderItems[orderId][0].order
+                                          .courier.profilePic
+                                      }
+                                      size="lg"
+                                    />
+                                  }
+                                >
+                                  Delivered By{" "}
+                                  {
+                                    searchedOrderItems[orderId][0].order.courier
+                                      .username
+                                  }
+                                </Chip>
+                              </Tooltip>
+                            ) : (
+                              <div>Courier information not available</div>
+                            )}
+                          </div>{" "}
+                          <Progress
+                            label="Progress..."
+                            size="sm"
+                            value={100}
+                            color="primary"
+                            showValueLabel={true}
+                            className="w-[100px] ml-4"
+                          />
+                        </>
+                      ) : (
+                        <>
+                          <Chip color="danger" variant="dot" size="lg">
+                            {searchedOrderItems[orderId][0].order.orderStatus}
+                          </Chip>
+                          <Progress
+                            label="Progress..."
+                            size="sm"
+                            value={0}
+                            color="default"
+                            showValueLabel={true}
+                            className="w-[100px] ml-4"
+                          />
+                        </>
+                      )}
+                    </div>
+                  </CardHeader>
+
                   <Divider />
-                  <div className="flex flex-row space-x-6 mt-4">
-                    <Input
-                      type="text"
-                      label="Payment Amount"
-                      isReadOnly
-                      defaultValue={`$${searchedOrderItems[orderId][0].order.paymentAmount}`}
-                      className="max-w-xs"
+                  <CardBody>
+                    <div className="flex flex-row space-x-6">
+                      <Input
+                        label={"Placement Date"}
+                        isReadOnly
+                        defaultValue={
+                          searchedOrderItems[orderId][0].order
+                            .orderPlacementDate
+                        }
+                        className="max-w-xs"
+                      />
+                      <Input
+                        type="text"
+                        label="Token"
+                        isReadOnly
+                        defaultValue={
+                          searchedOrderItems[orderId][0].order
+                            .orderCompletionCode
+                        }
+                        description="Use this token to receive your order"
+                        className="max-w-xs"
+                      />
+                      <Textarea
+                        type="text"
+                        label="Shipping Address"
+                        isReadOnly
+                        defaultValue={
+                          searchedOrderItems[orderId][0].order.shippingAddress
+                        }
+                        className="max-w-xs mb-4"
+                      />
+                      <Input
+                        type="text"
+                        label="Region"
+                        isReadOnly
+                        defaultValue={
+                          searchedOrderItems[orderId][0].order.region
+                        }
+                        className="max-w-xs"
+                      />
+                    </div>
+                    <Divider />
+                    <div className="flex flex-row space-x-6 mt-4">
+                      <Input
+                        type="text"
+                        label="Payment Amount"
+                        isReadOnly
+                        defaultValue={`$${searchedOrderItems[orderId][0].order.paymentAmount}`}
+                        className="max-w-xs"
+                      />
+                    </div>
+                  </CardBody>
+                  <Divider />
+                  <CardFooter className="flex justify-between">
+                    <View_Products
+                      orderObject={searchedOrderItems[orderId][0].order}
                     />
-                  </div>
-                </CardBody>
-                <Divider />
-                <CardFooter className="flex justify-between">
-                  <View_Products
-                    orderObject={searchedOrderItems[orderId][0].order}
-                  />
-                  {searchedOrderItems[orderId][0].order.orderStatus !==
-                    "Canceled" &&
-                  searchedOrderItems[orderId][0].order.orderStatus !==
-                    "Delivered" ? (
-                    <CancelOrder
-                      orderForCancellation={
-                        searchedOrderItems[orderId][0].order
-                      }
-                      callBackFunction={() => {
-                        // Fetch order items again to reflect cancellation
-                        const fetchOrderItems = async () => {
-                          try {
-                            const token = getToken();
-                            const userId = getUserIdFromToken(token);
-                            const response = await axios.get(
-                              `http://localhost:8098/orderItems/useOrders/${userId}`
-                            );
-                            setOrderItems(response.data);
-                            setLoading(false);
-                          } catch (err) {
-                            setLoading(false);
-                          }
-                        };
-                        fetchOrderItems();
-                      }}
-                    />
-                  ) : null}
-                </CardFooter>
-              </Card>
-            </div>
+                    {searchedOrderItems[orderId][0].order.orderStatus !==
+                      "Canceled" &&
+                    searchedOrderItems[orderId][0].order.orderStatus !==
+                      "Delivered" ? (
+                      <CancelOrder
+                        orderForCancellation={
+                          searchedOrderItems[orderId][0].order
+                        }
+                        callBackFunction={() => {
+                          // Fetch order items again to reflect cancellation
+                          const fetchOrderItems = async () => {
+                            try {
+                              const token = getToken();
+                              const userId = getUserIdFromToken(token);
+                              const response = await axios.get(
+                                `http://localhost:8098/orderItems/useOrders/${userId}`
+                              );
+                              setOrderItems(response.data);
+                              setLoading(false);
+                            } catch (err) {
+                              setLoading(false);
+                            }
+                          };
+                          fetchOrderItems();
+                        }}
+                      />
+                    ) : null}
+                  </CardFooter>
+                </Card>
+              </div>
+            </ScrollShadow>
           ))
         )}
       </div>

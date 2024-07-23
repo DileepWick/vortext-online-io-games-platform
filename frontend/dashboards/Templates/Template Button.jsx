@@ -65,6 +65,8 @@ const delete_Template = ({ deletingObject, callBackFunction }) => {
     }
   };
 
+  
+
   //Handle Delete Button
   const handleDelete = function () {
     onDeleteModalOpen();

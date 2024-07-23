@@ -5,6 +5,8 @@ import { getToken } from "../utils/getToken";
 import useAuthCheck from "../utils/authCheck";
 import Header from "../components/header";
 import Footer from "../components/footer";
+import { DeleteIcon } from "../assets/icons/DeleteIcon";
+import { ScrollShadow } from "@nextui-org/react";
 
 //Next Ui
 import {
@@ -17,9 +19,10 @@ import {
   useDisclosure,
   Radio,
   RadioGroup,
+  Image,
+  Chip,
 } from "@nextui-org/react";
 import { Input } from "@nextui-org/input";
-import { Select, SelectSection, SelectItem } from "@nextui-org/select";
 
 const CartPage = () => {
   // Authenticate user
@@ -34,6 +37,7 @@ const CartPage = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [subtotal, setSubtotal] = useState(0);
   const [totalDiscountedTotal, setTotalDiscountedTotal] = useState(0);
+  const [numberOfItems, setNumberoFItems] = useState(0);
 
   // Payment form state
   const [showPaymentForm, setShowPaymentForm] = useState(false);
@@ -56,6 +60,7 @@ const CartPage = () => {
         );
 
         setCartItems(response.data.cartItems);
+        setNumberoFItems(cartItems.length);
         calculateTotal(response.data.cartItems);
       } catch (err) {
         setError("Error fetching cart items");
@@ -189,9 +194,11 @@ const CartPage = () => {
 
   if (cartItems.length === 0)
     return (
-      <div className="bg-gray-800 min-h-screen">
+      <div className="bg-customDark min-h-screen">
         <Header />
-        <p className="text-center mt-8">No items in the cart</p>
+        <p className="text-center mt-8 text-lg text-white">
+          No items in the cart
+        </p>
         <Footer />
       </div>
     );
@@ -199,94 +206,135 @@ const CartPage = () => {
   return (
     <div className=" min-h-screen font-primaryRegular">
       <Header />
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">My Cart</h1>
-          <div>
-            {cartItems.map((item) => (
-              <div
-                key={item._id}
-                className="flex justify-between items-center mb-4"
-              >
-                <div>
-                  <h2 className="text-xl font-bold text-gray-800">
-                    {item.stockid.AssignedGame.title}
-                  </h2>
-                  <p className="text-gray-700">
-                    Platform: {item.stockid.Platform}
-                  </p>
-                  <p className="text-gray-700">
-                    Edition: {item.stockid.Edition}
-                  </p>
-                  <p className="text-gray-700">
-                    Price: ${item.stockid.UnitPrice}
-                  </p>
-                  <p className="text-gray-700">
-                    Total: $
-                    {(item.stockid.UnitPrice * item.quantity).toFixed(2)}
-                  </p>
-                  {item.stockid.discount > 0 && (
-                    <p className="text-gray-700">
-                      Discount: {item.stockid.discount}%
-                    </p>
-                  )}
-                  <p className="text-gray-700">
-                    Discounted Total: ${discountedPrice(item).toFixed(2)}
-                  </p>
-                  <p className="text-gray-700">
-                    Stock available: {item.stockid.NumberOfUnits}
-                  </p>
-                </div>
-                <div>
-                  <Button
-                    onClick={() =>
-                      handleQuantityChange(item.stockid._id, item.quantity - 1)
-                    }
-                    color="danger"
-                    variant="bordered"
-                  >
-                    -
-                  </Button>
-                  <input
-                    type="number"
-                    value={item.quantity}
-                    onChange={(e) =>
-                      handleQuantityChange(
-                        item.stockid._id,
-                        Number(e.target.value)
-                      )
-                    }
-                    className="w-16 text-center border-gray-300"
-                  />
-                  <Button
-                    onClick={() =>
-                      handleQuantityChange(item.stockid._id, item.quantity + 1)
-                    }
-                    color="success"
-                    variant="bordered"
-                  >
-                    +
-                  </Button>
-                </div>
-                <Button
-                  onClick={() => handleRemoveItem(item.stockid._id)}
-                  color="danger"
-                  variant="bordered"
+      <div className="container mx-auto px-4 py-8 bg-customDark">
+        <div className="bg-customDark rounded-lg shadow-lg p-8 flex flex-row">
+          <ScrollShadow hideScrollBar className="w-[1500px] h-[550px]">
+            <div className="flex flex-col ">
+              {cartItems.map((item) => (
+                <div
+                  key={item._id}
+                  className="flex justify-between items-center mb-4"
                 >
-                  Remove
-                </Button>
+                  <div className="flex flex-row p-4">
+                    <Image
+                      isZoomed
+                      className="w-[180px] h-[220px]"
+                      radius="none"
+                      alt="NextUI Fruit Image with Zoom"
+                      src={item.stockid.AssignedGame.coverPhoto}
+                    />
+                    <div className="flex flex-col m-4 p-4">
+                      <p className="text-editionColor text-sm ">
+                        {item.stockid.Edition} Edition
+                      </p>
+
+                      <h2 className="text-xl  text-white">
+                        {item.stockid.AssignedGame.title}
+                      </h2>
+                      <Chip
+                        variant="flat"
+                        color="primary"
+                        className="mt-2 text-white"
+                      >
+                        {item.stockid.Platform}
+                      </Chip>
+                      <p className="text-white mt-2">
+                        <span className="line-through text-editionColor">
+                          LKR.
+                          {(item.stockid.UnitPrice * item.quantity).toFixed(2)}
+                        </span>{" "}
+                        <span className="text-white">
+                          LKR.
+                          {discountedPrice(item).toFixed(2)}
+                        </span>
+                      </p>
+                      {item.stockid.discount > 0 && (
+                        <Chip
+                          color="primary"
+                          radius="none"
+                          className="text-white mt-2"
+                        >
+                          {item.stockid.discount}% OFF
+                        </Chip>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <Button
+                      onClick={() =>
+                        handleQuantityChange(
+                          item.stockid._id,
+                          item.quantity - 1
+                        )
+                      }
+                      color="danger"
+                      variant="bordered"
+                      size="sm"
+                    >
+                      -
+                    </Button>
+                    <input
+                      type="number"
+                      value={item.quantity}
+                      onChange={(e) =>
+                        handleQuantityChange(
+                          item.stockid._id,
+                          Number(e.target.value)
+                        )
+                      }
+                      className="w-16 text-center border-gray-300 bg-customDark text-white"
+                    />
+                    <Button
+                      onClick={() =>
+                        handleQuantityChange(
+                          item.stockid._id,
+                          item.quantity + 1
+                        )
+                      }
+                      color="success"
+                      variant="bordered"
+                      size="sm"
+                    >
+                      +
+                    </Button>
+                  </div>
+                  <Button
+                    onClick={() => handleRemoveItem(item.stockid._id)}
+                    color="danger"
+                    variant="flat"
+                    size="sm"
+                  >
+                    <DeleteIcon />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </ScrollShadow>
+          <div className="mt-8 p-4 m-8  w-[500px] bg-customDark text-white">
+            <div className="p-4 bg-headerDark rounded-lg shadow-md text-white">
+              <h1 className="text-lg text-gray-300 mb-4 underline">
+                Order Summary
+              </h1>
+
+              <div className="mb-4">
+                <h2 className="text-lg text-editionColor mb-1">Subtotal</h2>
+                <p className="text-xl ">${subtotal.toFixed(2)}</p>
               </div>
-            ))}
-          </div>
-          <div className="mt-8 ">
-            <h2 className="text-2xl font-bold text-gray-800">
-              Subtotal: ${subtotal.toFixed(2)}
-            </h2>
-            <Button onPress={onOpen} color="primary" variant="shadow">
-              Proceed to Payment
-            </Button>
+
+              <Button
+                onPress={onOpen}
+                color="primary"
+                radius="none"
+                size="md"
+                className="w-full mt-4"
+              >
+                CHECK OUT
+              </Button>
+            </div>
+
             <Modal
               backdrop="opaque"
+              size="5xl"
               isOpen={isOpen}
               onOpenChange={onOpenChange}
               classNames={{
@@ -294,13 +342,13 @@ const CartPage = () => {
                   "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20 font-primaryRegular",
               }}
             >
-              <ModalContent>
+              <ModalContent className="max-h-screen">
                 {(onClose) => (
                   <>
                     <ModalHeader className="flex flex-col gap-1 font-primaryRegular">
                       Place Order
                     </ModalHeader>
-                    <ModalBody>
+                    <ModalBody className="max-h-96 overflow-auto">
                       <Input
                         type="text"
                         value={cardNumber}
@@ -316,7 +364,7 @@ const CartPage = () => {
                         onChange={(e) => setCvv(e.target.value)}
                         className="font-primaryRegular"
                         required
-                      />{" "}
+                      />
                       <Input
                         type="text"
                         value={expiryDate}
@@ -333,16 +381,61 @@ const CartPage = () => {
                         className="font-primaryRegular"
                         required
                       />
-                      <RadioGroup label="Select region" className="font-primaryRegular">
-                        <Radio value="Northern" onChange={() => setRegion("Northern")}>Northern</Radio>
-                        <Radio value="North Western" onChange={() => setRegion("North Western")}>North Western</Radio>
-                        <Radio value="Western" onChange={() => setRegion("Western")}>Western</Radio>
-                        <Radio value="North Central" onChange={() => setRegion("North Central")}>North Central</Radio>
-                        <Radio value="Central" onChange={() => setRegion("Central")}>Central</Radio>
-                        <Radio value="Sabaragamuwa" onChange={() => setRegion("Sabaragamuwa")}>Sabaragamuwa</Radio>
-                        <Radio value="Eastern" onChange={() => setRegion("Eastern")}>Eastern</Radio>
-                        <Radio value="Uva" onChange={() => setRegion("Uva")}>Uva</Radio>
-                        <Radio value="Southern" onChange={() => setRegion("Southern")}>Southern</Radio>
+                      <RadioGroup
+                        label="Select region"
+                        className="font-primaryRegular"
+                      >
+                        <Radio
+                          value="Northern"
+                          onChange={() => setRegion("Northern")}
+                        >
+                          Northern
+                        </Radio>
+                        <Radio
+                          value="North Western"
+                          onChange={() => setRegion("North Western")}
+                        >
+                          North Western
+                        </Radio>
+                        <Radio
+                          value="Western"
+                          onChange={() => setRegion("Western")}
+                        >
+                          Western
+                        </Radio>
+                        <Radio
+                          value="North Central"
+                          onChange={() => setRegion("North Central")}
+                        >
+                          North Central
+                        </Radio>
+                        <Radio
+                          value="Central"
+                          onChange={() => setRegion("Central")}
+                        >
+                          Central
+                        </Radio>
+                        <Radio
+                          value="Sabaragamuwa"
+                          onChange={() => setRegion("Sabaragamuwa")}
+                        >
+                          Sabaragamuwa
+                        </Radio>
+                        <Radio
+                          value="Eastern"
+                          onChange={() => setRegion("Eastern")}
+                        >
+                          Eastern
+                        </Radio>
+                        <Radio value="Uva" onChange={() => setRegion("Uva")}>
+                          Uva
+                        </Radio>
+                        <Radio
+                          value="Southern"
+                          onChange={() => setRegion("Southern")}
+                        >
+                          Southern
+                        </Radio>
                       </RadioGroup>
                       <Input
                         type="text"

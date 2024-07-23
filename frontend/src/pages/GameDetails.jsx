@@ -14,7 +14,8 @@ import Footer from "../components/footer";
 
 // NextUI
 import { Button, Chip } from "@nextui-org/react";
-import { Card, CardBody, CardFooter, Image ,Textarea} from "@nextui-org/react";
+import { Card, CardBody, CardFooter, Image, Textarea } from "@nextui-org/react";
+import { ScrollShadow } from "@nextui-org/react";
 
 const GameDetails = () => {
   // Authenticate user
@@ -133,10 +134,10 @@ const GameDetails = () => {
       <Header />
       <div className="container mx-auto px-4 py-8  ">
         <div className="bg-customDark rounded-lg shadow-lg p-8">
-          <h1 className="text-3xl text-gray-900 mb-4 text-left">
+          <h1 className="text-5xl text-white mb-4 text-left">
             {gameStock.AssignedGame.title} {gameStock.Edition} Edition
             <br />
-            <Chip color="danger">
+            <Chip color="primary" radius="none">
               {gameStock.AssignedGame.RatingPoints} Rating Points ⭐
             </Chip>
           </h1>
@@ -149,9 +150,17 @@ const GameDetails = () => {
                 muted
                 className="w-[900px] h-[400px] object-cover mb-4 shadow-md"
               />
-              <Chip color="primary" variant="shadow" className="mt-8" size="lg">ABOUT {gameStock.AssignedGame.title}</Chip>
-              <p className="text-lg mt-4">{gameStock.AssignedGame.Description}</p>
-
+              <h1 className="mt-8 text-editionColor text-3xl">
+                About the game
+              </h1>
+              <p className="text-lg mt-4">
+                <ScrollShadow
+                  hideScrollBar
+                  className="w-[1000px] h-[200px] text-white"
+                >
+                  {gameStock.AssignedGame.Description}
+                </ScrollShadow>
+              </p>
             </div>
             <div className="flex flex-col items-center text-center md:text-left">
               <Card className="bg-customDark" radius="none">
@@ -163,56 +172,46 @@ const GameDetails = () => {
                   src={gameStock.AssignedGame.coverPhoto}
                 />
                 <CardBody>
-                  <h2 className="text-xl font-primaryRegular text-black mb-2">
+                  <h2 className="text-xl font-primaryRegular text-white mb-2">
                     {gameStock.AssignedGame.title} <br />
-                    <Chip variant="faded">{gameStock.Edition} Edition</Chip>
-                    <br />
-                    <br />
+                    <p className="text-editionColor text-sm">
+                      {gameStock.Edition} Edition
+                    </p>
                     {gameStock.discount > 0 && (
                       <>
                         <Chip color="primary" radius="none">
                           -{gameStock.discount}% off
                         </Chip>
                         <div className="flex items-center mt-2">
-                          <span className="line-through text-red-300 mr-4">
-                            ${originalPrice.toFixed(2)}
+                          <span className="line-through mr-4 text-editionColor">
+                            LKR .{originalPrice.toFixed(2)}
                           </span>
                           <span className="text-lg">
-                            ${discountedPrice.toFixed(2)}
+                            LKR .{discountedPrice.toFixed(2)}
                           </span>
                         </div>
                       </>
                     )}
                   </h2>
                   <div className="flex flex-wrap gap-2 mb-2">
-                      {Array.isArray(gameStock.AssignedGame.Genre)
-                        ? gameStock.AssignedGame.Genre.map((genre, index) => (
-                            <Chip
-                              key={index}
-                              color="danger"
-                              variant="dot"
-                              className="font-primaryRegular"
-                            >
-                              {genre}
-                            </Chip>
-                          ))
-                        : gameStock.AssignedGame.Genre.split(",").map(
-                            (genre, index) => (
-                              <Chip
-                                key={index}
-                                color="danger"
-                                radius="none"
-                                className="font-primaryRegular"
-                              >
-                                {genre}
-                              </Chip>
-                            )
-                          )}
-                    </div>
+                    {gameStock.AssignedGame.Genre.flatMap((genre) =>
+                      genre.includes(",") ? genre.split(",") : genre
+                    ).map((genre, index) => (
+                      <Chip
+                        key={index}
+                        color="primary"
+                        variant="flat"
+                        size="sm"
+                        radius="none"
+                        className="font-primaryRegular text-white"
+                      >
+                        {genre.trim()}
+                      </Chip>
+                    ))}
+                  </div>
 
                   {gameStock.Platform === "Windows" ? (
                     <div>
-                      Platform
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="20"
@@ -220,13 +219,13 @@ const GameDetails = () => {
                         fill="currentColor"
                         className="bi bi-windows"
                         viewBox="0 0 16 16"
+                        color="white"
                       >
                         <path d="M6.555 1.375 0 2.237v5.45h6.555zM0 13.795l6.555.933V8.313H0zm7.278-5.4.026 6.378L16 16V8.395zM16 0 7.33 1.244v6.414H16z" />
                       </svg>
                     </div>
                   ) : gameStock.Platform === "PS5" ? (
                     <div>
-                      Platform
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="20"
@@ -234,14 +233,13 @@ const GameDetails = () => {
                         fill="currentColor"
                         class="bi bi-playstation"
                         viewBox="0 0 16 16"
+                        color="white"
                       >
                         <path d="M15.858 11.451c-.313.395-1.079.676-1.079.676l-5.696 2.046v-1.509l4.192-1.493c.476-.17.549-.412.162-.538-.386-.127-1.085-.09-1.56.08l-2.794.984v-1.566l.161-.054s.807-.286 1.942-.412c1.135-.125 2.525.017 3.616.43 1.23.39 1.368.962 1.056 1.356M9.625 8.883v-3.86c0-.453-.083-.87-.508-.988-.326-.105-.528.198-.528.65v9.664l-2.606-.827V2c1.108.206 2.722.692 3.59.985 2.207.757 2.955 1.7 2.955 3.825 0 2.071-1.278 2.856-2.903 2.072Zm-8.424 3.625C-.061 12.15-.271 11.41.304 10.984c.532-.394 1.436-.69 1.436-.69l3.737-1.33v1.515l-2.69.963c-.474.17-.547.411-.161.538.386.126 1.085.09 1.56-.08l1.29-.469v1.356l-.257.043a8.45 8.45 0 0 1-4.018-.323Z" />
                       </svg>
                     </div>
                   ) : gameStock.Platform === "Xbox" ? (
                     <div className="flex flex-row p-4">
-                      <p>Platform</p>
-
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="20"
@@ -249,13 +247,13 @@ const GameDetails = () => {
                         fill="currentColor"
                         class="bi bi-xbox"
                         viewBox="0 0 16 16"
+                        color="white"
                       >
                         <path d="M7.202 15.967a8 8 0 0 1-3.552-1.26c-.898-.585-1.101-.826-1.101-1.306 0-.965 1.062-2.656 2.879-4.583C6.459 7.723 7.897 6.44 8.052 6.475c.302.068 2.718 2.423 3.622 3.531 1.43 1.753 2.088 3.189 1.754 3.829-.254.486-1.83 1.437-2.987 1.802-.954.301-2.207.429-3.239.33m-5.866-3.57C.589 11.253.212 10.127.03 8.497c-.06-.539-.038-.846.137-1.95.218-1.377 1.002-2.97 1.945-3.95.401-.417.437-.427.926-.263.595.2 1.23.638 2.213 1.528l.574.519-.313.385C4.056 6.553 2.52 9.086 1.94 10.653c-.315.852-.442 1.707-.306 2.063.091.24.007.15-.3-.319Zm13.101.195c.074-.36-.019-1.02-.238-1.687-.473-1.443-2.055-4.128-3.508-5.953l-.457-.575.494-.454c.646-.593 1.095-.948 1.58-1.25.381-.237.927-.448 1.161-.448.145 0 .654.528 1.065 1.104a8.4 8.4 0 0 1 1.343 3.102c.153.728.166 2.286.024 3.012a9.5 9.5 0 0 1-.6 1.893c-.179.393-.624 1.156-.82 1.404-.1.128-.1.127-.043-.148ZM7.335 1.952c-.67-.34-1.704-.705-2.276-.803a4 4 0 0 0-.759-.043c-.471.024-.45 0 .306-.358A7.8 7.8 0 0 1 6.47.128c.8-.169 2.306-.17 3.094-.005.85.18 1.853.552 2.418.9l.168.103-.385-.02c-.766-.038-1.88.27-3.078.853-.361.176-.676.316-.699.312a12 12 0 0 1-.654-.319Z" />
                       </svg>
                     </div>
                   ) : (
                     <div>
-                      Platform
                       <span>Other Platform</span>
                     </div>
                   )}

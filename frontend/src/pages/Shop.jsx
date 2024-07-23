@@ -4,11 +4,11 @@ import { Link } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { Spinner } from "@nextui-org/react";
-
-// NextUI
 import { Image } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
-import { Card, CardBody, CardFooter, Chip } from "@nextui-org/react";
+import { Card, CardBody, Chip } from "@nextui-org/react";
+import { FaShoppingCart } from "react-icons/fa";
+import { FaPlaystation } from "react-icons/fa";
 
 const Shop = () => {
   const [gameStocks, setGameStocks] = useState([]);
@@ -58,18 +58,24 @@ const Shop = () => {
               return (
                 <Card
                   key={stock._id}
-                  className="bg-customDark rounded-lg shadow-lg text-white"
+                  className="relative bg-customDark rounded-lg shadow-lg text-white transform transition-transform duration-300 hover:scale-105 hover:z-10 hover:shadow-2xl hover:bg-opacity-80"
                 >
                   <Link to={`/game/${stock._id}`}>
-                    <Image
-                      radius="none"
-                      removeWrapper
-                      alt={stock.AssignedGame.title}
-                      className="w-[250px] h-[350px] object-cover rounded-t-lg"
-                      src={stock.AssignedGame.coverPhoto}
-                    />
+                    <div className="relative">
+                      <Image
+                        radius="none"
+                        removeWrapper
+                        alt={stock.AssignedGame.title}
+                        className="w-[250px] h-[350px] object-cover rounded-t-lg"
+                        src={stock.AssignedGame.coverPhoto}
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity duration-300 hover:opacity-100">
+                        <FaPlaystation className="text-white text-3xl" />
+                        <FaShoppingCart className="text-white text-3xl absolute" />
+                      </div>
+                    </div>
                     <CardBody className="p-4 text-white">
-                      <p className="text-editionColor font-primaryRegular text-sm">
+                      <p className="text-editionColor font-primaryRegular text-sm ">
                         {stock.Edition} Edition
                       </p>
                       <h2 className="text-xl font-primaryRegular text-white mb-2">
@@ -79,7 +85,6 @@ const Shop = () => {
                       <p className="font-primaryRegular text-white mb-2 m-2">
                         {discount > 0 && (
                           <>
-
                             <Chip
                               color="primary"
                               radius="none"
@@ -97,31 +102,20 @@ const Shop = () => {
                       </p>
 
                       <div className="flex flex-wrap gap-2 mb-2 text-white ">
-                        {Array.isArray(stock.AssignedGame.Genre)
-                          ? stock.AssignedGame.Genre.map((genre, index) => (
-                              <Chip
-                                key={index}
-                                color="primary"
-                                variant="flat"
-                                size="sm"
-                                radius="none"
-                                className="font-primaryRegular text-white"
-                              >
-                                {genre}
-                              </Chip>
-                            ))
-                          : stock.AssignedGame.Genre.split(",").map(
-                              (genre, index) => (
-                                <Chip
-                                  key={index}
-                                  color="danger"
-                                  radius="none"
-                                  className="font-primaryRegular"
-                                >
-                                  {genre}
-                                </Chip>
-                              )
-                            )}
+                        {stock.AssignedGame.Genre.flatMap((genre) =>
+                          genre.includes(",") ? genre.split(",") : genre
+                        ).map((genre, index) => (
+                          <Chip
+                            key={index}
+                            color="primary"
+                            variant="flat"
+                            size="sm"
+                            radius="none"
+                            className="font-primaryRegular text-white"
+                          >
+                            {genre.trim()}
+                          </Chip>
+                        ))}
                       </div>
                     </CardBody>
                   </Link>

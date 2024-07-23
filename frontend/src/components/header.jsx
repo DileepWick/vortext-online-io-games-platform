@@ -10,7 +10,6 @@ import {
   Dropdown,
   DropdownMenu,
   User,
-  Divider,
 } from "@nextui-org/react";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -26,6 +25,13 @@ export default function Header() {
   const userId = getUserIdFromToken(token);
   const navigate = useNavigate();
   const location = useLocation();
+
+  const variants = [
+    "solid",
+    "underlined",
+    "bordered",
+    "light",
+  ];
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -51,9 +57,9 @@ export default function Header() {
 
   return (
     <div className="bg-headerDark">
-      <Navbar className="font-primaryRegular text-black bg-headerDark">
+      <Navbar className="font-primaryRegular bg-headerDark text-white">
         <NavbarBrand>
-          <p className="font-bold text-inherit">GAME STORE</p>
+          <p className="font-bold text-white">VORTEX GAMING</p>
         </NavbarBrand>
 
         <NavbarContent className="hidden sm:flex gap-4" justify="center">
@@ -61,6 +67,9 @@ export default function Header() {
             <Link
               color={location.pathname === "/" ? "white" : "default"}
               href="/"
+              className={`${
+                location.pathname === "/" ? "underline" : ""
+              } text-white hover:underline`}
             >
               Home
             </Link>
@@ -69,6 +78,9 @@ export default function Header() {
             <Link
               color={location.pathname === "/shop" ? "danger" : "default"}
               href="/shop"
+              className={`${
+                location.pathname === "/shop" ? "underline" : ""
+              } text-white hover:underline`}
             >
               Shop
             </Link>
@@ -77,6 +89,9 @@ export default function Header() {
             <Link
               color={location.pathname === "/articles" ? "primary" : "white"}
               href="/articles"
+              className={`${
+                location.pathname === "/articles" ? "underline" : ""
+              } text-white hover:underline`}
             >
               Articles
             </Link>
@@ -85,6 +100,9 @@ export default function Header() {
             <Link
               color={location.pathname === "/GamingSessions" ? "primary" : "white"}
               href="/GamingSessions"
+              className={`${
+                location.pathname === "/GamingSessions" ? "underline" : ""
+              } text-white hover:underline`}
             >
               Gaming Sessions
             </Link>
@@ -93,6 +111,9 @@ export default function Header() {
             <Link
               color={location.pathname === "/reviews" ? "primary" : "white"}
               href="#"
+              className={`${
+                location.pathname === "/reviews" ? "underline" : ""
+              } text-white hover:underline`}
             >
               Reviews
             </Link>
@@ -101,6 +122,9 @@ export default function Header() {
             <Link
               color={location.pathname === "/contact" ? "primary" : "white"}
               href="/contact"
+              className={`${
+                location.pathname === "/contact" ? "underline" : ""
+              } text-white hover:underline`}
             >
               Contact
             </Link>
@@ -112,7 +136,7 @@ export default function Header() {
             <Dropdown placement="bottom-end">
               <DropdownTrigger>
                 <User
-                  className="cursor-pointer text-black"
+                  className="cursor-pointer text-white"
                   name={user.username}
                   description={user.role}
                   avatarProps={{
@@ -235,7 +259,7 @@ export default function Header() {
               </DropdownMenu>
             </Dropdown>
           ) : (
-            <Link className="text-black" href="/login">
+            <Link className="text-white" href="/login">
               Login
             </Link>
           )}

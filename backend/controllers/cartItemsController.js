@@ -86,9 +86,15 @@ export const getCartItemsByUserId = async (req, res) => {
     }
 
     // Find all cart items for the found cart
-    const cartItems = await CartItems.find({ cartid: cart._id }).populate(
-      "stockid"
-    );
+    const cartItems = await CartItems.find({ cartid: cart._id })
+      .populate("stockid")
+      .populate({
+        path: "stockid",
+        populate: {
+          path: "AssignedGame",
+          model: "Game",
+        },
+      });
 
     // Return the cart items
     res.status(200).json({ cartItems });
@@ -106,11 +112,15 @@ export const updateCartItemByStockId = async (req, res) => {
 
     // Validate input
     if (!stockId || quantity === undefined) {
-      return res.status(400).json({ message: "Stock ID and quantity are required" });
+      return res
+        .status(400)
+        .json({ message: "Stock ID and quantity are required" });
     }
 
     // Find the cart item by stock ID and populate the stockid field
-    const cartItem = await CartItems.findOne({ stockid: stockId }).populate('stockid');
+    const cartItem = await CartItems.findOne({ stockid: stockId }).populate(
+      "stockid"
+    );
 
     if (!cartItem) {
       return res.status(404).json({ message: "Cart item not found" });
@@ -127,7 +137,10 @@ export const updateCartItemByStockId = async (req, res) => {
     const quantityDifference = quantity - cartItem.quantity;
 
     // Check if there is enough stock available for the increase
-    if (quantityDifference > 0 && gameStock.NumberOfUnits < quantityDifference) {
+    if (
+      quantityDifference > 0 &&
+      gameStock.NumberOfUnits < quantityDifference
+    ) {
       return res.status(400).json({ message: "Not enough stock available" });
     }
 
@@ -148,7 +161,6 @@ export const updateCartItemByStockId = async (req, res) => {
     res.status(500).json({ message: "Error updating cart item" });
   }
 };
-
 
 // Delete cart item by stock ID
 export const deleteCartItemByStockId = async (req, res) => {
