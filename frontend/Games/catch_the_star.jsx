@@ -16,36 +16,28 @@ const GameContainer = styled.div`
   height: 100vh;
   background: #282c34;
   overflow: hidden;
+  cursor: none; /* Hide the cursor */
 `;
 
-const Star = styled.div`
+const Item = styled.img`
   position: absolute;
-  width: 30px;
-  height: 30px;
-  background: yellow;
-  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  width: 60px;
+  height: 60px;
   animation: ${fall} 3s linear infinite;
   left: ${({ left }) => left}%;
 `;
 
-const Bomb = styled.div`
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  background: red;
-  border-radius: 50%;
-  animation: ${fall} 3s linear infinite;
-  left: ${({ left }) => left}%;
-`;
-
-const Basket = styled.div`
+const BasketContainer = styled.div`
   position: absolute;
   bottom: 20px;
   left: ${({ left }) => left}%;
-  width: 100px;
-  height: 50px;
-  background: brown;
-  border-radius: 10px;
+  width: 300px;
+  height: 150px;
+`;
+
+const BasketIcon = styled.img`
+  width: 100%;
+  height: 100%;
 `;
 
 const Score = styled.div`
@@ -121,14 +113,17 @@ const CatchTheStarGame = () => {
 
   return (
     <GameContainer>
-      {items.map((item) =>
-        item.type === 'star' ? (
-          <Star key={item.id} left={item.left} />
-        ) : (
-          <Bomb key={item.id} left={item.left} />
-        )
-      )}
-      <Basket left={basketLeft} />
+      {items.map((item) => (
+        <Item
+          key={item.id}
+          left={item.left}
+          src={item.type === 'star' ? 'https://pbs.twimg.com/profile_images/541867053351583744/rcxem8NU_400x400.jpeg' : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUgXQeGsvTBC-JFiecXjnh0IC4MbKi3yDZVw&s'}
+          alt={item.type}
+        />
+      ))}
+      <BasketContainer left={basketLeft}>
+        <BasketIcon src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR95J04FfX4oV8sULU8acqlDZy1TlbmpCuS-g&s" alt="Basket" />
+      </BasketContainer>
       <Score>Score: {score}</Score>
       <LifeLines>Life Lines: {lifeLines}</LifeLines>
       {lifeLines <= 0 && (
