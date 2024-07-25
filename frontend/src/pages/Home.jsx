@@ -2,7 +2,7 @@ import React from "react";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { toast, Flip } from "react-toastify";
-import SayMyName from "../components/SayMyName";
+import CatchTheStarGame from "../../Games/catch_the_star";
 
 const Home = () => {
 
@@ -37,6 +37,9 @@ const Home = () => {
       <h1>NimsaraThhenuka</h1>
       <h1>Bandara Ranasinghe</h1>
       <h1>Tharindu Ariyawansha</h1>
+
+      <>
+      <CatchTheStarGame/></>
 
 
       <Footer />
