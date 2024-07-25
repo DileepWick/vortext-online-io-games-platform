@@ -220,7 +220,7 @@ const CartPage = () => {
       <Header />
       <div className="container mx-auto px-4 py-8 bg-customDark">
         <div className="bg-customDark rounded-lg shadow-lg p-8 flex flex-row">
-          <ScrollShadow hideScrollBar className="w-[1500px] h-[550px]">
+          <ScrollShadow hideScrollBar className="w-[1500px] h-[cd ]">
             <div className="flex flex-col ">
               {cartItems.map((item) => (
                 <div
