@@ -80,17 +80,6 @@ export default function Header() {
           </NavbarItem>
           <NavbarItem>
             <Link
-              color={location.pathname === "/appointments" ? "primary" : "default"}
-              href="/caregiverRegistration"
-              className={`${
-                location.pathname === "/caregiverRegistration" ? "underline" : ""
-              } text-dark hover:underline`}
-            >
-              Career
-            </Link>
-          </NavbarItem>
-          <NavbarItem>
-            <Link
               color={location.pathname === "/careplans" ? "primary" : "default"}
               href="/careplans"
               className={`${

@@ -16,8 +16,7 @@ import ArticleList from "./pages/articles";
 import Contact from "./pages/Contact";
 import GamingSessions from "./pages/GamingSessions";
 
-//Caregiver Pages
-import CaregiverRegistrationPage from "./pages/CareGiver/CaregiverRegistrationPage";
+
 
 //Dashboards
 import ProductManagerDashboard from "../dashboards/product_manager_dashboard";
@@ -54,10 +53,6 @@ const App = () => {
       <Route path="/GamingSessions" element={<GamingSessions />} />
       <Route path="/staffManager" element={<StaffManager />} />
       <Route path="/review_dashboard" element={<Review_manager />} />
-      <Route
-        path="/caregiverRegistration"
-        element={<CaregiverRegistrationPage />}
-      />
     </Routes>
   );
 };

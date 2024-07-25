@@ -2,7 +2,7 @@ import React from "react";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { toast, Flip } from "react-toastify";
-import CatchTheStarGame from "../../Games/catch_the_star";
+import Hangman from "../../Games/Hangman"
 
 const Home = () => {
 
@@ -26,6 +26,13 @@ const Home = () => {
       alert("Hello");
   }
 
+  const questions = [
+    { word: 'REACT', hint: 'A JavaScript library for building user interfaces.' },
+    { word: 'JAVASCRIPT', hint: 'A programming language commonly used in web development.' },
+    { word: 'HANGMAN', hint: 'A word guessing game.' },
+    { word: 'DEVELOPER', hint: 'A person who writes computer software.' }
+  ];
+
   return (
     <div className="font-primaryRegular">
       <Header />
@@ -39,7 +46,7 @@ const Home = () => {
       <h1>Tharindu Ariyawansha</h1>
 
       <>
-      <CatchTheStarGame/></>
+      <Hangman questions={questions} learningSubject="Computer Science" /></>
 
 
       <Footer />
