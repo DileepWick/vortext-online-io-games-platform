@@ -1,29 +1,19 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { toast, Flip } from "react-toastify";
-import { Input, Button, Select, SelectItem } from "@nextui-org/react";
+import { Input, Button } from "@nextui-org/react";
 
-const AddNewStock = ({ gameForTheStock ,callBackFunction}) => {
+const AddNewStock = ({ gameForTheStock, callBackFunction }) => {
   // State Variables
   const [game] = useState(gameForTheStock);
   const [title] = useState(gameForTheStock.title);
-  const [platform, setPlatform] = useState("");
   const [price, setPrice] = useState(0);
-  const [quantity, setQuantity] = useState(0);
-  const [edition, setEdition] = useState("");
   const [discount, setDiscount] = useState("");
-
-  // Arrays for platform and edition options
-  const platforms = ["Windows", "PS5", "Xbox", "Nintendo"];
-  const editions = ["Standard", "Gold", "Ultimate"];
 
   const handleAddNewStock = async (e) => {
     e.preventDefault();
     try {
       const newStock = {
-        Platform: platform,
-        Edition: edition,
-        NumberOfUnits: quantity,
         UnitPrice: price,
         discount: discount,
         AssignedGame: game._id,
@@ -42,10 +32,9 @@ const AddNewStock = ({ gameForTheStock ,callBackFunction}) => {
           transition: Flip,
           style: { fontFamily: "Rubik" },
         });
-        if(callBackFunction)
-          {
-            callBackFunction();
-          }
+        if (callBackFunction) {
+          callBackFunction();
+        }
       } else if (response.status === 400 || response.status === 405) {
         toast.error(response.data.message, {
           theme: "dark",
@@ -84,49 +73,6 @@ const AddNewStock = ({ gameForTheStock ,callBackFunction}) => {
             readOnly
             className="w-full"
           />
-          <div className="w-full">
-            <Select
-              label="Select Platform"
-              value={platform}
-              onChange={(e) => setPlatform(e.target.value)}
-              className="font-primaryRegular"
-            >
-              {platforms.map((platformOption) => (
-                <SelectItem
-                  key={platformOption}
-                  value={platformOption}
-                  className="font-primaryRegular"
-                >
-                  {platformOption}
-                </SelectItem>
-              ))}
-            </Select>
-          </div>
-          <div className="w-full">
-            <Select
-              label="Select Edition"
-              value={edition}
-              onChange={(e) => setEdition(e.target.value)}
-              className="font-primaryRegular"
-            >
-              {editions.map((editionOption) => (
-                <SelectItem
-                  key={editionOption}
-                  value={editionOption}
-                  className="font-primaryRegular"
-                >
-                  {editionOption}
-                </SelectItem>
-              ))}
-            </Select>
-          </div>
-          <Input
-            type="number"
-            label="Quantity"
-            value={quantity}
-            onChange={(e) => setQuantity(Number(e.target.value))}
-            className="w-full"
-          />
           <Input
             type="number"
             label="Price"
@@ -147,7 +93,6 @@ const AddNewStock = ({ gameForTheStock ,callBackFunction}) => {
             onChange={(e) => setDiscount(Number(e.target.value))}
             className="w-full"
           />
-
           <Button type="submit" color="primary" size="lg" className="mt-4">
             Add New Stock
           </Button>

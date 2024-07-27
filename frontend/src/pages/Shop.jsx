@@ -76,9 +76,7 @@ const Shop = () => {
                       </div>
                     </div>
                     <CardBody className="p-4 text-white">
-                      <p className="text-editionColor font-primaryRegular text-sm ">
-                        {stock.Edition} Edition
-                      </p>
+
                       <h2 className="text-xl font-primaryRegular text-white mb-2">
                         {stock.AssignedGame.title}
                       </h2>

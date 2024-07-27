@@ -14,14 +14,11 @@ const nanoid = customAlphabet(alphabet, 6);
 // Create an Order
 export const createOrder = async (req, res) => {
   const { userId } = req.params;
-  const { shippingAddress, region, paymentAmount } = req.body;
+  const { paymentAmount } = req.body;
 
   try {
     const newOrder = new Order({
       user: userId,
-      shippingAddress,
-      region,
-      paymentAmount,
       orderCompletionCode: nanoid(),
     });
 

@@ -198,8 +198,8 @@ const Blogger = () => {
           color="primary"
         >
           <Tab key="analytics" title="Analytics" />
-          <Tab key="products" title="Products" />
-          <Tab key="stock" title="Stock" />
+          <Tab key="products" title="Unpublished Games" />
+          <Tab key="stock" title="Published Games" />
         </Tabs>
       </div>
       <div className="p-4">
@@ -324,7 +324,7 @@ const Blogger = () => {
                             variant="ghost"
                             onClick={() => handleAddNewStock(game)}
                           >
-                            New Stock
+                            Publish
                           </Button>
                         </Tooltip>
                       </div>

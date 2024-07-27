@@ -8,19 +8,6 @@ const gameStockSchema = Schema({
     ref: "Game",
     required:true
   },
-
-  Platform: {
-    type: String,
-    required: true,
-  },
-  Edition: {
-    type: String,
-    required: true,
-  },
-  NumberOfUnits: {
-    type: Number,
-    required: true,
-  },
   UnitPrice: {
     type: Number,
     required: true,

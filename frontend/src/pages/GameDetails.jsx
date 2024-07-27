@@ -135,7 +135,7 @@ const GameDetails = () => {
       <div className="container mx-auto px-4 py-8  ">
         <div className="bg-customDark rounded-lg shadow-lg p-8">
           <h1 className="text-5xl text-white mb-4 text-left">
-            {gameStock.AssignedGame.title} {gameStock.Edition} Edition
+            {gameStock.AssignedGame.title} {gameStock.Edition} 
             <br />
             <Chip color="primary" radius="none">
               {gameStock.AssignedGame.RatingPoints} Rating Points ⭐
@@ -174,9 +174,7 @@ const GameDetails = () => {
                 <CardBody>
                   <h2 className="text-xl font-primaryRegular text-white mb-2">
                     {gameStock.AssignedGame.title} <br />
-                    <p className="text-editionColor text-sm">
-                      {gameStock.Edition} Edition
-                    </p>
+
                     {gameStock.discount > 0 && (
                       <>
                         <Chip color="primary" radius="none">

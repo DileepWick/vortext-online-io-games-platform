@@ -237,20 +237,10 @@ const CartPage = () => {
                       src={item.stockid.AssignedGame.coverPhoto}
                     />
                     <div className="flex flex-col m-4 p-4">
-                      <p className="text-editionColor text-sm ">
-                        {item.stockid.Edition} Edition
-                      </p>
 
                       <h2 className="text-xl  text-white">
                         {item.stockid.AssignedGame.title}
                       </h2>
-                      <Chip
-                        variant="flat"
-                        color="primary"
-                        className="mt-2 text-white"
-                      >
-                        {item.stockid.Platform}
-                      </Chip>
                       <p className="text-white mt-2">
                         <span className="line-through text-editionColor">
                           LKR.
@@ -271,45 +261,6 @@ const CartPage = () => {
                         </Chip>
                       )}
                     </div>
-                  </div>
-                  <div>
-                    <Button
-                      onClick={() =>
-                        handleQuantityChange(
-                          item.stockid._id,
-                          item.quantity - 1
-                        )
-                      }
-                      color="danger"
-                      variant="bordered"
-                      size="sm"
-                    >
-                      -
-                    </Button>
-                    <input
-                      type="number"
-                      value={item.quantity}
-                      onChange={(e) =>
-                        handleQuantityChange(
-                          item.stockid._id,
-                          Number(e.target.value)
-                        )
-                      }
-                      className="w-16 text-center border-gray-300 bg-customDark text-white"
-                    />
-                    <Button
-                      onClick={() =>
-                        handleQuantityChange(
-                          item.stockid._id,
-                          item.quantity + 1
-                        )
-                      }
-                      color="success"
-                      variant="bordered"
-                      size="sm"
-                    >
-                      +
-                    </Button>
                   </div>
                   <Button
                     onClick={() => handleRemoveItem(item.stockid._id)}

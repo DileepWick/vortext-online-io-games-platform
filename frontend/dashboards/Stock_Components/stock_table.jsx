@@ -14,7 +14,6 @@ import {
   Input,
 } from "@nextui-org/react";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
-import Restock from "./restock";
 import UpdateStock from "./update_stock";
 
 //Stock Components
@@ -104,9 +103,6 @@ const StockTable = () => {
       >
         <TableHeader>
           <TableColumn key="GAME">GAME</TableColumn>
-          <TableColumn key="PLATFORM">PLATFORM</TableColumn>
-          <TableColumn key="EDITION">EDITION</TableColumn>
-          <TableColumn key="QUANTITY">QUANTITY</TableColumn>
           <TableColumn key="PRICE">PRICE</TableColumn>
           <TableColumn key="DISCOUNT">DISCOUNT</TableColumn>
           <TableColumn key="ACTIONS">ACTIONS</TableColumn>
@@ -115,30 +111,13 @@ const StockTable = () => {
           {items.map((stock) => (
             <TableRow key={stock.id}>
               <TableCell>{stock.AssignedGame.title}</TableCell>
-              <TableCell>
-                <Chip color="default" variant="flat">
-                  {stock.Platform}
-                </Chip>
-              </TableCell>
-              <TableCell>{stock.Edition}</TableCell>
-              <TableCell>
-                {stock.NumberOfUnits < 3 ? (
-                  <div>{stock.NumberOfUnits} - Low on stock !</div>
-                ) : (
-                  stock.NumberOfUnits
-                )}
-              </TableCell>
+
               <TableCell>{stock.UnitPrice}$</TableCell>
               <TableCell>{stock.discount}%</TableCell>
               <TableCell>
                 <div style={{ display: "flex", gap: "10px" }}>
                   <UpdateStock
                     updatingStock={stock}
-                    callBackFunction={getAllStocks}
-                  />
-
-                  <Restock
-                    stockForRestock={stock}
                     callBackFunction={getAllStocks}
                   />
                   <DeleteStock
