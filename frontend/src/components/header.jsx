@@ -26,6 +26,13 @@ export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const variants = [
+    "solid",
+    "underlined",
+    "bordered",
+    "light",
+  ];
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -49,53 +56,75 @@ export default function Header() {
   };
 
   return (
-    <div className="bg-lightGray">
-      <Navbar className="font-primaryRegular bg-lightGray text-dark">
+    <div className="bg-headerDark">
+      <Navbar className="font-primaryRegular bg-headerDark text-white">
         <NavbarBrand>
-          <p className="font-bold text-primary">ELDERLY CARE</p>
+          <p className="font-bold text-white">VORTEX GAMING</p>
         </NavbarBrand>
 
         <NavbarContent className="hidden sm:flex gap-4" justify="center">
           <NavbarItem>
             <Link
-              color={location.pathname === "/" ? "primary" : "default"}
+              color={location.pathname === "/" ? "white" : "default"}
               href="/"
               className={`${
                 location.pathname === "/" ? "underline" : ""
-              } text-dark hover:underline`}
+              } text-white hover:underline`}
             >
               Home
             </Link>
           </NavbarItem>
           <NavbarItem>
             <Link
-              color={location.pathname === "/services" ? "primary" : "default"}
-              href="/services"
+              color={location.pathname === "/shop" ? "danger" : "default"}
+              href="/shop"
               className={`${
-                location.pathname === "/services" ? "underline" : ""
-              } text-dark hover:underline`}
+                location.pathname === "/shop" ? "underline" : ""
+              } text-white hover:underline`}
             >
-              Services
+              Shop
             </Link>
           </NavbarItem>
           <NavbarItem>
             <Link
-              color={location.pathname === "/careplans" ? "primary" : "default"}
-              href="/careplans"
+              color={location.pathname === "/articles" ? "primary" : "white"}
+              href="/articles"
               className={`${
-                location.pathname === "/careplans" ? "underline" : ""
-              } text-dark hover:underline`}
+                location.pathname === "/articles" ? "underline" : ""
+              } text-white hover:underline`}
             >
-              Care Plans
+              Articles
             </Link>
           </NavbarItem>
           <NavbarItem>
             <Link
-              color={location.pathname === "/contact" ? "primary" : "default"}
+              color={location.pathname === "/GamingSessions" ? "primary" : "white"}
+              href="/GamingSessions"
+              className={`${
+                location.pathname === "/GamingSessions" ? "underline" : ""
+              } text-white hover:underline`}
+            >
+              Gaming Sessions
+            </Link>
+          </NavbarItem>
+          <NavbarItem>
+            <Link
+              color={location.pathname === "/reviews" ? "primary" : "white"}
+              href="#"
+              className={`${
+                location.pathname === "/reviews" ? "underline" : ""
+              } text-white hover:underline`}
+            >
+              Reviews
+            </Link>
+          </NavbarItem>
+          <NavbarItem>
+            <Link
+              color={location.pathname === "/contact" ? "primary" : "white"}
               href="/contact"
               className={`${
                 location.pathname === "/contact" ? "underline" : ""
-              } text-dark hover:underline`}
+              } text-white hover:underline`}
             >
               Contact
             </Link>
@@ -107,7 +136,7 @@ export default function Header() {
             <Dropdown placement="bottom-end">
               <DropdownTrigger>
                 <User
-                  className="cursor-pointer text-dark"
+                  className="cursor-pointer text-white"
                   name={user.username}
                   description={user.role}
                   avatarProps={{
@@ -118,7 +147,7 @@ export default function Header() {
               <DropdownMenu
                 aria-label="Profile Actions"
                 variant="flat"
-                className="font-primaryRegular text-dark"
+                className="font-primaryRegular text-black"
               >
                 <DropdownItem key="profile" className="h-14 gap-2">
                   <p className="font-semibold">Signed in as</p>
@@ -131,55 +160,92 @@ export default function Header() {
                   My Settings
                 </DropdownItem>
                 <DropdownItem
-                  key="appointments"
-                  onClick={() => navigate("/appointments")}
+                  key="orders"
+                  onClick={() => navigate("/myorders")}
                 >
-                  My Appointments
+                  My Orders
                 </DropdownItem>
-                <DropdownItem
-                  key="careplans"
-                  onClick={() => navigate("/careplans")}
-                >
-                  My Care Plans
+                <DropdownItem key="cart" onClick={() => navigate("/cartItems")}>
+                  My Cart
                 </DropdownItem>
 
                 {/* Admin Filter */}
                 {user.role === "admin" && (
                   <DropdownItem
                     key="admin-panel"
-                    onClick={() => navigate("/adminDashboard")}
+                    onClick={() => navigate("/productDashboard")}
                   >
                     Admin Panel
                   </DropdownItem>
                 )}
 
-                {/* Caregiver Filter */}
-                {user.role === "Caregiver" && (
+                {/* Order Manager Filter */}
+                {user.role === "Order Manager" && (
                   <DropdownItem
-                    key="caregiver-panel"
-                    onClick={() => navigate("/caregiverDashboard")}
+                    key="orders-panel"
+                    onClick={() => navigate("/ordersDashboard")}
                   >
-                    Caregiver Dashboard
+                    Order Management
                   </DropdownItem>
                 )}
 
-                {/* Family Member Filter */}
-                {user.role === "Family_Member" && (
+                {/* Blogger Filter */}
+                {user.role === "Blogger" && (
                   <DropdownItem
-                    key="family-panel"
-                    onClick={() => navigate("/familyDashboard")}
+                    key="blogger-panel"
+                    onClick={() => navigate("/bloggerDashboard")}
                   >
-                    Family Dashboard
+                    Blogger Dashboard
                   </DropdownItem>
                 )}
 
-                {/* Support Agent Filter */}
-                {user.role === "Support_Agent" && (
+                {/* Session Manager Filter */}
+                {user.role === "Session_Manager" && (
+                  <DropdownItem
+                    key="session-panel"
+                    onClick={() => navigate("/sessionDashboard")}
+                  >
+                    Session Dashboard
+                  </DropdownItem>
+                )}
+
+                {/* Courier Filter */}
+                {user.role === "Courier" && (
+                  <DropdownItem
+                    key="courier-panel"
+                    onClick={() => navigate("/courierDashboard")}
+                  >
+                    Courier Dashboard
+                  </DropdownItem>
+                )}
+
+                {/*Review manager*/}
+                {user.role === "Review_Manager" && (
+                  <DropdownItem
+                    key="Review-panel"
+                    onClick={() => navigate("/review_dashboard")}
+                  >
+                    Review Dashboard
+                  </DropdownItem>
+                )}
+
+                {/* Customer Support Filter */}
+                {user.role === "customeragent" && (
                   <DropdownItem
                     key="support-panel"
-                    onClick={() => navigate("/supportDashboard")}
+                    onClick={() => navigate("/ContactDash")}
                   >
-                    Support Dashboard
+                    Customer Support Panel
+                  </DropdownItem>
+                )}
+
+                {/* Staff Manager Filter */}
+                {user.role === "Staff_Manager" && (
+                  <DropdownItem
+                    key="manage-staff"
+                    onClick={() => navigate("/staffManager")}
+                  >
+                    Manage Staff
                   </DropdownItem>
                 )}
 
@@ -193,7 +259,7 @@ export default function Header() {
               </DropdownMenu>
             </Dropdown>
           ) : (
-            <Link className="text-dark" href="/login">
+            <Link className="text-white" href="/login">
               Login
             </Link>
           )}

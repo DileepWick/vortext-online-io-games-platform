@@ -2,7 +2,7 @@ import React from "react";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { toast, Flip } from "react-toastify";
-import Hangman from "../../Games/Hangman"
+import GameEmbed from "./GameEmbed";
 
 const Home = () => {
 
@@ -44,9 +44,10 @@ const Home = () => {
       <h1>NimsaraThhenuka</h1>
       <h1>Bandara Ranasinghe</h1>
       <h1>Tharindu Ariyawansha</h1>
+      <GameEmbed src={'https://bopz.io/'} title={'BOPZ'} />
 
-      <>
-      <Hangman questions={questions} learningSubject="Computer Science" /></>
+    
+       
 
 
       <Footer />
