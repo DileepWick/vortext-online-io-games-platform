@@ -44,11 +44,6 @@ const Home = () => {
       <h1>NimsaraThhenuka</h1>
       <h1>Bandara Ranasinghe</h1>
       <h1>Tharindu Ariyawansha</h1>
-      <GameEmbed src={'https://www.modd.io/play/A4T8MHYD4/'} title={'BOPZ'} />
-
-    
-       
-
 
       <Footer />
     </div>

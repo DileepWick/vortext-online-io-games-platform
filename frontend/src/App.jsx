@@ -11,12 +11,13 @@ import AddGameForm from "./pages/add_new_game";
 import Shop from "./pages/Shop";
 import GameDetails from "./pages/GameDetails";
 import CartPage from "./pages/Cart_Page";
-import OrderHistory from "./pages/my_orders";
+import MyLibrary from "./pages/My_Library";
 import ArticleList from "./pages/articles";
 import Contact from "./pages/Contact";
 import GamingSessions from "./pages/GamingSessions";
 
-
+//Gameplay
+import GameEmbed from "./pages/GameEmbed";
 
 //Dashboards
 import ProductManagerDashboard from "../dashboards/product_manager_dashboard";
@@ -40,7 +41,7 @@ const App = () => {
       <Route path="/Shop" element={<Shop />} />
       <Route path="/game/:id" element={<GameDetails />} />
       <Route path="/cartItems" element={<CartPage />} />
-      <Route path="/myorders" element={<OrderHistory />} />
+      <Route path="/mylibrary" element={<MyLibrary />} />
       <Route path="/articles" element={<ArticleList />} />
       <Route path="/productDashboard" element={<ProductManagerDashboard />} />
       <Route path="/ordersDashboard" element={<OrderManagerDashboard />} />
@@ -53,6 +54,7 @@ const App = () => {
       <Route path="/GamingSessions" element={<GamingSessions />} />
       <Route path="/staffManager" element={<StaffManager />} />
       <Route path="/review_dashboard" element={<Review_manager />} />
+      <Route path="/playgame/:src/:title" element={<GameEmbed />} />
     </Routes>
   );
 };

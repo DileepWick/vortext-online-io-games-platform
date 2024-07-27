@@ -4,10 +4,10 @@ import { Order } from "../models/order.js";
 // Create a new order item
 export const createOrderItem = async (req, res) => {
   try {
-    const { order, stockid, quantity, price } = req.body;
+    const { order, stockid, price } = req.body;
 
     // Validate input
-    if (!order || !stockid || !quantity || !price) {
+    if (!order || !stockid || !price) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -15,7 +15,6 @@ export const createOrderItem = async (req, res) => {
     const newOrderItem = new OrderItems({
       order,
       stockid,
-      quantity,
       price,
     });
 
@@ -152,14 +151,7 @@ export const getOrderItemsByUserId = async (req, res) => {
           model: "Game",
         },
       })
-      .populate("order")
-      .populate({
-        path: "order",
-        populate: {
-          path: "courier",
-          model: "User",
-        },
-      });
+      .populate("order");
 
     if (orderItems.length === 0) {
       return res

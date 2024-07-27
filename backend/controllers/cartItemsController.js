@@ -2,7 +2,6 @@ import { CartItems } from "../models/cartItems.js";
 import { Cart } from "../models/cart.js";
 import { GameStock } from "../models/gameStock.js";
 
-// Create a new cart item or update quantity if it already exists
 export const createCartItem = async (req, res) => {
   try {
     const { cartid, stockid, quantity } = req.body;
@@ -30,41 +29,36 @@ export const createCartItem = async (req, res) => {
     }
 
     // Check if the item already exists in the cart
-    let existingCartItem = await CartItems.findOne({ cartid, stockid });
+    const existingCartItem = await CartItems.findOne({ cartid, stockid });
 
     if (existingCartItem) {
-      // If item exists, update the quantity and total
-      const newQuantity = existingCartItem.quantity + quantity;
-
-      // Calculate the new total price
-      const newTotal = gameStock.UnitPrice * newQuantity;
-
-      existingCartItem.quantity = newQuantity;
-      existingCartItem.total = newTotal;
-      await existingCartItem.save();
+      // Item is already in the cart
+      return res.status(400).json({ message: "Item already in the cart" });
     } else {
       // Otherwise, create a new cart item
       const total = gameStock.UnitPrice * quantity;
+
+      // Add the new cart item
       await CartItems.create({
         cartid,
         stockid,
         quantity,
         total,
       });
+
+      // Subtract the quantity from the game stock and save the updated game stock
+      gameStock.NumberOfUnits -= quantity;
+      await gameStock.save();
+
+      return res.status(201).json({ message: "Cart item added successfully" });
     }
 
-    // Subtract the quantity from the game stock and save the updated game stock
-    gameStock.NumberOfUnits -= quantity;
-    await gameStock.save();
-
-    res
-      .status(201)
-      .json({ message: "Cart item created or updated successfully" });
   } catch (error) {
-    console.error("Error creating or updating cart item:", error);
+    console.error("Error creating cart item:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 // Get all cart items by user ID
 export const getCartItemsByUserId = async (req, res) => {

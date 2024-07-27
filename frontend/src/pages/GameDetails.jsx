@@ -104,8 +104,19 @@ const GameDetails = () => {
           transition: Flip,
           style: { fontFamily: "Rubik" },
         });
-      } else {
-        setCartMessage("Failed to add item to cart.");
+      } else if (response.status == 400) {
+        toast.warning("Item is already in the cart", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Flip,
+          style: { fontFamily: "Rubik" },
+        });
       }
     } catch (error) {
       console.error("Error adding item to cart:", error);
@@ -135,7 +146,7 @@ const GameDetails = () => {
       <div className="container mx-auto px-4 py-8  ">
         <div className="bg-customDark rounded-lg shadow-lg p-8">
           <h1 className="text-5xl text-white mb-4 text-left">
-            {gameStock.AssignedGame.title} {gameStock.Edition} 
+            {gameStock.AssignedGame.title}
             <br />
             <Chip color="primary" radius="none">
               {gameStock.AssignedGame.RatingPoints} Rating Points ⭐
@@ -174,7 +185,6 @@ const GameDetails = () => {
                 <CardBody>
                   <h2 className="text-xl font-primaryRegular text-white mb-2">
                     {gameStock.AssignedGame.title} <br />
-
                     {gameStock.discount > 0 && (
                       <>
                         <Chip color="primary" radius="none">

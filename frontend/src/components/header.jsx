@@ -161,7 +161,7 @@ export default function Header() {
                 </DropdownItem>
                 <DropdownItem
                   key="orders"
-                  onClick={() => navigate("/myorders")}
+                  onClick={() => navigate("/mylibrary")}
                 >
                   My Library
                 </DropdownItem>
