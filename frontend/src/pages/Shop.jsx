@@ -59,61 +59,66 @@ const Shop = () => {
                 <Card
                   key={stock._id}
                   className="relative bg-customDark rounded-lg shadow-lg text-white transform transition-transform duration-300 hover:scale-105 hover:z-10 hover:shadow-2xl hover:bg-opacity-80"
-                  radius="none"
                 >
                   <Link to={`/game/${stock._id}`}>
-                    <div className="flex flex-row">
-                      <div className="relative">
-                        <Image
-                        radius="none"
-                          isBlurred
-                          alt={stock.AssignedGame.title}
-                          className="w-[140px] h-[150px] object-cover rounded-t-lg"
-                          src={stock.AssignedGame.coverPhoto}
-                        />
+                    <div className="relative">
+                      <Image
+                        isBlurred
+                        
+                        
+                        alt={stock.AssignedGame.title}
+                        className="w-[250px] h-[350px] object-cover rounded-t-lg"
+                        src={stock.AssignedGame.coverPhoto}
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity duration-300 hover:opacity-100">
+                        <FaPlaystation className="text-white text-3xl" />
+                        <FaShoppingCart className="text-white text-3xl absolute" />
                       </div>
-                      <CardBody className="p-4 text-white">
-                        <h2 className="text-xl font-primaryRegular text-white mb-2">
-                          {stock.AssignedGame.title}
-                        </h2>
-
-                        <p className="font-primaryRegular text-white mb-2 m-2">
-                          {discount > 0 && (
-                            <>
-                              <Chip
-                                color="primary"
-                                radius="none"
-                                className="font-primaryRegular mr-2"
-                                size="sm"
-                              >
-                                -{stock.discount}% off
-                              </Chip>
-                              <span className="line-through mr-2 text-editionColor">
-                                LKR.{originalPrice}
-                              </span>
-                            </>
-                          )}
-                          <span>LKR.{discountedPrice}</span>
-                        </p>
-
-                        <div className="flex flex-wrap gap-2 mb-2 text-white ">
-                          {stock.AssignedGame.Genre.flatMap((genre) =>
-                            genre.includes(",") ? genre.split(",") : genre
-                          ).map((genre, index) => (
-                            <Chip
-                              key={index}
-                              color="primary"
-                              variant="flat"
-                              size="sm"
-                              radius="none"
-                              className="font-primaryRegular text-white"
-                            >
-                              {genre.trim()}
-                            </Chip>
-                          ))}
-                        </div>
-                      </CardBody>
                     </div>
+                    <CardBody className="p-4 text-white">
+                      <p className="text-editionColor font-primaryRegular text-sm ">
+                        Ratings points {stock.AssignedGame.RatingPoints} ⭐
+                      </p>
+                      <h2 className="text-xl font-primaryRegular text-white mb-2">
+                        {stock.AssignedGame.title}
+                      </h2>
+
+                      <p className="font-primaryRegular text-white mb-2 m-2">
+                        {discount > 0 && (
+                          <>
+                            <Chip
+                              color="primary"
+                              radius="none"
+                              className="font-primaryRegular mr-2"
+                              size="sm"
+                            >
+                              -{stock.discount}% off
+                            </Chip>
+                            <span className="line-through mr-2 text-editionColor">
+                              LKR.{originalPrice}
+                            </span>
+                          </>
+                        )}
+                        <span>LKR.{discountedPrice}</span>
+                      </p>
+
+                      <div className="flex flex-wrap gap-2 mb-2 text-white ">
+                        {stock.AssignedGame.Genre.flatMap((genre) =>
+                          genre.includes(",") ? genre.split(",") : genre
+                        ).map((genre, index) => (
+                          <Chip
+                            key={index}
+                            color="primary"
+                            variant="flat"
+                            size="sm"
+                            radius="none"
+                            className="font-primaryRegular text-white"
+                          >
+                            {genre.trim()}
+                          </Chip>
+                        ))}
+                      </div>
+                    </CardBody>
                   </Link>
                 </Card>
               );
