@@ -57,7 +57,7 @@ export default function Header() {
 
   return (
     <div className="bg-headerDark">
-      <Navbar className="font-primaryRegular bg-headerDark text-white">
+      <Navbar className="font-primaryRegular bg-headerDark text-white" position="sticky"> 
         <NavbarBrand>
           <p className="font-bold text-white">VORTEX GAMING</p>
         </NavbarBrand>
