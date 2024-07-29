@@ -74,6 +74,61 @@ export const getOrderItemsByOrderId = async (req, res) => {
   }
 };
 
+// Check if a specific item is already in the user's library
+export const checkLibraryItem = async (req, res) => {
+  try {
+    const { stockid } = req.params;
+    const {userId} = req.params; 
+
+    // Validate stock ID
+    if (!stockid) {
+      return res.status(400).json({ message: "Stock ID is required" });
+    }
+
+    // Validate user ID
+    if (!userId) {
+      return res.status(401).json({ message: "User ID is required" });
+    }
+
+    // Find all orders by user ID
+    const orders = await Order.find({ user: userId });
+
+    if (orders.length === 0) {
+      return res.status(404).json({ message: "Orders not found for the user" });
+    }
+
+    // Extract order IDs
+    const orderIds = orders.map((order) => order._id);
+
+    // Find order items by order IDs and stock ID
+    const libraryItems = await OrderItems.find({
+      order: { $in: orderIds },
+      stockid: stockid,
+    })
+      .populate({
+        path: "stockid",
+        populate: {
+          path: "AssignedGame",
+          model: "Game",
+        },
+      })
+      .populate("order");
+
+    if (libraryItems.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "You have not purchased this item yet" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "You already own this item", items: libraryItems });
+  } catch (error) {
+    console.error("Error fetching order items by user ID and stock ID:", error);
+    res.status(500).json({ message: "Error fetching order items status 500" });
+  }
+};
+
 // Update an order item by ID
 export const updateOrderItemById = async (req, res) => {
   try {

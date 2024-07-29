@@ -26,9 +26,10 @@ const GameDetails = () => {
   const [relatedGameStocks, setRelatedGameStocks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [cartMessage, setCartMessage] = useState("");
   const [cartId, setCartId] = useState(null); // State to handle cart ID
   const [quantityByStockId, setQuantityByStockId] = useState({}); // State to handle quantity by stock id
+
+  const [checkItem, setCheckItem] = useState("not in the library");
 
   useEffect(() => {
     const fetchGameDetails = async () => {
@@ -70,57 +71,88 @@ const GameDetails = () => {
       }
     };
 
-    fetchGameDetails();
-    fetchCartId(); // Fetch cart ID
+    //Check library Item
+    const checkLibrary = async () => {
+      try {
+        const token = getToken(); // Get token
+        const userId = getUserIdFromToken(token); // Use token to get user id
+        const checkStatus = await axios.get(
+          `http://localhost:8098/orderItems/checkItem/${id}/${userId}/`
+        );
+
+        if (checkStatus.status == 200) {
+          setCheckItem("in the library");
+        }
+      } catch (error) {}
+    };
+
+    checkLibrary(); //Check library item
+    fetchGameDetails(); //fetch game details
+    fetchCartId(); // Fetch cart
   }, [id]);
 
   // Handle Add to Cart
   const handleAddToCart = async (stockId) => {
-    try {
-      if (!cartId) {
-        setCartMessage("Cart not found.");
-        return;
-      }
-
-      const response = await axios.post(
-        `http://localhost:8098/cartItems/createCartItem`,
-        {
-          cartid: cartId, // Use the fetched cart id
-          stockid: stockId,
-          quantity: quantityByStockId[stockId] || 1, // Use the selected quantity or default to 1
+    if (checkItem === "in the library") {
+      toast.warning("Game is already in Library.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Flip,
+        style: { fontFamily: "Rubik" },
+      });
+    } else {
+      try {
+        if (!cartId) {
+          setCartMessage("Cart not found.");
+          return;
         }
-      );
 
-      if (response.status === 201) {
-        toast.success("Item Added Successfully!", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-          transition: Flip,
-          style: { fontFamily: "Rubik" },
-        });
-      } else if (response.status == 400) {
-        toast.warning("Item is already in the cart", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-          transition: Flip,
-          style: { fontFamily: "Rubik" },
-        });
+        const response = await axios.post(
+          `http://localhost:8098/cartItems/createCartItem`,
+          {
+            cartid: cartId, // Use the fetched cart id
+            stockid: stockId,
+            quantity: quantityByStockId[stockId] || 1, // Use the selected quantity or default to 1
+          }
+        );
+
+        if (response.status === 201) {
+          toast.success(response.data.message, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+            transition: Flip,
+            style: { fontFamily: "Rubik" },
+          });
+        } else if (response.status == 222) {
+          toast.warning("Item is already in the cart", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+            transition: Flip,
+            style: { fontFamily: "Rubik" },
+          });
+        }
+      } catch (error) {
+        console.error("Error adding item to cart:", error);
+        setCartMessage("Error adding item to cart.");
       }
-    } catch (error) {
-      console.error("Error adding item to cart:", error);
-      setCartMessage("Error adding item to cart.");
     }
   };
 

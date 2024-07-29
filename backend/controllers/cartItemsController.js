@@ -33,7 +33,7 @@ export const createCartItem = async (req, res) => {
 
     if (existingCartItem) {
       // Item is already in the cart
-      return res.status(400).json({ message: "Item already in the cart" });
+      return res.status(222).json({ message: "Item already in the cart" });
     } else {
       // Otherwise, create a new cart item
       const total = gameStock.UnitPrice * quantity;
@@ -50,7 +50,7 @@ export const createCartItem = async (req, res) => {
       gameStock.NumberOfUnits -= quantity;
       await gameStock.save();
 
-      return res.status(201).json({ message: "Cart item added successfully" });
+      return res.status(201).json({ message: "Game added to cart " });
     }
 
   } catch (error) {

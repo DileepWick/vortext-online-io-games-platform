@@ -104,6 +104,7 @@ const Profile = () => {
         style:{fontFamily:'Rubik'}
         });
 
+
       
     } catch (error) {
       console.error("Error updating profile:", error);
