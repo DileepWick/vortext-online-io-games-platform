@@ -11,10 +11,6 @@ import AddGameForm from "./pages/add_new_game";
 import Shop from "./pages/Shop";
 import GameDetails from "./pages/GameDetails";
 import CartPage from "./pages/Cart_Page";
-import OrderHistory from "./pages/my_orders";
-import ArticleList from "./pages/articles";
-import Contact from "./pages/Contact";
-import Support from "./pages/support";
 import MyLibrary from "./pages/My_Library";
 import ArticleList from "./pages/articles";
 import Contact from "./pages/Contact";
@@ -24,19 +20,15 @@ import SessionHistory from "./pages/SessionHistory";
 //Gameplay
 import GameEmbed from "./pages/GameEmbed";
 
-
 //Dashboards
 import ProductManagerDashboard from "../dashboards/product_manager_dashboard";
 import OrderManagerDashboard from "../dashboards/order_manager_dashboard";
 import BloggerDashboard from "../dashboards/blogger_dashboard";
 import CourierDashBoard from "../dashboards/courier_dashboard";
-
-=======
 import Review_manager from "../dashboards/review_dashboard";
 import ContactDash from "../dashboards/Customer suport";
 import SessionManagerDash from "../dashboards/session_manager_dashbord";
 import StaffManager from "../dashboards/staff_manager_dashboard";
-
 
 const App = () => {
   return (
@@ -50,7 +42,6 @@ const App = () => {
       <Route path="/Shop" element={<Shop />} />
       <Route path="/game/:id" element={<GameDetails />} />
       <Route path="/cartItems" element={<CartPage />} />
-      <Route path="/myorders" element={<OrderHistory />} />
       <Route path="/mylibrary" element={<MyLibrary />} />
       <Route path="/articles" element={<ArticleList />} />
       <Route path="/productDashboard" element={<ProductManagerDashboard />} />
@@ -58,7 +49,6 @@ const App = () => {
       <Route path="/bloggerDashboard" element={<BloggerDashboard />} />
       <Route path="/courierDashboard" element={<CourierDashBoard />} />
       <Route path="/contact" element={<Contact />} />
-      <Route path="/support" element={<Support />} />
       <Route path="/review_dashboard" element={<Review_manager />} />
       <Route path="/ContactDash" element={<ContactDash />} />
       <Route path="/sessionDashboard" element={<SessionManagerDash />} />
