@@ -22,20 +22,18 @@ const UserSchema = new mongoose.Schema({
         type: String,
         default: "https://res.cloudinary.com/dhcawltsr/image/upload/v1719572309/user_swzm7h.webp"
     },
-    //Courier attributes
-    workingRegion: {
-        type: String,
-        required: function() {
-            return this.role === 'courier';
-        }
+    birthday: {
+        type: Date,
+        required: true
     },
-    status: {
+    age: {
+        type: Number,
+        required: true
+    },
+    playerType: {
         type: String,
-        enum: ['Free', 'Working', 'Not available'],
-        required: function() {
-            return this.role === 'Courier';
-        },
-        default: 'Free'
+        enum: ['Kid', 'Teenager', 'Adult'],
+        required: true
     }
 });
 

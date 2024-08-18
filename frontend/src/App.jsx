@@ -28,6 +28,7 @@ import Review_manager from "../dashboards/review_dashboard";
 import ContactDash from "../dashboards/Customer suport";
 import SessionManagerDash from "../dashboards/session_manager_dashbord";
 import StaffManager from "../dashboards/staff_manager_dashboard";
+import UserManagementDashboard from "../dashboards/UserManagementDashboard";
 
 const App = () => {
   return (
@@ -55,6 +56,7 @@ const App = () => {
       <Route path="/staffManager" element={<StaffManager />} />
       <Route path="/review_dashboard" element={<Review_manager />} />
       <Route path="/playgame/:src/:title" element={<GameEmbed />} />
+      <Route path="/UserManagementDashboard" element={<UserManagementDashboard />} />
     </Routes>
   );
 };
