@@ -8,7 +8,6 @@ import Footer from "../components/footer";
 import { DeleteIcon } from "../assets/icons/DeleteIcon";
 import { ScrollShadow } from "@nextui-org/react";
 import { toast, Flip } from "react-toastify";
-
 // Next UI
 import {
   Modal,
@@ -18,8 +17,6 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
-  Radio,
-  RadioGroup,
   Image,
   Chip,
 } from "@nextui-org/react";
@@ -31,19 +28,44 @@ const CartPage = () => {
 
   // Modal
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [subtotal, setSubtotal] = useState(0);
   const [totalDiscountedTotal, setTotalDiscountedTotal] = useState(0);
-  const [numberOfItems, setNumberOfItems] = useState(0);
 
   // Payment form state
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [cvv, setCvv] = useState("");
   const [paymentAmount, setPaymentAmount] = useState(0); // This will be set dynamically
+  const [errors, setErrors] = useState({});
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Card Number validation
+    const cardNumberPattern = /^[0-9]{16}$/;
+    if (!cardNumberPattern.test(cardNumber)) {
+      newErrors.cardNumber = "Card Number must be 16 digits";
+    }
+
+    // Expiry Date validation
+    const expiryDatePattern = /^(0[1-9]|1[0-2])\/\d{2}$/; // MM/YY format
+    if (!expiryDatePattern.test(expiryDate)) {
+      newErrors.expiryDate = "Expiry Date must be in MM/YY format";
+    }
+
+    // CVV validation
+    const cvvPattern = /^[0-9]{3,4}$/; // 3 or 4 digits
+    if (!cvvPattern.test(cvv)) {
+      newErrors.cvv = "CVV must be 3 or 4 digits";
+    }
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  };
 
   // Get CartItems
   useEffect(() => {
@@ -57,7 +79,6 @@ const CartPage = () => {
         );
 
         setCartItems(response.data.cartItems);
-        setNumberOfItems(response.data.cartItems.length);
         calculateTotal(response.data.cartItems);
       } catch (err) {
         setError("Error fetching cart items");
@@ -75,11 +96,7 @@ const CartPage = () => {
     let totalDiscountedTotal = 0;
 
     items.forEach((item) => {
-      const discount = item.stockid.discount || 0;
-      const discountedPrice =
-        discount > 0
-          ? item.stockid.UnitPrice * (1 - discount / 100)
-          : item.stockid.UnitPrice;
+      const discountedPrice = calculateDiscountedPrice(item);
       subTotal += discountedPrice * item.quantity;
       totalDiscountedTotal += discountedPrice * item.quantity;
     });
@@ -87,6 +104,14 @@ const CartPage = () => {
     setSubtotal(subTotal);
     setTotalDiscountedTotal(totalDiscountedTotal);
     setPaymentAmount(subTotal); // Set payment amount to subtotal initially
+  };
+
+  // Calculate discounted price
+  const calculateDiscountedPrice = (item) => {
+    const discount = item.stockid.discount || 0;
+    return discount > 0
+      ? item.stockid.UnitPrice * (1 - discount / 100)
+      : item.stockid.UnitPrice;
   };
 
   // Handle Remove Item
@@ -112,57 +137,56 @@ const CartPage = () => {
   const handlePaymentSubmit = async (event) => {
     event.preventDefault();
 
-    // Basic form validation
-    if (!cardNumber || !expiryDate || !cvv) {
-      setError("Please fill in all required fields.");
-      return;
-    }
+    if (validateForm()) {
+      try {
+        const token = getToken();
+        const userId = getUserIdFromToken(token);
 
-    try {
-      const token = getToken();
-      const userId = getUserIdFromToken(token);
+        // Order data
+        const orderData = {
+          paymentAmount: totalDiscountedTotal,
+        };
 
-      // Order data
-      const orderData = {
-        paymentAmount: totalDiscountedTotal,
-      };
+        // Add new order
+        const response = await axios.post(
+          `http://localhost:8098/orders/create/${userId}`,
+          orderData
+        );
 
-      // Add new order
-      const response = await axios.post(
-        `http://localhost:8098/orders/create/${userId}`,
-        orderData
-      );
+        const orderid = response.data._id; // Assuming the created order ID is returned in the response
 
-      const orderid = response.data._id; // Assuming the created order ID is returned in the response
+        // Create order items for each cart item
+        await Promise.all(
+          cartItems.map((item) => {
+            const orderItemData = {
+              order: orderid,
+              stockid: item.stockid._id,
+              price: item.stockid.UnitPrice,
+            };
+            return axios.post(
+              `http://localhost:8098/orderItems/`,
+              orderItemData
+            );
+          })
+        );
 
-      // Create order items for each cart item
-      await Promise.all(
-        cartItems.map((item) => {
-          const orderItemData = {
-            order: orderid,
-            stockid: item.stockid._id,
-            price: item.stockid.UnitPrice,
-          };
-          return axios.post(`http://localhost:8098/orderItems/`, orderItemData);
-        })
-      );
-
-      // Clear cart and show success message
-      setCartItems([]);
-      toast.success("Order Placed Successfully !", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-        transition: Flip,
-        style: { fontFamily: "Rubik" },
-      });
-    } catch (err) {
-      setError("Error placing order");
+        // Clear cart and show success message
+        setCartItems([]);
+        toast.success("Order Placed Successfully !", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Flip,
+          style: { fontFamily: "Rubik" },
+        });
+      } catch (err) {
+        setError("Error placing order");
+      }
     }
   };
 
@@ -188,8 +212,8 @@ const CartPage = () => {
       <Header />
       <div className="container mx-auto px-4 py-8 bg-customDark">
         <div className="bg-customDark rounded-lg shadow-lg p-8 flex flex-row">
-          <ScrollShadow hideScrollBar className="w-[1500px] h-[cd ]">
-            <div className="flex flex-col ">
+          <ScrollShadow hideScrollBar className="w-full h-[500px]">
+            <div className="flex flex-col">
               {cartItems.map((item) => (
                 <div
                   key={item._id}
@@ -211,11 +235,13 @@ const CartPage = () => {
                       <p className="text-white mt-2">
                         <span className="line-through text-editionColor">
                           LKR.
-                          {(item.stockid.UnitPrice * item.quantity).toFixed(2)}
+                          {(
+                            item.stockid.UnitPrice * item.quantity
+                          ).toFixed(2)}
                         </span>{" "}
                         <span className="text-white">
                           LKR.
-                          {discountedPrice(item).toFixed(2)}
+                          {calculateDiscountedPrice(item).toFixed(2)}
                         </span>
                       </p>
                       {item.stockid.discount > 0 && (
@@ -241,116 +267,99 @@ const CartPage = () => {
               ))}
             </div>
           </ScrollShadow>
-          <div className="mt-8 p-4 m-8 w-[500px] bg-customDark text-white">
-            <div className="p-4 bg-headerDark rounded-lg shadow-md text-white">
-              <h1 className="text-lg text-gray-300 mb-4 underline">
-                Order Summary
-              </h1>
-
-              <div className="mb-4">
-                <h2 className="text-lg text-editionColor mb-1">Subtotal</h2>
-                <p className="text-xl ">${subtotal.toFixed(2)}</p>
-              </div>
-
-              <Button
-                onPress={onOpen}
-                color="primary"
-                radius="none"
-                size="md"
-                className="w-full mt-4"
-              >
-                CHECK OUT
-              </Button>
-            </div>
-
-            <Modal
-              backdrop="opaque"
-              size="5xl"
-              isOpen={isOpen}
-              onOpenChange={onOpenChange}
-              classNames={{
-                backdrop:
-                  "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20 font-primaryRegular",
-              }}
+          <div className="mt-8 p-4 m-8 w-[30%] rounded-md bg-customCardDark h-[500px]">
+            <h2 className="text-lg font-bold mb-4 text-white">Summary</h2>
+            <p className="text-sm mb-2 text-white">Total: LKR.{subtotal}</p>
+            <p className="text-sm mb-2 text-white">
+              Discounted Total: LKR.{totalDiscountedTotal}
+            </p>
+            <Button
+              onPress={onOpen}
+              variant="bordered"
+              color="primary"
+              className="text-white mt-2"
+              radius="none"
             >
-              <ModalContent className="max-h-screen">
-                {(onClose) => (
-                  <>
-                    <ModalHeader className="flex flex-col gap-1 font-primaryRegular">
-                      Payment Details
-                    </ModalHeader>
+              Checkout
+            </Button>
+          </div>
+          <Modal
+            isOpen={isOpen}
+            onOpenChange={onOpenChange}
+            placement="center"
+            radius="none"
+          >
+            <ModalContent>
+              {(onClose) => (
+                <>
+                  <ModalHeader className="font-primaryBold">
+                    Checkout
+                  </ModalHeader>
+                  <form onSubmit={handlePaymentSubmit}>
                     <ModalBody>
-                      <form onSubmit={handlePaymentSubmit} className="p-4">
+                      <Input
+                        isClearable
+                        className="mt-2"
+                        label="Card Number"
+                        type="text"
+                        radius="none"
+                        placeholder="0000 0000 0000 0000"
+                        value={cardNumber}
+                        onValueChange={setCardNumber}
+                        validationState={
+                          errors.cardNumber ? "invalid" : "valid"
+                        }
+                        errorMessage={errors.cardNumber}
+                      />
+                      <div className="flex flex-row mt-4">
                         <Input
-                          aria-label="Card Number"
-                          type="text"
-                          label="Card Number"
-                          value={cardNumber}
-                          onChange={(e) => setCardNumber(e.target.value)}
-                          placeholder="Card Number"
-                          className="mb-4"
-                        />
-                        <Input
-                          aria-label="Expiry Date"
-                          type="text"
+                          isClearable
+                          className="mr-4"
                           label="Expiry Date"
-                          value={expiryDate}
-                          onChange={(e) => setExpiryDate(e.target.value)}
                           placeholder="MM/YY"
-                          className="mb-4"
+                          radius="none"
+                          type="text"
+                          value={expiryDate}
+                          onValueChange={setExpiryDate}
+                          validationState={
+                            errors.expiryDate ? "invalid" : "valid"
+                          }
+                          errorMessage={errors.expiryDate}
                         />
                         <Input
-                          aria-label="CVV"
-                          type="text"
+                          isClearable
+                          className="ml-4"
                           label="CVV"
-                          value={cvv}
-                          onChange={(e) => setCvv(e.target.value)}
-                          placeholder="CVV"
-                          className="mb-4"
-                        />
-                        <p className="text-lg text-white mb-4">
-                          Total Amount: LKR. {paymentAmount.toFixed(2)}
-                        </p>
-                        <Button
-                          type="submit"
-                          color="success"
+                          placeholder="123"
                           radius="none"
-                          size="md"
-                          className="w-full mt-4"
-                        >
-                          Submit Payment
-                        </Button>
-                      </form>
+                          type="text"
+                          value={cvv}
+                          onValueChange={setCvv}
+                          validationState={errors.cvv ? "invalid" : "valid"}
+                          errorMessage={errors.cvv}
+                        />
+                      </div>
                     </ModalBody>
                     <ModalFooter>
                       <Button
-                        auto
-                        flat
-                        color="error"
-                        onPress={() => {
-                          onClose();
-                        }}
+                        color="primary"
+                        type="submit"
+                        radius="none"
+                        className="text-white"
                       >
-                        Close
+                        Pay LKR. {paymentAmount}
                       </Button>
                     </ModalFooter>
-                  </>
-                )}
-              </ModalContent>
-            </Modal>
-          </div>
+                  </form>
+                </>
+              )}
+            </ModalContent>
+          </Modal>
         </div>
       </div>
       <Footer />
     </div>
   );
-};
-
-const discountedPrice = (item) => {
-  const discount = item.stockid.discount || 0;
-  return discount > 0
-    ? item.stockid.UnitPrice * (1 - discount / 100)
-    : item.stockid.UnitPrice;
 };
 
 export default CartPage;
