@@ -212,6 +212,13 @@ export default function Header() {
                   </DropdownItem>
                 )}
 
+
+                <DropdownItem
+                  key="support"
+                  onClick={() => navigate("/support")}
+                >
+                  Support
+                </DropdownItem>
                 {/*Review manager*/}
                 {user.role === "Review_Manager" && (
                   <DropdownItem
@@ -241,7 +248,6 @@ export default function Header() {
                     Manage Staff
                   </DropdownItem>
                 )}
-
                 <DropdownItem
                   key="logout"
                   color="danger"
