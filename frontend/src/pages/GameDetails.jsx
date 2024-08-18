@@ -375,7 +375,7 @@ const GameDetails = () => {
                     Add to Cart
                   </button>
                   <button
-                    onClick={() => handleRent(stock._id)}
+                    onClick={() => navigate(`/handleRentals/${stock._id}`)}
                     className="block w-full text-center bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition duration-300 mt-4"
                   >
                     Rent

@@ -6,7 +6,19 @@ import useAuthCheck from "../utils/authCheck";
 import { useNavigate, Link } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
-import { Image, Card, CardBody, Chip, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
+import {
+  Image,
+  Card,
+  CardBody,
+  Chip,
+  Button,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Progress,
+} from "@nextui-org/react";
 
 const GamingSessions = () => {
   useAuthCheck();
@@ -32,8 +44,13 @@ const GamingSessions = () => {
         );
         setOrderItems(response.data);
       } catch (err) {
-        console.error("Error fetching order items:", err.response ? err.response.data : err.message);
-        setError(err.response ? err.response.data.message : err.message);
+        console.error(
+          "Error fetching order items:",
+          err.response ? err.response.data : err.message
+        );
+        setError(
+          err.response ? err.response.data.message : err.message
+        );
       } finally {
         setLoading(false);
       }
@@ -49,12 +66,25 @@ const GamingSessions = () => {
       endOfDay.setHours(23, 59, 59, 999);
 
       const timeDifference = endOfDay - now;
-      const hours = Math.floor(timeDifference / (1000 * 60 * 60));
-      const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+      const hours = Math.floor(
+        timeDifference / (1000 * 60 * 60)
+      );
+      const minutes = Math.floor(
+        (timeDifference % (1000 * 60 * 60)) / (1000 * 60)
+      );
+      const seconds = Math.floor(
+        (timeDifference % (1000 * 60)) / 1000
+      );
 
-      setRemainingTime(`${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`);
-      setTimeLeft((timeDifference / (1000 * 60 * 60 * 24)) * 100);
+      setRemainingTime(
+        `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
+          2,
+          "0"
+        )}:${String(seconds).padStart(2, "0")}`
+      );
+      setTimeLeft(
+        (timeDifference / (1000 * 60 * 60 * 24)) * 100
+      );
 
       setCurrentDate(now.toLocaleDateString());
     }, 1000);
@@ -63,7 +93,6 @@ const GamingSessions = () => {
   }, []);
 
   const openModal = (game) => {
-    console.log("Opening modal for game:", game);
     setCurrentGame(game);
     setIsModalVisible(true);
   };
@@ -75,7 +104,11 @@ const GamingSessions = () => {
 
   const handleStartSession = () => {
     if (currentGame) {
-      navigate(`/playgame/${encodeURIComponent(currentGame.PlayLink)}/${encodeURIComponent(currentGame.title)}`);
+      navigate(
+        `/playgame/${encodeURIComponent(
+          currentGame.PlayLink
+        )}/${encodeURIComponent(currentGame.title)}`
+      );
     }
     closeModal();
   };
@@ -85,7 +118,11 @@ const GamingSessions = () => {
   }
 
   if (error) {
-    return <div className="text-center mt-10 text-red-500">Error: {error}</div>;
+    return (
+      <div className="text-center mt-10 text-red-500">
+        Error: {error}
+      </div>
+    );
   }
 
   return (
@@ -103,9 +140,11 @@ const GamingSessions = () => {
           <div>Remaining Time: {remainingTime}</div>
           <div>Date: {currentDate}</div>
         </div>
-        
+
         <div className="container mx-auto p-6">
-          <div className="text-2xl font-primaryRegular mb-6">MY LIBRARY</div>
+          <div className="text-2xl font-primaryRegular mb-6">
+            MY RENTED GAMES
+          </div>
           {orderItems.length > 0 ? (
             <div className="flex flex-wrap gap-6">
               {orderItems.map((item) => (
@@ -124,10 +163,12 @@ const GamingSessions = () => {
                     <p className="mb-2 font-primaryRegular text-lg text-white">
                       {item.stockid.AssignedGame.title}
                     </p>
-                    
+
                     <div className="flex flex-wrap gap-2 mb-4 font-primaryRegular">
                       {item.stockid.AssignedGame.Genre.flatMap((genre) =>
-                        genre.includes(",") ? genre.split(",") : genre
+                        genre.includes(",")
+                          ? genre.split(",")
+                          : genre
                       ).map((genre, index) => (
                         <Chip
                           key={index}
@@ -141,10 +182,12 @@ const GamingSessions = () => {
                         </Chip>
                       ))}
                     </div>
-                    
+
                     <div className="flex flex-col gap-2">
                       <Button
-                        onClick={() => openModal(item.stockid.AssignedGame)}
+                        onClick={() =>
+                          openModal(item.stockid.AssignedGame)
+                        }
                         color="primary"
                         className="font-primaryRegular"
                         radius="none"
@@ -174,29 +217,70 @@ const GamingSessions = () => {
             <p>No Games in the library</p>
           )}
         </div>
-        
+
         {/* NextUI Modal */}
-        <Modal 
-          isOpen={isModalVisible} 
+        <Modal
+          isOpen={isModalVisible}
           onClose={closeModal}
           backdrop="blur"
         >
           <ModalContent>
             {(onClose) => (
               <>
-                <ModalHeader className="flex flex-col gap-1">Start Session</ModalHeader>
-                <ModalBody>
+                <ModalHeader className="flex flex-col gap-1">
+                  {currentGame
+                    ? `Session for ${currentGame.title}`
+                    : "Start Session"}
+                </ModalHeader>
+                <ModalBody className="flex flex-col gap-4">
                   {currentGame ? (
-                    <p>Are you sure you want to start a session for {currentGame.title}?</p>
+                    <>
+                      <p className="text-gray-500">
+                        Are you sure you want to start a session for{" "}
+                        <span className="font-semibold">
+                          {currentGame.title}
+                        </span>
+                        ?
+                      </p>
+                      {/* Remaining Time and Progress */}
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="text-lg font-bold text-center">
+                          Time Remaining: {remainingTime}
+                        </div>
+                        <Progress
+                          value={timeLeft}
+                          color="success"
+                          radius="none"
+                          className="w-full"
+                        />
+                        <Button
+                          color="secondary"
+                          variant="flat"
+                          size="sm"
+                          radius="none"
+                        >
+                          Extend Time
+                        </Button>
+                      </div>
+                    </>
                   ) : (
                     <p>Loading game details...</p>
                   )}
                 </ModalBody>
-                <ModalFooter>
-                  <Button color="danger" variant="light" onPress={onClose}>
+                <ModalFooter className="flex justify-between">
+                  <Button
+                    color="danger"
+                    variant="light"
+                    onPress={onClose}
+                    radius="none"
+                  >
                     Cancel
                   </Button>
-                  <Button color="primary" onPress={handleStartSession}>
+                  <Button
+                    color="primary"
+                    onPress={handleStartSession}
+                    radius="none"
+                  >
                     Start Session
                   </Button>
                 </ModalFooter>

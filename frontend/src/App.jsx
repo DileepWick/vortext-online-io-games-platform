@@ -16,6 +16,8 @@ import ArticleList from "./pages/articles";
 import Contact from "./pages/Contact";
 import GamingSessions from "./pages/GamingSessions";
 import SessionHistory from "./pages/SessionHistory";
+import HandleRentals from "./pages/HandleRentals";
+
 
 //Gameplay
 import GameEmbed from "./pages/GameEmbed";
@@ -57,6 +59,8 @@ const App = () => {
       <Route path="/review_dashboard" element={<Review_manager />} />
       <Route path="/playgame/:src/:title" element={<GameEmbed />} />
       <Route path="/SessionHistory" element={<SessionHistory />} />
+      <Route path="/HandleRentals" element={<HandleRentals />} />
+
     </Routes>
   );
 };
