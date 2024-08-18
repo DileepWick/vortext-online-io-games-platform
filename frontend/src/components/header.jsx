@@ -172,6 +172,16 @@ export default function Header() {
                   </DropdownItem>
                 )}
 
+                {/* Admin user Filter */}
+                {user.role === "Admin" && (
+                  <DropdownItem
+                    key="Admin-panel"
+                    onClick={() => navigate("/UserManagementDashboard")}
+                  >
+                    User Managemnt
+                  </DropdownItem>
+                )}
+
                 {/* Order Manager Filter */}
                 {user.role === "Order Manager" && (
                   <DropdownItem

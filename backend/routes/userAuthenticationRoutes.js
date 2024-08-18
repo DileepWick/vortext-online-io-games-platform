@@ -1,4 +1,4 @@
-import express, { response } from "express";
+import express from "express";
 import { User } from "../models/user.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -14,10 +14,10 @@ const userRouter = express.Router();
 //User Registration
 userRouter.post("/register", async (request, response) => {
   try {
-    const { username, password, role, email, workingRegion } = request.body;
+    const { username, password, role, email, birthday } = request.body;
 
     // Validate input
-    if (!username || !password || !role || !email) {
+    if (!username || !password || !role || !email || !birthday) {
       return response.status(400).json({ message: "All fields are required" });
     }
 
@@ -36,22 +36,29 @@ userRouter.post("/register", async (request, response) => {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Calculate age from birthday
+    const age = calculateAge(birthday);
+
+    // Categorize player type based on age
+    let playerType;
+    if (age < 13) {
+      playerType = "Kid";
+    } else if (age >= 13 && age < 18) {
+      playerType = "Teenager";
+    } else {
+      playerType = "Adult";
+    }
+
     // Prepare new user object
     const newUser = {
       username,
       password: hashedPassword,
       role,
       email,
+      birthday,
+      age, // Store the calculated age
+      playerType, // Store the categorized player type
     };
-
-    // Add courier-specific fields if the role is 'courier'
-    if (role === 'Courier') {
-      if (!workingRegion) {
-        return response.status(400).json({ message: "Working region is required for couriers" });
-      }
-      newUser.workingRegion = workingRegion;
-      newUser.status = 'Free'; // Set default status for couriers
-    }
 
     // Create a new user
     const createdUser = await User.create(newUser);
@@ -70,6 +77,20 @@ userRouter.post("/register", async (request, response) => {
     return response.status(500).json({ message: "Server error" });
   }
 });
+
+// Helper function to calculate age from birthday
+function calculateAge(birthday) {
+  const birthDate = new Date(birthday);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDifference = today.getMonth() - birthDate.getMonth();
+  
+  if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+
+  return age;
+}
 
 // Login route
 userRouter.post("/login", async (req, res) => {
@@ -229,33 +250,6 @@ userRouter.put(
   }
 );
 
-// Get all couriers filtered by working region
-userRouter.get("/couriers/:workingRegion", async (request, response) => {
-  try {
-    const { workingRegion } = request.params; // Get workingRegion from query params
-
-    if (!workingRegion) {
-      return response.status(400).json({ message: "Working region is required" });
-    }
-
-    // Find couriers by role and working region
-    const couriers = await User.find({ 
-      role: "Courier", 
-      workingRegion: workingRegion,
-      status: "Free" 
-    });
-
-    return response.status(200).json({
-      total_couriers: couriers.length,
-      couriers: couriers,
-    });
-  } catch (error) {
-    console.log("Error fetching couriers:", error.message);
-    return response.status(500).json({ message: "Server error" });
-  }
-});
-
-
 //Change Status
 userRouter.put("/changeStatus/:id", async (request, response) => {
   const { id } = request.params;
@@ -277,6 +271,5 @@ userRouter.put("/changeStatus/:id", async (request, response) => {
     response.status(500).json({ message: "Internal server error" });
   }
 });
-
 
 export default userRouter;
