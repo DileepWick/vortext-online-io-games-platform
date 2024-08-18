@@ -11,6 +11,11 @@ export default {
       fontFamily: {
         primaryRegular:['Rubik'],
       },
+      colors: {
+        customDark: '#131213',
+        headerDark:'#18191d',
+        editionColor:'#787979'
+      },
     },
   },
   

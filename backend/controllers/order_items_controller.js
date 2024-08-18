@@ -1,13 +1,13 @@
 import { OrderItems } from "../models/orderItems.js";
-import {Order} from "../models/order.js"
+import { Order } from "../models/order.js";
 
 // Create a new order item
 export const createOrderItem = async (req, res) => {
   try {
-    const { order, stockid, quantity, price } = req.body;
+    const { order, stockid, price } = req.body;
 
     // Validate input
-    if (!order || !stockid || !quantity || !price) {
+    if (!order || !stockid || !price) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -15,7 +15,6 @@ export const createOrderItem = async (req, res) => {
     const newOrderItem = new OrderItems({
       order,
       stockid,
-      quantity,
       price,
     });
 
@@ -36,7 +35,7 @@ export const getAllOrderItems = async (req, res) => {
       .populate("stockid")
       .populate("order");
     res.status(200).json({
-      orderHistory:orderItems
+      orderHistory: orderItems,
     });
   } catch (error) {
     console.error("Error fetching order items:", error);
@@ -56,7 +55,13 @@ export const getOrderItemsByOrderId = async (req, res) => {
 
     const orderItems = await OrderItems.find({ order: orderId })
       .populate("order")
-      .populate("stockid");
+      .populate({
+        path: "stockid",
+        populate: {
+          path: "AssignedGame",
+          model: "Game",
+        },
+      });
 
     if (orderItems.length === 0) {
       return res.status(404).json({ message: "Order items not found" });
@@ -66,6 +71,61 @@ export const getOrderItemsByOrderId = async (req, res) => {
   } catch (error) {
     console.error("Error fetching order items by order ID:", error);
     res.status(500).json({ message: "Error fetching order items" });
+  }
+};
+
+// Check if a specific item is already in the user's library
+export const checkLibraryItem = async (req, res) => {
+  try {
+    const { stockid } = req.params;
+    const {userId} = req.params; 
+
+    // Validate stock ID
+    if (!stockid) {
+      return res.status(400).json({ message: "Stock ID is required" });
+    }
+
+    // Validate user ID
+    if (!userId) {
+      return res.status(401).json({ message: "User ID is required" });
+    }
+
+    // Find all orders by user ID
+    const orders = await Order.find({ user: userId });
+
+    if (orders.length === 0) {
+      return res.status(404).json({ message: "Orders not found for the user" });
+    }
+
+    // Extract order IDs
+    const orderIds = orders.map((order) => order._id);
+
+    // Find order items by order IDs and stock ID
+    const libraryItems = await OrderItems.find({
+      order: { $in: orderIds },
+      stockid: stockid,
+    })
+      .populate({
+        path: "stockid",
+        populate: {
+          path: "AssignedGame",
+          model: "Game",
+        },
+      })
+      .populate("order");
+
+    if (libraryItems.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "You have not purchased this item yet" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "You already own this item", items: libraryItems });
+  } catch (error) {
+    console.error("Error fetching order items by user ID and stock ID:", error);
+    res.status(500).json({ message: "Error fetching order items status 500" });
   }
 };
 
@@ -135,7 +195,7 @@ export const getOrderItemsByUserId = async (req, res) => {
     }
 
     // Extract order IDs
-    const orderIds = orders.map(order => order._id);
+    const orderIds = orders.map((order) => order._id);
 
     // Find all order items by order IDs and populate stockid and assignedGame fields
     const orderItems = await OrderItems.find({ order: { $in: orderIds } })
@@ -143,13 +203,15 @@ export const getOrderItemsByUserId = async (req, res) => {
         path: "stockid",
         populate: {
           path: "AssignedGame",
-          model: "Game"
-        }
+          model: "Game",
+        },
       })
       .populate("order");
 
     if (orderItems.length === 0) {
-      return res.status(404).json({ message: "Order items not found for the user" });
+      return res
+        .status(404)
+        .json({ message: "Order items not found for the user" });
     }
 
     res.status(200).json(orderItems);

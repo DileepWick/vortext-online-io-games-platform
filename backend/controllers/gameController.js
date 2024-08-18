@@ -3,6 +3,8 @@ import fs from "fs";
 import { Game } from "../models/game.js";
 import cloudinary from "../utils/cloudinary.js";
 
+
+//Add new game
 export const uploadGame = async (req, res) => {
   try {
     // Ensure that req.files is defined and contains necessary properties
@@ -31,13 +33,13 @@ export const uploadGame = async (req, res) => {
     );
 
     // Check required fields
-    if (!req.body.title || !req.body.Description || !req.body.Genre) {
+    if (!req.body.title || !req.body.Description || !req.body.Genre || !req.body.PlayLink || !req.body.AgeGroup) {
       // Clean up uploaded files before returning error response
       fs.unlinkSync(req.files.image[0].path);
       fs.unlinkSync(req.files.video[0].path);
 
       return res.status(400).json({
-        message: "Title, description, and genre are required",
+        message: "Title, description, genre, play link, and age group are required",
       });
     }
 
@@ -45,10 +47,12 @@ export const uploadGame = async (req, res) => {
     const newGame = new Game({
       title: req.body.title,
       coverPhoto: imageResult.secure_url,
-      RatingPoints: req.body.RatingPoints || 0, // Corrected property name
+      RatingPoints: req.body.RatingPoints || 0,
       TrailerVideo: videoResult.secure_url,
       Description: req.body.Description,
       Genre: req.body.Genre,
+      PlayLink: req.body.PlayLink,
+      AgeGroup: req.body.AgeGroup,
     });
 
     // Save the new game to the database
@@ -70,6 +74,8 @@ export const uploadGame = async (req, res) => {
     });
   }
 };
+
+
 
 //Get all games
 export const getAllGames = async (req, res) => {

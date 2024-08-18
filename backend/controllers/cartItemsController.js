@@ -2,7 +2,6 @@ import { CartItems } from "../models/cartItems.js";
 import { Cart } from "../models/cart.js";
 import { GameStock } from "../models/gameStock.js";
 
-// Create a new cart item or update quantity if it already exists
 export const createCartItem = async (req, res) => {
   try {
     const { cartid, stockid, quantity } = req.body;
@@ -30,41 +29,36 @@ export const createCartItem = async (req, res) => {
     }
 
     // Check if the item already exists in the cart
-    let existingCartItem = await CartItems.findOne({ cartid, stockid });
+    const existingCartItem = await CartItems.findOne({ cartid, stockid });
 
     if (existingCartItem) {
-      // If item exists, update the quantity and total
-      const newQuantity = existingCartItem.quantity + quantity;
-
-      // Calculate the new total price
-      const newTotal = gameStock.UnitPrice * newQuantity;
-
-      existingCartItem.quantity = newQuantity;
-      existingCartItem.total = newTotal;
-      await existingCartItem.save();
+      // Item is already in the cart
+      return res.status(222).json({ message: "Item already in the cart" });
     } else {
       // Otherwise, create a new cart item
       const total = gameStock.UnitPrice * quantity;
+
+      // Add the new cart item
       await CartItems.create({
         cartid,
         stockid,
         quantity,
         total,
       });
+
+      // Subtract the quantity from the game stock and save the updated game stock
+      gameStock.NumberOfUnits -= quantity;
+      await gameStock.save();
+
+      return res.status(201).json({ message: "Game added to cart " });
     }
 
-    // Subtract the quantity from the game stock and save the updated game stock
-    gameStock.NumberOfUnits -= quantity;
-    await gameStock.save();
-
-    res
-      .status(201)
-      .json({ message: "Cart item created or updated successfully" });
   } catch (error) {
-    console.error("Error creating or updating cart item:", error);
+    console.error("Error creating cart item:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 // Get all cart items by user ID
 export const getCartItemsByUserId = async (req, res) => {
@@ -86,9 +80,15 @@ export const getCartItemsByUserId = async (req, res) => {
     }
 
     // Find all cart items for the found cart
-    const cartItems = await CartItems.find({ cartid: cart._id }).populate(
-      "stockid"
-    );
+    const cartItems = await CartItems.find({ cartid: cart._id })
+      .populate("stockid")
+      .populate({
+        path: "stockid",
+        populate: {
+          path: "AssignedGame",
+          model: "Game",
+        },
+      });
 
     // Return the cart items
     res.status(200).json({ cartItems });
@@ -106,11 +106,15 @@ export const updateCartItemByStockId = async (req, res) => {
 
     // Validate input
     if (!stockId || quantity === undefined) {
-      return res.status(400).json({ message: "Stock ID and quantity are required" });
+      return res
+        .status(400)
+        .json({ message: "Stock ID and quantity are required" });
     }
 
     // Find the cart item by stock ID and populate the stockid field
-    const cartItem = await CartItems.findOne({ stockid: stockId }).populate('stockid');
+    const cartItem = await CartItems.findOne({ stockid: stockId }).populate(
+      "stockid"
+    );
 
     if (!cartItem) {
       return res.status(404).json({ message: "Cart item not found" });
@@ -127,7 +131,10 @@ export const updateCartItemByStockId = async (req, res) => {
     const quantityDifference = quantity - cartItem.quantity;
 
     // Check if there is enough stock available for the increase
-    if (quantityDifference > 0 && gameStock.NumberOfUnits < quantityDifference) {
+    if (
+      quantityDifference > 0 &&
+      gameStock.NumberOfUnits < quantityDifference
+    ) {
       return res.status(400).json({ message: "Not enough stock available" });
     }
 
@@ -148,7 +155,6 @@ export const updateCartItemByStockId = async (req, res) => {
     res.status(500).json({ message: "Error updating cart item" });
   }
 };
-
 
 // Delete cart item by stock ID
 export const deleteCartItemByStockId = async (req, res) => {

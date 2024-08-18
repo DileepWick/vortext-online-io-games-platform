@@ -7,12 +7,12 @@ import UploadGame from "./Games_Components/add_new_game";
 import UpdateGame from "./Games_Components/update_game";
 import AddNewStock from "./Games_Components/add_new_stock";
 
-
 //Stock Components
 import StockTable from "./Stock_Components/stock_table";
 
 // Next UI
 import { Tabs, Tab, Button, Input, User, Chip, Image } from "@nextui-org/react";
+import { ScrollShadow } from "@nextui-org/react";
 import {
   Table,
   TableHeader,
@@ -198,8 +198,8 @@ const Blogger = () => {
           color="primary"
         >
           <Tab key="analytics" title="Analytics" />
-          <Tab key="products" title="Products" />
-          <Tab key="stock" title="Stock" />
+          <Tab key="products" title="Unpublished Games" />
+          <Tab key="stock" title="Published Games" />
         </Tabs>
       </div>
       <div className="p-4">
@@ -324,7 +324,7 @@ const Blogger = () => {
                             variant="ghost"
                             onClick={() => handleAddNewStock(game)}
                           >
-                            New Stock
+                            Publish
                           </Button>
                         </Tooltip>
                       </div>
@@ -337,7 +337,7 @@ const Blogger = () => {
             {/* Show Game Details */}
             <Modal
               isOpen={isDetailsModalOpen}
-              size="lg"
+              size="full"
               onOpenChange={onDetailsModalClose}
               classNames={{
                 backdrop:
@@ -347,48 +347,48 @@ const Blogger = () => {
               <ModalContent className="font-primaryRegular">
                 <ModalHeader>Game Details</ModalHeader>
                 <ModalBody>
-                  {selectedGame && (
-                    <div className="flex flex-col gap-4">
-                      <h2 className="text-xl font-bold">
-                        {selectedGame.title}
-                      </h2>
-                      {selectedGame.TrailerVideo && (
-                        <div className="w-full rounded-lg mb-4 shadow-md">
-                          <video
-                            src={selectedGame.TrailerVideo}
-                            autoPlay
-                            controls
-                            className="w-full rounded-lg"
-                            width={100}
-                            height={100}
-                          />
-                        </div>
-                      )}
+                  <ScrollShadow hideScrollBar className="w-[1500px] h-[550px]">
+                    {selectedGame && (
+                      <div className="flex flex-col gap-4">
+                        <h2 className="text-xl font-bold">
+                          {selectedGame.title}
+                        </h2>
+                        {selectedGame.TrailerVideo && (
+                          <div className="w-full rounded-lg mb-4 shadow-md">
+                            <video
+                              src={selectedGame.TrailerVideo}
+                              autoPlay
+                              controls
+                              className="w-full rounded-lg"
+                              width={50}
+                              height={50}
+                            />
+                          </div>
+                        )}
 
-                      <p className="text-gray-600">
-                        {selectedGame.Description}
-                      </p>
-                      <div className="flex items-center gap-4">
-                        <Image
-                          isZoomed
-                          width={240}
-                          alt="Game Cover Photo"
-                          src={selectedGame.coverPhoto}
-                          className="rounded-lg shadow-md"
-                        />
-                        <Chip color="default" variant="flat">
-                          {selectedGame.RatingPoints}
-                        </Chip>
-                        <br></br>
                         <p className="text-gray-600">
-                          Release Date: <br></br>
-                          {selectedGame.insertDate}
+                          {selectedGame.Description}
                         </p>
+                        <div className="flex items-center gap-4">
+                          <Image
+                            isZoomed
+                            width={200}
+                            alt="Game Cover Photo"
+                            src={selectedGame.coverPhoto}
+                            className="rounded-lg shadow-md"
+                          />
+                          <Chip color="default" variant="flat">
+                            {selectedGame.RatingPoints}
+                          </Chip>
+                          <br></br>
+                          <p className="text-gray-600">
+                            Release Date: <br></br>
+                            {selectedGame.insertDate}
+                          </p>
+                        </div>
                       </div>
-
-                      {/* Add more details as needed */}
-                    </div>
-                  )}
+                    )}{" "}
+                  </ScrollShadow>
                 </ModalBody>
                 <ModalFooter>
                   <Button
@@ -457,7 +457,7 @@ const Blogger = () => {
             {/* Update Game Details */}
             <Modal
               isOpen={isUpdateModalOpen}
-              size="3xl"
+              size="full"
               onOpenChange={onUpdateModalClose}
               classNames={{
                 backdrop:

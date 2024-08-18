@@ -5,8 +5,10 @@ import { getToken } from "../utils/getToken";
 import useAuthCheck from "../utils/authCheck";
 import Header from "../components/header";
 import Footer from "../components/footer";
-
-//Next Ui
+import { DeleteIcon } from "../assets/icons/DeleteIcon";
+import { ScrollShadow } from "@nextui-org/react";
+import { toast, Flip } from "react-toastify";
+// Next UI
 import {
   Modal,
   ModalContent,
@@ -15,34 +17,55 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
-  Radio,
-  RadioGroup,
+  Image,
+  Chip,
 } from "@nextui-org/react";
 import { Input } from "@nextui-org/input";
-import { Select, SelectSection, SelectItem } from "@nextui-org/select";
 
 const CartPage = () => {
   // Authenticate user
   useAuthCheck();
 
-  //Modal
+  // Modal
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [totalPrice, setTotalPrice] = useState(0);
   const [subtotal, setSubtotal] = useState(0);
   const [totalDiscountedTotal, setTotalDiscountedTotal] = useState(0);
 
   // Payment form state
-  const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [cvv, setCvv] = useState("");
-  const [shippingAddress, setShippingAddress] = useState("");
-  const [region, setRegion] = useState("");
   const [paymentAmount, setPaymentAmount] = useState(0); // This will be set dynamically
+  const [errors, setErrors] = useState({});
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Card Number validation
+    const cardNumberPattern = /^[0-9]{16}$/;
+    if (!cardNumberPattern.test(cardNumber)) {
+      newErrors.cardNumber = "Card Number must be 16 digits";
+    }
+
+    // Expiry Date validation
+    const expiryDatePattern = /^(0[1-9]|1[0-2])\/\d{2}$/; // MM/YY format
+    if (!expiryDatePattern.test(expiryDate)) {
+      newErrors.expiryDate = "Expiry Date must be in MM/YY format";
+    }
+
+    // CVV validation
+    const cvvPattern = /^[0-9]{3,4}$/; // 3 or 4 digits
+    if (!cvvPattern.test(cvv)) {
+      newErrors.cvv = "CVV must be 3 or 4 digits";
+    }
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  };
 
   // Get CartItems
   useEffect(() => {
@@ -73,47 +96,22 @@ const CartPage = () => {
     let totalDiscountedTotal = 0;
 
     items.forEach((item) => {
-      const discount = item.stockid.discount || 0;
-      const discountedPrice =
-        discount > 0
-          ? item.stockid.UnitPrice * (1 - discount / 100)
-          : item.stockid.UnitPrice; // Calculate discounted price if discount > 0, else use regular price
+      const discountedPrice = calculateDiscountedPrice(item);
       subTotal += discountedPrice * item.quantity;
-      totalDiscountedTotal += discountedPrice * item.quantity; // Always add discounted price to totalDiscountedTotal
+      totalDiscountedTotal += discountedPrice * item.quantity;
     });
 
     setSubtotal(subTotal);
-    setTotalPrice(subTotal); // Set totalPrice initially to subtotal
     setTotalDiscountedTotal(totalDiscountedTotal);
     setPaymentAmount(subTotal); // Set payment amount to subtotal initially
   };
 
-  // Handle Quantity change
-  const handleQuantityChange = async (stockid, newQuantity) => {
-    try {
-      if (newQuantity <= 0) return;
-
-      const response = await axios.put(
-        `http://localhost:8098/cartItems/updateCartItem/${stockid}`,
-        { quantity: newQuantity }
-      );
-
-      if (response.status === 200) {
-        const updatedItems = cartItems.map((item) =>
-          item.stockid._id === stockid
-            ? {
-                ...item,
-                quantity: newQuantity,
-                total: item.stockid.UnitPrice * newQuantity,
-              }
-            : item
-        );
-        setCartItems(updatedItems);
-        calculateTotal(updatedItems);
-      }
-    } catch (error) {
-      setError("Error updating cart item quantity");
-    }
+  // Calculate discounted price
+  const calculateDiscountedPrice = (item) => {
+    const discount = item.stockid.discount || 0;
+    return discount > 0
+      ? item.stockid.UnitPrice * (1 - discount / 100)
+      : item.stockid.UnitPrice;
   };
 
   // Handle Remove Item
@@ -139,255 +137,229 @@ const CartPage = () => {
   const handlePaymentSubmit = async (event) => {
     event.preventDefault();
 
-    // Basic form validation
-    if (!cardNumber || !expiryDate || !cvv || !shippingAddress || !region) {
-      setError("Please fill in all required fields.");
-      return;
-    }
+    if (validateForm()) {
+      try {
+        const token = getToken();
+        const userId = getUserIdFromToken(token);
 
-    try {
-      const token = getToken();
-      const userId = getUserIdFromToken(token);
-
-      // Order data
-      const orderData = {
-        shippingAddress,
-        region,
-        paymentAmount: totalDiscountedTotal,
-      };
-
-      // Add new order
-      const response = await axios.post(
-        `http://localhost:8098/orders/create/${userId}`,
-        orderData
-      );
-
-      const orderid = response.data._id; // Assuming the created order ID is returned in the response
-
-      // Create order items for each cart item
-      cartItems.map((item) => {
-        const orderItemData = {
-          order: orderid,
-          stockid: item.stockid._id,
-          quantity: item.quantity,
-          price: item.stockid.UnitPrice,
+        // Order data
+        const orderData = {
+          paymentAmount: totalDiscountedTotal,
         };
-        return axios.post(`http://localhost:8098/orderItems/`, orderItemData);
-      });
 
-      // Clear cart and show success message
-      setCartItems([]);
-      setShowPaymentForm(false);
-      alert("Order placed successfully!");
-    } catch (err) {
-      setError(err);
+        // Add new order
+        const response = await axios.post(
+          `http://localhost:8098/orders/create/${userId}`,
+          orderData
+        );
+
+        const orderid = response.data._id; // Assuming the created order ID is returned in the response
+
+        // Create order items for each cart item
+        await Promise.all(
+          cartItems.map((item) => {
+            const orderItemData = {
+              order: orderid,
+              stockid: item.stockid._id,
+              price: item.stockid.UnitPrice,
+            };
+            return axios.post(
+              `http://localhost:8098/orderItems/`,
+              orderItemData
+            );
+          })
+        );
+
+        // Clear cart and show success message
+        setCartItems([]);
+        toast.success("Order Placed Successfully !", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Flip,
+          style: { fontFamily: "Rubik" },
+        });
+      } catch (err) {
+        setError("Error placing order");
+      }
     }
   };
 
   if (loading) return <p className="text-center mt-8">Loading...</p>;
-  if (error) return <p className="text-center mt-8">Error: {error}</p>;
+  if (error) {
+    const errorMessage = error?.message || "Error occurred";
+    return <p className="text-center mt-8">Error: {errorMessage}</p>;
+  }
 
   if (cartItems.length === 0)
     return (
-      <div className="bg-gray-800 min-h-screen">
+      <div className="bg-customDark min-h-screen">
         <Header />
-        <p className="text-center mt-8">No items in the cart</p>
+        <p className="text-center mt-8 text-lg text-white">
+          No items in the cart
+        </p>
         <Footer />
       </div>
     );
 
   return (
-    <div className=" min-h-screen font-primaryRegular">
+    <div className="min-h-screen font-primaryRegular">
       <Header />
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">My Cart</h1>
-          <div>
-            {cartItems.map((item) => (
-              <div
-                key={item._id}
-                className="flex justify-between items-center mb-4"
-              >
-                <div>
-                  <h2 className="text-xl font-bold text-gray-800">
-                    {item.stockid.AssignedGame.title}
-                  </h2>
-                  <p className="text-gray-700">
-                    Platform: {item.stockid.Platform}
-                  </p>
-                  <p className="text-gray-700">
-                    Edition: {item.stockid.Edition}
-                  </p>
-                  <p className="text-gray-700">
-                    Price: ${item.stockid.UnitPrice}
-                  </p>
-                  <p className="text-gray-700">
-                    Total: $
-                    {(item.stockid.UnitPrice * item.quantity).toFixed(2)}
-                  </p>
-                  {item.stockid.discount > 0 && (
-                    <p className="text-gray-700">
-                      Discount: {item.stockid.discount}%
-                    </p>
-                  )}
-                  <p className="text-gray-700">
-                    Discounted Total: ${discountedPrice(item).toFixed(2)}
-                  </p>
-                  <p className="text-gray-700">
-                    Stock available: {item.stockid.NumberOfUnits}
-                  </p>
-                </div>
-                <div>
-                  <Button
-                    onClick={() =>
-                      handleQuantityChange(item.stockid._id, item.quantity - 1)
-                    }
-                    color="danger"
-                    variant="bordered"
-                  >
-                    -
-                  </Button>
-                  <input
-                    type="number"
-                    value={item.quantity}
-                    onChange={(e) =>
-                      handleQuantityChange(
-                        item.stockid._id,
-                        Number(e.target.value)
-                      )
-                    }
-                    className="w-16 text-center border-gray-300"
-                  />
-                  <Button
-                    onClick={() =>
-                      handleQuantityChange(item.stockid._id, item.quantity + 1)
-                    }
-                    color="success"
-                    variant="bordered"
-                  >
-                    +
-                  </Button>
-                </div>
-                <Button
-                  onClick={() => handleRemoveItem(item.stockid._id)}
-                  color="danger"
-                  variant="bordered"
+      <div className="container mx-auto px-4 py-8 bg-customDark">
+        <div className="bg-customDark rounded-lg shadow-lg p-8 flex flex-row">
+          <ScrollShadow hideScrollBar className="w-full h-[500px]">
+            <div className="flex flex-col">
+              {cartItems.map((item) => (
+                <div
+                  key={item._id}
+                  className="flex justify-between items-center mb-4"
                 >
-                  Remove
-                </Button>
-              </div>
-            ))}
-          </div>
-          <div className="mt-8 ">
-            <h2 className="text-2xl font-bold text-gray-800">
-              Subtotal: ${subtotal.toFixed(2)}
-            </h2>
-            <Button onPress={onOpen} color="primary" variant="shadow">
-              Proceed to Payment
-            </Button>
-            <Modal
-              backdrop="opaque"
-              isOpen={isOpen}
-              onOpenChange={onOpenChange}
-              classNames={{
-                backdrop:
-                  "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20 font-primaryRegular",
-              }}
+                  <div className="flex flex-row p-4">
+                    <Image
+                      isBlurred
+                      isZoomed
+                      className="w-[180px] h-[220px]"
+                      radius="none"
+                      alt="Game Cover"
+                      src={item.stockid.AssignedGame.coverPhoto}
+                    />
+                    <div className="flex flex-col m-4 p-4">
+                      <h2 className="text-xl text-white">
+                        {item.stockid.AssignedGame.title}
+                      </h2>
+                      <p className="text-white mt-2">
+                        <span className="line-through text-editionColor">
+                          LKR.
+                          {(
+                            item.stockid.UnitPrice * item.quantity
+                          ).toFixed(2)}
+                        </span>{" "}
+                        <span className="text-white">
+                          LKR.
+                          {calculateDiscountedPrice(item).toFixed(2)}
+                        </span>
+                      </p>
+                      {item.stockid.discount > 0 && (
+                        <Chip
+                          color="primary"
+                          radius="none"
+                          className="text-white mt-2"
+                        >
+                          {item.stockid.discount}% OFF
+                        </Chip>
+                      )}
+                    </div>
+                  </div>
+                  <Button
+                    onClick={() => handleRemoveItem(item.stockid._id)}
+                    color="danger"
+                    variant="flat"
+                    size="sm"
+                  >
+                    <DeleteIcon />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </ScrollShadow>
+          <div className="mt-8 p-4 m-8 w-[30%] rounded-md bg-customCardDark h-[500px]">
+            <h2 className="text-lg font-bold mb-4 text-white">Summary</h2>
+            <p className="text-sm mb-2 text-white">Total: LKR.{subtotal}</p>
+            <p className="text-sm mb-2 text-white">
+              Discounted Total: LKR.{totalDiscountedTotal}
+            </p>
+            <Button
+              onPress={onOpen}
+              variant="bordered"
+              color="primary"
+              className="text-white mt-2"
+              radius="none"
             >
-              <ModalContent>
-                {(onClose) => (
-                  <>
-                    <ModalHeader className="flex flex-col gap-1 font-primaryRegular">
-                      Place Order
-                    </ModalHeader>
+              Checkout
+            </Button>
+          </div>
+          <Modal
+            isOpen={isOpen}
+            onOpenChange={onOpenChange}
+            placement="center"
+            radius="none"
+          >
+            <ModalContent>
+              {(onClose) => (
+                <>
+                  <ModalHeader className="font-primaryBold">
+                    Checkout
+                  </ModalHeader>
+                  <form onSubmit={handlePaymentSubmit}>
                     <ModalBody>
                       <Input
+                        isClearable
+                        className="mt-2"
+                        label="Card Number"
                         type="text"
+                        radius="none"
+                        placeholder="0000 0000 0000 0000"
                         value={cardNumber}
-                        label="Card number"
-                        className="font-primaryRegular"
-                        onChange={(e) => setCardNumber(e.target.value)}
-                        required
+                        onValueChange={setCardNumber}
+                        validationState={
+                          errors.cardNumber ? "invalid" : "valid"
+                        }
+                        errorMessage={errors.cardNumber}
                       />
-                      <Input
-                        type="text"
-                        value={cvv}
-                        label="CVV"
-                        onChange={(e) => setCvv(e.target.value)}
-                        className="font-primaryRegular"
-                        required
-                      />{" "}
-                      <Input
-                        type="text"
-                        value={expiryDate}
-                        label="Expiry Date"
-                        onChange={(e) => setExpiryDate(e.target.value)}
-                        className="font-primaryRegular"
-                        required
-                      />
-                      <Input
-                        type="text"
-                        value={shippingAddress}
-                        label="Shipping Address"
-                        onChange={(e) => setShippingAddress(e.target.value)}
-                        className="font-primaryRegular"
-                        required
-                      />
-                      <RadioGroup label="Select region" className="font-primaryRegular">
-                        <Radio value="Northern" onChange={() => setRegion("Northern")}>Northern</Radio>
-                        <Radio value="North Western" onChange={() => setRegion("North Western")}>North Western</Radio>
-                        <Radio value="Western" onChange={() => setRegion("Western")}>Western</Radio>
-                        <Radio value="North Central" onChange={() => setRegion("North Central")}>North Central</Radio>
-                        <Radio value="Central" onChange={() => setRegion("Central")}>Central</Radio>
-                        <Radio value="Sabaragamuwa" onChange={() => setRegion("Sabaragamuwa")}>Sabaragamuwa</Radio>
-                        <Radio value="Eastern" onChange={() => setRegion("Eastern")}>Eastern</Radio>
-                        <Radio value="Uva" onChange={() => setRegion("Uva")}>Uva</Radio>
-                        <Radio value="Southern" onChange={() => setRegion("Southern")}>Southern</Radio>
-                      </RadioGroup>
-                      <Input
-                        type="text"
-                        value={`$${paymentAmount.toFixed(2)}`}
-                        label="Payment"
-                        readOnly
-                        className="font-primaryRegular"
-                        required
-                      />
+                      <div className="flex flex-row mt-4">
+                        <Input
+                          isClearable
+                          className="mr-4"
+                          label="Expiry Date"
+                          placeholder="MM/YY"
+                          radius="none"
+                          type="text"
+                          value={expiryDate}
+                          onValueChange={setExpiryDate}
+                          validationState={
+                            errors.expiryDate ? "invalid" : "valid"
+                          }
+                          errorMessage={errors.expiryDate}
+                        />
+                        <Input
+                          isClearable
+                          className="ml-4"
+                          label="CVV"
+                          placeholder="123"
+                          radius="none"
+                          type="text"
+                          value={cvv}
+                          onValueChange={setCvv}
+                          validationState={errors.cvv ? "invalid" : "valid"}
+                          errorMessage={errors.cvv}
+                        />
+                      </div>
                     </ModalBody>
                     <ModalFooter>
                       <Button
-                        color="danger"
-                        variant="light"
-                        onPress={onClose}
-                        className="font-primaryRegular"
-                      >
-                        Cancel
-                      </Button>
-                      <Button
                         color="primary"
-                        onPress={onClose}
-                        className="font-primaryRegular"
-                        onClick={handlePaymentSubmit}
+                        type="submit"
+                        radius="none"
+                        className="text-white"
                       >
-                        Place Order
+                        Pay LKR. {paymentAmount}
                       </Button>
                     </ModalFooter>
-                  </>
-                )}
-              </ModalContent>
-            </Modal>
-          </div>
+                  </form>
+                </>
+              )}
+            </ModalContent>
+          </Modal>
         </div>
       </div>
       <Footer />
     </div>
   );
-};
-
-const discountedPrice = (item) => {
-  const discount = item.stockid.discount || 0;
-  return discount > 0
-    ? item.stockid.UnitPrice * (1 - discount / 100) * item.quantity
-    : item.stockid.UnitPrice * item.quantity;
 };
 
 export default CartPage;

@@ -1,28 +1,19 @@
 import { Order } from "../models/order.js";
 import { Cart } from "../models/cart.js";
-import { customAlphabet } from "nanoid";
 import { CartItems } from "../models/cartItems.js";
 import { OrderItems } from "../models/orderItems.js";
 import { GameStock } from "../models/gameStock.js";
 import { User } from "../models/user.js";
 
-// Custom alphabet for generating a unique 4-length code (letters and numbers)
-const alphabet =
-  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-const nanoid = customAlphabet(alphabet, 6);
-
 // Create an Order
 export const createOrder = async (req, res) => {
   const { userId } = req.params;
-  const { shippingAddress, region, paymentAmount } = req.body;
+  const { paymentAmount } = req.body;
 
   try {
     const newOrder = new Order({
       user: userId,
-      shippingAddress,
-      region,
-      paymentAmount,
-      orderCompletionCode: nanoid(),
+      paymentAmount:paymentAmount,
     });
 
     const savedOrder = await newOrder.save();

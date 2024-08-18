@@ -6,28 +6,12 @@ import { Game } from "../models/game.js";
 export const createGameStock = async (req, res) => {
   try {
     const {
-      Platform,
-      Edition,
-      NumberOfUnits,
       UnitPrice,
       discount,
       AssignedGame,
     } = req.body;
 
     // Validate required fields individually
-    if (!Platform) {
-      return res.status(400).json({ message: "Platform is required" });
-    }
-
-    if (!Edition) {
-      return res.status(400).json({ message: "Edition is required" });
-    }
-
-    if (NumberOfUnits == null) {
-      // Check for both null and undefined
-      return res.status(400).json({ message: "Number of Units is required" });
-    }
-
     if (UnitPrice == null) {
       // Check for both null and undefined
       return res.status(400).json({ message: "Unit Price is required" });
@@ -43,25 +27,20 @@ export const createGameStock = async (req, res) => {
       return res.status(404).json({ message: "Assigned game not found" });
     }
 
-    // Check if there is already a stock entry for the given platform and edition
+    // Check if game is already published
     const existingStock = await GameStock.findOne({
-      AssignedGame,
-      Platform,
-      Edition,
+      AssignedGame
     }).populate("AssignedGame");
 
     if (existingStock) {
       return res.status(405).json({
-        message: `Stock already exists for  Platform '${Platform}' and Edition '${Edition}'`,
+        message: `Game has already been published`,
       });
     }
 
     // Create new GameStock object
     const newGameStock = new GameStock({
       AssignedGame,
-      Platform,
-      Edition,
-      NumberOfUnits,
       UnitPrice,
       discount,
     });
@@ -71,7 +50,7 @@ export const createGameStock = async (req, res) => {
 
     // Return success message with the savedGameStock object
     return res.status(201).json({
-      message: "Game stock created successfully",
+      message: "Game published successfully !",
       savedGameStock,
     });
 
@@ -94,7 +73,7 @@ export const getAllGameStocks = async (req, res) => {
     });
   } catch (error) {
     return res.status(500).json({
-      message: "Error getting game stocks",
+      message: "Error getting published games",
       error: error.message,
     });
   }

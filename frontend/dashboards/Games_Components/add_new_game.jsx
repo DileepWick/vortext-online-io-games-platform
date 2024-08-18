@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Progress, Input, Button, Textarea } from "@nextui-org/react";
+import { Progress, Input, Button, Textarea, Select, SelectItem } from "@nextui-org/react";
 import { CheckboxGroup, Checkbox } from "@nextui-org/checkbox";
 
 const UploadGame = ({ FunctionToCallAfterUpload }) => {
@@ -10,13 +10,22 @@ const UploadGame = ({ FunctionToCallAfterUpload }) => {
   const [image, setImage] = useState(null);
   const [video, setVideo] = useState(null);
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [ageGroup, setAgeGroup] = useState(""); // New state for AgeGroup
+  const [playLink, setPlayLink] = useState(""); // New state for PlayLink
   const [isLoading, setLoading] = useState(false); // Loading state
 
   // Fixed categories list
   const categoriesList = [
-    { _id: "action", categoryName: "Action" },
-    { _id: "adventure", categoryName: "Adventure" },
-    { _id: "racing", categoryName: "Racing" },
+    { _id: "Action", categoryName: "Action" },
+    { _id: "Adventure", categoryName: "Adventure" },
+    { _id: "Racing", categoryName: "Racing" },
+  ];
+
+  // Fixed age groups list
+  const ageGroups = [
+    { value: "Everyone", label: "Everyone" },
+    { value: "Teen", label: "Teen" },
+    { value: "Mature", label: "Mature" },
   ];
 
   const handleFileChange = (e) => {
@@ -37,7 +46,9 @@ const UploadGame = ({ FunctionToCallAfterUpload }) => {
     formData.append("Description", description);
     formData.append("image", image);
     formData.append("video", video);
-    formData.append("Genre", selectedCategories); 
+    formData.append("Genre", selectedCategories);
+    formData.append("AgeGroup", ageGroup);
+    formData.append("PlayLink", playLink); // Add PlayLink to formData
 
     try {
       const response = await axios.post(
@@ -49,7 +60,7 @@ const UploadGame = ({ FunctionToCallAfterUpload }) => {
           },
         }
       );
-    
+
       if (response.status === 201) {
         // Handle success
         toast.success("Game Added Successfully", {
@@ -63,6 +74,8 @@ const UploadGame = ({ FunctionToCallAfterUpload }) => {
         setImage(null);
         setVideo(null);
         setSelectedCategories([]);
+        setAgeGroup(""); // Reset AgeGroup
+        setPlayLink(""); // Reset PlayLink
       } else {
         // Handle unexpected response
         toast.error("Unexpected server response");
@@ -144,6 +157,29 @@ const UploadGame = ({ FunctionToCallAfterUpload }) => {
               name="video"
               onChange={handleFileChange}
               accept="video/*"
+              required
+            />
+          </div>
+          <div>
+            <Select
+              label="Age Group"
+              value={ageGroup}
+              onChange={setAgeGroup}
+              required
+            >
+              {ageGroups.map((group) => (
+                <SelectItem key={group.value} value={group.value}>
+                  {group.label}
+                </SelectItem>
+              ))}
+            </Select>
+          </div>
+          <div>
+            <Input
+              label="Play Link"
+              type="text"
+              value={playLink}
+              onChange={(e) => setPlayLink(e.target.value)}
               required
             />
           </div>

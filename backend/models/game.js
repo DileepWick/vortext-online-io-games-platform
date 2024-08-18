@@ -8,7 +8,7 @@ const gameSchema = Schema({
     required: true,
   },
   coverPhoto: {
-    type: String, //Cloudinary url
+    type: String, // Cloudinary URL
     required: true,
   },
   RatingPoints: {
@@ -21,7 +21,7 @@ const gameSchema = Schema({
     default: Date.now,
   },
   TrailerVideo: {
-    type: String, //Cloudinary url
+    type: String, // Cloudinary URL
     required: true,
   },
   Description: {
@@ -30,6 +30,14 @@ const gameSchema = Schema({
   },
   Genre: {
     type: [String],
+    required: true,
+  },
+  PlayLink: {
+    type: String,
+    required: true,
+  },
+  AgeGroup: {
+    type: String,
     required: true,
   }
 });

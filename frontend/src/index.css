@@ -8,3 +8,11 @@
     url('./assets/fonts/Rubik-Regular.ttf') format("truetype");
 
 }
+/* Hide scrollbar */
+.hide-scrollbar {
+    scrollbar-width: none; /* Firefox */
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }

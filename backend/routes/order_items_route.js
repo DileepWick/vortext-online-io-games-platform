@@ -5,7 +5,8 @@ import {
   getOrderItemsByOrderId,
   updateOrderItemById,
   deleteOrderItemById,
-  getOrderItemsByUserId
+  getOrderItemsByUserId,
+  checkLibraryItem
 } from '../controllers/order_items_controller.js';
 
 const OrderItemsRouter = express.Router();
@@ -15,6 +16,9 @@ OrderItemsRouter.post('/', createOrderItem);
 
 // Get all order items
 OrderItemsRouter.get('/', getAllOrderItems);
+
+//CheckLibraryItem
+OrderItemsRouter.get('/checkItem/:stockid/:userId',checkLibraryItem);
 
 // Get order items by order ID
 OrderItemsRouter.get('/order/:orderId', getOrderItemsByOrderId);
@@ -27,6 +31,8 @@ OrderItemsRouter.put('/:orderItemId', updateOrderItemById);
 
 // Delete an order item by ID
 OrderItemsRouter.delete('/:orderItemId', deleteOrderItemById);
+
+
 
 
 
