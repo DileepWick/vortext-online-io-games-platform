@@ -96,17 +96,7 @@ export default function Header() {
               Articles
             </Link>
           </NavbarItem>
-          <NavbarItem>
-            <Link
-              color={location.pathname === "/GamingSessions" ? "primary" : "white"}
-              href="/GamingSessions"
-              className={`${
-                location.pathname === "/GamingSessions" ? "underline" : ""
-              } text-white hover:underline`}
-            >
-              Gaming Sessions
-            </Link>
-          </NavbarItem>
+          
           <NavbarItem>
             <Link
               color={location.pathname === "/reviews" ? "primary" : "white"}
@@ -164,6 +154,9 @@ export default function Header() {
                   onClick={() => navigate("/mylibrary")}
                 >
                   My Library
+                </DropdownItem>
+                <DropdownItem key="cart" onClick={() => navigate("/GamingSessions")}>
+                  Rentals
                 </DropdownItem>
                 <DropdownItem key="cart" onClick={() => navigate("/cartItems")}>
                   My Cart

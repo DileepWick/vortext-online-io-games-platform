@@ -15,6 +15,7 @@ import MyLibrary from "./pages/My_Library";
 import ArticleList from "./pages/articles";
 import Contact from "./pages/Contact";
 import GamingSessions from "./pages/GamingSessions";
+import SessionHistory from "./pages/SessionHistory";
 
 //Gameplay
 import GameEmbed from "./pages/GameEmbed";
@@ -55,6 +56,7 @@ const App = () => {
       <Route path="/staffManager" element={<StaffManager />} />
       <Route path="/review_dashboard" element={<Review_manager />} />
       <Route path="/playgame/:src/:title" element={<GameEmbed />} />
+      <Route path="/SessionHistory" element={<SessionHistory />} />
     </Routes>
   );
 };
