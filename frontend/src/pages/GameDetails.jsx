@@ -156,6 +156,61 @@ const GameDetails = () => {
     }
   };
 
+  // Handle Rent
+  const handleRent = async (stockId) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:8098/rentals/createRental`, // Update with your API endpoint
+        {
+          stockid: stockId,
+          quantity: quantityByStockId[stockId] || 1, // Use the selected quantity or default to 1
+        }
+      );
+
+      if (response.status === 201) {
+        toast.success(response.data.message, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Flip,
+          style: { fontFamily: "Rubik" },
+        });
+      } else if (response.status === 222) {
+        toast.warning("Item is already rented", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Flip,
+          style: { fontFamily: "Rubik" },
+        });
+      }
+    } catch (error) {
+      console.error("Error renting item:", error);
+      toast.error("Error renting item.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Flip,
+        style: { fontFamily: "Rubik" },
+      });
+    }
+  };
+
   const handleQuantityChange = (stockId, newQuantity) => {
     // Update quantityByStockId state
     setQuantityByStockId({ ...quantityByStockId, [stockId]: newQuantity });
@@ -173,9 +228,9 @@ const GameDetails = () => {
     : originalPrice;
 
   return (
-    <div className="bg-customDark  text-black min-h-screen font-primaryRegular">
+    <div className="bg-customDark text-black min-h-screen font-primaryRegular">
       <Header />
-      <div className="container mx-auto px-4 py-8  ">
+      <div className="container mx-auto px-4 py-8">
         <div className="bg-customDark rounded-lg shadow-lg p-8">
           <h1 className="text-5xl text-white mb-4 text-left">
             {gameStock.AssignedGame.title}
@@ -193,9 +248,7 @@ const GameDetails = () => {
                 muted
                 className="w-[900px] h-[400px] object-cover mb-4 shadow-md"
               />
-              <h1 className="mt-8 text-editionColor text-3xl">
-                About the game
-              </h1>
+              <h1 className="mt-8 text-editionColor text-3xl">About the game</h1>
               <p className="text-lg mt-4">
                 <ScrollShadow
                   hideScrollBar
@@ -250,17 +303,29 @@ const GameDetails = () => {
                     ))}
                   </div>
                 </CardBody>
-                <CardFooter className="text-center">
-                  <Button
-                    onClick={() => handleAddToCart(gameStock._id)}
-                    color="primary"
-                    radius="none"
-                    className=" w-[300px]"
-                    variant="ghost"
-                  >
-                    Add to Cart
-                  </Button>
-                </CardFooter>
+                        <CardFooter className="text-center">
+          <div className="flex flex-col items-center">
+            <Button
+              onClick={() => handleAddToCart(gameStock._id)}
+              color="primary"
+              radius="none"
+              className="w-[300px] mb-2"
+              variant="ghost"
+            >
+              Add to Cart
+            </Button>
+            <Button
+              onClick={() => handleRent(gameStock._id)}
+              color="secondary"
+              radius="none"
+              className="w-[300px]"
+              variant="ghost"
+            >
+              Rent Game
+            </Button>
+          </div>
+        </CardFooter>
+
               </Card>
             </div>
           </div>
@@ -292,9 +357,7 @@ const GameDetails = () => {
                     View Details
                   </Link>
                   <div className="mt-4">
-                    <label className="block text-gray-700 mb-2">
-                      Quantity:
-                    </label>
+                    <label className="block text-gray-700 mb-2">Quantity:</label>
                     <input
                       type="number"
                       min="1"
@@ -310,6 +373,12 @@ const GameDetails = () => {
                     className="block w-full text-center bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300 mt-4"
                   >
                     Add to Cart
+                  </button>
+                  <button
+                    onClick={() => handleRent(stock._id)}
+                    className="block w-full text-center bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition duration-300 mt-4"
+                  >
+                    Rent
                   </button>
                 </div>
               ))}
