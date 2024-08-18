@@ -2,10 +2,8 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 
 //Pages
-import CreateBook from "./pages/CreateBook";
 import Home from "./pages/Home";
 import Login from "./pages/login";
-import ManageBooks from "./pages/ManageBooks";
 import Profile from "./pages/profile";
 import AddGameForm from "./pages/add_new_game";
 import Shop from "./pages/Shop";
@@ -34,8 +32,6 @@ const App = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/books/addNewBook" element={<CreateBook />} />
-      <Route path="/books/manageBooks" element={<ManageBooks />} />
       <Route path="/login" element={<Login />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/adminAddNewGame" element={<AddGameForm />} />

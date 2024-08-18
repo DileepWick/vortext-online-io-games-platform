@@ -8,6 +8,21 @@
     url('./assets/fonts/Rubik-Regular.ttf') format("truetype");
 
 }
+
+@font-face{
+  font-family:"scary";
+  src:local("HelpMe"),
+  url('./assets/fonts/HelpMe.ttf') format("truetype");
+
+}
+
+@font-face{
+  font-family:"scary2";
+  src:local("BLOODY"),
+  url('./assets/fonts/BLOODY.TTF') format("truetype");
+
+}
+
 /* Hide scrollbar */
 .hide-scrollbar {
     scrollbar-width: none; /* Firefox */

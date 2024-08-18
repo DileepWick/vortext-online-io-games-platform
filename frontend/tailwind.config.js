@@ -10,12 +10,25 @@ export default {
     extend: {
       fontFamily: {
         primaryRegular:['Rubik'],
+        scary:['scary'],
+        scary2:['scary2'],
       },
       colors: {
         customDark: '#131213',
         headerDark:'#18191d',
-        editionColor:'#787979'
+        editionColor:'#787979',
+        customPink: '#f10b63'
       },
+      animation: {
+        blink: 'blink 0.5s linear infinite',
+      },
+      keyframes: {
+        blink: {
+          '0%': { backgroundColor: 'white' },
+          '50%': { backgroundColor: 'red' },
+          '100%': { backgroundColor: 'white' },
+        },
+      }
     },
   },
   
