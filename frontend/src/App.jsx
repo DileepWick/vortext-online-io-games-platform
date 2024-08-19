@@ -57,7 +57,7 @@ const App = () => {
       <Route path="/playgame/:src/:title" element={<GameEmbed />} />
       <Route path="/UserManagementDashboard"element={<UserManagementDashboard />}/>
       <Route path="/SessionHistory" element={<SessionHistory />} />
-      <Route path="/HandleRentals" element={<HandleRentals />} />
+      <Route path="/HandleRentals/:id" element={<HandleRentals />} />
       ,r
     </Routes>
   );
