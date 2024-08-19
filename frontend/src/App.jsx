@@ -15,6 +15,7 @@ import Contact from "./pages/Contact";
 import GamingSessions from "./pages/GamingSessions";
 import SessionHistory from "./pages/SessionHistory";
 
+
 //Gameplay
 import GameEmbed from "./pages/GameEmbed";
 
@@ -28,6 +29,7 @@ import ContactDash from "../dashboards/Customer suport";
 import SessionManagerDash from "../dashboards/session_manager_dashbord";
 import StaffManager from "../dashboards/staff_manager_dashboard";
 import UserManagementDashboard from "../dashboards/UserManagementDashboard";
+import Payment_Manager from "../dashboards/Payment_manager_dashboard";
 
 const App = () => {
   return (
@@ -57,6 +59,7 @@ const App = () => {
       <Route path="/UserManagementDashboard" element={<UserManagementDashboard />} />
 
       <Route path="/SessionHistory" element={<SessionHistory />} />
+      <Route path="/Payment_manager_dashboard" element={<Payment_Manager />} />
 
     </Routes>
   );
