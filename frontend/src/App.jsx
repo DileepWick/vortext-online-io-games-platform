@@ -16,6 +16,7 @@ import GamingSessions from "./pages/GamingSessions";
 import SessionHistory from "./pages/SessionHistory";
 import Support from "./pages/Support";
 
+
 //Gameplay
 import GameEmbed from "./pages/GameEmbed";
 
@@ -29,6 +30,7 @@ import ContactDash from "../dashboards/Customer suport";
 import SessionManagerDash from "../dashboards/session_manager_dashbord";
 
 import UserManagementDashboard from "../dashboards/UserManagementDashboard";
+import Payment_Manager from "../dashboards/Payment_manager_dashboard";
 
 const App = () => {
   return (
@@ -61,6 +63,8 @@ const App = () => {
       />
 
       <Route path="/SessionHistory" element={<SessionHistory />} />
+      <Route path="/Payment_manager_dashboard" element={<Payment_Manager />} />
+
     </Routes>
   );
 };

@@ -28,12 +28,24 @@ export const createOrderItem = async (req, res) => {
   }
 };
 
+
 // Get all order items
 export const getAllOrderItems = async (req, res) => {
   try {
     const orderItems = await OrderItems.find()
-      .populate("stockid")
-      .populate("order");
+      .populate({
+        path: "stockid",
+        populate: {
+          path: "AssignedGame", // Populate all fields of AssignedGame
+        }
+      })
+      .populate({
+        path: "order",
+        populate: {
+          path: "user", // Populate all fields of user
+        }
+      });
+
     res.status(200).json({
       orderHistory: orderItems,
     });
@@ -42,6 +54,7 @@ export const getAllOrderItems = async (req, res) => {
     res.status(500).json({ message: "Error fetching order items" });
   }
 };
+
 
 // Get order items by order ID
 export const getOrderItemsByOrderId = async (req, res) => {
