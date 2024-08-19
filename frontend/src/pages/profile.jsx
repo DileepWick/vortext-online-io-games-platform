@@ -150,7 +150,7 @@ const Profile = () => {
               </div>
 
               <div className="mb-4">
-                <Input
+                <input
                   type="file"
                   accept="image/*"
                   onChange={handleFileChange}
