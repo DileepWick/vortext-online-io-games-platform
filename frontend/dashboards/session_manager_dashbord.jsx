@@ -14,8 +14,6 @@ const SessionManagerDash = () => {
     { id: 4, time: "2hours", price: 250 }
   ]);
   const [newOption, setNewOption] = useState({ time: "", price: "" });
-  const [editingId, setEditingId] = useState(null);
-  const [editingOption, setEditingOption] = useState({ time: "", price: "" });
 
   const handleAddOption = () => {
     if (newOption.time && newOption.price) {
@@ -26,19 +24,6 @@ const SessionManagerDash = () => {
 
   const handleDeleteOption = (id) => {
     setRentalOptions(rentalOptions.filter(option => option.id !== id));
-  };
-
-  const handleEditClick = (option) => {
-    setEditingId(option.id);
-    setEditingOption({ time: option.time, price: option.price });
-  };
-
-  const handleUpdateOption = () => {
-    setRentalOptions(rentalOptions.map(option => 
-      option.id === editingId ? { ...option, ...editingOption } : option
-    ));
-    setEditingId(null);
-    setEditingOption({ time: "", price: "" });
   };
 
   const renderManageRentals = () => (
@@ -61,30 +46,8 @@ const SessionManagerDash = () => {
       <div>
         {rentalOptions.map(option => (
           <div key={option.id} className="flex items-center justify-between mb-2">
-            {editingId === option.id ? (
-              <>
-                <Input
-                  value={editingOption.time}
-                  onChange={(e) => setEditingOption({ ...editingOption, time: e.target.value })}
-                  className="mr-2"
-                />
-                <Input
-                  value={editingOption.price}
-                  onChange={(e) => setEditingOption({ ...editingOption, price: e.target.value })}
-                  className="mr-2"
-                />
-                <Button color="success" size="sm" onPress={handleUpdateOption} className="mr-2">Update</Button>
-                <Button color="danger" size="sm" onPress={() => setEditingId(null)}>Cancel</Button>
-              </>
-            ) : (
-              <>
-                <span>{option.time} - LKR {option.price}</span>
-                <div>
-                  <Button color="primary" size="sm" onPress={() => handleEditClick(option)} className="mr-2">Edit</Button>
-                  <Button color="danger" size="sm" onPress={() => handleDeleteOption(option.id)}>Delete</Button>
-                </div>
-              </>
-            )}
+            <span>{option.time} - LKR {option.price}</span>
+            <Button color="danger" size="sm" onPress={() => handleDeleteOption(option.id)}>Delete</Button>
           </div>
         ))}
       </div>

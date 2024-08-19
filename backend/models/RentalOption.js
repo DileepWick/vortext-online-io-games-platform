@@ -10,7 +10,8 @@ const rentalOptionSchema = new Schema({
   },
   price: {
     type: Number,
-    required: true
+    required: true,
+    min: [0, 'Price must be a positive number']
   },
   insertDate: {
     type: Date,

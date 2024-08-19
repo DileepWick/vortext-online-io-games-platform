@@ -5,20 +5,17 @@ export const addRentalOption = async (req, res) => {
   try {
     const { time, price } = req.body;
 
-    // Check required fields
     if (!time || !price) {
       return res.status(400).json({
         message: "Time and price are required",
       });
     }
 
-    // Create a new rental option object
     const newRentalOption = new RentalOption({
       time,
       price
     });
 
-    // Save the new rental option to the database
     const savedRentalOption = await newRentalOption.save();
 
     return res.status(201).json({
@@ -28,8 +25,7 @@ export const addRentalOption = async (req, res) => {
   } catch (err) {
     console.error("Error adding rental option:", err);
     return res.status(500).json({
-      success: false,
-      message: "Error",
+      message: err.message || "Error adding rental option",
     });
   }
 };
@@ -39,12 +35,14 @@ export const getAllRentalOptions = async (req, res) => {
   try {
     const allRentalOptions = await RentalOption.find().sort('price');
     return res.status(200).json({
+      message: "Rental options fetched successfully",
       total_options: allRentalOptions.length,
       allRentalOptions,
     });
   } catch (error) {
+    console.error("Error getting rental options:", error);
     return res.status(500).json({
-      message: "Error getting rental options.",
+      message: error.message || "Error getting rental options",
     });
   }
 };
@@ -60,11 +58,13 @@ export const getSpecificRentalOption = async (req, res) => {
     }
 
     return res.status(200).json({
+      message: "Rental option fetched successfully",
       rentalOption,
     });
   } catch (error) {
+    console.error("Error getting rental option:", error);
     return res.status(500).json({
-      message: "Error getting the rental option.",
+      message: error.message || "Error getting the rental option",
     });
   }
 };
@@ -84,10 +84,9 @@ export const deleteRentalOption = async (req, res) => {
       deletedOption,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Error deleting rental option:", error);
     return res.status(500).json({
-      message: "Failed to delete rental option",
-      error: error.message,
+      message: error.message || "Failed to delete rental option",
     });
   }
 };
@@ -116,10 +115,9 @@ export const updateRentalOption = async (req, res) => {
       updatedOption,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Error updating rental option:", error);
     return res.status(500).json({
-      message: "Failed to update rental option",
-      error: error.message,
+      message: error.message || "Failed to update rental option",
     });
   }
 };
