@@ -59,7 +59,7 @@ const App = () => {
       <Route path="/review_dashboard" element={<Review_manager />} />
       <Route path="/playgame/:src/:title" element={<GameEmbed />} />
       <Route path="/SessionHistory" element={<SessionHistory />} />
-      <Route path="/HandleRentals" element={<HandleRentals />} />
+      <Route path="/handleRentals/:stockid" element={<HandleRentals />} />
 
     </Routes>
   );
