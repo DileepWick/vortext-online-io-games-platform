@@ -3,36 +3,46 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate, useLocation } from "react-router-dom";
 
-//Next UI
-import { Input } from "@nextui-org/react";
-import { Button } from "@nextui-org/react";
-import { Tabs, Tab, Link, Card, CardBody } from "@nextui-org/react";
+// Next UI
+import { Input, Button, Tabs, Tab, Link, Card, CardBody } from "@nextui-org/react";
 
-//Components
+// Components
 import Header from "../components/header";
 import Footer from "../components/footer";
 
-//Utils
-import { getUserRoleFromToken } from "../utils/user_role_decoder"; //Role decoder
+// Utils
+import { getUserRoleFromToken } from "../utils/user_role_decoder"; // Role decoder
 
 const Login = () => {
-  const [selected, setSelected] = useState("login");
+  const [selectedTab, setSelectedTab] = useState("login");
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
-  const [birthday, setBirthday] = useState(""); // New state for birthday
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+    email: "",
+    birthday: "", // Added birthday to form data
+  });
+
   const [alertMessage, setAlertMessage] = useState("");
 
+  // Handle form data changes
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  // Handle login submission
   const handleLogin = async () => {
     try {
-      const loggedUser = { username, password };
-      const response = await axios.post(
-        "http://localhost:8098/users/login",
-        loggedUser
-      );
+      const { username, password } = formData;
+      const response = await axios.post("http://localhost:8098/users/login", {
+        username,
+        password,
+      });
 
       const token = response.data.token;
 
@@ -44,60 +54,48 @@ const Login = () => {
 
         const userRole = getUserRoleFromToken(token);
 
-        if (userRole === "admin") {
-          navigate("/");
-        } else {
-          navigate(redirectTo ? decodeURIComponent(redirectTo) : "/");
-        }
+        navigate(userRole === "admin" ? "/" : redirectTo ? decodeURIComponent(redirectTo) : "/");
       } else {
         setAlertMessage(response.data.message);
       }
     } catch (error) {
       console.error("Login error:", error);
       setAlertMessage("Login failed");
-      setUsername("");
-      setPassword("");
+    } finally {
+      // Clear password field after attempt
+      setFormData({ ...formData, password: "" });
     }
   };
 
+  // Handle sign-up submission
   const handleSignUp = async () => {
     try {
-      // Calculate age based on birthday
+      const { username, email, password, birthday } = formData;
+
+      // Calculate age
       const today = new Date();
       const birthDate = new Date(birthday);
       let age = today.getFullYear() - birthDate.getFullYear();
-      const m = today.getMonth() - birthDate.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
         age--;
       }
 
       // Determine player category
-      let playerCategory = "";
-      if (age <= 12) {
-        playerCategory = "Kid";
-      } else if (age <= 18) {
-        playerCategory = "Teenager";
-      } else {
-        playerCategory = "Adult";
-      }
+      const playerCategory = age <= 12 ? "Kid" : age <= 18 ? "Teenager" : "Adult";
 
-      const newUser = {
+      const response = await axios.post("http://localhost:8098/users/register", {
         username,
         email,
         password,
         birthday,
         age,
-        playerCategory, // Send player category
-      };
-
-      const response = await axios.post(
-        "http://localhost:8098/users/register",
-        newUser
-      );
+        playerCategory,
+      });
 
       if (response.data.success) {
         setAlertMessage("Registration successful! Please log in.");
-        setSelected("login");
+        setSelectedTab("login");
       } else {
         setAlertMessage(response.data.message);
       }
@@ -117,8 +115,8 @@ const Login = () => {
               fullWidth
               size="lg"
               aria-label="Tabs form"
-              selectedKey={selected}
-              onSelectionChange={setSelected}
+              selectedKey={selectedTab}
+              onSelectionChange={setSelectedTab}
             >
               <Tab key="login" title="Login">
                 <form className="flex flex-col gap-4">
@@ -126,21 +124,23 @@ const Login = () => {
                     isRequired
                     label="Username"
                     placeholder="Enter your username"
+                    name="username"
                     type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    value={formData.username}
+                    onChange={handleInputChange}
                   />
                   <Input
                     isRequired
                     label="Password"
                     placeholder="Enter your password"
+                    name="password"
                     type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={formData.password}
+                    onChange={handleInputChange}
                   />
                   <p className="text-center text-small">
                     Need to create an account?{" "}
-                    <Link size="sm" onPress={() => setSelected("sign-up")}>
+                    <Link size="sm" onPress={() => setSelectedTab("sign-up")}>
                       Sign up
                     </Link>
                   </p>
@@ -162,38 +162,41 @@ const Login = () => {
                     isRequired
                     label="Username"
                     placeholder="Enter your username"
+                    name="username"
                     type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    value={formData.username}
+                    onChange={handleInputChange}
                   />
                   <Input
                     isRequired
                     label="Email"
                     placeholder="Enter your email"
+                    name="email"
                     type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={formData.email}
+                    onChange={handleInputChange}
                   />
                   <Input
                     isRequired
                     label="Birthday"
                     placeholder="Enter your birthday"
+                    name="birthday"
                     type="date"
-                    value={birthday}
-                    onChange={(e) => setBirthday(e.target.value)}
+                    value={formData.birthday}
+                    onChange={handleInputChange}
                   />
                   <Input
                     isRequired
                     label="Password"
                     placeholder="Enter your password"
+                    name="password"
                     type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={formData.password}
+                    onChange={handleInputChange}
                   />
-                  
                   <p className="text-center text-small">
                     Already have an account?{" "}
-                    <Link size="sm" onPress={() => setSelected("login")}>
+                    <Link size="sm" onPress={() => setSelectedTab("login")}>
                       Login
                     </Link>
                   </p>

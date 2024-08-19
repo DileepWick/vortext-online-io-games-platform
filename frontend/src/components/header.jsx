@@ -26,12 +26,7 @@ export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const variants = [
-    "solid",
-    "underlined",
-    "bordered",
-    "light",
-  ];
+  const variants = ["solid", "underlined", "bordered", "light"];
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -57,7 +52,10 @@ export default function Header() {
 
   return (
     <div className="bg-headerDark">
-      <Navbar className="font-primaryRegular bg-headerDark text-white" position="sticky"> 
+      <Navbar
+        className="font-primaryRegular bg-headerDark text-white"
+        position="sticky"
+      >
         <NavbarBrand>
           <p className="font-bold text-white">VORTEX GAMING</p>
         </NavbarBrand>
@@ -96,7 +94,7 @@ export default function Header() {
               Articles
             </Link>
           </NavbarItem>
-          
+
           <NavbarItem>
             <Link
               color={location.pathname === "/reviews" ? "primary" : "white"}
@@ -119,6 +117,29 @@ export default function Header() {
               Contact
             </Link>
           </NavbarItem>
+          <Dropdown placement="bottom-start">
+            <DropdownTrigger>
+              <NavbarItem>Support</NavbarItem>
+            </DropdownTrigger>
+            <DropdownMenu
+              aria-label="Profile Actions"
+              variant="flat"
+              className="font-primaryRegular text-black"
+            >
+              <DropdownItem key="support" onClick={() => navigate("/support")}>
+                Vortex Support
+              </DropdownItem>
+              <DropdownItem
+                key="privacy"
+                onClick={() => navigate("/privacyPolicy")}
+              >
+                Privacy Policy
+              </DropdownItem>
+              <DropdownItem key="about" onClick={() => navigate("/about")}>
+                About Vortex
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
         </NavbarContent>
 
         <NavbarContent as="div" justify="end">
@@ -155,7 +176,10 @@ export default function Header() {
                 >
                   My Library
                 </DropdownItem>
-                <DropdownItem key="cart" onClick={() => navigate("/GamingSessions")}>
+                <DropdownItem
+                  key="cart"
+                  onClick={() => navigate("/GamingSessions")}
+                >
                   Rentals
                 </DropdownItem>
                 <DropdownItem key="cart" onClick={() => navigate("/cartItems")}>
