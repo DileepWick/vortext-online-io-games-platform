@@ -4,20 +4,9 @@ import Footer from "../components/footer";
 import { toast, Flip } from "react-toastify";
 import Hangman from "../components/Games/Hangaman";
 
+
 const Home = () => {
-  const questions = [
-    {
-      question: "A type of fruit",
-      answer: "Apple",
-      hint: "Keeps the doctor away",
-    },
-    {
-      question: "A programming language",
-      answer: "JavaScript",
-      hint: "The language of the web",
-    },
-    { question: "A color", answer: "Yellow", hint: "The color of the sun" },
-  ];
+
 
   const notify = () => {
     toast.success("🦄 Wow so easy!", {
@@ -51,7 +40,7 @@ const Home = () => {
       <h1>Bandara Ranasinghe</h1>
       <h1>Tharindu Ariyawansha</h1>
 
-      <Hangman questions={questions} />
+      <Hangman/>
 
       <Footer />
     </div>
