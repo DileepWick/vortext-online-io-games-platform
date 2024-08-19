@@ -89,7 +89,7 @@ const HandleRentals = () => {
         style: { fontFamily: "Rubik" },
       });
       onClose();
-      navigate('/library'); // Assuming you have a library page
+      navigate('/GamingSessions'); // Assuming you have a library page
     } catch (error) {
       toast.error("Rental failed. Please try again.", {
         position: "top-right",

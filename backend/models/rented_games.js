@@ -10,7 +10,7 @@ const rentedGamesSchema = new Schema({
   },
   stockid: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "GameStock",
+    ref: "GameStock", 
     required: true,
   },
   rentStartTime: {
