@@ -58,6 +58,13 @@ const App = () => {
       <Route path="/staffManager" element={<StaffManager />} />
       <Route path="/review_dashboard" element={<Review_manager />} />
       <Route path="/playgame/:src/:title" element={<GameEmbed />} />
+<<<<<<< Updated upstream
+=======
+
+      <Route path="/UserManagementDashboard" element={<UserManagementDashboard />} />
+      <Route path="/handleRentals/:stockid" element={<HandleRentals />} />
+
+>>>>>>> Stashed changes
       <Route path="/SessionHistory" element={<SessionHistory />} />
       <Route path="/handleRentals/:stockid" element={<HandleRentals />} />
 
