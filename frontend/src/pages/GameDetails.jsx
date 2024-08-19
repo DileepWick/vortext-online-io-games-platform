@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 // Utils
@@ -20,6 +20,7 @@ import { ScrollShadow } from "@nextui-org/react";
 const GameDetails = () => {
   // Authenticate user
   useAuthCheck();
+  const navigate = useNavigate(); // Initialize navigate hook
 
   const { id } = useParams();
   const [gameStock, setGameStock] = useState(null);
@@ -71,7 +72,7 @@ const GameDetails = () => {
       }
     };
 
-    //Check library Item
+    // Check library Item
     const checkLibrary = async () => {
       try {
         const token = getToken(); // Get token
@@ -80,14 +81,14 @@ const GameDetails = () => {
           `http://localhost:8098/orderItems/checkItem/${id}/${userId}/`
         );
 
-        if (checkStatus.status == 200) {
+        if (checkStatus.status === 200) {
           setCheckItem("in the library");
         }
       } catch (error) {}
     };
 
-    checkLibrary(); //Check library item
-    fetchGameDetails(); //fetch game details
+    checkLibrary(); // Check library item
+    fetchGameDetails(); // Fetch game details
     fetchCartId(); // Fetch cart
   }, [id]);
 
@@ -135,7 +136,7 @@ const GameDetails = () => {
             transition: Flip,
             style: { fontFamily: "Rubik" },
           });
-        } else if (response.status == 222) {
+        } else if (response.status === 222) {
           toast.warning("Item is already in the cart", {
             position: "top-right",
             autoClose: 3000,
@@ -157,58 +158,8 @@ const GameDetails = () => {
   };
 
   // Handle Rent
-  const handleRent = async (stockId) => {
-    try {
-      const response = await axios.post(
-        `http://localhost:8098/rentals/createRental`, // Update with your API endpoint
-        {
-          stockid: stockId,
-          quantity: quantityByStockId[stockId] || 1, // Use the selected quantity or default to 1
-        }
-      );
-
-      if (response.status === 201) {
-        toast.success(response.data.message, {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-          transition: Flip,
-          style: { fontFamily: "Rubik" },
-        });
-      } else if (response.status === 222) {
-        toast.warning("Item is already rented", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-          transition: Flip,
-          style: { fontFamily: "Rubik" },
-        });
-      }
-    } catch (error) {
-      console.error("Error renting item:", error);
-      toast.error("Error renting item.", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-        transition: Flip,
-        style: { fontFamily: "Rubik" },
-      });
-    }
+  const handleRent = (stockId) => {
+    navigate(`/handleRentals/${stockId}`); // Redirect to Handle Rentals page
   };
 
   const handleQuantityChange = (stockId, newQuantity) => {
@@ -279,112 +230,79 @@ const GameDetails = () => {
                           <span className="line-through mr-4 text-editionColor">
                             LKR .{originalPrice.toFixed(2)}
                           </span>
-                          <span className="text-lg">
+                          <span className="text-lg text-green-600">
                             LKR .{discountedPrice.toFixed(2)}
                           </span>
                         </div>
                       </>
                     )}
+                    {gameStock.discount === 0 && (
+                      <div className="flex items-center mt-2">
+                        <span className="text-lg text-white">
+                          LKR .{originalPrice.toFixed(2)}
+                        </span>
+                      </div>
+                    )}
                   </h2>
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {gameStock.AssignedGame.Genre.flatMap((genre) =>
-                      genre.includes(",") ? genre.split(",") : genre
-                    ).map((genre, index) => (
-                      <Chip
-                        key={index}
-                        color="primary"
-                        variant="flat"
-                        size="sm"
-                        radius="none"
-                        className="font-primaryRegular text-white"
-                      >
-                        {genre.trim()}
-                      </Chip>
-                    ))}
-                  </div>
                 </CardBody>
-                        <CardFooter className="text-center">
-          <div className="flex flex-col items-center">
-            <Button
-              onClick={() => handleAddToCart(gameStock._id)}
-              color="primary"
-              radius="none"
-              className="w-[300px] mb-2"
-              variant="ghost"
-            >
-              Add to Cart
-            </Button>
-            <Button
-              onClick={() => handleRent(gameStock._id)}
-              color="secondary"
-              radius="none"
-              className="w-[300px]"
-              variant="ghost"
-            >
-              Rent Game
-            </Button>
-          </div>
-        </CardFooter>
-
+                <CardFooter>
+                  {checkItem === "not in the library" && (
+                    <Button
+                      onClick={() => handleAddToCart(gameStock._id)}
+                      color="success"
+                      css={{ backgroundColor: "#0070f3", color: "white" }} // Custom styling
+                    >
+                      Add to Cart
+                    </Button>
+                  )}
+                  <Button
+                    onClick={() => handleRent(gameStock._id)}
+                    color="success"
+                    css={{ backgroundColor: "#0070f3", color: "white", marginTop: "8px" }} // Custom styling
+                  >
+                    Rent
+                  </Button>
+                </CardFooter>
               </Card>
             </div>
           </div>
-        </div>
-
-        {relatedGameStocks.length > 0 && (
           <div className="mt-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">
-              Related Editions
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-              {relatedGameStocks.map((stock) => (
-                <div
-                  key={stock._id}
-                  className="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center text-center"
+            <h2 className="text-3xl text-white">Related Games</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+              {relatedGameStocks.map((relatedGameStock) => (
+                <Card
+                  key={relatedGameStock._id}
+                  className="bg-customDark"
+                  radius="none"
                 >
-                  <img
-                    src={stock.AssignedGame.coverPhoto}
-                    alt={stock.AssignedGame.title}
-                    className="w-40 h-52 object-cover rounded-lg mb-2"
+                  <Image
+                    radius="none"
+                    alt={relatedGameStock.AssignedGame.title}
+                    className="w-full h-[200px] object-cover rounded-t"
+                    src={relatedGameStock.AssignedGame.coverPhoto}
                   />
-                  <h2 className="text-xl font-bold text-gray-900 mb-2">
-                    {stock.AssignedGame.title} {stock.Edition} Edition
-                  </h2>
-                  <Link
-                    to={`/game/${stock._id}`}
-                    className="block text-center bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300"
-                  >
-                    View Details
-                  </Link>
-                  <div className="mt-4">
-                    <label className="block text-gray-700 mb-2">Quantity:</label>
-                    <input
-                      type="number"
-                      min="1"
-                      value={quantityByStockId[stock._id] || 1}
-                      onChange={(e) =>
-                        handleQuantityChange(stock._id, Number(e.target.value))
-                      }
-                      className="block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 bg-gray-100 text-black px-3 py-2"
-                    />
-                  </div>
-                  <button
-                    onClick={() => handleAddToCart(stock._id)}
-                    className="block w-full text-center bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300 mt-4"
-                  >
-                    Add to Cart
-                  </button>
-                  <button
-                    onClick={() => navigate(`/handleRentals/${stock._id}`)}
-                    className="block w-full text-center bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition duration-300 mt-4"
-                  >
-                    Rent
-                  </button>
-                </div>
+                  <CardBody>
+                    <h3 className="text-xl font-primaryRegular text-white">
+                      {relatedGameStock.AssignedGame.title}
+                    </h3>
+                    <p className="mt-2">
+                      {relatedGameStock.AssignedGame.Description}
+                    </p>
+                  </CardBody>
+                  <CardFooter>
+                    <Button
+                      onClick={() => handleRent(relatedGameStock._id)}
+                      color="success"
+                      css={{ backgroundColor: "#0070f3", color: "white", marginTop: "8px" }} // Custom styling
+                    >
+                      Rent
+                    </Button>
+                  </CardFooter>
+                </Card>
               ))}
             </div>
           </div>
-        )}
+        </div>
       </div>
       <Footer />
     </div>
