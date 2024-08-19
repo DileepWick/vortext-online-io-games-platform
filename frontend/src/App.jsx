@@ -16,7 +16,6 @@ import GamingSessions from "./pages/GamingSessions";
 import SessionHistory from "./pages/SessionHistory";
 import Support from "./pages/Support";
 
-
 //Gameplay
 import GameEmbed from "./pages/GameEmbed";
 
@@ -64,7 +63,6 @@ const App = () => {
 
       <Route path="/SessionHistory" element={<SessionHistory />} />
       <Route path="/Payment_manager_dashboard" element={<Payment_Manager />} />
-
     </Routes>
   );
 };
