@@ -14,6 +14,7 @@ import ArticleList from "./pages/articles";
 import Contact from "./pages/Contact";
 import GamingSessions from "./pages/GamingSessions";
 import SessionHistory from "./pages/SessionHistory";
+import Support from "./pages/Support";
 
 
 //Gameplay
@@ -27,7 +28,7 @@ import CourierDashBoard from "../dashboards/courier_dashboard";
 import Review_manager from "../dashboards/review_dashboard";
 import ContactDash from "../dashboards/Customer suport";
 import SessionManagerDash from "../dashboards/session_manager_dashbord";
-import StaffManager from "../dashboards/staff_manager_dashboard";
+
 import UserManagementDashboard from "../dashboards/UserManagementDashboard";
 import Payment_Manager from "../dashboards/Payment_manager_dashboard";
 
@@ -52,11 +53,14 @@ const App = () => {
       <Route path="/ContactDash" element={<ContactDash />} />
       <Route path="/sessionDashboard" element={<SessionManagerDash />} />
       <Route path="/GamingSessions" element={<GamingSessions />} />
-      <Route path="/staffManager" element={<StaffManager />} />
+      <Route path="/support" element={<Support />} />
       <Route path="/review_dashboard" element={<Review_manager />} />
       <Route path="/playgame/:src/:title" element={<GameEmbed />} />
 
-      <Route path="/UserManagementDashboard" element={<UserManagementDashboard />} />
+      <Route
+        path="/UserManagementDashboard"
+        element={<UserManagementDashboard />}
+      />
 
       <Route path="/SessionHistory" element={<SessionHistory />} />
       <Route path="/Payment_manager_dashboard" element={<Payment_Manager />} />

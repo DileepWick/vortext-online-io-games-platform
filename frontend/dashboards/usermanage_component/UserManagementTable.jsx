@@ -1,5 +1,6 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 import {
   Table,
   TableHeader,
@@ -9,13 +10,21 @@ import {
   TableCell,
   Pagination,
   Input,
-  Button
+  Button,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
 } from "@nextui-org/react";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
 
 const UserManagementTable = ({ users, setUsers }) => {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedUser, setSelectedUser] = useState(null); // For editing
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const rowsPerPage = 4; // Adjust rows per page if necessary
 
   // Filtered and paginated users
@@ -43,19 +52,47 @@ const UserManagementTable = ({ users, setUsers }) => {
     setPage(1); // Reset page to 1 when search query is cleared
   };
 
-  // Update user (placeholder function)
-  const handleUpdate = (user) => {
-    console.log("Update user:", user);
-    // Implement the update logic here
+  // Open the edit modal
+  const openEditModal = (user) => {
+    setSelectedUser(user);
+    setEditModalOpen(true);
   };
 
-  // Delete user
-  const handleDelete = async (userId) => {
+  // Handle user update
+  const handleUpdate = async () => {
     try {
-      await axios.delete(`http://localhost:8098/users/delete/${userId}`);
-      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
+      await axios.put(`http://localhost:8098/users/profile/update/${selectedUser._id}`, selectedUser);
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user._id === selectedUser._id ? selectedUser : user
+        )
+      );
+      setEditModalOpen(false);
+      toast.success("User updated successfully", {
+        style: { fontFamily: "Rubik" },
+      }); // Use alert or a notification library
+    } catch (error) {
+      console.error("Error updating user:", error);
+      alert("Error updating user");
+    }
+  };
+
+  // Open the delete modal
+  const openDeleteModal = (user) => {
+    setSelectedUser(user);
+    setDeleteModalOpen(true);
+  };
+
+  // Handle user deletion
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`http://localhost:8098/users/delete/${selectedUser._id}`);
+      setUsers((prevUsers) => prevUsers.filter((user) => user._id !== selectedUser._id));
+      setDeleteModalOpen(false);
+      alert("User deleted successfully"); // Use alert or a notification library
     } catch (error) {
       console.error("Error deleting user:", error);
+      alert("Error deleting user");
     }
   };
 
@@ -92,25 +129,25 @@ const UserManagementTable = ({ users, setUsers }) => {
         }}
       >
         <TableHeader>
-          <TableColumn key="ID">ID</TableColumn>
-          <TableColumn key="USERNAME">Username</TableColumn>
-          <TableColumn key="EMAIL">Email</TableColumn>
-          <TableColumn key="AGE">Age</TableColumn>
-          <TableColumn key="ACTIONS">Actions</TableColumn>
+          <TableColumn>ID</TableColumn>
+          <TableColumn>Username</TableColumn>
+          <TableColumn>Email</TableColumn>
+          <TableColumn>Age</TableColumn>
+          <TableColumn>Actions</TableColumn>
         </TableHeader>
         <TableBody>
           {items.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell>{user.id}</TableCell>
+            <TableRow key={user._id}>
+              <TableCell>{user._id}</TableCell>
               <TableCell>{user.username}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>{user.age}</TableCell>
               <TableCell>
                 <div style={{ display: "flex", gap: "10px" }}>
-                  <Button auto flat color="primary" onClick={() => handleUpdate(user)}>
+                  <Button auto flat color="primary" onClick={() => openEditModal(user)}>
                     Update
                   </Button>
-                  <Button auto flat color="error" onClick={() => handleDelete(user.id)}>
+                  <Button auto flat color="error" onClick={() => openDeleteModal(user)}>
                     Delete
                   </Button>
                 </div>
@@ -119,6 +156,66 @@ const UserManagementTable = ({ users, setUsers }) => {
           ))}
         </TableBody>
       </Table>
+
+      {/* Edit Modal */}
+      <Modal isOpen={isEditModalOpen} onClose={() => setEditModalOpen(false)}>
+        <ModalContent>
+          <ModalHeader>Edit User</ModalHeader>
+          <ModalBody>
+            <Input
+              fullWidth
+              label="Username"
+              value={selectedUser?.username || ""}
+              onChange={(e) =>
+                setSelectedUser({ ...selectedUser, username: e.target.value })
+              }
+            />
+            <Input
+              fullWidth
+              label="Email"
+              value={selectedUser?.email || ""}
+              onChange={(e) =>
+                setSelectedUser({ ...selectedUser, email: e.target.value })
+              }
+            />
+            <Input
+              fullWidth
+              label="Age"
+              type="number"
+              value={selectedUser?.age || ""}
+              onChange={(e) =>
+                setSelectedUser({ ...selectedUser, age: e.target.value })
+              }
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button color="error" flat onClick={() => setEditModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button color="primary" onClick={handleUpdate}>
+              Save
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal isOpen={isDeleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
+        <ModalContent>
+          <ModalHeader>Delete User</ModalHeader>
+          <ModalBody>
+            Are you sure you want to delete {selectedUser?.username}?
+          </ModalBody>
+          <ModalFooter>
+            <Button color="error" flat onClick={() => setDeleteModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button color="primary" onClick={handleDelete}>
+              Confirm
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 };
