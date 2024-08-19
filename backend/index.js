@@ -16,6 +16,7 @@ import orderRouter from "./routes/order_Routes.js";
 import OrderItemsRouter from "./routes/order_items_route.js";
 import articleRouter from "./routes/article_routes.js";
 import postRouter from "./routes/communityPost_routes.js";
+import ratingRouter from "./routes/rating_routes.js"
 
 //Create the app
 const app = express();
@@ -58,3 +59,4 @@ app.use("/orders",orderRouter);//Orders
 app.use("/orderItems",OrderItemsRouter)//Order Items
 app.use("/articles",articleRouter);//Articles
 app.use("/feed",postRouter); //Post
+app.use("/ratings",ratingRouter)
