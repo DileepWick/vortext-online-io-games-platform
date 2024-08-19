@@ -1,46 +1,133 @@
-import React, { useState} from "react";
+import React, { useState } from "react";
 import Header from "../src/components/header";
+import Footer from "../src/components/footer";
 import useAuthCheck from "../src/utils/authCheck";
-
-
-
-// Next UI
-import { Tabs, Tab } from "@nextui-org/react";
-
+import { Button, Card, CardBody, Input } from "@nextui-org/react";
 
 const SessionManagerDash = () => {
-    useAuthCheck();
-  const [activeTab, setActiveTab] = useState("stats");
-  return (
+  useAuthCheck();
+  const [activeTab, setActiveTab] = useState("manageRentals");
+  const [rentalOptions, setRentalOptions] = useState([
+    { id: 1, time: "15min", price: 50 },
+    { id: 2, time: "30min", price: 80 },
+    { id: 3, time: "1hour", price: 150 },
+    { id: 4, time: "2hours", price: 250 }
+  ]);
+  const [newOption, setNewOption] = useState({ time: "", price: "" });
+  const [editingId, setEditingId] = useState(null);
+  const [editingOption, setEditingOption] = useState({ time: "", price: "" });
+
+  const handleAddOption = () => {
+    if (newOption.time && newOption.price) {
+      setRentalOptions([...rentalOptions, { ...newOption, id: Date.now() }]);
+      setNewOption({ time: "", price: "" });
+    }
+  };
+
+  const handleDeleteOption = (id) => {
+    setRentalOptions(rentalOptions.filter(option => option.id !== id));
+  };
+
+  const handleEditClick = (option) => {
+    setEditingId(option.id);
+    setEditingOption({ time: option.time, price: option.price });
+  };
+
+  const handleUpdateOption = () => {
+    setRentalOptions(rentalOptions.map(option => 
+      option.id === editingId ? { ...option, ...editingOption } : option
+    ));
+    setEditingId(null);
+    setEditingOption({ time: "", price: "" });
+  };
+
+  const renderManageRentals = () => (
     <div>
-        <Header/>
-        <div className="flex w-full flex-col">
-      <div className="relative">
+      <h2 className="text-xl font-bold mb-4">Manage Rental Options</h2>
+      <div className="mb-4 flex gap-2">
+        <Input
+          placeholder="Time (e.g., 15min)"
+          value={newOption.time}
+          onChange={(e) => setNewOption({ ...newOption, time: e.target.value })}
+        />
+        <Input
+          placeholder="Price"
+          type="number"
+          value={newOption.price}
+          onChange={(e) => setNewOption({ ...newOption, price: e.target.value })}
+        />
+        <Button color="primary" onPress={handleAddOption}>Add</Button>
       </div>
-      <div className="flex items-center p-4 font-primaryRegular">
-        <Tabs
-          aria-label="Blogger Tabs"
-          className="flex-1"
-          onSelectionChange={setActiveTab}
-          selectedKey={activeTab}
-          size="lg"
-          color="primary"
-        >
-          <Tab key="tab1" title="SessionRequests" />
-          <Tab key="tab2" title="Tournament Requests" />
-          <Tab key="tab3" title="Manage Sessions" />
-          <Tab key="tab4" title="Manage Tournaments" />
-        </Tabs>
-      </div>
-      <div className="p-4">
-        {activeTab === "tab1" && <div>Tab1</div>}
-        {activeTab === "tab2" && <div>Tab2</div>}
-        {activeTab === "tab3" && <div>Tab3</div>}
-        {activeTab === "tab4" && <div>Tab4</div>}
+      <div>
+        {rentalOptions.map(option => (
+          <div key={option.id} className="flex items-center justify-between mb-2">
+            {editingId === option.id ? (
+              <>
+                <Input
+                  value={editingOption.time}
+                  onChange={(e) => setEditingOption({ ...editingOption, time: e.target.value })}
+                  className="mr-2"
+                />
+                <Input
+                  value={editingOption.price}
+                  onChange={(e) => setEditingOption({ ...editingOption, price: e.target.value })}
+                  className="mr-2"
+                />
+                <Button color="success" size="sm" onPress={handleUpdateOption} className="mr-2">Update</Button>
+                <Button color="danger" size="sm" onPress={() => setEditingId(null)}>Cancel</Button>
+              </>
+            ) : (
+              <>
+                <span>{option.time} - LKR {option.price}</span>
+                <div>
+                  <Button color="primary" size="sm" onPress={() => handleEditClick(option)} className="mr-2">Edit</Button>
+                  <Button color="danger" size="sm" onPress={() => handleDeleteOption(option.id)}>Delete</Button>
+                </div>
+              </>
+            )}
+          </div>
+        ))}
       </div>
     </div>
+  );
+
+  const renderAnalytics = () => (
+    <div>
+      <h2 className="text-xl font-bold mb-4">Player Analytics</h2>
+      <p>Total Players: 100</p>
+      <p>Active Rentals: 25</p>
+      <p>Total Revenue: LKR 10,000</p>
+    </div>
+  );
+
+  return (
+    <div className="bg-gray-900 text-white min-h-screen">
+      <Header />
+      <div className="container mx-auto px-4 py-8">
+        <Card>
+          <CardBody>
+            <div className="flex mb-4">
+              <Button
+                color={activeTab === "manageRentals" ? "primary" : "default"}
+                onPress={() => setActiveTab("manageRentals")}
+                className="mr-2"
+              >
+                Manage Rentals
+              </Button>
+              <Button
+                color={activeTab === "analytics" ? "primary" : "default"}
+                onPress={() => setActiveTab("analytics")}
+              >
+                Analytics
+              </Button>
+            </div>
+            {activeTab === "manageRentals" ? renderManageRentals() : renderAnalytics()}
+          </CardBody>
+        </Card>
+      </div>
+      <Footer />
     </div>
   );
 };
 
-export default SessionManagerDash ;
+export default SessionManagerDash;

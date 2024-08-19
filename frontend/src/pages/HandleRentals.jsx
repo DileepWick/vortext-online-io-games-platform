@@ -113,6 +113,11 @@ const HandleRentals = () => {
   return (
     <div className="bg-customDark text-white min-h-screen font-primaryRegular">
       <Header />
+      <div className="bg-primary py-4">
+        <div className="container mx-auto px-4">
+          <h1 className="text-4xl font-bold text-white text-center">Rent the Game</h1>
+        </div>
+      </div>
       <div className="container mx-auto px-4 py-8">
         <div className="bg-customDark rounded-lg shadow-lg p-8">
           <h1 className="text-5xl text-white mb-4">
