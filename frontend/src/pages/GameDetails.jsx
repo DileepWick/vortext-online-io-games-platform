@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 // Utils
@@ -20,8 +20,8 @@ import { ScrollShadow } from "@nextui-org/react";
 const GameDetails = () => {
   // Authenticate user
   useAuthCheck();
-  const navigate = useNavigate(); // Initialize navigate hook
-
+  
+  const navigate = useNavigate(); // Initialize useNavigate hook
   const { id } = useParams();
   const [gameStock, setGameStock] = useState(null);
   const [relatedGameStocks, setRelatedGameStocks] = useState([]);
@@ -72,7 +72,7 @@ const GameDetails = () => {
       }
     };
 
-    // Check library Item
+    //Check library Item
     const checkLibrary = async () => {
       try {
         const token = getToken(); // Get token
@@ -81,14 +81,14 @@ const GameDetails = () => {
           `http://localhost:8098/orderItems/checkItem/${id}/${userId}/`
         );
 
-        if (checkStatus.status === 200) {
+        if (checkStatus.status == 200) {
           setCheckItem("in the library");
         }
       } catch (error) {}
     };
 
-    checkLibrary(); // Check library item
-    fetchGameDetails(); // Fetch game details
+    checkLibrary(); //Check library item
+    fetchGameDetails(); //fetch game details
     fetchCartId(); // Fetch cart
   }, [id]);
 
@@ -136,7 +136,7 @@ const GameDetails = () => {
             transition: Flip,
             style: { fontFamily: "Rubik" },
           });
-        } else if (response.status === 222) {
+        } else if (response.status == 222) {
           toast.warning("Item is already in the cart", {
             position: "top-right",
             autoClose: 3000,
@@ -157,9 +157,9 @@ const GameDetails = () => {
     }
   };
 
-  // Handle Rent
+  // Handle Rent and Navigate
   const handleRent = (stockId) => {
-    navigate(`/handleRentals/${stockId}`); // Redirect to Handle Rentals page
+    navigate(`/handleRentals/${stockId}`); // Navigate to HandleRentals page with stockId
   };
 
   const handleQuantityChange = (stockId, newQuantity) => {
@@ -230,7 +230,7 @@ const GameDetails = () => {
                           <span className="line-through mr-4 text-editionColor">
                             LKR .{originalPrice.toFixed(2)}
                           </span>
-                          <span className="text-lg text-green-600">
+                          <span className="text-lg">
                             LKR .{discountedPrice.toFixed(2)}
                           </span>
                         </div>
@@ -238,7 +238,7 @@ const GameDetails = () => {
                     )}
                     {gameStock.discount === 0 && (
                       <div className="flex items-center mt-2">
-                        <span className="text-lg text-white">
+                        <span className="text-lg">
                           LKR .{originalPrice.toFixed(2)}
                         </span>
                       </div>
@@ -246,58 +246,51 @@ const GameDetails = () => {
                   </h2>
                 </CardBody>
                 <CardFooter>
-                  {checkItem === "not in the library" && (
+                  <div className="flex justify-around gap-4 mt-4">
                     <Button
+                      auto
+                      color="primary"
                       onClick={() => handleAddToCart(gameStock._id)}
-                      color="success"
-                      css={{ backgroundColor: "#0070f3", color: "white" }} // Custom styling
                     >
                       Add to Cart
                     </Button>
-                  )}
-                  <Button
-                    onClick={() => handleRent(gameStock._id)}
-                    color="success"
-                    css={{ backgroundColor: "#0070f3", color: "white", marginTop: "8px" }} // Custom styling
-                  >
-                    Rent
-                  </Button>
+                    <Button
+                      auto
+                      color="success"
+                      onClick={() => handleRent(gameStock._id)}
+                    >
+                      Rent Game
+                    </Button>
+                  </div>
                 </CardFooter>
               </Card>
             </div>
           </div>
           <div className="mt-8">
-            <h2 className="text-3xl text-white">Related Games</h2>
+            <h1 className="text-white text-3xl">Related Games</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-              {relatedGameStocks.map((relatedGameStock) => (
-                <Card
-                  key={relatedGameStock._id}
-                  className="bg-customDark"
-                  radius="none"
-                >
+              {relatedGameStocks.map((relatedGame) => (
+                <Card key={relatedGame._id} className="bg-customDark">
                   <Image
                     radius="none"
-                    alt={relatedGameStock.AssignedGame.title}
-                    className="w-full h-[200px] object-cover rounded-t"
-                    src={relatedGameStock.AssignedGame.coverPhoto}
+                    removeWrapper
+                    alt={relatedGame.AssignedGame.title}
+                    className="w-full h-[200px] object-cover"
+                    src={relatedGame.AssignedGame.coverPhoto}
                   />
                   <CardBody>
                     <h3 className="text-xl font-primaryRegular text-white">
-                      {relatedGameStock.AssignedGame.title}
+                      {relatedGame.AssignedGame.title}
                     </h3>
-                    <p className="mt-2">
-                      {relatedGameStock.AssignedGame.Description}
-                    </p>
-                  </CardBody>
-                  <CardFooter>
                     <Button
-                      onClick={() => handleRent(relatedGameStock._id)}
+                      auto
                       color="success"
-                      css={{ backgroundColor: "#0070f3", color: "white", marginTop: "8px" }} // Custom styling
+                      className="mt-2"
+                      onClick={() => handleRent(relatedGame._id)}
                     >
-                      Rent
+                      Rent Game
                     </Button>
-                  </CardFooter>
+                  </CardBody>
                 </Card>
               ))}
             </div>
