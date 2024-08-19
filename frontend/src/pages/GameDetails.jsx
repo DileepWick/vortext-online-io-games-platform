@@ -164,10 +164,27 @@ const GameDetails = () => {
   // Handle Rent
   const navigate = useNavigate();
 
-const handleRent = (stockId) => {
-  navigate(`/HandleRentals/${stockId}`);
-};
-
+  const handleRent = (stockId) => {
+    if (checkItem === "in the library") {
+      toast.info("You already own this game in your library.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Flip,
+        style: { fontFamily: "Rubik" },
+      });
+    } else {
+      navigate(`/HandleRentals/${stockId}`);
+    }
+  };
+  
+  
+  
 
 
   const handleQuantityChange = (stockId, newQuantity) => {
