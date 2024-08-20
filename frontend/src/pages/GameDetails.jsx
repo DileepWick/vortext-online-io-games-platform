@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
+
 import axios from "axios";
 
 // Utils
@@ -8,7 +9,7 @@ import useAuthCheck from "../utils/authCheck";
 import { getToken } from "../utils/getToken";
 import { toast, Flip } from "react-toastify";
 import VideoPlayer from "../components/videoPlayer";
-
+import { useNavigate } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import RatingSystem from "../components/RatingSystem"; // New import
@@ -18,6 +19,8 @@ import RatingSystem from "../components/RatingSystem"; // New import
 import { Button, Chip } from "@nextui-org/react";
 import { Card, CardBody, CardFooter, Image, Textarea } from "@nextui-org/react";
 import { ScrollShadow } from "@nextui-org/react";
+
+
 
 const GameDetails = () => {
   // Authenticate user
@@ -35,6 +38,8 @@ const GameDetails = () => {
   
   const [ratings, setRatings] = useState([]);
   const [averageRating, setAverageRating] = useState(0);
+
+
 
   useEffect(() => {
     const fetchGameDetails = async () => {
@@ -219,46 +224,11 @@ const GameDetails = () => {
 
 
   // Handle Rent
-  const handleRent = async (stockId) => {
-    try {
-      const response = await axios.post(
-        `http://localhost:8098/rentals/createRental`, // Update with your API endpoint
-        {
-          stockid: stockId,
-          quantity: quantityByStockId[stockId] || 1, // Use the selected quantity or default to 1
-        }
-      );
+  const navigate = useNavigate();
 
-      if (response.status === 201) {
-        toast.success(response.data.message, {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-          transition: Flip,
-          style: { fontFamily: "Rubik" },
-        });
-      } else if (response.status === 222) {
-        toast.warning("Item is already rented", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-          transition: Flip,
-          style: { fontFamily: "Rubik" },
-        });
-      }
-    } catch (error) {
-      console.error("Error renting item:", error);
-      toast.error("Error renting item.", {
+  const handleRent = (stockId) => {
+    if (checkItem === "in the library") {
+      toast.info("You already own this game in your library.", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -270,8 +240,14 @@ const GameDetails = () => {
         transition: Flip,
         style: { fontFamily: "Rubik" },
       });
+    } else {
+      navigate(`/HandleRentals/${stockId}`);
     }
   };
+  
+  
+  
+
 
   const handleQuantityChange = (stockId, newQuantity) => {
     // Update quantityByStockId state

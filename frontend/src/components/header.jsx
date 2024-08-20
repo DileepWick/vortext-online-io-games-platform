@@ -187,7 +187,7 @@ export default function Header() {
                 </DropdownItem>
 
                 {/* Admin Filter */}
-                {user.role === "admin" && (
+                {user.role === "Admin" && (
                   <DropdownItem
                     key="admin-panel"
                     onClick={() => navigate("/productDashboard")}
@@ -197,7 +197,7 @@ export default function Header() {
                 )}
 
                 {/* Admin user Filter */}
-                {user.role === "Admin" && (
+                {user.role === "User Manager" && (
                   <DropdownItem
                     key="Admin-panel"
                     onClick={() => navigate("/UserManagementDashboard")}
@@ -275,6 +275,17 @@ export default function Header() {
                     Manage Staff
                   </DropdownItem>
                 )}
+
+                  {/* Payment Manager Filter */}
+                  {user.role === "Payment Manager" && (
+                  <DropdownItem
+                    key="manage-payment"
+                    onClick={() => navigate("/Payment_manager_dashboard")}
+                  >
+                    Payment Management Dashboard
+                  </DropdownItem>
+                )}
+
 
                 <DropdownItem
                   key="logout"
