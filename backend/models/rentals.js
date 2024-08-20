@@ -2,7 +2,17 @@ import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 
-const rentalOptionSchema = new Schema({
+const RentalSchema = new Schema({
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  game: {
+    type: Schema.Types.ObjectId,
+    ref: "Game",
+    required: true,
+  },
   time: {
     type: String,
     required: true,
@@ -19,4 +29,4 @@ const rentalOptionSchema = new Schema({
   }
 });
 
-export const RentalOption = mongoose.model("RentalOption", rentalOptionSchema);
+export const Rental = mongoose.model("Rental", RentalSchema);

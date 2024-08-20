@@ -12,7 +12,7 @@ const GamingSessions = () => {
   useAuthCheck();
   const navigate = useNavigate();
 
-  const [orderItems, setOrderItems] = useState([]);
+  const [rentals, setRentals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [timeLeft, setTimeLeft] = useState(100);
@@ -23,23 +23,23 @@ const GamingSessions = () => {
   const [currentGame, setCurrentGame] = useState(null);
 
   useEffect(() => {
-    const fetchOrderItems = async () => {
+    const fetchRentals = async () => {
       try {
         const token = getToken();
         const userId = getUserIdFromToken(token);
         const response = await axios.get(
-          `http://localhost:8098/orderItems/useOrders/${userId}`
+          `http://localhost:8098/Rentals/user/${userId}`
         );
-        setOrderItems(response.data);
+        setRentals(response.data);
       } catch (err) {
-        console.error("Error fetching order items:", err.response ? err.response.data : err.message);
+        console.error("Error fetching rentals:", err.response ? err.response.data : err.message);
         setError(err.response ? err.response.data.message : err.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchOrderItems();
+    fetchRentals();
   }, []);
 
   useEffect(() => {
@@ -106,27 +106,27 @@ const GamingSessions = () => {
         
         <div className="container mx-auto p-6">
           <div className="text-2xl font-primaryRegular mb-6">MY LIBRARY</div>
-          {orderItems.length > 0 ? (
+          {rentals.length > 0 ? (
             <div className="flex flex-wrap gap-6">
-              {orderItems.map((item) => (
+              {rentals.map((rental) => (
                 <Card
-                  key={item.stockid._id}
+                  key={rental._id}
                   className="relative bg-customDark overflow-hidden transition-transform transform hover:scale-105 hover:shadow-lg"
                 >
                   <Image
                     isBlurred
                     radius="none"
-                    alt={item.stockid.AssignedGame.title}
+                    alt={rental.game.title}
                     className="w-[100px] h-[100px] object-cover"
-                    src={item.stockid.AssignedGame.coverPhoto}
+                    src={rental.game.coverPhoto}
                   />
                   <CardBody className="p-4">
                     <p className="mb-2 font-primaryRegular text-lg text-white">
-                      {item.stockid.AssignedGame.title}
+                      {rental.game.title}
                     </p>
                     
                     <div className="flex flex-wrap gap-2 mb-4 font-primaryRegular">
-                      {item.stockid.AssignedGame.Genre.flatMap((genre) =>
+                      {rental.game.Genre.flatMap((genre) =>
                         genre.includes(",") ? genre.split(",") : genre
                       ).map((genre, index) => (
                         <Chip
@@ -144,7 +144,7 @@ const GamingSessions = () => {
                     
                     <div className="flex flex-col gap-2">
                       <Button
-                        onClick={() => openModal(item.stockid.AssignedGame)}
+                        onClick={() => openModal(rental.game)}
                         color="primary"
                         className="font-primaryRegular"
                         radius="none"
@@ -156,7 +156,7 @@ const GamingSessions = () => {
 
                       <Button
                         as={Link}
-                        to={`/game/${item.stockid._id}`}
+                        to={`/game/${rental.game._id}`}
                         color="secondary"
                         className="font-primaryRegular"
                         radius="none"
