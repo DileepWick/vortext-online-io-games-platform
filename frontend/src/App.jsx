@@ -18,6 +18,7 @@ import Community from "./pages/community";
 import SessionHistory from "./pages/SessionHistory";
 import Support from "./pages/Support";
 import HandleRentals from "./pages/HandleRentals";
+import RentalGamesEmbed from "./pages/RentalGamesEmbed";
 
 //Gameplay
 import GameEmbed from "./pages/GameEmbed";
@@ -66,6 +67,9 @@ const App = () => {
       <Route path="/SessionHistory" element={<SessionHistory />} />
       <Route path="/HandleRentals/:id" element={<HandleRentals />} />
       <Route path="/Payment_manager_dashboard" element={<Payment_Manager />} />
+      <Route path="/RentalGamesEmbed/:src/:title" element={<RentalGamesEmbed />} />
+
+
     </Routes>
   );
 };
