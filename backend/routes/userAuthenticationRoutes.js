@@ -275,4 +275,21 @@ userRouter.put("/changeStatus/:id", async (request, response) => {
   }
 });
 
+// Delete User
+userRouter.delete("/delete/:id", async (request, response) => {
+  try {
+    const { id } = request.params;
+    const deletedUser = await User.findByIdAndDelete(id);
+
+    if (!deletedUser) {
+      return response.status(404).json({ message: "User not found" });
+    }
+
+    response.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    response.status(500).json({ message: "Internal server error" });
+  }
+});
+
 export default userRouter;
