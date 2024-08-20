@@ -6,8 +6,6 @@ import Hangman from "../components/Games/Hangaman";
 import Chatbot from "../components/chatbox";
 
 const Home = () => {
-
-
   const notify = () => {
     toast.success("🦄 Wow so easy!", {
       position: "top-right",
@@ -31,7 +29,7 @@ const Home = () => {
   return (
     <div className="font-primaryRegular">
       <Header />
-      <Chatbot/>
+      <Chatbot />
       <button onClick={notify}>Notify</button>
       <h1>Home </h1>
       <h1>Kavi Gomez</h1>
@@ -41,9 +39,7 @@ const Home = () => {
       <h1>NimsaraThhenuka</h1>
       <h1>Bandara Ranasinghe</h1>
       <h1>Tharindu Ariyawansha</h1>
-
-      <Hangman/>
-
+      <Hangman />
       <Footer />
     </div>
   );

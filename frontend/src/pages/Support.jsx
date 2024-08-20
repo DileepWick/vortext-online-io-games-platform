@@ -1,76 +1,176 @@
-import React, { useState } from "react";
-
-// next ui
-import { Button } from "@nextui-org/react";
-
-//components
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { ToastContainer, toast, Flip } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Import the CSS
 import Header from "../components/header";
-
-const faqs = [
-  {
-    question: "How do I purchase a game?",
-    answer:
-      "To purchase a game, navigate to the game’s page and click on the 'Buy' button. You can then proceed to checkout.",
-  },
-  {
-    question: "What is the rental policy?",
-    answer:
-      "You can rent a game for a specified period. After the rental period expires, the game will no longer be accessible.",
-  },
-  {
-    question: "How do I contact support?",
-    answer:
-      "You can contact support by filling out the form above, or by emailing us directly at support@gamestore.com.",
-  },
-  {
-    question: "Can I cancel a purchase?",
-    answer:
-      "Cancellations are only available within 24 hours of purchase and if the game hasn't been downloaded.",
-  },
-  {
-    question: "What payment methods are accepted?",
-    answer:
-      "We accept major credit cards, PayPal, and other digital payment methods.",
-  },
-];
+import Footer from "../components/footer";
+import {
+  Spinner,
+  Card,
+  CardBody,
+  Button,
+  Input,
+  Textarea,
+  ScrollShadow,
+} from "@nextui-org/react";
+import Chatbot from "../components/Chatbot";
 
 const Support = () => {
-  const [activeIndex, setActiveIndex] = useState(null);
+  const [faqs, setFaqs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [newQuestion, setNewQuestion] = useState("");
+  const [newAnswer, setNewAnswer] = useState("");
 
-  const toggleFAQ = (index) => {
-    setActiveIndex(activeIndex === index ? null : index);
+  useEffect(() => {
+    const fetchFAQs = async () => {
+      try {
+        const response = await axios.get("http://localhost:8098/faq/fetchFAQ");
+        setFaqs(response.data.allFAQs);
+      } catch (err) {
+        setError("Failed to fetch FAQs");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFAQs();
+  }, []);
+
+  const notifySuccess = (message) => {
+    toast.success(message, {
+      position: "top-right",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      transition: Flip,
+      progressBarClassName: "bg-gray-800",
+      style: { fontFamily: "Rubik" },
+    });
   };
 
+  const notifyError = (message) => {
+    toast.error(message, {
+      position: "top-right",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      transition: Flip,
+      progressBarClassName: "bg-gray-800",
+      style: { fontFamily: "Rubik" },
+    });
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:8098/faq/deleteFAQ/${id}`);
+      setFaqs(faqs.filter((faq) => faq._id !== id));
+      notifySuccess("FAQ deleted successfully!");
+    } catch (err) {
+      setError("Failed to delete FAQ");
+      notifyError("Failed to delete FAQ.");
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post("http://localhost:8098/faq/createFAQ", {
+        question: newQuestion,
+        answer: newAnswer,
+      });
+      setFaqs([...faqs, response.data]);
+      setNewQuestion("");
+      setNewAnswer("");
+      notifySuccess("FAQ added successfully!");
+    } catch (err) {
+      setError("Failed to add new FAQ");
+      notifyError("Failed to add new FAQ.");
+    }
+  };
+
+  if (loading) return <Spinner />;
+  if (error) return <p className="text-red-500 text-center">Error: {error}</p>;
+
   return (
-    <div>
-      <Header />
-      <div className="max-w-3xl mx-auto p-6 bg-gray-50 rounded-lg shadow-lg">
-        <h2 className="text-center text-2xl font-semibold text-gray-800 mb-6">
-          Customer Support
-        </h2>
-        <div className="support-faq">
-          <h3 className="text-xl font-medium text-gray-700 mb-4">
-            Frequently Asked Questions
-          </h3>
-          <ul className="space-y-4">
-            {faqs.map((faq, index) => (
-              <li key={index} className="faq-item">
-                <button
-                  className="w-full text-left bg-blue-600 text-white py-3 px-4 rounded-md transition duration-300 ease-in-out hover:bg-blue-700 focus:outline-none"
-                  onClick={() => toggleFAQ(index)}
-                >
-                  {faq.question}
-                </button>
-                {activeIndex === index && (
-                  <div className="mt-3 p-4 bg-gray-100 border-l-4 border-blue-600 rounded-md text-gray-700">
-                    {faq.answer}
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
+    <div className="min-h-screen bg-customDark text-white">
+      <ToastContainer /> {/* Toast Container */}
+      <ScrollShadow hideScrollBar>
+        <Header />
+        <Chatbot />
+        <div className="container mx-auto px-4 py-16">
+          <h1 className="text-4xl text-center text-white mb-8 font-primaryRegular">
+            Customer Support
+          </h1>
+
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-2xl font-primaryRegular text-white mb-6">
+              Frequently Asked Questions
+            </h2>
+            <div className="flex flex-col gap-4">
+              {faqs.length === 0 ? (
+                <p className="text-center text-gray-400">No FAQs available</p>
+              ) : (
+                faqs.map((faq) => (
+                  <Card
+                    isBlurred
+                    key={faq._id}
+                    className="bg-gray-800 rounded-lg shadow-lg text-white"
+                  >
+                    <CardBody>
+                      <h2 className="text-xl font-primaryRegular mb-4">
+                        {faq.question}
+                      </h2>
+                      <p
+                        dangerouslySetInnerHTML={{ __html: faq.answer }}
+                        className="text-base"
+                      />
+                    </CardBody>
+                    <Button
+                      color="danger"
+                      onClick={() => handleDelete(faq._id)}
+                    >
+                      Delete
+                    </Button>
+                  </Card>
+                ))
+              )}
+            </div>
+
+            <h2 className="text-2xl font-primaryRegular text-white mb-6">
+              Add New FAQ
+            </h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <Input
+                label="Question"
+                value={newQuestion}
+                onChange={(e) => setNewQuestion(e.target.value)}
+                required
+                className="bg-white text-black"
+              />
+              <Textarea
+                label="Answer"
+                value={newAnswer}
+                onChange={(e) => setNewAnswer(e.target.value)}
+                required
+                className="bg-white text-black"
+              />
+              <Button type="submit" color="primary">
+                Add FAQ
+              </Button>
+            </form>
+          </div>
         </div>
-      </div>
+        <Footer />
+      </ScrollShadow>
     </div>
   );
 };
