@@ -3,7 +3,7 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import { toast, Flip } from "react-toastify";
 import Hangman from "../components/Games/Hangaman";
-
+import Chatbot from "../components/chatbox";
 
 const Home = () => {
 
@@ -31,6 +31,7 @@ const Home = () => {
   return (
     <div className="font-primaryRegular">
       <Header />
+      <Chatbot/>
       <button onClick={notify}>Notify</button>
       <h1>Home </h1>
       <h1>Kavi Gomez</h1>

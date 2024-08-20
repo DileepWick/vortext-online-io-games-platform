@@ -4,6 +4,8 @@ import { mongoDBURL } from "./config.js";
 import mongoose from "mongoose";
 import cors from "cors";
 
+
+
 //Route files
 import userRouter from "./routes/userAuthenticationRoutes.js";
 import bookRouter from "./routes/book_Routes.js";
@@ -18,8 +20,12 @@ import articleRouter from "./routes/article_routes.js";
 import postRouter from "./routes/communityPost_routes.js";
 import ratingRouter from "./routes/rating_routes.js"
 import spookeyRouter from "./routes/spookey_guesses_routes.js";
+<<<<<<< Updated upstream
 import RentalRouter from "./routes/rental_routes.js";
 
+=======
+import chatRouter from "./routes/chat_bot_route.js";
+>>>>>>> Stashed changes
 
 //Create the app
 const app = express();
@@ -34,6 +40,7 @@ app.use(cors());
 app.listen(PORT, () =>
   console.log(`Server running on http://localhost:${PORT}`)
 );
+
 
 //Connect DB
 mongoose
@@ -50,6 +57,9 @@ mongoose
     console.error("Error connecting to MongoDB");
   });
 
+
+
+
 //Routes
 app.use("/books", bookRouter); //Books
 app.use("/users", userRouter); //Users
@@ -64,5 +74,9 @@ app.use("/articles",articleRouter);//Articles
 app.use("/feed",postRouter); //Post
 app.use("/ratings",ratingRouter)
 app.use("/spookeyEditons",spookeyRouter) //Spookey_Game
+<<<<<<< Updated upstream
 app.use("/Rentals",RentalRouter); //Rentals
 
+=======
+app.use('/api', chatRouter);// Use chatbot routes
+>>>>>>> Stashed changes
