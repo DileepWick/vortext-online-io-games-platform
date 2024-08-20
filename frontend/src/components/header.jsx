@@ -93,7 +93,7 @@ export default function Header() {
                 location.pathname === "/articles" ? "underline" : ""
               } text-white hover:underline`}
             >
-              Articles
+              Community
             </Link>
           </NavbarItem>
           <NavbarItem>
