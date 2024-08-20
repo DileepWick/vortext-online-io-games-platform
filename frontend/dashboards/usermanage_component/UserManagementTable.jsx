@@ -1,5 +1,6 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 import {
   Table,
   TableHeader,
@@ -9,16 +10,23 @@ import {
   TableCell,
   Pagination,
   Input,
-  Button
+  Button,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
 } from "@nextui-org/react";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
 
 const UserManagementTable = ({ users, setUsers }) => {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const rowsPerPage = 4; // Adjust rows per page if necessary
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const rowsPerPage = 4;
 
-  // Filtered and paginated users
   const filteredUsers = useMemo(() => {
     return users.filter((user) =>
       user.username.toLowerCase().includes(searchQuery.toLowerCase())
@@ -31,38 +39,66 @@ const UserManagementTable = ({ users, setUsers }) => {
     return filteredUsers.slice(start, end);
   }, [page, filteredUsers]);
 
-  // Handle Search change
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
-    setPage(1); // Reset page to 1 when search query changes
+    setPage(1);
   };
 
-  // Clear Search
   const handleClearSearch = () => {
     setSearchQuery("");
-    setPage(1); // Reset page to 1 when search query is cleared
+    setPage(1);
   };
 
-  // Update user (placeholder function)
-  const handleUpdate = (user) => {
-    console.log("Update user:", user);
-    // Implement the update logic here
+  const openEditModal = (user) => {
+    setSelectedUser(user);
+    setEditModalOpen(true);
   };
 
-  // Delete user
-  const handleDelete = async (userId) => {
+  const handleUpdate = async () => {
     try {
-      await axios.delete(`http://localhost:8098/users/delete/${userId}`);
-      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
+      const response = await axios.put(`http://localhost:8098/users/profile/update/${selectedUser._id}`, selectedUser);
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user._id === selectedUser._id ? response.data : user
+        )
+      );
+      setEditModalOpen(false);
+      toast.success("User updated successfully", {
+        style: { fontFamily: "Rubik" },
+      });
+    } catch (error) {
+      console.error("Error updating user:", error);
+      toast.error("Error updating user", {
+        style: { fontFamily: "Rubik" },
+      });
+    }
+  };
+
+  const openDeleteModal = (user) => {
+    setSelectedUser(user);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`http://localhost:8098/users/delete/${selectedUser._id}`);
+      setUsers((prevUsers) => prevUsers.filter((user) => user._id !== selectedUser._id));
+      setDeleteModalOpen(false);
+      toast.success("User deleted successfully", {
+        style: { fontFamily: "Rubik" },
+      });
     } catch (error) {
       console.error("Error deleting user:", error);
+      toast.error("Error deleting user", {
+        style: { fontFamily: "Rubik" },
+      });
     }
   };
 
   return (
     <div>
       <Input
-        className="ml-2 font-primaryRegular w-48 sm:w-64"
+        className="ml-2 font-primaryRegular w-48 sm:w-64 mb-4"
         placeholder="Search by username..."
         startContent={<SearchIcon />}
         value={searchQuery}
@@ -70,14 +106,12 @@ const UserManagementTable = ({ users, setUsers }) => {
         onClear={handleClearSearch}
       />
       <Table
-        isHeaderSticky
         aria-label="User Management Table"
         className="font-primaryRegular"
         bottomContent={
           <div className="flex w-full justify-center font-primaryRegular">
             <Pagination
               isCompact
-              loop
               showControls
               showShadow
               color="primary"
@@ -92,33 +126,107 @@ const UserManagementTable = ({ users, setUsers }) => {
         }}
       >
         <TableHeader>
-          <TableColumn key="ID">ID</TableColumn>
-          <TableColumn key="USERNAME">Username</TableColumn>
-          <TableColumn key="EMAIL">Email</TableColumn>
-          <TableColumn key="AGE">Age</TableColumn>
-          <TableColumn key="ACTIONS">Actions</TableColumn>
+          
+          <TableColumn>Username</TableColumn>
+          <TableColumn>Email</TableColumn>
+          <TableColumn>Age</TableColumn>
+          <TableColumn>Player Type</TableColumn>
+          <TableColumn>Actions</TableColumn>
         </TableHeader>
         <TableBody>
           {items.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell>{user.id}</TableCell>
+            <TableRow key={user._id}>
+              
               <TableCell>{user.username}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>{user.age}</TableCell>
+              <TableCell>{user.playerType}</TableCell>
               <TableCell>
                 <div style={{ display: "flex", gap: "10px" }}>
-                  <Button auto flat color="primary" onClick={() => handleUpdate(user)}>
+                  <Button auto flat color="primary" onClick={() => openEditModal(user)}>
                     Update
                   </Button>
-                  <Button auto flat color="error" onClick={() => handleDelete(user.id)}>
-                    Delete
-                  </Button>
+                  <Button 
+            variant="ghost" color="danger" 
+            onClick={() => openDeleteModal(user)}
+            
+          >
+            Delete
+          </Button>
                 </div>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+
+      {/* Edit Modal */}
+      <Modal isOpen={isEditModalOpen} onClose={() => setEditModalOpen(false)}>
+        <ModalContent>
+          <ModalHeader>Edit User</ModalHeader>
+          <ModalBody>
+            <Input
+              fullWidth
+              label="Username"
+              value={selectedUser?.username || ""}
+              onChange={(e) =>
+                setSelectedUser({ ...selectedUser, username: e.target.value })
+              }
+            />
+            <Input
+              fullWidth
+              label="Email"
+              value={selectedUser?.email || ""}
+              onChange={(e) =>
+                setSelectedUser({ ...selectedUser, email: e.target.value })
+              }
+            />
+            <Input
+              fullWidth
+              label="Age"
+              type="number"
+              value={selectedUser?.age || ""}
+              onChange={(e) =>
+                setSelectedUser({ ...selectedUser, age: e.target.value })
+              }
+            />
+            <Input
+              fullWidth
+              label="Player Type"
+              value={selectedUser?.playerType || ""}
+              onChange={(e) =>
+                setSelectedUser({ ...selectedUser, playerType: e.target.value })
+              }
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button color="error" flat onClick={() => setEditModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button color="primary" onClick={handleUpdate}>
+              Save
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal isOpen={isDeleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
+        <ModalContent>
+          <ModalHeader>Delete User</ModalHeader>
+          <ModalBody>
+            Are you sure you want to delete {selectedUser?.username}?
+          </ModalBody>
+          <ModalFooter>
+            <Button color="error" flat onClick={() => setDeleteModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button color="primary" onClick={handleDelete}>
+              Confirm
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

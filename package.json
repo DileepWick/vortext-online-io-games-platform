@@ -22,11 +22,15 @@
     "@tiptap/starter-kit": "^2.4.0",
     "chart.js": "^4.4.3",
     "cloudinary": "^2.2.0",
+    "compromise": "^14.14.0",
     "dayjs": "^1.11.11",
     "dotenv": "^16.4.5",
     "embla-carousel-react": "^8.1.5",
+    "fuse.js": "^7.0.0",
+    "fuzzball": "^2.1.2",
     "multer": "^1.4.5-lts.1",
     "react-chartjs-2": "^5.2.0",
+    "react-chat-widget": "^3.1.4",
     "react-toastify": "^10.0.5",
     "recharts": "^2.12.7"
   }

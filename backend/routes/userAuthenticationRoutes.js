@@ -11,13 +11,13 @@ import upload from "../middleware/multer.js";
 // Router
 const userRouter = express.Router();
 
-//User Registration
+// User Registration
 userRouter.post("/register", async (request, response) => {
   try {
-    const { username, password, role, email, birthday } = request.body;
+    const { username, password, email, birthday, role } = request.body;
 
     // Validate input
-    if (!username || !password || !role || !email || !birthday) {
+    if (!username || !password || !email || !birthday) {
       return response.status(400).json({ message: "All fields are required" });
     }
 
@@ -49,11 +49,14 @@ userRouter.post("/register", async (request, response) => {
       playerType = "Adult";
     }
 
+    // Assign the role (either provided or default to 'user')
+    const assignedRole = role || "user";
+
     // Prepare new user object
     const newUser = {
       username,
       password: hashedPassword,
-      role,
+      role: assignedRole,
       email,
       birthday,
       age, // Store the calculated age
@@ -133,7 +136,7 @@ userRouter.post("/login", async (req, res) => {
   }
 });
 
-//Get all users
+// Get all users
 userRouter.get("/allusers", async (request, response) => {
   try {
     const allUsers = await User.find({});
@@ -146,7 +149,7 @@ userRouter.get("/allusers", async (request, response) => {
   }
 });
 
-//Get user profile
+// Get user profile
 userRouter.get("/profile/:id", async (request, response) => {
   try {
     const { id } = request.params;
@@ -165,7 +168,7 @@ userRouter.get("/profile/:id", async (request, response) => {
   }
 });
 
-//Update Profile
+// Update Profile
 userRouter.put(
   "/profile/update/:id",
   upload.fields([{ name: "image", maxCount: 1 }]),
@@ -250,7 +253,7 @@ userRouter.put(
   }
 );
 
-//Change Status
+// Change Status
 userRouter.put("/changeStatus/:id", async (request, response) => {
   const { id } = request.params;
   const { newStatus } = request.body;
@@ -268,6 +271,23 @@ userRouter.put("/changeStatus/:id", async (request, response) => {
     response.status(200).json({ message: "Status updated successfully" });
   } catch (error) {
     console.error("Error updating status:", error);
+    response.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Delete User
+userRouter.delete("/delete/:id", async (request, response) => {
+  try {
+    const { id } = request.params;
+    const deletedUser = await User.findByIdAndDelete(id);
+
+    if (!deletedUser) {
+      return response.status(404).json({ message: "User not found" });
+    }
+
+    response.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
     response.status(500).json({ message: "Internal server error" });
   }
 });
