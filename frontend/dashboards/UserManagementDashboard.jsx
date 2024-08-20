@@ -3,6 +3,7 @@ import axios from "axios";
 import { Tabs, Tab } from "@nextui-org/react";
 import Header from "../src/components/header";
 import UserManagementTable from "./usermanage_component/UserManagementTable";
+import UserStats from "./usermanage_component/Userstats"; // Import UserStats component
 
 const UserManagementDashboard = () => {
   const [activeTab, setActiveTab] = useState("tab1");
@@ -45,16 +46,25 @@ const UserManagementDashboard = () => {
           size="lg"
           color="primary"
         >
-          <Tab key="tab1" title="Manage Users" />
-          <Tab key="tab2" title="Manage Moderators" />
-          <Tab key="tab3" title="Tab 3" />
+          <Tab key="tab1" title="User Statistics" /> {/* Updated title */}
+          <Tab key="tab2" title="Manage Users" />
+          <Tab key="tab3" title="Manage Moderators" />
           <Tab key="tab4" title="Tab 4" />
         </Tabs>
       </div>
       <div className="p-4">
+        {/* Tab 1: User Stats */}
         {activeTab === "tab1" && (
           <div>
-            <h2>Users</h2>
+            
+            <UserStats users={users} /> {/* Render UserStats component */}
+          </div>
+        )}
+
+        {/* Tab 2: Manage Users */}
+        {activeTab === "tab2" && (
+          <div>
+            
             <UserManagementTable
               users={users}
               setUsers={setUsers}
@@ -62,7 +72,9 @@ const UserManagementDashboard = () => {
             />
           </div>
         )}
-        {activeTab === "tab2" && (
+
+        {/* Tab 3: Manage Moderators */}
+        {activeTab === "tab3" && (
           <div>
             <h2>Moderators</h2>
             <UserManagementTable
@@ -72,7 +84,8 @@ const UserManagementDashboard = () => {
             />
           </div>
         )}
-        {activeTab === "tab3" && <div>Content for Tab 3</div>}
+
+        {/* Tab 4: Placeholder */}
         {activeTab === "tab4" && <div>Content for Tab 4</div>}
       </div>
     </div>
