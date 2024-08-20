@@ -15,6 +15,7 @@ import Contact from "./pages/Contact";
 import GamingSessions from "./pages/GamingSessions";
 import SessionHistory from "./pages/SessionHistory";
 import Support from "./pages/Support";
+import HandleRentals from "./pages/HandleRentals";
 
 //Gameplay
 import GameEmbed from "./pages/GameEmbed";
@@ -55,13 +56,9 @@ const App = () => {
       <Route path="/support" element={<Support />} />
       <Route path="/review_dashboard" element={<Review_manager />} />
       <Route path="/playgame/:src/:title" element={<GameEmbed />} />
-
-      <Route
-        path="/UserManagementDashboard"
-        element={<UserManagementDashboard />}
-      />
-
+      <Route path="/UserManagementDashboard"element={<UserManagementDashboard />}/>
       <Route path="/SessionHistory" element={<SessionHistory />} />
+      <Route path="/HandleRentals/:id" element={<HandleRentals />} />
       <Route path="/Payment_manager_dashboard" element={<Payment_Manager />} />
     </Routes>
   );
