@@ -37,7 +37,7 @@ const GameEmbed = () => {
   const decodedTitle = decodeURIComponent(title);
   const iframeRef = useRef(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(200); // 4 hours in seconds
+  const [timeLeft, setTimeLeft] = useState(10); // 4 hours in seconds
 
   useEffect(() => {
     // Countdown timer
