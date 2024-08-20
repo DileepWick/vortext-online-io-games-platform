@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { getToken } from "../utils/getToken";
@@ -12,7 +12,7 @@ const GamingSessions = () => {
   useAuthCheck();
   const navigate = useNavigate();
 
-  const [orderItems, setOrderItems] = useState([]);
+  const [rentals, setRentals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [timeLeft, setTimeLeft] = useState(100);
@@ -22,25 +22,25 @@ const GamingSessions = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentGame, setCurrentGame] = useState(null);
 
-  useEffect(() => {
-    const fetchOrderItems = async () => {
-      try {
-        const token = getToken();
-        const userId = getUserIdFromToken(token);
-        const response = await axios.get(
-          `http://localhost:8098/orderItems/useOrders/${userId}`
-        );
-        setOrderItems(response.data);
-      } catch (err) {
-        console.error("Error fetching order items:", err.response ? err.response.data : err.message);
-        setError(err.response ? err.response.data.message : err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrderItems();
+  const fetchRentals = useCallback(async () => {
+    try {
+      const token = getToken();
+      const userId = getUserIdFromToken(token);
+      const response = await axios.get(
+        `http://localhost:8098/Rentals/getRentalsByUser/${userId}`
+      );
+      setRentals(response.data);
+    } catch (err) {
+      console.error("Error fetching rentals:", err.response ? err.response.data : err.message);
+      setError(err.response ? err.response.data.message : err.message);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchRentals();
+  }, [fetchRentals]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -62,23 +62,23 @@ const GamingSessions = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const openModal = (game) => {
+  const openModal = useCallback((game) => {
     console.log("Opening modal for game:", game);
     setCurrentGame(game);
     setIsModalVisible(true);
-  };
+  }, []);
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setIsModalVisible(false);
     setCurrentGame(null);
-  };
+  }, []);
 
-  const handleStartSession = () => {
+  const handleStartSession = useCallback(() => {
     if (currentGame) {
-      navigate(`/playgame/${encodeURIComponent(currentGame.PlayLink)}/${encodeURIComponent(currentGame.title)}`);
+      navigate(`/RentalGamesEmbed/${encodeURIComponent(currentGame.PlayLink)}/${encodeURIComponent(currentGame.title)}`);
     }
     closeModal();
-  };
+  }, [currentGame, navigate, closeModal]);
 
   if (loading) {
     return <div className="text-center mt-10">Loading...</div>;
@@ -105,28 +105,32 @@ const GamingSessions = () => {
         </div>
         
         <div className="container mx-auto p-6">
-          <div className="text-2xl font-primaryRegular mb-6">MY LIBRARY</div>
-          {orderItems.length > 0 ? (
+          <div className="text-2xl font-primaryRegular mb-6">MY RENTED GAMES</div>
+          {rentals.length > 0 ? (
             <div className="flex flex-wrap gap-6">
-              {orderItems.map((item) => (
+              {rentals.map((rental) => (
                 <Card
-                  key={item.stockid._id}
+                  key={rental._id}
                   className="relative bg-customDark overflow-hidden transition-transform transform hover:scale-105 hover:shadow-lg"
                 >
                   <Image
                     isBlurred
                     radius="none"
-                    alt={item.stockid.AssignedGame.title}
+                    alt={rental.game.title}
                     className="w-[100px] h-[100px] object-cover"
-                    src={item.stockid.AssignedGame.coverPhoto}
+                    src={rental.game.coverPhoto}
                   />
                   <CardBody className="p-4">
                     <p className="mb-2 font-primaryRegular text-lg text-white">
-                      {item.stockid.AssignedGame.title}
+                      {rental.game.title}
+                    </p>
+                    
+                    <p className="mb-2 text-sm text-gray-300">
+                      Rental Time: {rental.time}
                     </p>
                     
                     <div className="flex flex-wrap gap-2 mb-4 font-primaryRegular">
-                      {item.stockid.AssignedGame.Genre.flatMap((genre) =>
+                      {rental.game.Genre && rental.game.Genre.flatMap((genre) =>
                         genre.includes(",") ? genre.split(",") : genre
                       ).map((genre, index) => (
                         <Chip
@@ -144,7 +148,7 @@ const GamingSessions = () => {
                     
                     <div className="flex flex-col gap-2">
                       <Button
-                        onClick={() => openModal(item.stockid.AssignedGame)}
+                        onClick={() => openModal(rental.game)}
                         color="primary"
                         className="font-primaryRegular"
                         radius="none"
@@ -156,7 +160,7 @@ const GamingSessions = () => {
 
                       <Button
                         as={Link}
-                        to={`/game/${item.stockid._id}`}
+                        to={`/GameDetails/${rental.game._id}`}
                         color="secondary"
                         className="font-primaryRegular"
                         radius="none"
@@ -175,7 +179,6 @@ const GamingSessions = () => {
           )}
         </div>
         
-        {/* NextUI Modal */}
         <Modal 
           isOpen={isModalVisible} 
           onClose={closeModal}

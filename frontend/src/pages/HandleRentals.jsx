@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
@@ -21,10 +21,10 @@ const HandleRentals = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const rentalOptions = [
-    { time: "15min", price: 50 },
-    { time: "30min", price: 80 },
-    { time: "1hour", price: 150 },
-    { time: "2hours", price: 250 }
+    { time: "15", price: 50 },
+    { time: "30", price: 80 },
+    { time: "60", price: 150 },
+    { time: "120", price: 250 }
   ];
 
   const termsAndConditions = [
@@ -52,7 +52,13 @@ const HandleRentals = () => {
     fetchGameDetails();
   }, [id]);
 
-  const handleRentClick = () => {
+  const handleRentalSelection = useCallback((option) => {
+    setSelectedRental(prevSelected => 
+      prevSelected && prevSelected.time === option.time ? null : option
+    );
+  }, []);
+
+  const handleRentClick = useCallback(() => {
     if (selectedRental) {
       onOpen();
     } else {
@@ -69,29 +75,53 @@ const HandleRentals = () => {
         style: { fontFamily: "Rubik" },
       });
     }
-  };
+  }, [selectedRental, onOpen]);
 
   const handlePayment = async () => {
     try {
       const token = getToken();
       const userId = getUserIdFromToken(token);
-      // Implement your payment logic here
-      toast.success("Rental successful!", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-        transition: Flip,
-        style: { fontFamily: "Rubik" },
+      
+      if (!userId) {
+        throw new Error("User ID not found. Please log in again.");
+      }
+
+      const rentalData = {
+        user: userId,
+        game: gameStock.AssignedGame._id,
+        time: selectedRental.time, // Already in minutes
+        price: selectedRental.price
+      };
+
+      console.log("Rental data being sent:", rentalData);
+
+      const response = await axios.post('http://localhost:8098/Rentals/createRental', rentalData, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
-      onClose();
-      navigate('/GamingSessions'); // Assuming you have a library page
+
+      if (response.status === 201) {
+        toast.success("Rental successful!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Flip,
+          style: { fontFamily: "Rubik" },
+        });
+        onClose();
+        navigate('/GamingSessions');
+      } else {
+        throw new Error("Failed to create rental");
+      }
     } catch (error) {
-      toast.error("Rental failed. Please try again.", {
+      console.error("Error creating rental:", error);
+      toast.error(error.message || "Rental failed. Please try again.", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -185,7 +215,7 @@ const HandleRentals = () => {
                   key={option.time}
                   isPressable
                   isHoverable
-                  onPress={() => setSelectedRental(option)}
+                  onPress={() => handleRentalSelection(option)}
                   className={`
                     transition-all duration-300 ease-in-out
                     ${selectedRental?.time === option.time 
@@ -195,7 +225,7 @@ const HandleRentals = () => {
                 >
                   <CardBody className="text-center">
                     <p className={`text-lg font-bold ${selectedRental?.time === option.time ? 'text-primary' : ''}`}>
-                      {option.time}
+                      {parseInt(option.time) >= 60 ? `${parseInt(option.time) / 60} hour${parseInt(option.time) > 60 ? 's' : ''}` : `${option.time} min`}
                     </p>
                     <p className={`text-sm ${selectedRental?.time === option.time ? 'text-primary' : ''}`}>
                       LKR {option.price}
@@ -219,7 +249,7 @@ const HandleRentals = () => {
         <ModalContent>
           <ModalHeader>Confirm Rental</ModalHeader>
           <ModalBody>
-            <p>You are about to rent {gameStock.AssignedGame.title} for {selectedRental?.time}.</p>
+            <p>You are about to rent {gameStock.AssignedGame.title} for {parseInt(selectedRental?.time) >= 60 ? `${parseInt(selectedRental?.time) / 60} hour${parseInt(selectedRental?.time) > 60 ? 's' : ''}` : `${selectedRental?.time} min`}.</p>
             <p>Price: LKR {selectedRental?.price}</p>
             <p>Please confirm to proceed with the payment.</p>
           </ModalBody>
