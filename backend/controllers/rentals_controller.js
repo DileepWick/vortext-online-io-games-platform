@@ -3,22 +3,26 @@ import { User } from '../models/user.js';
 import { Game } from '../models/game.js';
 
 export const createRental = async (req, res) => {
-  try {
-    const { user, game, time, price } = req.body;
-    console.log("Received rental data:", { user, game, time, price });
-
-    const newRental = new Rental({ user, game, time, price });
-    await newRental.save();
-
-
-
-    console.log("Rental saved successfully");
-    res.status(201).json(newRental);
-  } catch (error) {
-    console.error("Error in createRental:", error);
-    res.status(400).json({ message: error.message });
-  }
-};
+    try {
+      const { user, game, time, price } = req.body;
+      console.log("Received rental data:", { user, game, time, price });
+  
+      const newRental = new Rental({ user, game, time, price });
+      const savedRental = await newRental.save();
+  
+      console.log("Rental saved successfully");
+      res.status(201).json({
+        message: "Rental created successfully!",
+        rental: savedRental,
+      });
+    } catch (error) {
+      console.error("Error in createRental:", error);
+      res.status(500).json({
+        message: error.message || "Error creating rental",
+        error: "SERVER_ERROR"
+      });
+    }
+  };
 
 export const getRentals = async (req, res) => {
   try {

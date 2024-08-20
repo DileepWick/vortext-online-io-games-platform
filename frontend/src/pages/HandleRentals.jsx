@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
@@ -52,7 +52,13 @@ const HandleRentals = () => {
     fetchGameDetails();
   }, [id]);
 
-  const handleRentClick = () => {
+  const handleRentalSelection = useCallback((option) => {
+    setSelectedRental(prevSelected => 
+      prevSelected && prevSelected.time === option.time ? null : option
+    );
+  }, []);
+
+  const handleRentClick = useCallback(() => {
     if (selectedRental) {
       onOpen();
     } else {
@@ -69,7 +75,7 @@ const HandleRentals = () => {
         style: { fontFamily: "Rubik" },
       });
     }
-  };
+  }, [selectedRental, onOpen]);
 
   const handlePayment = async () => {
     try {
@@ -209,7 +215,7 @@ const HandleRentals = () => {
                   key={option.time}
                   isPressable
                   isHoverable
-                  onPress={() => setSelectedRental(option)}
+                  onPress={() => handleRentalSelection(option)}
                   className={`
                     transition-all duration-300 ease-in-out
                     ${selectedRental?.time === option.time 

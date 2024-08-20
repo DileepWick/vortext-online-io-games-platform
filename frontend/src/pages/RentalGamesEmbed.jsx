@@ -37,7 +37,7 @@ const RentalGamesEmbed = () => {
   const decodedTitle = decodeURIComponent(title);
   const iframeRef = useRef(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(200); // 4 hours in seconds
+  const [timeLeft, setTimeLeft] = useState(10); // 4 hours in seconds
 
   useEffect(() => {
     // Countdown timer
@@ -46,7 +46,7 @@ const RentalGamesEmbed = () => {
         if (prevTime <= 1) {
           clearInterval(timer);
           window.alert("Your gaming session for the day has ended !"); // Alert box
-          navigate("/mylibrary"); // Navigate to /mylibrary after alert is closed
+          navigate("/GamingSessions"); // Navigate to /mylibrary after alert is closed
           return 0;
         }
         return prevTime - 1;
@@ -88,7 +88,7 @@ const RentalGamesEmbed = () => {
   };
 
   const handleCut = () => {
-    navigate("/mylibrary");
+    navigate("/GamingSessions");
   };
 
   // Format time left in HH:MM:SS

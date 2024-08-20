@@ -16,7 +16,6 @@ const RentalSchema = new Schema({
   time: {
     type: String,
     required: true,
-    unique: true
   },
   price: {
     type: Number,
@@ -28,5 +27,8 @@ const RentalSchema = new Schema({
     default: Date.now
   }
 });
+
+// Explicitly remove the index if it exists
+RentalSchema.index({ time: 1 }, { unique: false });
 
 export const Rental = mongoose.model("Rental", RentalSchema);
