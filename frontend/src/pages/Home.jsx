@@ -2,9 +2,11 @@ import React from "react";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { toast, Flip } from "react-toastify";
-import GameEmbed from "./GameEmbed";
+import Hangman from "../components/Games/Hangaman";
+
 
 const Home = () => {
+
 
   const notify = () => {
     toast.success("🦄 Wow so easy!", {
@@ -22,16 +24,9 @@ const Home = () => {
     });
   };
 
-  const propFunction =()=>{
-      alert("Hello");
-  }
-
-  const questions = [
-    { word: 'REACT', hint: 'A JavaScript library for building user interfaces.' },
-    { word: 'JAVASCRIPT', hint: 'A programming language commonly used in web development.' },
-    { word: 'HANGMAN', hint: 'A word guessing game.' },
-    { word: 'DEVELOPER', hint: 'A person who writes computer software.' }
-  ];
+  const propFunction = () => {
+    alert("Hello");
+  };
 
   return (
     <div className="font-primaryRegular">
@@ -45,6 +40,8 @@ const Home = () => {
       <h1>NimsaraThhenuka</h1>
       <h1>Bandara Ranasinghe</h1>
       <h1>Tharindu Ariyawansha</h1>
+
+      <Hangman/>
 
       <Footer />
     </div>

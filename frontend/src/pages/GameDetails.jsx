@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
+
 import axios from "axios";
 
 // Utils
@@ -8,14 +9,18 @@ import useAuthCheck from "../utils/authCheck";
 import { getToken } from "../utils/getToken";
 import { toast, Flip } from "react-toastify";
 import VideoPlayer from "../components/videoPlayer";
-
+import { useNavigate } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
+import RatingSystem from "../components/RatingSystem"; // New import
+
 
 // NextUI
 import { Button, Chip } from "@nextui-org/react";
 import { Card, CardBody, CardFooter, Image, Textarea } from "@nextui-org/react";
 import { ScrollShadow } from "@nextui-org/react";
+
+
 
 const GameDetails = () => {
   // Authenticate user
@@ -30,6 +35,11 @@ const GameDetails = () => {
   const [quantityByStockId, setQuantityByStockId] = useState({}); // State to handle quantity by stock id
 
   const [checkItem, setCheckItem] = useState("not in the library");
+  
+  const [ratings, setRatings] = useState([]);
+  const [averageRating, setAverageRating] = useState(0);
+
+
 
   useEffect(() => {
     const fetchGameDetails = async () => {
@@ -57,6 +67,25 @@ const GameDetails = () => {
         setLoading(false);
       }
     };
+
+
+
+    // Add this new fetch for ratings
+    const fetchRatings = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8098/ratings/game/${id}`);
+        setRatings(response.data);
+        // Calculate average rating
+        const avg = response.data.reduce((sum, rating) => sum + rating.rating, 0) / response.data.length;
+        setAverageRating(avg);
+      } catch (error) {
+        console.error("Error fetching ratings:", error);
+      }
+    };
+
+    fetchRatings();
+   
+  
 
     const fetchCartId = async () => {
       try {
@@ -156,6 +185,70 @@ const GameDetails = () => {
     }
   };
 
+
+
+ // New function to handle rating submission
+ const handleRatingSubmit = async (rating, comment) => {
+  try {
+    const token = getToken();
+    const userId = getUserIdFromToken(token);
+    console.log("Submitting rating:", { userId, gameId: id, rating, comment });
+    
+    const response = await axios.post(`http://localhost:8098/ratings`, {
+      user: userId,
+      game: id,
+      rating,
+      comment
+    });
+    
+    console.log("Rating submission response:", response);
+    
+    if (response.status === 201) {
+      toast.success("Rating submitted successfully", {
+        // ... (keep existing toast options)
+      });
+      // Refresh ratings
+      const updatedRatings = await axios.get(`http://localhost:8098/ratings/game/${id}`);
+      console.log("Updated ratings:", updatedRatings.data);
+      setRatings(updatedRatings.data);
+      const avg = updatedRatings.data.reduce((sum, r) => sum + r.rating, 0) / updatedRatings.data.length;
+      setAverageRating(avg);
+    }
+  } catch (error) {
+    console.error("Error submitting rating:", error.response || error);
+    toast.error(`Error submitting rating: ${error.response?.data?.message || error.message}`, {
+      // ... (keep existing toast options)
+    });
+  }
+};
+
+
+  // Handle Rent
+  const navigate = useNavigate();
+
+  const handleRent = (stockId) => {
+    if (checkItem === "in the library") {
+      toast.info("You already own this game in your library.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Flip,
+        style: { fontFamily: "Rubik" },
+      });
+    } else {
+      navigate(`/HandleRentals/${stockId}`);
+    }
+  };
+  
+  
+  
+
+
   const handleQuantityChange = (stockId, newQuantity) => {
     // Update quantityByStockId state
     setQuantityByStockId({ ...quantityByStockId, [stockId]: newQuantity });
@@ -173,9 +266,9 @@ const GameDetails = () => {
     : originalPrice;
 
   return (
-    <div className="bg-customDark  text-black min-h-screen font-primaryRegular">
+    <div className="bg-customDark text-black min-h-screen font-primaryRegular">
       <Header />
-      <div className="container mx-auto px-4 py-8  ">
+      <div className="container mx-auto px-4 py-8">
         <div className="bg-customDark rounded-lg shadow-lg p-8">
           <h1 className="text-5xl text-white mb-4 text-left">
             {gameStock.AssignedGame.title}
@@ -193,9 +286,7 @@ const GameDetails = () => {
                 muted
                 className="w-[900px] h-[400px] object-cover mb-4 shadow-md"
               />
-              <h1 className="mt-8 text-editionColor text-3xl">
-                About the game
-              </h1>
+              <h1 className="mt-8 text-editionColor text-3xl">About the game</h1>
               <p className="text-lg mt-4">
                 <ScrollShadow
                   hideScrollBar
@@ -250,21 +341,43 @@ const GameDetails = () => {
                     ))}
                   </div>
                 </CardBody>
-                <CardFooter className="text-center">
-                  <Button
-                    onClick={() => handleAddToCart(gameStock._id)}
-                    color="primary"
-                    radius="none"
-                    className=" w-[300px]"
-                    variant="ghost"
-                  >
-                    Add to Cart
-                  </Button>
-                </CardFooter>
+                        <CardFooter className="text-center">
+          <div className="flex flex-col items-center">
+            <Button
+              onClick={() => handleAddToCart(gameStock._id)}
+              color="primary"
+              radius="none"
+              className="w-[300px] mb-2"
+              variant="ghost"
+            >
+              Add to Cart
+            </Button>
+            <Button
+              onClick={() => handleRent(gameStock._id)}
+              color="secondary"
+              radius="none"
+              className="w-[300px]"
+              variant="ghost"
+            >
+              Rent Game
+            </Button>
+          </div>
+        </CardFooter>
+
               </Card>
             </div>
           </div>
         </div>
+
+        <div className="mt-8">
+            <h2 className="text-3xl text-white mb-4">Ratings and Reviews</h2>
+            <RatingSystem 
+              gameId={id} 
+              ratings={ratings} 
+              averageRating={averageRating} 
+              onSubmitRating={handleRatingSubmit}
+            />
+          </div>
 
         {relatedGameStocks.length > 0 && (
           <div className="mt-8">
@@ -292,9 +405,7 @@ const GameDetails = () => {
                     View Details
                   </Link>
                   <div className="mt-4">
-                    <label className="block text-gray-700 mb-2">
-                      Quantity:
-                    </label>
+                    <label className="block text-gray-700 mb-2">Quantity:</label>
                     <input
                       type="number"
                       min="1"
@@ -310,6 +421,12 @@ const GameDetails = () => {
                     className="block w-full text-center bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300 mt-4"
                   >
                     Add to Cart
+                  </button>
+                  <button
+                    onClick={() => handleRent(stock._id)}
+                    className="block w-full text-center bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition duration-300 mt-4"
+                  >
+                    Rent
                   </button>
                 </div>
               ))}
