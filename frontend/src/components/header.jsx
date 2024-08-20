@@ -91,18 +91,7 @@ export default function Header() {
                 location.pathname === "/articles" ? "underline" : ""
               } text-white hover:underline`}
             >
-              article
-            </Link>
-          </NavbarItem>
-          <NavbarItem>
-            <Link
-              color={location.pathname === "/community" ? "primary" : "white"}
-              href="/community"
-              className={`${
-                location.pathname === "/community" ? "underline" : ""
-              } text-white hover:underline`}
-            >
-              Community
+              Articles
             </Link>
           </NavbarItem>
 
@@ -247,17 +236,15 @@ export default function Header() {
                   </DropdownItem>
                 )}
 
-                {/* community Manager Filter */}
-                {user.role === "Community Manager" && (
+                {/* Courier Filter */}
+                {user.role === "Courier" && (
                   <DropdownItem
-                    key="community-panel"
-                    onClick={() => navigate("/CommunityDashBoard")}
+                    key="courier-panel"
+                    onClick={() => navigate("/courierDashboard")}
                   >
-                    Community Dashboard
+                    Courier Dashboard
                   </DropdownItem>
                 )}
-
-
 
                 {/*Review manager*/}
                 {user.role === "Review_Manager" && (
