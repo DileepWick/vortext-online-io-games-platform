@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { Avatar } from "@nextui-org/react";
 import {
   Table,
   TableHeader,
@@ -32,13 +33,13 @@ const UserManagementTable = ({ users, setUsers }) => {
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedPlayerType, setSelectedPlayerType] = useState("All");
-  const rowsPerPage = 4;
+  const rowsPerPage = 8;
 
-  
   const filteredUsers = useMemo(() => {
-    return users.filter((user) =>
-      user.username.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      (selectedPlayerType === "All" || user.playerType === selectedPlayerType)
+    return users.filter(
+      (user) =>
+        user.username.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        (selectedPlayerType === "All" || user.playerType === selectedPlayerType)
     );
   }, [users, searchQuery, selectedPlayerType]);
 
@@ -61,7 +62,6 @@ const UserManagementTable = ({ users, setUsers }) => {
     setSelectedPlayerType(playerType);
     setPage(1);
   };
-  
 
   const openEditModal = (user) => {
     setSelectedUser(user);
@@ -70,7 +70,10 @@ const UserManagementTable = ({ users, setUsers }) => {
 
   const handleUpdate = async () => {
     try {
-      const response = await axios.put(`http://localhost:8098/users/profile/update/${selectedUser._id}`, selectedUser);
+      const response = await axios.put(
+        `http://localhost:8098/users/profile/update/${selectedUser._id}`,
+        selectedUser
+      );
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
           user._id === selectedUser._id ? response.data : user
@@ -95,8 +98,12 @@ const UserManagementTable = ({ users, setUsers }) => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:8098/users/delete/${selectedUser._id}`);
-      setUsers((prevUsers) => prevUsers.filter((user) => user._id !== selectedUser._id));
+      await axios.delete(
+        `http://localhost:8098/users/delete/${selectedUser._id}`
+      );
+      setUsers((prevUsers) =>
+        prevUsers.filter((user) => user._id !== selectedUser._id)
+      );
       setDeleteModalOpen(false);
       toast.success("User deleted successfully", {
         style: { fontFamily: "Rubik" },
@@ -111,9 +118,8 @@ const UserManagementTable = ({ users, setUsers }) => {
 
   return (
     <div>
-      
       <div className="flex items-center mb-4">
-      <Input
+        <Input
           className="ml-2 font-primaryRegular w-48 sm:w-64"
           placeholder="Search by username..."
           startContent={<SearchIcon />}
@@ -124,11 +130,13 @@ const UserManagementTable = ({ users, setUsers }) => {
         <Dropdown>
           <DropdownTrigger>
             <Button light>
-              {selectedPlayerType === "All" ? "Filter by Player Type" : selectedPlayerType}
+              {selectedPlayerType === "All"
+                ? "Filter by Player Type"
+                : selectedPlayerType}
             </Button>
           </DropdownTrigger>
-          <DropdownMenu 
-            aria-label="Player Type Selection" 
+          <DropdownMenu
+            aria-label="Player Type Selection"
             onAction={(key) => handlePlayerTypeSelect(key)}
           >
             <DropdownItem key="All">All</DropdownItem>
@@ -137,7 +145,6 @@ const UserManagementTable = ({ users, setUsers }) => {
             <DropdownItem key="Adult">Adult</DropdownItem>
           </DropdownMenu>
         </Dropdown>
-        
       </div>
       <Table
         aria-label="User Management Table"
@@ -160,7 +167,8 @@ const UserManagementTable = ({ users, setUsers }) => {
         }}
       >
         <TableHeader>
-        <TableColumn>Fullname</TableColumn>
+          <TableColumn>Fullname</TableColumn>
+          <TableColumn>Profile Image</TableColumn>
           <TableColumn>Username</TableColumn>
           <TableColumn>Email</TableColumn>
           <TableColumn>Age</TableColumn>
@@ -171,22 +179,31 @@ const UserManagementTable = ({ users, setUsers }) => {
           {items.map((user) => (
             <TableRow key={user._id}>
               <TableCell>{user.firstname + " " + user.lastname}</TableCell>
+              <TableCell>
+                <Avatar src={user.profilePic} />
+              </TableCell>
+
               <TableCell>{user.username}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>{user.age}</TableCell>
               <TableCell>{user.playerType}</TableCell>
               <TableCell>
                 <div style={{ display: "flex", gap: "10px" }}>
-                  <Button auto flat color="primary" onClick={() => openEditModal(user)}>
+                  <Button
+                    auto
+                    flat
+                    color="primary"
+                    onClick={() => openEditModal(user)}
+                  >
                     Update
                   </Button>
-                  <Button 
-            variant="ghost" color="danger" 
-            onClick={() => openDeleteModal(user)}
-            
-          >
-            Delete
-          </Button>
+                  <Button
+                    variant="ghost"
+                    color="danger"
+                    onClick={() => openDeleteModal(user)}
+                  >
+                    Delete
+                  </Button>
                 </div>
               </TableCell>
             </TableRow>
@@ -245,14 +262,21 @@ const UserManagementTable = ({ users, setUsers }) => {
       </Modal>
 
       {/* Delete Confirmation Modal */}
-      <Modal isOpen={isDeleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+      >
         <ModalContent>
           <ModalHeader>Delete User</ModalHeader>
           <ModalBody>
             Are you sure you want to delete {selectedUser?.username}?
           </ModalBody>
           <ModalFooter>
-            <Button color="error" flat onClick={() => setDeleteModalOpen(false)}>
+            <Button
+              color="error"
+              flat
+              onClick={() => setDeleteModalOpen(false)}
+            >
               Cancel
             </Button>
             <Button color="primary" onClick={handleDelete}>

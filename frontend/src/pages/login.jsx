@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate, useLocation } from "react-router-dom";
-import { toast } from "react-toastify";
+
 
 // Next UI
 import { Input, Button, Tabs, Tab, Link, Card, CardBody } from "@nextui-org/react";
@@ -39,10 +39,9 @@ const Login = () => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
       ...prevFormData,
-      [name]:
-        name === "firstname" || name === "lastname"
-          ? filterLettersOnly(value)
-          : value,
+      [name]: name === "firstname" || name === "lastname"
+        ? filterLettersOnly(value)
+        : value,
     }));
   };
 
@@ -93,13 +92,7 @@ const Login = () => {
 
         const userRole = getUserRoleFromToken(token);
 
-        navigate(
-          userRole === "admin"
-            ? "/"
-            : redirectTo
-            ? decodeURIComponent(redirectTo)
-            : "/"
-        );
+        navigate(userRole === "admin" ? "/" : redirectTo ? decodeURIComponent(redirectTo) : "/");
       } else {
         setAlertMessage(response.data.message);
       }
@@ -119,24 +112,19 @@ const Login = () => {
     }
 
     try {
-      const { firstname, lastname, username, email, password, birthday } =
-        formData;
+      const { firstname, lastname, username, email, password, birthday } = formData;
 
       // Calculate age
       const today = new Date();
       const birthDate = new Date(birthday);
       let age = today.getFullYear() - birthDate.getFullYear();
       const monthDiff = today.getMonth() - birthDate.getMonth();
-      if (
-        monthDiff < 0 ||
-        (monthDiff === 0 && today.getDate() < birthDate.getDate())
-      ) {
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
         age--;
       }
 
       // Determine player category
-      const playerCategory =
-        age <= 12 ? "Kid" : age <= 18 ? "Teenager" : "Adult";
+      const playerCategory = age <= 12 ? "Kid" : age <= 18 ? "Teenager" : "Adult";
 
       const response = await axios.post("http://localhost:8098/users/register", {
         firstname,
@@ -152,12 +140,8 @@ const Login = () => {
       if (response.data.success) {
         setAlertMessage("Registration successful! Please log in.");
         setSelectedTab("login");
-
-
       } else {
-                // Trigger the toast notification for success
-                toast.success("Account created successfully!");
-        
+        setAlertMessage(response.data.message);
       }
     } catch (error) {
       console.error("Registration error:", error);
@@ -167,9 +151,7 @@ const Login = () => {
 
   // Get today's date and calculate the max date for the birthday input
   const today = new Date();
-  const maxDate = new Date(today.setFullYear(today.getFullYear() - 5))
-    .toISOString()
-    .split("T")[0];
+  const maxDate = new Date(today.setFullYear(today.getFullYear() - 5)).toISOString().split('T')[0];
 
   return (
     <div>
@@ -235,9 +217,7 @@ const Login = () => {
                     color={validationErrors.firstname ? "error" : "default"}
                   />
                   {validationErrors.firstname && (
-                    <div className="text-red-500">
-                      {validationErrors.firstname}
-                    </div>
+                    <div className="text-red-500">{validationErrors.firstname}</div>
                   )}
                   <Input
                     isRequired
@@ -250,9 +230,7 @@ const Login = () => {
                     color={validationErrors.lastname ? "error" : "default"}
                   />
                   {validationErrors.lastname && (
-                    <div className="text-red-500">
-                      {validationErrors.lastname}
-                    </div>
+                    <div className="text-red-500">{validationErrors.lastname}</div>
                   )}
                   <Input
                     isRequired
@@ -262,6 +240,7 @@ const Login = () => {
                     type="text"
                     value={formData.username}
                     onChange={handleInputChange}
+                    // Removed validation-related props for username
                   />
                   <Input
                     isRequired
@@ -297,12 +276,16 @@ const Login = () => {
                     color={validationErrors.password ? "error" : "default"}
                   />
                   {validationErrors.password && (
-                    <div className="text-red-500">
-                      {validationErrors.password}
-                    </div>
+                    <div className="text-red-500">{validationErrors.password}</div>
                   )}
+                  <p className="text-center text-small">
+                    Already have an account?{" "}
+                    <Link size="sm" onPress={() => setSelectedTab("login")}>
+                      Login
+                    </Link>
+                  </p>
                   {alertMessage && (
-                    <div className="text-center text-red-500">
+                    <div className="mt-4 text-center text-red-500">
                       {alertMessage}
                     </div>
                   )}
