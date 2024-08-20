@@ -17,6 +17,12 @@ import {
   ModalBody,
   ModalFooter,
 } from "@nextui-org/react";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+} from "@nextui-org/react";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
 
 const UserManagementTable = ({ users, setUsers }) => {
@@ -25,13 +31,16 @@ const UserManagementTable = ({ users, setUsers }) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedPlayerType, setSelectedPlayerType] = useState("All");
   const rowsPerPage = 4;
 
+  
   const filteredUsers = useMemo(() => {
     return users.filter((user) =>
-      user.username.toLowerCase().includes(searchQuery.toLowerCase())
+      user.username.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      (selectedPlayerType === "All" || user.playerType === selectedPlayerType)
     );
-  }, [users, searchQuery]);
+  }, [users, searchQuery, selectedPlayerType]);
 
   const items = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
@@ -48,6 +57,11 @@ const UserManagementTable = ({ users, setUsers }) => {
     setSearchQuery("");
     setPage(1);
   };
+  const handlePlayerTypeSelect = (playerType) => {
+    setSelectedPlayerType(playerType);
+    setPage(1);
+  };
+  
 
   const openEditModal = (user) => {
     setSelectedUser(user);
@@ -97,14 +111,34 @@ const UserManagementTable = ({ users, setUsers }) => {
 
   return (
     <div>
+      
+      <div className="flex items-center mb-4">
       <Input
-        className="ml-2 font-primaryRegular w-48 sm:w-64 mb-4"
-        placeholder="Search by username..."
-        startContent={<SearchIcon />}
-        value={searchQuery}
-        onChange={handleSearchChange}
-        onClear={handleClearSearch}
-      />
+          className="ml-2 font-primaryRegular w-48 sm:w-64"
+          placeholder="Search by username..."
+          startContent={<SearchIcon />}
+          value={searchQuery}
+          onChange={handleSearchChange}
+          onClear={handleClearSearch}
+        />
+        <Dropdown>
+          <DropdownTrigger>
+            <Button light>
+              {selectedPlayerType === "All" ? "Filter by Player Type" : selectedPlayerType}
+            </Button>
+          </DropdownTrigger>
+          <DropdownMenu 
+            aria-label="Player Type Selection" 
+            onAction={(key) => handlePlayerTypeSelect(key)}
+          >
+            <DropdownItem key="All">All</DropdownItem>
+            <DropdownItem key="Kid">Kid</DropdownItem>
+            <DropdownItem key="Teenager">Teenager</DropdownItem>
+            <DropdownItem key="Adult">Adult</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+        
+      </div>
       <Table
         aria-label="User Management Table"
         className="font-primaryRegular"
@@ -126,7 +160,7 @@ const UserManagementTable = ({ users, setUsers }) => {
         }}
       >
         <TableHeader>
-          
+        <TableColumn>Fullname</TableColumn>
           <TableColumn>Username</TableColumn>
           <TableColumn>Email</TableColumn>
           <TableColumn>Age</TableColumn>
@@ -136,7 +170,7 @@ const UserManagementTable = ({ users, setUsers }) => {
         <TableBody>
           {items.map((user) => (
             <TableRow key={user._id}>
-              
+              <TableCell>{user.firstname + " " + user.lastname}</TableCell>
               <TableCell>{user.username}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>{user.age}</TableCell>
