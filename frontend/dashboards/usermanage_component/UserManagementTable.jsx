@@ -22,12 +22,11 @@ import { SearchIcon } from "../../src/assets/icons/SearchIcon";
 const UserManagementTable = ({ users, setUsers }) => {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedUser, setSelectedUser] = useState(null); // For editing
+  const [selectedUser, setSelectedUser] = useState(null);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const rowsPerPage = 4; // Adjust rows per page if necessary
+  const rowsPerPage = 4;
 
-  // Filtered and paginated users
   const filteredUsers = useMemo(() => {
     return users.filter((user) =>
       user.username.toLowerCase().includes(searchQuery.toLowerCase())
@@ -40,66 +39,66 @@ const UserManagementTable = ({ users, setUsers }) => {
     return filteredUsers.slice(start, end);
   }, [page, filteredUsers]);
 
-  // Handle Search change
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
-    setPage(1); // Reset page to 1 when search query changes
+    setPage(1);
   };
 
-  // Clear Search
   const handleClearSearch = () => {
     setSearchQuery("");
-    setPage(1); // Reset page to 1 when search query is cleared
+    setPage(1);
   };
 
-  // Open the edit modal
   const openEditModal = (user) => {
     setSelectedUser(user);
     setEditModalOpen(true);
   };
 
-  // Handle user update
   const handleUpdate = async () => {
     try {
-      await axios.put(`http://localhost:8098/users/profile/update/${selectedUser._id}`, selectedUser);
+      const response = await axios.put(`http://localhost:8098/users/profile/update/${selectedUser._id}`, selectedUser);
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
-          user._id === selectedUser._id ? selectedUser : user
+          user._id === selectedUser._id ? response.data : user
         )
       );
       setEditModalOpen(false);
       toast.success("User updated successfully", {
         style: { fontFamily: "Rubik" },
-      }); // Use alert or a notification library
+      });
     } catch (error) {
       console.error("Error updating user:", error);
-      alert("Error updating user");
+      toast.error("Error updating user", {
+        style: { fontFamily: "Rubik" },
+      });
     }
   };
 
-  // Open the delete modal
   const openDeleteModal = (user) => {
     setSelectedUser(user);
     setDeleteModalOpen(true);
   };
 
-  // Handle user deletion
   const handleDelete = async () => {
     try {
       await axios.delete(`http://localhost:8098/users/delete/${selectedUser._id}`);
       setUsers((prevUsers) => prevUsers.filter((user) => user._id !== selectedUser._id));
       setDeleteModalOpen(false);
-      alert("User deleted successfully"); // Use alert or a notification library
+      toast.success("User deleted successfully", {
+        style: { fontFamily: "Rubik" },
+      });
     } catch (error) {
       console.error("Error deleting user:", error);
-      alert("Error deleting user");
+      toast.error("Error deleting user", {
+        style: { fontFamily: "Rubik" },
+      });
     }
   };
 
   return (
     <div>
       <Input
-        className="ml-2 font-primaryRegular w-48 sm:w-64"
+        className="ml-2 font-primaryRegular w-48 sm:w-64 mb-4"
         placeholder="Search by username..."
         startContent={<SearchIcon />}
         value={searchQuery}
@@ -107,14 +106,12 @@ const UserManagementTable = ({ users, setUsers }) => {
         onClear={handleClearSearch}
       />
       <Table
-        isHeaderSticky
         aria-label="User Management Table"
         className="font-primaryRegular"
         bottomContent={
           <div className="flex w-full justify-center font-primaryRegular">
             <Pagination
               isCompact
-              loop
               showControls
               showShadow
               color="primary"
@@ -129,27 +126,33 @@ const UserManagementTable = ({ users, setUsers }) => {
         }}
       >
         <TableHeader>
-          <TableColumn>ID</TableColumn>
+          
           <TableColumn>Username</TableColumn>
           <TableColumn>Email</TableColumn>
           <TableColumn>Age</TableColumn>
+          <TableColumn>Player Type</TableColumn>
           <TableColumn>Actions</TableColumn>
         </TableHeader>
         <TableBody>
           {items.map((user) => (
             <TableRow key={user._id}>
-              <TableCell>{user._id}</TableCell>
+              
               <TableCell>{user.username}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>{user.age}</TableCell>
+              <TableCell>{user.playerType}</TableCell>
               <TableCell>
                 <div style={{ display: "flex", gap: "10px" }}>
                   <Button auto flat color="primary" onClick={() => openEditModal(user)}>
                     Update
                   </Button>
-                  <Button auto flat color="error" onClick={() => openDeleteModal(user)}>
-                    Delete
-                  </Button>
+                  <Button 
+            variant="ghost" color="danger" 
+            onClick={() => openDeleteModal(user)}
+            
+          >
+            Delete
+          </Button>
                 </div>
               </TableCell>
             </TableRow>
@@ -185,6 +188,14 @@ const UserManagementTable = ({ users, setUsers }) => {
               value={selectedUser?.age || ""}
               onChange={(e) =>
                 setSelectedUser({ ...selectedUser, age: e.target.value })
+              }
+            />
+            <Input
+              fullWidth
+              label="Player Type"
+              value={selectedUser?.playerType || ""}
+              onChange={(e) =>
+                setSelectedUser({ ...selectedUser, playerType: e.target.value })
               }
             />
           </ModalBody>
