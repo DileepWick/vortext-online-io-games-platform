@@ -15,6 +15,8 @@ import MyLibrary from "./pages/My_Library";
 import ArticleList from "./pages/articles";
 import Contact from "./pages/Contact";
 import GamingSessions from "./pages/GamingSessions";
+import Community from "./pages/community";
+
 
 //Gameplay
 import GameEmbed from "./pages/GameEmbed";
@@ -28,6 +30,7 @@ import Review_manager from "../dashboards/review_dashboard";
 import ContactDash from "../dashboards/Customer suport";
 import SessionManagerDash from "../dashboards/session_manager_dashbord";
 import StaffManager from "../dashboards/staff_manager_dashboard";
+import CommunityDashBoard from  "../dashboards/communityDashboard";
 
 const App = () => {
   return (
@@ -47,6 +50,7 @@ const App = () => {
       <Route path="/ordersDashboard" element={<OrderManagerDashboard />} />
       <Route path="/bloggerDashboard" element={<BloggerDashboard />} />
       <Route path="/courierDashboard" element={<CourierDashBoard />} />
+      <Route path="/CommunityDashBoard" element={<CommunityDashBoard />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/review_dashboard" element={<Review_manager />} />
       <Route path="/ContactDash" element={<ContactDash />} />
@@ -55,6 +59,9 @@ const App = () => {
       <Route path="/staffManager" element={<StaffManager />} />
       <Route path="/review_dashboard" element={<Review_manager />} />
       <Route path="/playgame/:src/:title" element={<GameEmbed />} />
+
+      <Route path="/community" element={<Community />} />
+      
     </Routes>
   );
 };
