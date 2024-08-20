@@ -105,7 +105,7 @@ const GamingSessions = () => {
         </div>
         
         <div className="container mx-auto p-6">
-          <div className="text-2xl font-primaryRegular mb-6">MY LIBRARY</div>
+          <div className="text-2xl font-primaryRegular mb-6">MY RENTED GAMES</div>
           {rentals.length > 0 ? (
             <div className="flex flex-wrap gap-6">
               {rentals.map((rental) => (
@@ -160,7 +160,7 @@ const GamingSessions = () => {
 
                       <Button
                         as={Link}
-                        to={`/game/${rental.game._id}`}
+                        to={`/GameDetails/${rental.game._id}`}
                         color="secondary"
                         className="font-primaryRegular"
                         radius="none"

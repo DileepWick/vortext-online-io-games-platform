@@ -21,10 +21,10 @@ const HandleRentals = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const rentalOptions = [
-    { time: "15min", price: 50 },
-    { time: "30min", price: 80 },
-    { time: "1hour", price: 150 },
-    { time: "2hours", price: 250 }
+    { time: "15", price: 50 },
+    { time: "30", price: 80 },
+    { time: "60", price: 150 },
+    { time: "120", price: 250 }
   ];
 
   const termsAndConditions = [
@@ -89,7 +89,7 @@ const HandleRentals = () => {
       const rentalData = {
         user: userId,
         game: gameStock.AssignedGame._id,
-        time: selectedRental.time,
+        time: selectedRental.time, // Already in minutes
         price: selectedRental.price
       };
 
@@ -225,7 +225,7 @@ const HandleRentals = () => {
                 >
                   <CardBody className="text-center">
                     <p className={`text-lg font-bold ${selectedRental?.time === option.time ? 'text-primary' : ''}`}>
-                      {option.time}
+                      {parseInt(option.time) >= 60 ? `${parseInt(option.time) / 60} hour${parseInt(option.time) > 60 ? 's' : ''}` : `${option.time} min`}
                     </p>
                     <p className={`text-sm ${selectedRental?.time === option.time ? 'text-primary' : ''}`}>
                       LKR {option.price}
@@ -249,7 +249,7 @@ const HandleRentals = () => {
         <ModalContent>
           <ModalHeader>Confirm Rental</ModalHeader>
           <ModalBody>
-            <p>You are about to rent {gameStock.AssignedGame.title} for {selectedRental?.time}.</p>
+            <p>You are about to rent {gameStock.AssignedGame.title} for {parseInt(selectedRental?.time) >= 60 ? `${parseInt(selectedRental?.time) / 60} hour${parseInt(selectedRental?.time) > 60 ? 's' : ''}` : `${selectedRental?.time} min`}.</p>
             <p>Price: LKR {selectedRental?.price}</p>
             <p>Please confirm to proceed with the payment.</p>
           </ModalBody>

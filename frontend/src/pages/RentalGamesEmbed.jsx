@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
-import { Button } from "@nextui-org/react";
+import { Button, Progress } from "@nextui-org/react";
 
 // Helper function to handle full-screen requests
 const requestFullScreen = (element) => {
@@ -38,6 +38,7 @@ const RentalGamesEmbed = () => {
   const iframeRef = useRef(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [timeLeft, setTimeLeft] = useState(10); // 4 hours in seconds
+  const totalTime = 14400; // 4 hours in seconds
 
   useEffect(() => {
     // Countdown timer
@@ -45,8 +46,8 @@ const RentalGamesEmbed = () => {
       setTimeLeft((prevTime) => {
         if (prevTime <= 1) {
           clearInterval(timer);
-          window.alert("Your gaming session for the day has ended !"); // Alert box
-          navigate("/GamingSessions"); // Navigate to /mylibrary after alert is closed
+          window.alert("Your rental time has expired");
+          navigate("/GamingSessions");
           return 0;
         }
         return prevTime - 1;
@@ -99,10 +100,26 @@ const RentalGamesEmbed = () => {
     return `${hrs.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
+  const calculateProgress = () => {
+    return ((totalTime - timeLeft) / totalTime) * 100;
+  };
+
   return (
     <>
       <Header />
       <div className="relative bg-customDark min-h-screen p-4">
+        {/* Timer Progress Bar */}
+        <div className="absolute top-4 right-4 z-20 w-64">
+          <Progress
+            value={calculateProgress()}
+            color="primary"
+            className="mb-2"
+          />
+          <div className="text-white text-center">
+            Time Left: {formatTime(timeLeft)}
+          </div>
+        </div>
+
         <h1 className="text-5xl text-white mb-4 text-left">{decodedTitle}</h1>
         <div className="relative">
           <iframe
@@ -143,10 +160,6 @@ const RentalGamesEmbed = () => {
               EXIT GAME
             </Button>
           </div>
-        </div>
-        {/* Timer Display */}
-        <div className="absolute bottom-4 left-4 text-black text-xl">
-          Time Left: {formatTime(timeLeft)}
         </div>
       </div>
       <Footer />
