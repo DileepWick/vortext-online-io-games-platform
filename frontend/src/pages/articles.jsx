@@ -213,7 +213,7 @@ const Articles = () => {
                       disabled={!userId}
                     >
                       {likedArticles[article._id] ? <FaHeart className="text-white" /> : <FaRegHeart className="text-gray-400" />}
-                      <span className="ml-2">{article.likes}</span>
+                      <span className="ml-2 text-white">{article.likes}</span>
                     </Button>
                   </div>
                 </div>
