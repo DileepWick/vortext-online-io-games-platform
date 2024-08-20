@@ -20,6 +20,7 @@ import ratingRouter from "./routes/rating_routes.js"
 import spookeyRouter from "./routes/spookey_guesses_routes.js";
 import RentalRouter from "./routes/rental_routes.js";
 
+
 //Create the app
 const app = express();
 

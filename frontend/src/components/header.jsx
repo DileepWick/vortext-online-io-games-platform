@@ -91,7 +91,18 @@ export default function Header() {
                 location.pathname === "/articles" ? "underline" : ""
               } text-white hover:underline`}
             >
-              Articles
+              article
+            </Link>
+          </NavbarItem>
+          <NavbarItem>
+            <Link
+              color={location.pathname === "/community" ? "primary" : "white"}
+              href="/community"
+              className={`${
+                location.pathname === "/community" ? "underline" : ""
+              } text-white hover:underline`}
+            >
+              Community
             </Link>
           </NavbarItem>
 
@@ -187,7 +198,7 @@ export default function Header() {
                 </DropdownItem>
 
                 {/* Admin Filter */}
-                {user.role === "admin" && (
+                {user.role === "Admin" && (
                   <DropdownItem
                     key="admin-panel"
                     onClick={() => navigate("/productDashboard")}
@@ -197,7 +208,7 @@ export default function Header() {
                 )}
 
                 {/* Admin user Filter */}
-                {user.role === "Admin" && (
+                {user.role === "User Manager" && (
                   <DropdownItem
                     key="Admin-panel"
                     onClick={() => navigate("/UserManagementDashboard")}
@@ -236,15 +247,17 @@ export default function Header() {
                   </DropdownItem>
                 )}
 
-                {/* Courier Filter */}
-                {user.role === "Courier" && (
+                {/* community Manager Filter */}
+                {user.role === "Community Manager" && (
                   <DropdownItem
-                    key="courier-panel"
-                    onClick={() => navigate("/courierDashboard")}
+                    key="community-panel"
+                    onClick={() => navigate("/CommunityDashBoard")}
                   >
-                    Courier Dashboard
+                    Community Dashboard
                   </DropdownItem>
                 )}
+
+
 
                 {/*Review manager*/}
                 {user.role === "Review_Manager" && (
@@ -277,12 +290,12 @@ export default function Header() {
                 )}
 
                   {/* Payment Manager Filter */}
-                  {user.role === "Customer" && (
+                  {user.role === "Payment Manager" && (
                   <DropdownItem
                     key="manage-payment"
                     onClick={() => navigate("/Payment_manager_dashboard")}
                   >
-                    Manage payment
+                    Payment Management Dashboard
                   </DropdownItem>
                 )}
 
