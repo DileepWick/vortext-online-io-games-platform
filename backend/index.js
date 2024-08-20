@@ -20,12 +20,8 @@ import articleRouter from "./routes/article_routes.js";
 import postRouter from "./routes/communityPost_routes.js";
 import ratingRouter from "./routes/rating_routes.js"
 import spookeyRouter from "./routes/spookey_guesses_routes.js";
-<<<<<<< Updated upstream
 import RentalRouter from "./routes/rental_routes.js";
-
-=======
 import chatRouter from "./routes/chat_bot_route.js";
->>>>>>> Stashed changes
 
 //Create the app
 const app = express();
@@ -74,9 +70,5 @@ app.use("/articles",articleRouter);//Articles
 app.use("/feed",postRouter); //Post
 app.use("/ratings",ratingRouter)
 app.use("/spookeyEditons",spookeyRouter) //Spookey_Game
-<<<<<<< Updated upstream
 app.use("/Rentals",RentalRouter); //Rentals
-
-=======
 app.use('/api', chatRouter);// Use chatbot routes
->>>>>>> Stashed changes
