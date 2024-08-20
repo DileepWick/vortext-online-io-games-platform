@@ -19,6 +19,7 @@ import postRouter from "./routes/communityPost_routes.js";
 import ratingRouter from "./routes/rating_routes.js"
 import spookeyRouter from "./routes/spookey_guesses_routes.js";
 
+
 //Create the app
 const app = express();
 
@@ -62,4 +63,3 @@ app.use("/articles",articleRouter);//Articles
 app.use("/feed",postRouter); //Post
 app.use("/ratings",ratingRouter)
 app.use("/spookeyEditons",spookeyRouter) //Spookey_Game
-
