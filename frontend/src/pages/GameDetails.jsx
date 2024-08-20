@@ -370,15 +370,14 @@ const GameDetails = () => {
         </div>
 
         <div className="mt-8">
-            <h2 className="text-3xl text-white mb-4">Ratings and Reviews</h2>
-            <RatingSystem 
-              gameId={id} 
-              ratings={ratings} 
-              averageRating={averageRating} 
-              onSubmitRating={handleRatingSubmit}
-            />
-          </div>
-
+  <h2 className="text-3xl text-white mb-4">Ratings and Reviews</h2>
+  <RatingSystem 
+    gameId={id} 
+    ratings={ratings} 
+    averageRating={averageRating} 
+    onSubmitRating={handleRatingSubmit}
+  />
+</div>
         {relatedGameStocks.length > 0 && (
           <div className="mt-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">
