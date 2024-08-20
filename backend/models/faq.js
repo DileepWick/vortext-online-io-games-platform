@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const { Schema } = mongoose; // Destructure Schema from mongoose
 
-const faqSchema = Schema({
+const FAQSchema = Schema({
   question: {
     type: String,
     required: true,
@@ -13,4 +13,4 @@ const faqSchema = Schema({
   },
 });
 
-export const FAQ = mongoose.model("FAQ", faqSchema);
+export const FAQ = mongoose.model("FAQ", FAQSchema);
