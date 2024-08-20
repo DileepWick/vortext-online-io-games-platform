@@ -10,12 +10,7 @@ export const createRental = async (req, res) => {
     const newRental = new Rental({ user, game, time, price });
     await newRental.save();
 
-    // Update user's rental count or any other relevant data
-    const userDoc = await User.findById(user);
-    if (userDoc) {
-      // Assuming you have a method to update user's rental count
-      await userDoc.updateRentalCount();
-    }
+
 
     console.log("Rental saved successfully");
     res.status(201).json(newRental);
@@ -38,20 +33,27 @@ export const getRentals = async (req, res) => {
   }
 };
 
+
+
 export const getRentalById = async (req, res) => {
   try {
     const { id } = req.params;
     const rental = await Rental.findById(id)
-      .populate('user', 'username')
-      .populate('game', 'title');
+      .populate('user', 'username email') // Populate only username and email from user
+      .populate({
+        path: 'game',
+        select: 'PlayLink', // Select specific fields from game
+      });
+
     if (!rental) {
       return res.status(404).json({ message: "Rental not found" });
     }
+
     console.log(`Fetched rental with id ${id}`);
     res.json(rental);
   } catch (error) {
     console.error("Error in getRentalById:", error);
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -101,7 +103,7 @@ export const deleteRental = async (req, res) => {
 export const getRentalsByUser = async (req, res) => {
   try {
     const { userId } = req.params;
-    const rentals = await Rental.find({ user: userId }).populate('game', 'title');
+    const rentals = await Rental.find({ user: userId }).populate('game');
     console.log(`Fetched ${rentals.length} rentals for user ${userId}`);
     res.json(rentals);
   } catch (error) {

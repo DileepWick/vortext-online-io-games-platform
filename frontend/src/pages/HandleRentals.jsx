@@ -75,23 +75,47 @@ const HandleRentals = () => {
     try {
       const token = getToken();
       const userId = getUserIdFromToken(token);
-      // Implement your payment logic here
-      toast.success("Rental successful!", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-        transition: Flip,
-        style: { fontFamily: "Rubik" },
+      
+      if (!userId) {
+        throw new Error("User ID not found. Please log in again.");
+      }
+
+      const rentalData = {
+        user: userId,
+        game: gameStock.AssignedGame._id,
+        time: selectedRental.time,
+        price: selectedRental.price
+      };
+
+      console.log("Rental data being sent:", rentalData);
+
+      const response = await axios.post('http://localhost:8098/Rentals/createRental', rentalData, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
-      onClose();
-      navigate('/GamingSessions'); // Assuming you have a library page
+
+      if (response.status === 201) {
+        toast.success("Rental successful!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Flip,
+          style: { fontFamily: "Rubik" },
+        });
+        onClose();
+        navigate('/GamingSessions');
+      } else {
+        throw new Error("Failed to create rental");
+      }
     } catch (error) {
-      toast.error("Rental failed. Please try again.", {
+      console.error("Error creating rental:", error);
+      toast.error(error.message || "Rental failed. Please try again.", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,

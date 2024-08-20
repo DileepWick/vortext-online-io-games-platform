@@ -11,9 +11,9 @@ RentalRouter.post("/createRental",createRental);
 RentalRouter.get("/getAllRentals",getRentals)
 
 //fetch rentals by id
-RentalRouter.get("/getRentalsByUser",getRentalsByUser)
+RentalRouter.get("/getRentalsByUser/:userId",getRentalsByUser)
 
 //Delete Rental
-RentalRouter.delete("deleteRentalByID",deleteRental)
+RentalRouter.delete("/deleteRentalByID/:id",deleteRental)
 
 export default RentalRouter;
