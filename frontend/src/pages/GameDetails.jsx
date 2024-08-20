@@ -12,6 +12,8 @@ import VideoPlayer from "../components/videoPlayer";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
+import RatingSystem from "../components/RatingSystem"; // New import
+
 
 // NextUI
 import { Button, Chip } from "@nextui-org/react";
@@ -33,6 +35,9 @@ const GameDetails = () => {
   const [quantityByStockId, setQuantityByStockId] = useState({}); // State to handle quantity by stock id
 
   const [checkItem, setCheckItem] = useState("not in the library");
+  
+  const [ratings, setRatings] = useState([]);
+  const [averageRating, setAverageRating] = useState(0);
 
 
 
@@ -62,6 +67,25 @@ const GameDetails = () => {
         setLoading(false);
       }
     };
+
+
+
+    // Add this new fetch for ratings
+    const fetchRatings = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8098/ratings/game/${id}`);
+        setRatings(response.data);
+        // Calculate average rating
+        const avg = response.data.reduce((sum, rating) => sum + rating.rating, 0) / response.data.length;
+        setAverageRating(avg);
+      } catch (error) {
+        console.error("Error fetching ratings:", error);
+      }
+    };
+
+    fetchRatings();
+   
+  
 
     const fetchCartId = async () => {
       try {
@@ -160,6 +184,44 @@ const GameDetails = () => {
       }
     }
   };
+
+
+
+ // New function to handle rating submission
+ const handleRatingSubmit = async (rating, comment) => {
+  try {
+    const token = getToken();
+    const userId = getUserIdFromToken(token);
+    console.log("Submitting rating:", { userId, gameId: id, rating, comment });
+    
+    const response = await axios.post(`http://localhost:8098/ratings`, {
+      user: userId,
+      game: id,
+      rating,
+      comment
+    });
+    
+    console.log("Rating submission response:", response);
+    
+    if (response.status === 201) {
+      toast.success("Rating submitted successfully", {
+        // ... (keep existing toast options)
+      });
+      // Refresh ratings
+      const updatedRatings = await axios.get(`http://localhost:8098/ratings/game/${id}`);
+      console.log("Updated ratings:", updatedRatings.data);
+      setRatings(updatedRatings.data);
+      const avg = updatedRatings.data.reduce((sum, r) => sum + r.rating, 0) / updatedRatings.data.length;
+      setAverageRating(avg);
+    }
+  } catch (error) {
+    console.error("Error submitting rating:", error.response || error);
+    toast.error(`Error submitting rating: ${error.response?.data?.message || error.message}`, {
+      // ... (keep existing toast options)
+    });
+  }
+};
+
 
   // Handle Rent
   const navigate = useNavigate();
@@ -306,6 +368,16 @@ const GameDetails = () => {
             </div>
           </div>
         </div>
+
+        <div className="mt-8">
+            <h2 className="text-3xl text-white mb-4">Ratings and Reviews</h2>
+            <RatingSystem 
+              gameId={id} 
+              ratings={ratings} 
+              averageRating={averageRating} 
+              onSubmitRating={handleRatingSubmit}
+            />
+          </div>
 
         {relatedGameStocks.length > 0 && (
           <div className="mt-8">

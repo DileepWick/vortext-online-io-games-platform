@@ -276,6 +276,17 @@ export default function Header() {
                   </DropdownItem>
                 )}
 
+                  {/* Payment Manager Filter */}
+                  {user.role === "Customer" && (
+                  <DropdownItem
+                    key="manage-payment"
+                    onClick={() => navigate("/Payment_manager_dashboard")}
+                  >
+                    Manage payment
+                  </DropdownItem>
+                )}
+
+
                 <DropdownItem
                   key="logout"
                   color="danger"

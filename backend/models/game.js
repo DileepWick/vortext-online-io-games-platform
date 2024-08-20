@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 
-const { Schema } = mongoose; // Destructure Schema from mongoose
+const { Schema } = mongoose;
 
-const gameSchema = Schema({
+const gameSchema = new Schema({
   title: {
     type: String,
     required: true,
@@ -39,7 +39,38 @@ const gameSchema = Schema({
   AgeGroup: {
     type: String,
     required: true,
+  },
+  averageRating: { 
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 5
+  },
+  totalRatings: { 
+    type: Number,
+    default: 0
   }
 });
+
+// Add a method to update the average rating
+gameSchema.methods.updateAverageRating = async function() {
+  const Rating = mongoose.model('Rating');
+  const result = await Rating.aggregate([
+    { $match: { game: this._id } },
+    { 
+      $group: {
+        _id: null,
+        averageRating: { $avg: "$rating" },
+        totalRatings: { $sum: 1 }
+      }
+    }
+  ]);
+
+  if (result.length > 0) {
+    this.averageRating = result[0].averageRating;
+    this.totalRatings = result[0].totalRatings;
+    await this.save();
+  }
+};
 
 export const Game = mongoose.model("Game", gameSchema);
