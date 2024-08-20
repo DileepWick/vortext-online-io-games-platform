@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
-// Next UI Components
 import { Tabs, Tab } from "@nextui-org/react";
 import Header from "../src/components/header";
-import UserManagementTable from "./usermanage_component/UserManagementTable"; // Import the table component
+import UserManagementTable from "./usermanage_component/UserManagementTable";
 
 const UserManagementDashboard = () => {
   const [activeTab, setActiveTab] = useState("tab1");
   const [users, setUsers] = useState([]);
   const [moderators, setModerators] = useState([]);
 
-  // Fetch users from the backend
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -58,13 +55,21 @@ const UserManagementDashboard = () => {
         {activeTab === "tab1" && (
           <div>
             <h2>Users</h2>
-            <UserManagementTable users={users} setUsers={setUsers} />
+            <UserManagementTable
+              users={users}
+              setUsers={setUsers}
+              userType="user"
+            />
           </div>
         )}
         {activeTab === "tab2" && (
           <div>
             <h2>Moderators</h2>
-            <UserManagementTable users={moderators} setUsers={setModerators} />
+            <UserManagementTable
+              users={moderators}
+              setUsers={setModerators}
+              userType="moderator"
+            />
           </div>
         )}
         {activeTab === "tab3" && <div>Content for Tab 3</div>}
