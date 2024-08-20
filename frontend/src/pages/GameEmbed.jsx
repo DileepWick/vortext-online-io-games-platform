@@ -33,13 +33,11 @@ const exitFullScreen = () => {
 const GameEmbed = () => {
   const { src, title } = useParams();
   const navigate = useNavigate();
-
   const decodedSrc = decodeURIComponent(src);
   const decodedTitle = decodeURIComponent(title);
-
   const iframeRef = useRef(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(20); // 4 hours in seconds
+  const [timeLeft, setTimeLeft] = useState(200); // 4 hours in seconds
 
   useEffect(() => {
     // Countdown timer

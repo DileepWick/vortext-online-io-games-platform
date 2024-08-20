@@ -1,4 +1,4 @@
-import express, { response } from "express";
+import express from "express";
 import { User } from "../models/user.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -11,13 +11,13 @@ import upload from "../middleware/multer.js";
 // Router
 const userRouter = express.Router();
 
-//User Registration
+// User Registration
 userRouter.post("/register", async (request, response) => {
   try {
-    const { username, password, role, email, workingRegion } = request.body;
+    const { username, password, email, birthday, role } = request.body;
 
     // Validate input
-    if (!username || !password || !role || !email) {
+    if (!username || !password || !email || !birthday) {
       return response.status(400).json({ message: "All fields are required" });
     }
 
@@ -36,22 +36,32 @@ userRouter.post("/register", async (request, response) => {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Calculate age from birthday
+    const age = calculateAge(birthday);
+
+    // Categorize player type based on age
+    let playerType;
+    if (age < 13) {
+      playerType = "Kid";
+    } else if (age >= 13 && age < 18) {
+      playerType = "Teenager";
+    } else {
+      playerType = "Adult";
+    }
+
+    // Assign the role (either provided or default to 'user')
+    const assignedRole = role || "user";
+
     // Prepare new user object
     const newUser = {
       username,
       password: hashedPassword,
-      role,
+      role: assignedRole,
       email,
+      birthday,
+      age, // Store the calculated age
+      playerType, // Store the categorized player type
     };
-
-    // Add courier-specific fields if the role is 'courier'
-    if (role === 'Courier') {
-      if (!workingRegion) {
-        return response.status(400).json({ message: "Working region is required for couriers" });
-      }
-      newUser.workingRegion = workingRegion;
-      newUser.status = 'Free'; // Set default status for couriers
-    }
 
     // Create a new user
     const createdUser = await User.create(newUser);
@@ -70,6 +80,20 @@ userRouter.post("/register", async (request, response) => {
     return response.status(500).json({ message: "Server error" });
   }
 });
+
+// Helper function to calculate age from birthday
+function calculateAge(birthday) {
+  const birthDate = new Date(birthday);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDifference = today.getMonth() - birthDate.getMonth();
+  
+  if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+
+  return age;
+}
 
 // Login route
 userRouter.post("/login", async (req, res) => {
@@ -112,7 +136,7 @@ userRouter.post("/login", async (req, res) => {
   }
 });
 
-//Get all users
+// Get all users
 userRouter.get("/allusers", async (request, response) => {
   try {
     const allUsers = await User.find({});
@@ -125,7 +149,7 @@ userRouter.get("/allusers", async (request, response) => {
   }
 });
 
-//Get user profile
+// Get user profile
 userRouter.get("/profile/:id", async (request, response) => {
   try {
     const { id } = request.params;
@@ -144,7 +168,7 @@ userRouter.get("/profile/:id", async (request, response) => {
   }
 });
 
-//Update Profile
+// Update Profile
 userRouter.put(
   "/profile/update/:id",
   upload.fields([{ name: "image", maxCount: 1 }]),
@@ -229,34 +253,7 @@ userRouter.put(
   }
 );
 
-// Get all couriers filtered by working region
-userRouter.get("/couriers/:workingRegion", async (request, response) => {
-  try {
-    const { workingRegion } = request.params; // Get workingRegion from query params
-
-    if (!workingRegion) {
-      return response.status(400).json({ message: "Working region is required" });
-    }
-
-    // Find couriers by role and working region
-    const couriers = await User.find({ 
-      role: "Courier", 
-      workingRegion: workingRegion,
-      status: "Free" 
-    });
-
-    return response.status(200).json({
-      total_couriers: couriers.length,
-      couriers: couriers,
-    });
-  } catch (error) {
-    console.log("Error fetching couriers:", error.message);
-    return response.status(500).json({ message: "Server error" });
-  }
-});
-
-
-//Change Status
+// Change Status
 userRouter.put("/changeStatus/:id", async (request, response) => {
   const { id } = request.params;
   const { newStatus } = request.body;
@@ -278,5 +275,21 @@ userRouter.put("/changeStatus/:id", async (request, response) => {
   }
 });
 
+// Delete User
+userRouter.delete("/delete/:id", async (request, response) => {
+  try {
+    const { id } = request.params;
+    const deletedUser = await User.findByIdAndDelete(id);
+
+    if (!deletedUser) {
+      return response.status(404).json({ message: "User not found" });
+    }
+
+    response.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    response.status(500).json({ message: "Internal server error" });
+  }
+});
 
 export default userRouter;
