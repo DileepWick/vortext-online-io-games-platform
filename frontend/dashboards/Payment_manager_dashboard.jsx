@@ -5,6 +5,9 @@ import useAuthCheck from "../src/utils/authCheck";
 import { Tabs, Tab } from "@nextui-org/react";
 import AllPayments from "./Payment_Management/all_payments";
 import Chart from "./Payment_Management/chart";
+import GamesSortChart from"./Payment_Management/Games_Sort";
+
+
 
 const API_BASE_URL = "http://localhost:8098";
 
@@ -50,7 +53,7 @@ const Payment_Manager = () => {
           >
             <Tab key="tab1" title="All Order Items" />
             <Tab key="tab2" title="Price Comparison Chart" />
-            <Tab key="tab3" title="Tab 3" />
+            <Tab key="tab3" title="Most Sold Games" />
             <Tab key="tab4" title="Tab 4" />
           </Tabs>
         </div>
@@ -67,7 +70,18 @@ const Payment_Manager = () => {
               )}
             </div>
           )}
-          {activeTab !== "tab1" && activeTab !== "tab2" && (
+           {activeTab === "tab3" && (
+            <div className="w-full h-[500px]">
+              {isLoading ? (
+                <div>Loading chart data...</div>
+              ) : error ? (
+                <div>{error}</div>
+              ) : (
+                <GamesSortChart data={tableData} />
+              )}
+            </div>
+          )}
+         {activeTab !== "tab1" && activeTab !== "tab2" && activeTab !== "tab3" && (
             <div>{`Content for ${activeTab}`}</div>
           )}
         </div>
