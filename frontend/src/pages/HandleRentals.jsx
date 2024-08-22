@@ -19,13 +19,7 @@ const HandleRentals = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
-
-  const rentalOptions = [
-    { time: "15", price: 50 },
-    { time: "30", price: 80 },
-    { time: "60", price: 150 },
-    { time: "120", price: 250 }
-  ];
+  const [rentalOptions, setRentalOptions] = useState([]);
 
   const termsAndConditions = [
     "Rental period starts immediately after payment.",
@@ -37,11 +31,26 @@ const HandleRentals = () => {
     "Rented games cannot be transferred to other accounts.",
   ];
 
+  const fetchRentalTimes = async (gameId) => {
+    try {
+      const response = await axios.get(`http://localhost:8098/rentalDurations/game/${gameId}`);
+      setRentalOptions(response.data.map(option => ({
+        time: option.duration.toString(),
+        price: option.price
+      })));
+    } catch (err) {
+      console.error("Error fetching rental times:", err);
+      toast.error("Failed to fetch rental options. Please try again.");
+      setRentalOptions([]); // Ensure rental options are empty on error
+    }
+  };
+
   useEffect(() => {
     const fetchGameDetails = async () => {
       try {
         const response = await axios.get(`http://localhost:8098/gameStocks/GetStockById/${id}`);
         setGameStock(response.data);
+        await fetchRentalTimes(response.data.AssignedGame._id);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -89,7 +98,7 @@ const HandleRentals = () => {
       const rentalData = {
         user: userId,
         game: gameStock.AssignedGame._id,
-        time: selectedRental.time, // Already in minutes
+        time: selectedRental.time,
         price: selectedRental.price
       };
 
@@ -209,39 +218,52 @@ const HandleRentals = () => {
           </div>
           <div>
             <h3 className="text-2xl font-semibold mb-4">Select Rental Duration</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              {rentalOptions.map((option) => (
-                <Card 
-                  key={option.time}
-                  isPressable
-                  isHoverable
-                  onPress={() => handleRentalSelection(option)}
-                  className={`
-                    transition-all duration-300 ease-in-out
-                    ${selectedRental?.time === option.time 
-                      ? 'border-primary border-2 shadow-lg scale-105 bg-primary bg-opacity-20' 
-                      : 'border-gray-600 hover:border-gray-400'}
-                  `}
+            {rentalOptions.length > 0 ? (
+              <>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  {rentalOptions.map((option) => (
+                    <Card 
+                      key={option.time}
+                      isPressable
+                      isHoverable
+                      onPress={() => handleRentalSelection(option)}
+                      className={`
+                        transition-all duration-300 ease-in-out
+                        ${selectedRental?.time === option.time 
+                          ? 'border-primary border-2 shadow-lg scale-105 bg-primary bg-opacity-20' 
+                          : 'border-gray-600 hover:border-gray-400'}
+                      `}
+                    >
+                      <CardBody className="text-center">
+                        <p className={`text-lg font-bold ${selectedRental?.time === option.time ? 'text-primary' : ''}`}>
+                          {parseInt(option.time) >= 60 ? `${parseInt(option.time) / 60} hour${parseInt(option.time) > 60 ? 's' : ''}` : `${option.time} min`}
+                        </p>
+                        <p className={`text-sm ${selectedRental?.time === option.time ? 'text-primary' : ''}`}>
+                          LKR {option.price}
+                        </p>
+                      </CardBody>
+                    </Card>
+                  ))}
+                </div>
+                <Button
+                  color="success"
+                  onPress={handleRentClick}
+                  className="w-full"
+                  disabled={!selectedRental}
                 >
-                  <CardBody className="text-center">
-                    <p className={`text-lg font-bold ${selectedRental?.time === option.time ? 'text-primary' : ''}`}>
-                      {parseInt(option.time) >= 60 ? `${parseInt(option.time) / 60} hour${parseInt(option.time) > 60 ? 's' : ''}` : `${option.time} min`}
-                    </p>
-                    <p className={`text-sm ${selectedRental?.time === option.time ? 'text-primary' : ''}`}>
-                      LKR {option.price}
-                    </p>
-                  </CardBody>
-                </Card>
-              ))}
-            </div>
-            <Button
-              color="success"
-              onPress={handleRentClick}
-              className="w-full"
-              disabled={!selectedRental}
-            >
-              Rent Now for LKR {selectedRental?.price || ''}
-            </Button>
+                  Rent Now for LKR {selectedRental?.price || ''}
+                </Button>
+              </>
+            ) : (
+              <div className="text-center py-4 bg-gray-800 rounded-lg">
+                <p className="text-xl text-yellow-400">
+                  This game is not available for rent at the moment.
+                </p>
+                <p className="text-sm text-gray-400 mt-2">
+                  Please check back later or contact support for more information.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

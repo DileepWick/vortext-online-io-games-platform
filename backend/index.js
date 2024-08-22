@@ -24,6 +24,8 @@ import faqRouter from "./routes/faq_routes.js";
 import RentalRouter from "./routes/rental_routes.js";
 import chatRouter from "./routes/chat_bot_route.js";
 
+import { RentalDurationRouter } from "./routes/rentalDurationRoutes.js";
+
 //Create the app
 const app = express();
 
@@ -82,3 +84,5 @@ app.use("/ratings",ratingRouter)
 app.use("/spookeyEditons",spookeyRouter) //Spookey_Game
 app.use("/Rentals",RentalRouter); //Rentals
 app.use('/api', chatRouter);// Use chatbot routes
+
+app.use("/rentalDurations", RentalDurationRouter);
