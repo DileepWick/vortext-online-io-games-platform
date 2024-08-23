@@ -3,6 +3,7 @@ import { PORT } from "./config.js";
 import { mongoDBURL } from "./config.js";
 import mongoose from "mongoose";
 import cors from "cors";
+import GPTRouter from "./routes/gpt_route.js";
 
 
 
@@ -84,5 +85,9 @@ app.use("/ratings",ratingRouter)
 app.use("/spookeyEditons",spookeyRouter) //Spookey_Game
 app.use("/Rentals",RentalRouter); //Rentals
 app.use('/api', chatRouter);// Use chatbot routes
+<<<<<<< Updated upstream
 
 app.use("/rentalDurations", RentalDurationRouter);
+=======
+app.use('/api', GPTRouter);
+>>>>>>> Stashed changes
