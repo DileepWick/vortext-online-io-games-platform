@@ -27,6 +27,7 @@ const GameDetails = () => {
   useAuthCheck();
 
   const { id } = useParams();
+  
   const [gameStock, setGameStock] = useState(null);
   const [relatedGameStocks, setRelatedGameStocks] = useState([]);
   const [loading, setLoading] = useState(true);
