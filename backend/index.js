@@ -85,9 +85,5 @@ app.use("/ratings",ratingRouter)
 app.use("/spookeyEditons",spookeyRouter) //Spookey_Game
 app.use("/Rentals",RentalRouter); //Rentals
 app.use('/api', chatRouter);// Use chatbot routes
-<<<<<<< Updated upstream
-
 app.use("/rentalDurations", RentalDurationRouter);
-=======
 app.use('/api', GPTRouter);
->>>>>>> Stashed changes

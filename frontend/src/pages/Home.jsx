@@ -4,7 +4,6 @@ import Footer from "../components/footer";
 import { toast, Flip } from "react-toastify";
 import Hangman from "../components/Games/Hangaman";
 import Chatbot from "../components/chatbox";
-import ChatComponent from "./GeminiBot";
 
 const Home = () => {
   const notify = () => {
@@ -30,7 +29,6 @@ const Home = () => {
   return (
     <div className="font-primaryRegular bg-white">
       <Header />
-      <ChatComponent/>
       <Hangman />
       <Footer />
     </div>
