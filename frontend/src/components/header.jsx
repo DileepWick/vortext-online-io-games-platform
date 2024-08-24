@@ -268,7 +268,7 @@ export default function Header() {
                 )}
 
                 {/* Customer Support Filter */}
-                {user.role === "customeragent" && (
+                {user.role === "Support Agent" && (
                   <DropdownItem
                     key="support-panel"
                     onClick={() => navigate("/ContactDash")}
