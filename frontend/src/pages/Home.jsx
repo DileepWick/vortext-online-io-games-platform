@@ -29,7 +29,6 @@ const Home = () => {
   return (
     <div className="font-primaryRegular bg-white">
       <Header />
-      <Hangman />
       <Footer />
     </div>
   );

@@ -184,7 +184,7 @@ const Blogger = () => {
   };
 
   return (
-    <div className="flex w-full flex-col">
+    <div className="flex w-full flex-col bg-white">
       <div className="relative">
         <Header />
       </div>

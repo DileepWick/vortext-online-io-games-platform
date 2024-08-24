@@ -108,13 +108,13 @@ export default function Header() {
 
           <NavbarItem>
             <Link
-              color={location.pathname === "/reviews" ? "primary" : "white"}
-              href="#"
+              color={location.pathname === "/TailoredGames" ? "primary" : "white"}
+              href="/TailoredGames"
               className={`${
-                location.pathname === "/reviews" ? "underline" : ""
+                location.pathname === "/TailoredGames" ? "underline" : ""
               } text-white hover:underline`}
             >
-              Reviews
+              Tailored Games
             </Link>
           </NavbarItem>
           <NavbarItem>
