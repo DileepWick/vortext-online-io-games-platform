@@ -214,57 +214,82 @@ const CartPage = () => {
         <div className="bg-customDark rounded-lg shadow-lg p-8 flex flex-row">
           <ScrollShadow hideScrollBar className="w-full h-[500px]">
             <div className="flex flex-col">
-              {cartItems.map((item) => (
-                <div
-                  key={item._id}
-                  className="flex justify-between items-center mb-4"
-                >
-                  <div className="flex flex-row p-4">
-                    <Image
-                      isBlurred
-                      isZoomed
-                      className="w-[180px] h-[220px]"
-                      radius="none"
-                      alt="Game Cover"
-                      src={item.stockid.AssignedGame.coverPhoto}
-                    />
-                    <div className="flex flex-col m-4 p-4">
-                      <h2 className="text-xl text-white">
-                        {item.stockid.AssignedGame.title}
-                      </h2>
-                      <p className="text-white mt-2">
-                        <span className="line-through text-editionColor">
-                          LKR.
-                          {(
-                            item.stockid.UnitPrice * item.quantity
-                          ).toFixed(2)}
-                        </span>{" "}
-                        <span className="text-white">
-                          LKR.
-                          {calculateDiscountedPrice(item).toFixed(2)}
-                        </span>
-                      </p>
-                      {item.stockid.discount > 0 && (
-                        <Chip
-                          color="primary"
-                          radius="none"
-                          className="text-white mt-2"
-                        >
-                          {item.stockid.discount}% OFF
-                        </Chip>
-                      )}
-                    </div>
-                  </div>
-                  <Button
-                    onClick={() => handleRemoveItem(item.stockid._id)}
-                    color="danger"
-                    variant="flat"
-                    size="sm"
+              {cartItems.map((item) => {
+                // Check if the game information exists
+                const game = item.stockid.AssignedGame;
+                const gameExists = game && game._id; // Adjust this if your ID field name is different
+
+                return (
+                  <div
+                    key={item._id}
+                    className="flex justify-between items-center mb-4"
                   >
-                    <DeleteIcon />
-                  </Button>
-                </div>
-              ))}
+                    {gameExists ? (
+                      <>
+                        <div className="flex flex-row p-4">
+                          <Image
+                            isBlurred
+                            isZoomed
+                            className="w-[180px] h-[220px]"
+                            radius="none"
+                            alt={game.title || "Game Cover"}
+                            src={game.coverPhoto || "default-image-url"} // Replace with a default image URL if needed
+                          />
+                          <div className="flex flex-col m-4 p-4">
+                            <h2 className="text-xl text-white">
+                              {game.title || "N/A"}
+                            </h2>
+                            <p className="text-white mt-2">
+                              <span className="line-through text-editionColor">
+                                LKR.
+                                {(
+                                  item.stockid.UnitPrice * item.quantity
+                                ).toFixed(2)}
+                              </span>{" "}
+                              <span className="text-white">
+                                LKR.
+                                {calculateDiscountedPrice(item).toFixed(2)}
+                              </span>
+                            </p>
+                            {item.stockid.discount > 0 && (
+                              <Chip
+                                color="primary"
+                                radius="none"
+                                className="text-white mt-2"
+                              >
+                                {item.stockid.discount}% OFF
+                              </Chip>
+                            )}
+                          </div>
+                        </div>
+                        <Button
+                          onClick={() => handleRemoveItem(item.stockid._id)}
+                          color="danger"
+                          variant="flat"
+                          size="sm"
+                        >
+                          <DeleteIcon />
+                        </Button>
+                      </>
+                    ) : (
+                      <div className="flex justify-between items-center p-4">
+                        <p className="text-white">
+                          This game has been removed by an admin or the
+                          developer.
+                        </p>
+                        <Button
+                          onClick={() => handleRemoveItem(item._id)}
+                          color="danger"
+                          variant="flat"
+                          size="sm"
+                        >
+                          <DeleteIcon />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </ScrollShadow>
           <div className="mt-8 p-4 m-8 w-[30%] rounded-md bg-customCardDark h-[500px]">

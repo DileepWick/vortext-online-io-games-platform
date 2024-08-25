@@ -87,9 +87,22 @@ export const update_stock = ({ updatingStock, callBackFunction }) => {
 
   return (
     <div>
-      <Button color="warning" variant="bordered" onClick={handlePricingButton} size="sm">
-        Pricing $
-      </Button>
+      <Tooltip
+        content="Set Pricings"
+        showArrow
+        color="warning"
+        className="font-primaryRegular"
+        placement="top-end"
+      >
+        <Button
+          color="warning"
+          variant="bordered"
+          onClick={handlePricingButton}
+          size="sm"
+        >
+          Pricing $
+        </Button>
+      </Tooltip>
       {/* Modal */}
       <Modal
         isOpen={isPricingModalOpen}
@@ -104,10 +117,20 @@ export const update_stock = ({ updatingStock, callBackFunction }) => {
           <ModalBody>
             <form onSubmit={updateStock}>
               <p>Current Price {updatingStock.UnitPrice}$</p>
-              <Input label="New Price" type="Number" value={newPrice} onChange={(e) => setNewPrice(e.target.value)}></Input>
+              <Input
+                label="New Price"
+                type="Number"
+                value={newPrice}
+                onChange={(e) => setNewPrice(e.target.value)}
+              ></Input>
               <br></br>
               <p>Current Discount {updatingStock.discount}%</p>
-              <Input label="New Discount" type="Number" value={newDiscount} onChange={(e) => setNewDiscount(e.target.value)}></Input>
+              <Input
+                label="New Discount"
+                type="Number"
+                value={newDiscount}
+                onChange={(e) => setNewDiscount(e.target.value)}
+              ></Input>
               <br></br>
               <Button type="submit" color="primary">
                 Save Changes

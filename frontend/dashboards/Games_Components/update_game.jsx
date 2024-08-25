@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Progress, Input, Button, Textarea } from "@nextui-org/react";
+import { Progress, Input, Button, Textarea, Chip } from "@nextui-org/react";
 import { CheckboxGroup, Checkbox } from "@nextui-org/checkbox";
+import { ScrollShadow } from "@nextui-org/react";
 
 const UpdateGame = ({ updatingGame, callBackFunction1, callBackFunction2 }) => {
   if (!updatingGame) {
@@ -33,8 +34,10 @@ const UpdateGame = ({ updatingGame, callBackFunction1, callBackFunction2 }) => {
     { _id: "Action", categoryName: "Action" },
     { _id: "Adventure", categoryName: "Adventure" },
     { _id: "Racing", categoryName: "Racing" },
+    { _id: "Puzzle", categoryName: "Puzzle" },
+    { _id: "Fighting", categoryName: "Fighting" },
+    { _id: "Strategy", categoryName: "Strategy" },
   ];
-
 
   const handleCategoryChange = (category) => {
     if (selectedCategories.includes(category)) {
@@ -79,9 +82,9 @@ const UpdateGame = ({ updatingGame, callBackFunction1, callBackFunction2 }) => {
 
   // Separate selected and other categories
   const selectedCategoriesDisplay = selectedCategories.map((cat) => (
-    <li defaultSelected key={cat}>
+    <Chip color ="danger"    defaultSelected key={cat}>
       {cat}
-    </li>
+    </Chip>
   ));
 
   const otherCategoriesCheckboxes = categoriesList.map((cat) => (
@@ -100,69 +103,110 @@ const UpdateGame = ({ updatingGame, callBackFunction1, callBackFunction2 }) => {
       {isLoading ? (
         <div className="loading">
           <Progress
-            label="Updating..."
-            size="sm"
+            label="Saving Changes"
+            size="lg"
             isIndeterminate
             aria-label="Loading..."
             className="max-w-md"
           />
         </div>
       ) : (
-        <form onSubmit={handleUpdate} className="p-4">
-          <div className="form-section">
-            <h3>Game Information</h3>
-            <Input
-              label="title"
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
+        <ScrollShadow className="w-[700px] h-[400px]" hideScrollBar>
+          <form
+            onSubmit={handleUpdate}
+            className="space-y-6 p-6 bg-gray-900 rounded-lg shadow-lg"
+          >
+            {/* Title Section */}
+            <div className="form-section">
+              <h3 className="text-2xl font-semibold text-black mb-4">
+                Change Title
+              </h3>
+              <Input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Enter game title"
+                className="w-full  text-white"
+              />
+            </div>
 
-            <label>
-              About Game:
+            {/* Description Section */}
+            <div className="form-section">
+              <label className="text-2xl font-semibold text-black mb-4">
+                Change Description
+              </label>
               <Textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
+                maxLength={390}
+                placeholder="Write a brief description of the game..."
+                className="w-full  rounded-lg text-white"
               />
-            </label>
+            </div>
 
-            <label>Change Cover photo</label>
-            <Input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setCoverPhoto(e.target.files[0])}
-            />
-            {coverPhoto && (
-              <img src={coverPhoto} alt="Game Cover" width="40" />
-            )}
-          </div>
+            {/* Cover Photo Section */}
+            <div className="form-section">
+              <label className="text-2xl font-semibold text-black mb-4">
+                Change Cover Photo
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setCoverPhoto(e.target.files[0])}
+                className="block w-full text-sm text-gray-400 file:py-2 file:px-4 file:border file:border-gray-700 file:rounded-lg file:bg-gray-800 file:text-white file:cursor-pointer"
+              />
+            </div>
 
-          <div className="form-section">
-            <label>
-              Trailer Video:
-              <Input
+            {/* Trailer Video Section */}
+            <div className="form-section">
+              <label className="text-2xl font-semibold text-black mb-4">
+                Change Trailer Video
+              </label>
+              <input
                 type="file"
                 accept="video/*"
                 onChange={(e) => setTrailerVideo(e.target.files[0])}
+                className="block w-full text-sm text-gray-400 file:py-2 file:px-4 file:border file:border-gray-700 file:rounded-lg file:bg-gray-800 file:text-white file:cursor-pointer"
               />
-            </label>
-            {trailerVideo && <video src={trailerVideo} controls width="100" />}
-
-            <div>
-              <h4>Current Categories</h4>
-              {selectedCategoriesDisplay}
             </div>
 
-            <div>
-              <h4>Select other categories:</h4>
-              {otherCategoriesCheckboxes}
+            {/* Current Categories Section */}
+            <div className="form-section mb-4">
+              <h4 className="text-2xl font-semibold text-black mb-4">
+                Current Categories
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {selectedCategoriesDisplay}
+                
+              </div>
             </div>
-          </div>
 
-          <Button type="submit" color="primary" size="lg">
-            Update
-          </Button>
-        </form>
+            {/* Select Other Categories Section */}
+            <div className="form-section  rounded-lg ">
+              <h4 className="text-2xl font-semibold text-black">
+                Select Other Categories
+              </h4>
+              <p className="text-gray-400 mb-4">
+                Tick the boxes to add or remove categories
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {otherCategoriesCheckboxes}
+              </div>
+            </div>
+
+            {/* Button Section */}
+            <div className="flex justify-start">
+              <Button
+                type="submit"
+                color="primary"
+                size="lg"
+                className="bg-blue-600 text-white hover:bg-blue-700 mt-8"
+              >
+                Save Changes
+              </Button>
+            </div>
+          </form>
+        </ScrollShadow>
       )}
     </div>
   );

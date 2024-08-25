@@ -6,6 +6,8 @@ import Header from "../src/components/header";
 import UploadGame from "./Games_Components/add_new_game";
 import UpdateGame from "./Games_Components/update_game";
 import AddNewStock from "./Games_Components/add_new_stock";
+import Footer from "../src/components/footer";
+import VideoPlayer from "../src/components/videoPlayer";
 
 //Stock Components
 import StockTable from "./Stock_Components/stock_table";
@@ -184,17 +186,18 @@ const Blogger = () => {
   };
 
   return (
-    <div className="flex w-full flex-col bg-white">
+    <div className="flex w-full flex-col dark text-foreground bg-background">
       <div className="relative">
         <Header />
       </div>
-      <div className="flex items-center p-4 font-primaryRegular">
+      <div className="flex items-center p-4 font-primaryRegular bg-inputColor">
         <Tabs
           aria-label="Blogger Tabs"
           className="flex-1"
           onSelectionChange={setActiveTab}
           selectedKey={activeTab}
           size="lg"
+          variant="bordered"
           color="primary"
         >
           <Tab key="analytics" title="Analytics" />
@@ -211,10 +214,10 @@ const Blogger = () => {
         {/*PRODUCTS*/}
         {activeTab === "products" && (
           <>
-            <div className="flex justify-between mb-4">
+            <div className="flex justify-between mb-4 bg-inputColor">
               <Input
-                className="ml-2 font-primaryRegular w-48 sm:w-64"
-                placeholder="Search by title . . ."
+                className="ml-2 font-primaryRegular w-[300px] bg-inputColor"
+                placeholder="SEARCH BY GAME"
                 startContent={<SearchIcon />}
                 value={searchQuery}
                 onChange={handleSearchChange}
@@ -234,8 +237,8 @@ const Blogger = () => {
             {/*Product Table*/}
             <Table
               isHeaderSticky
-              aria-label="Example table with client side pagination"
-              className="font-primaryRegular"
+              aria-label="Example table with client side pagination "
+              className="font-primaryRegular bg-inputColor"
               bottomContent={
                 <div className="flex w-full justify-center font-primaryRegular">
                   <Pagination
@@ -254,22 +257,22 @@ const Blogger = () => {
                 wrapper: "min-h-[222px]",
               }}
             >
-              <TableHeader>
+              <TableHeader className="bg-foreground">
                 <TableColumn key="name">TITLE</TableColumn>
-                <TableColumn key="role">RATINGS</TableColumn>
                 <TableColumn key="date">RELEASE DATE</TableColumn>
                 <TableColumn key="actions">ACTIONS</TableColumn>
               </TableHeader>
-              <TableBody>
+              <TableBody className="bg-inputColor">
                 {items.map((game) => (
                   <TableRow key={game.id}>
                     <TableCell>{game.title}</TableCell>
                     <TableCell>
-                      <Chip color="default" variant="flat">
-                        {game.RatingPoints}
-                      </Chip>
+                      {new Date(game.insertDate).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
                     </TableCell>
-                    <TableCell>{game.insertDate}</TableCell>
                     <TableCell>
                       <div className="relative flex items-center gap-2 space-x-4">
                         <Tooltip
@@ -314,7 +317,7 @@ const Blogger = () => {
                           </span>
                         </Tooltip>
                         <Tooltip
-                          content="Add new stock from this game"
+                          content="Publish This Games"
                           showArrow
                           color="default"
                           className="font-primaryRegular"
@@ -337,63 +340,71 @@ const Blogger = () => {
             {/* Show Game Details */}
             <Modal
               isOpen={isDetailsModalOpen}
-              size="full"
+              size="2xl"
               onOpenChange={onDetailsModalClose}
               classNames={{
                 backdrop:
                   "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20",
               }}
+              className="p-4"
             >
-              <ModalContent className="font-primaryRegular">
-                <ModalHeader>Game Details</ModalHeader>
+              <ModalContent className="font-primaryRegular bg-black">
                 <ModalBody>
-                  <ScrollShadow hideScrollBar className="w-[1500px] h-[550px]">
-                    {selectedGame && (
-                      <div className="flex flex-col gap-4">
-                        <h2 className="text-xl font-bold">
-                          {selectedGame.title}
-                        </h2>
-                        {selectedGame.TrailerVideo && (
-                          <div className="w-full rounded-lg mb-4 shadow-md">
-                            <video
-                              src={selectedGame.TrailerVideo}
-                              autoPlay
-                              controls
-                              className="w-full rounded-lg"
-                              width={50}
-                              height={50}
-                            />
-                          </div>
-                        )}
+                  {selectedGame && (
+                    <div className="flex flex-col gap-4">
+                      <h2 className=" font-primaryRegular text-white text-5xl">
+                        {selectedGame.title}
+                      </h2>
 
-                        <p className="text-gray-600">
-                          {selectedGame.Description}
-                        </p>
-                        <div className="flex items-center gap-4">
+                      <div className="flex gap-4 items-start">
+                        <div>
                           <Image
                             isZoomed
-                            width={200}
+                            width={300}
                             alt="Game Cover Photo"
                             src={selectedGame.coverPhoto}
                             className="rounded-lg shadow-md"
                           />
-                          <Chip color="default" variant="flat">
-                            {selectedGame.RatingPoints}
-                          </Chip>
-                          <br></br>
-                          <p className="text-gray-600">
-                            Release Date: <br></br>
-                            {selectedGame.insertDate}
-                          </p>
                         </div>
+                        {selectedGame.TrailerVideo && (
+                          <div className="w-[700px] h-[100px] mb-8">
+                            <VideoPlayer
+                              videoUrl={selectedGame.TrailerVideo}
+                              autoPlay
+                              controls
+                              className="w-[400px] h-[300px]"
+                              muted
+                            />
+                          </div>
+                        )}
                       </div>
-                    )}{" "}
-                  </ScrollShadow>
+
+                      <p className="text-white text-[16px] mt-8">
+                        {selectedGame.Description}
+                      </p>
+
+                      <p className="text-gray-600">
+                        Release Date <br />
+                        <Chip radius="none" color="default">
+                          {new Date(selectedGame.insertDate).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            }
+                          )}
+                        </Chip>
+                      </p>
+                    </div>
+                  )}
                 </ModalBody>
+
                 <ModalFooter>
                   <Button
-                    color="primary"
-                    variant="light"
+                    color="danger"
+                    variant="bordered"
+                    size="sm"
                     onPress={onDetailsModalClose}
                   >
                     Close
@@ -457,7 +468,7 @@ const Blogger = () => {
             {/* Update Game Details */}
             <Modal
               isOpen={isUpdateModalOpen}
-              size="full"
+              size="3xl"
               onOpenChange={onUpdateModalClose}
               classNames={{
                 backdrop:
@@ -465,18 +476,18 @@ const Blogger = () => {
               }}
             >
               <ModalContent className="font-primaryRegular">
-                <ModalHeader>Update Game</ModalHeader>
-                <ModalBody>
+              
+                <ModalBody className="bg-white text-black">
                   <UpdateGame
                     updatingGame={selectedGame}
                     callBackFunction1={onUpdateModalClose}
                     callBackFunction2={handleUploadComplete}
                   />
                 </ModalBody>
-                <ModalFooter>
+                <ModalFooter className="bg-white ">
                   <Button
-                    color="primary"
-                    variant="light"
+                    color="danger"
+                    variant="bordered"
                     onPress={onUpdateModalClose}
                   >
                     Close
@@ -488,7 +499,7 @@ const Blogger = () => {
             {/*Add New Stock Modal*/}
             <Modal
               isOpen={isAddStockModalOpen}
-              size="3xl"
+              size="lg"
               onOpenChange={onAddStockModalClose}
               classNames={{
                 backdrop:
@@ -496,28 +507,19 @@ const Blogger = () => {
               }}
             >
               <ModalContent className="font-primaryRegular">
-                <ModalHeader>Add New Stock</ModalHeader>
                 <ModalBody>
                   <AddNewStock
                     gameForTheStock={selectedGame}
                     callBackFunction={onAddStockModalClose}
                   />
                 </ModalBody>
-                <ModalFooter>
-                  <Button
-                    color="primary"
-                    variant="light"
-                    onPress={onAddStockModalClose}
-                  >
-                    Close
-                  </Button>
-                </ModalFooter>
               </ModalContent>
             </Modal>
           </>
         )}
         {activeTab === "stock" && <StockTable />}
       </div>
+      <Footer />
     </div>
   );
 };

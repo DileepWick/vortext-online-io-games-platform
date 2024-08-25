@@ -258,7 +258,7 @@ export default function Header() {
                 )}
 
                 {/*Review manager*/}
-                {user.role === "Review_Manager" && (
+                {user.role === "Review Manager" && (
                   <DropdownItem
                     key="Review-panel"
                     onClick={() => navigate("/review_dashboard")}
