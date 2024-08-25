@@ -19,6 +19,9 @@ const UploadGame = ({ FunctionToCallAfterUpload }) => {
     { _id: "Action", categoryName: "Action" },
     { _id: "Adventure", categoryName: "Adventure" },
     { _id: "Racing", categoryName: "Racing" },
+    { _id: "Puzzle", categoryName: "Puzzle" },
+    { _id: "Fighting", categoryName: "Fighting" },
+    { _id: "Strategy", categoryName: "Strategy" },
   ];
 
   // Fixed age groups list
@@ -115,6 +118,7 @@ const UploadGame = ({ FunctionToCallAfterUpload }) => {
               variant="bordered"
               placeholder="About the game"
               disableAnimation
+              maxLength={390}
               disableAutosize
               classNames={{
                 base: "max-w-xs",

@@ -54,7 +54,7 @@ const delete_stock = ({ deletingStock, callBackFunction }) => {
   return (
     <div>
       <Tooltip
-        content="Remove stock"
+        content="Remove from shop"
         showArrow
         color="danger"
         className="font-primaryRegular"
@@ -77,8 +77,9 @@ const delete_stock = ({ deletingStock, callBackFunction }) => {
         }}
       >
         <ModalContent className="font-primaryRegular">
-          <ModalHeader>Confirm Stock Deletion</ModalHeader>
+          <ModalHeader>Confirm Removal</ModalHeader>
           <ModalFooter>
+            <p>You can add this game if you want again after removing.</p>
             <Button color="danger" variant="light" onPress={onDeleteModalClose}>
               Cancel
             </Button>

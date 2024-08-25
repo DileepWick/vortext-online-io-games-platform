@@ -27,16 +27,13 @@ const GameDetails = () => {
   useAuthCheck();
 
   const { id } = useParams();
-  
   const [gameStock, setGameStock] = useState(null);
   const [relatedGameStocks, setRelatedGameStocks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cartId, setCartId] = useState(null); // State to handle cart ID
   const [quantityByStockId, setQuantityByStockId] = useState({}); // State to handle quantity by stock id
-
   const [checkItem, setCheckItem] = useState("not in the library");
-  
   const [ratings, setRatings] = useState([]);
   const [averageRating, setAverageRating] = useState(0);
 
@@ -274,9 +271,6 @@ const GameDetails = () => {
           <h1 className="text-5xl text-white mb-4 text-left">
             {gameStock.AssignedGame.title}
             <br />
-            <Chip color="primary" radius="none">
-              {gameStock.AssignedGame.RatingPoints} Rating Points ⭐
-            </Chip>
           </h1>
           <div className="flex flex-col md:flex-row items-start justify-start gap-8 bg-customDark">
             <div className="flex flex-col">
@@ -287,7 +281,7 @@ const GameDetails = () => {
                 muted
                 className="w-[900px] h-[400px] object-cover mb-4 shadow-md"
               />
-              <h1 className="mt-8 text-editionColor text-3xl">About the game</h1>
+              <h1 className="mt-8 text-editionColor text-5xl">About the game</h1>
               <p className="text-lg mt-4">
                 <ScrollShadow
                   hideScrollBar
@@ -349,16 +343,16 @@ const GameDetails = () => {
               color="primary"
               radius="none"
               className="w-[300px] mb-2"
-              variant="ghost"
+              variant="shadow"
             >
               Add to Cart
             </Button>
             <Button
               onClick={() => handleRent(gameStock._id)}
-              color="secondary"
+              color="primary"
               radius="none"
-              className="w-[300px]"
-              variant="ghost"
+              className="w-[300px] mt-2"
+              variant="bordered"
             >
               Rent Game
             </Button>

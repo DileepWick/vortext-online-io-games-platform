@@ -51,61 +51,79 @@ const OrderHistory = () => {
         <div className="text-2xl font-primaryRegular mb-6">MY LIBRARY</div>
         {orderItems.length > 0 ? (
           <div className="flex flex-wrap gap-6">
-            {orderItems.map((item) => (
-              <Card
-                key={item.stockid._id}
-                className="relative bg-customDark overflow-hidden transition-transform transform hover:scale-105 hover:shadow-lg"
-              
-              >
-                <Image
-                  isBlurred
-                  radius="none"
-                  alt={item.stockid.AssignedGame.title}
-                  className="w-[100px] h-[100px] object-cover"
-                  src={item.stockid.AssignedGame.coverPhoto}
-                />
-                <CardBody className="p-4">
-                  <p className="mb-2 font-primaryRegular text-lg text-white">
-                    {item.stockid.AssignedGame.title}
-                  </p>
-                  
-                  <div className="flex flex-wrap gap-2 mb-4 font-primaryRegular">
-                    {item.stockid.AssignedGame.Genre.flatMap((genre) =>
-                      genre.includes(",") ? genre.split(",") : genre
-                    ).map((genre, index) => (
-                      <Chip
-                        key={index}
-                        color="primary"
-                        variant="flat"
-                        size="sm"
-                        className="text-white"
+            {orderItems.map((item) => {
+              // Check if the game information exists
+              const game = item.stockid?.AssignedGame;
+              const gameExists = game && game._id; // Adjust this if your ID field name is different
+
+              return (
+                <Card
+                  key={item._id} // Use item._id for the card key
+                  className="relative bg-customDark overflow-hidden transition-transform transform hover:scale-105 hover:shadow-lg"
+                >
+                  {gameExists ? (
+                    <>
+                      <Image
+                        isBlurred
                         radius="none"
-                      >
-                        {genre.trim()}
-                      </Chip>
-                    ))}
-                  </div>
-                  
-                  <Button
-                    as={Link}
-                    to={`/playgame/${encodeURIComponent(
-                      item.stockid.AssignedGame.PlayLink
-                    )}/${encodeURIComponent(item.stockid.AssignedGame.title)}`}
-                    color="primary"
-                    className="font-primaryRegular"
-                    radius="none"
-                    variant="ghost"
-                  >
-                    PLAY NOW
-                  </Button>
-                </CardBody>
-              </Card>
-            ))}
+                        alt={game.title || "Game Image"}
+                        className="w-[100px] h-[100px] object-cover"
+                        src={game.coverPhoto || "default-image-url"} // Replace with a default image URL if needed
+                      />
+                      <CardBody className="p-4">
+                        <p className="mb-2 font-primaryRegular text-lg text-white">
+                          {game.title || "N/A"}
+                        </p>
+
+                        <div className="flex flex-wrap gap-2 mb-4 font-primaryRegular">
+                          {(game.Genre || ["N/A"])
+                            .flatMap((genre) =>
+                              genre.includes(",") ? genre.split(",") : genre
+                            )
+                            .map((genre, index) => (
+                              <Chip
+                                key={index}
+                                color="primary"
+                                variant="flat"
+                                size="sm"
+                                className="text-white"
+                                radius="none"
+                              >
+                                {genre.trim() || "N/A"}
+                              </Chip>
+                            ))}
+                        </div>
+
+                        <Button
+                          as={Link}
+                          to={`/playgame/${encodeURIComponent(
+                            game.PlayLink || "default-link"
+                          )}/${encodeURIComponent(game.title || "N/A")}`}
+                          color="primary"
+                          className="font-primaryRegular"
+                          radius="none"
+                          variant="ghost"
+                        >
+                          PLAY NOW
+                        </Button>
+                      </CardBody>
+                    </>
+                  ) : (
+                    <CardBody className="p-4 text-center text-white">
+                      <p className="text-lg font-primaryRegular">
+                        This game has been removed.
+                      </p>
+                    </CardBody>
+                  )}
+                </Card>
+              );
+            })}
           </div>
         ) : (
           <p>No Games in the library</p>
         )}
       </div>
+
       <Footer />
     </div>
   );

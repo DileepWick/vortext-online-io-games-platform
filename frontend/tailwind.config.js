@@ -18,7 +18,8 @@ export default {
         headerDark:'#18191d',
         editionColor:'#787979',
         customPink: '#f10b63',
-        customGreen: '#00FF00'
+        customGreen: '#00FF00',
+        inputColor:"#202125"
       },
       animation: {
         blink: 'blink 0.5s linear infinite',

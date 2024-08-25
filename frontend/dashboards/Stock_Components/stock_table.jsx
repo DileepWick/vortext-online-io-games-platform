@@ -72,8 +72,8 @@ const StockTable = () => {
   return (
     <div>
       <Input
-        className="ml-2 font-primaryRegular w-48 sm:w-64"
-        placeholder="Search by GAME . . ."
+        className="ml-2 font-primaryRegular w-[300px] mb-8"
+        placeholder="SEARCH BY GAME"
         startContent={<SearchIcon />}
         value={searchQuery}
         onChange={handleSearchChange}

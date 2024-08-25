@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { toast, Flip } from "react-toastify";
-import { Input, Button } from "@nextui-org/react";
+import { Input, Button, Chip } from "@nextui-org/react";
 
 const AddNewStock = ({ gameForTheStock, callBackFunction }) => {
   // State Variables
@@ -66,13 +66,13 @@ const AddNewStock = ({ gameForTheStock, callBackFunction }) => {
     <div className="p-4">
       <form onSubmit={handleAddNewStock} className="space-y-4">
         <div className="form-group space-y-4">
-          <Input
-            type="text"
-            value={title}
-            label="Game"
-            readOnly
-            className="w-full"
-          />
+          <Chip color="default" size="lg" radius="none">
+            {title}
+          </Chip>
+          <p>
+            Set price and discount to publish the game. <br></br>After
+            publishing the game will be appear in the shop.
+          </p>
           <Input
             type="number"
             label="Price"
@@ -93,8 +93,13 @@ const AddNewStock = ({ gameForTheStock, callBackFunction }) => {
             onChange={(e) => setDiscount(Number(e.target.value))}
             className="w-full"
           />
-          <Button type="submit" color="primary" size="lg" className="mt-4">
-            Add New Stock
+          <Button
+            type="submit"
+            color="primary"
+            size="md"
+            className="mt-8 text-center"
+          >
+            Publish
           </Button>
         </div>
       </form>
