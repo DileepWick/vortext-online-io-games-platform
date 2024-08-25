@@ -108,13 +108,13 @@ export default function Header() {
 
           <NavbarItem>
             <Link
-              color={location.pathname === "/reviews" ? "primary" : "white"}
-              href="#"
+              color={location.pathname === "/TailoredGames" ? "primary" : "white"}
+              href="/TailoredGames"
               className={`${
-                location.pathname === "/reviews" ? "underline" : ""
+                location.pathname === "/TailoredGames" ? "underline" : ""
               } text-white hover:underline`}
             >
-              Reviews
+              Tailored Games
             </Link>
           </NavbarItem>
           <NavbarItem>
@@ -130,7 +130,7 @@ export default function Header() {
           </NavbarItem>
           <Dropdown placement="bottom-start">
             <DropdownTrigger>
-              <NavbarItem>Support</NavbarItem>
+              <NavbarItem>Help</NavbarItem>
             </DropdownTrigger>
             <DropdownMenu
               aria-label="Profile Actions"
@@ -257,8 +257,6 @@ export default function Header() {
                   </DropdownItem>
                 )}
 
-
-
                 {/*Review manager*/}
                 {user.role === "Review_Manager" && (
                   <DropdownItem
@@ -289,8 +287,8 @@ export default function Header() {
                   </DropdownItem>
                 )}
 
-                  {/* Payment Manager Filter */}
-                  {user.role === "Payment Manager" && (
+                {/* Payment Manager Filter */}
+                {user.role === "Payment Manager" && (
                   <DropdownItem
                     key="manage-payment"
                     onClick={() => navigate("/Payment_manager_dashboard")}
@@ -298,7 +296,6 @@ export default function Header() {
                     Payment Management Dashboard
                   </DropdownItem>
                 )}
-
 
                 <DropdownItem
                   key="logout"

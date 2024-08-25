@@ -14,10 +14,10 @@ const userRouter = express.Router();
 // User Registration
 userRouter.post("/register", async (request, response) => {
   try {
-    const { username, password, email, birthday, role } = request.body;
+    const { firstname,lastname,username, password, email, birthday, role } = request.body;
 
     // Validate input
-    if (!username || !password || !email || !birthday) {
+    if ( !firstname || !lastname || !username || !password || !email || !birthday) {
       return response.status(400).json({ message: "All fields are required" });
     }
 
@@ -54,6 +54,8 @@ userRouter.post("/register", async (request, response) => {
 
     // Prepare new user object
     const newUser = {
+      firstname,
+      lastname,
       username,
       password: hashedPassword,
       role: assignedRole,
@@ -71,7 +73,7 @@ userRouter.post("/register", async (request, response) => {
     const cartCreation = await Cart.create(newCart);
 
     if (createdUser && cartCreation) {
-      return response.status(201).json({ message: "User created successfully with a cart." });
+      return response.status(201).json({ message: "User created successfully." });
     } else {
       return response.status(500).json({ message: "Failed to create account" });
     }

@@ -30,14 +30,14 @@ const defaultQuestions = [
     hint: "City of Light",
   },
   {
-    question: "Who wrote 'To Kill a Mockingbird'?",
-    answer: "Harper Lee",
+    question: "A large mammal known for its trunk.",
+    answer: "Elephant",
     hint: "Author's name",
   },
   {
-    question: "What is the chemical symbol for water?",
-    answer: "H2O",
-    hint: "Two hydrogen, one oxygen",
+    question: "The main character in the TV series Breaking Bad.",
+    answer: "Walter",
+    hint: "The bald guy.",
   },
 ];
 

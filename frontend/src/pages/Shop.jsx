@@ -3,8 +3,17 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
-import { Spinner, Image, Button, Card, CardBody, Chip, ScrollShadow } from "@nextui-org/react";
+import {
+  Spinner,
+  Image,
+  Button,
+  Card,
+  CardBody,
+  Chip,
+  ScrollShadow,
+} from "@nextui-org/react";
 import { FaShoppingCart, FaPlaystation } from "react-icons/fa";
+import Chatbot from "../components/Chatbot";
 
 const Shop = () => {
   const [gameStocks, setGameStocks] = useState([]);
@@ -14,7 +23,9 @@ const Shop = () => {
   useEffect(() => {
     const fetchGameStocks = async () => {
       try {
-        const response = await axios.get("http://localhost:8098/gameStocks/allGameStock");
+        const response = await axios.get(
+          "http://localhost:8098/gameStocks/allGameStock"
+        );
         setGameStocks(response.data.allGameStocks);
       } catch (err) {
         setError(err.message);
@@ -32,20 +43,26 @@ const Shop = () => {
   return (
     <div className="min-h-screen bg-customDark text-white">
       <ScrollShadow hideScrollBar>
-      <Header />
-      <div className="container mx-auto px-4 py-16">
-        <h1 className="text-4xl text-center text-white mb-8 font-primaryRegular">Games</h1>
+        <Header />
+        <Chatbot />
+        <div className="container mx-auto px-4 py-16">
+          <h1 className="text-4xl text-center text-white mb-8 font-primaryRegular">
+            Games
+          </h1>
 
-        {gameStocks.length === 0 ? (
-          <p className="text-gray-400 text-center">No game stocks available</p>
-        ) : (
-          
+          {gameStocks.length === 0 ? (
+            <p className="text-gray-400 text-center">
+              No game stocks available
+            </p>
+          ) : (
             <div className="flex flex-wrap justify-center gap-8 hide-scrollbar">
               {gameStocks.map((stock) => {
                 const originalPrice = stock.UnitPrice;
                 const discount = stock.discount;
                 const discountedPrice =
-                  discount > 0 ? originalPrice - (originalPrice * discount) / 100 : originalPrice;
+                  discount > 0
+                    ? originalPrice - (originalPrice * discount) / 100
+                    : originalPrice;
 
                 return (
                   <Card
@@ -114,10 +131,9 @@ const Shop = () => {
                 );
               })}
             </div>
-          
-        )}
-      </div>
-      <Footer />
+          )}
+        </div>
+        <Footer />
       </ScrollShadow>
     </div>
   );

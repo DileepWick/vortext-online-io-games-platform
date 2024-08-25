@@ -3,6 +3,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate, useLocation } from "react-router-dom";
 
+
 // Next UI
 import { Input, Button, Tabs, Tab, Link, Card, CardBody } from "@nextui-org/react";
 
@@ -19,20 +20,57 @@ const Login = () => {
   const location = useLocation();
 
   const [formData, setFormData] = useState({
+    firstname: "",
+    lastname: "",
     username: "",
     password: "",
     email: "",
-    birthday: "", // Added birthday to form data
+    birthday: "",
   });
 
   const [alertMessage, setAlertMessage] = useState("");
+  const [validationErrors, setValidationErrors] = useState({});
+
+  // Filter out non-letter characters for firstname and lastname
+  const filterLettersOnly = (value) => value.replace(/[^a-zA-Z]/g, "");
 
   // Handle form data changes
   const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: name === "firstname" || name === "lastname"
+        ? filterLettersOnly(value)
+        : value,
+    }));
+  };
+
+  // Validation functions
+  const validateFirstname = (firstname) => /^[a-zA-Z]+$/.test(firstname);
+  const validateLastname = (lastname) => /^[a-zA-Z]+$/.test(lastname);
+  const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
+  const validatePassword = (password) =>
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password);
+
+  const validateForm = () => {
+    const errors = {};
+
+    if (!validateFirstname(formData.firstname)) {
+      errors.firstname = "Firstname must contain only letters.";
+    }
+    if (!validateLastname(formData.lastname)) {
+      errors.lastname = "Lastname must contain only letters.";
+    }
+    if (!validateEmail(formData.email)) {
+      errors.email = "Invalid email format.";
+    }
+    if (!validatePassword(formData.password)) {
+      errors.password =
+        "Password must be at least 8 characters long and include uppercase, lowercase, number, and symbol.";
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   // Handle login submission
@@ -69,8 +107,12 @@ const Login = () => {
 
   // Handle sign-up submission
   const handleSignUp = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
     try {
-      const { username, email, password, birthday } = formData;
+      const { firstname, lastname, username, email, password, birthday } = formData;
 
       // Calculate age
       const today = new Date();
@@ -85,6 +127,8 @@ const Login = () => {
       const playerCategory = age <= 12 ? "Kid" : age <= 18 ? "Teenager" : "Adult";
 
       const response = await axios.post("http://localhost:8098/users/register", {
+        firstname,
+        lastname,
         username,
         email,
         password,
@@ -105,11 +149,15 @@ const Login = () => {
     }
   };
 
+  // Get today's date and calculate the max date for the birthday input
+  const today = new Date();
+  const maxDate = new Date(today.setFullYear(today.getFullYear() - 5)).toISOString().split('T')[0];
+
   return (
     <div>
       <Header />
-      <div className="flex flex-col w-full font-primaryRegular justify-center">
-        <Card className="max-w-full w-[340px] h-[450px]">
+      <div className="flex items-center justify-center min-h-screen bg-gray-20">
+        <Card className="w-[340px] h-[650px]">
           <CardBody className="overflow-hidden">
             <Tabs
               fullWidth
@@ -157,7 +205,33 @@ const Login = () => {
                 </form>
               </Tab>
               <Tab key="sign-up" title="Sign up">
-                <form className="flex flex-col gap-4 h-[350px]">
+                <form className="flex flex-col gap-4 h-[400px]">
+                  <Input
+                    isRequired
+                    label="Firstname"
+                    placeholder="Enter your first name"
+                    name="firstname"
+                    type="text"
+                    value={formData.firstname}
+                    onChange={handleInputChange}
+                    color={validationErrors.firstname ? "error" : "default"}
+                  />
+                  {validationErrors.firstname && (
+                    <div className="text-red-500">{validationErrors.firstname}</div>
+                  )}
+                  <Input
+                    isRequired
+                    label="Lastname"
+                    placeholder="Enter your lastname"
+                    name="lastname"
+                    type="text"
+                    value={formData.lastname}
+                    onChange={handleInputChange}
+                    color={validationErrors.lastname ? "error" : "default"}
+                  />
+                  {validationErrors.lastname && (
+                    <div className="text-red-500">{validationErrors.lastname}</div>
+                  )}
                   <Input
                     isRequired
                     label="Username"
@@ -166,6 +240,7 @@ const Login = () => {
                     type="text"
                     value={formData.username}
                     onChange={handleInputChange}
+                    // Removed validation-related props for username
                   />
                   <Input
                     isRequired
@@ -175,7 +250,11 @@ const Login = () => {
                     type="email"
                     value={formData.email}
                     onChange={handleInputChange}
+                    color={validationErrors.email ? "error" : "default"}
                   />
+                  {validationErrors.email && (
+                    <div className="text-red-500">{validationErrors.email}</div>
+                  )}
                   <Input
                     isRequired
                     label="Birthday"
@@ -184,6 +263,7 @@ const Login = () => {
                     type="date"
                     value={formData.birthday}
                     onChange={handleInputChange}
+                    max={maxDate} // Set max date to 5 years before today
                   />
                   <Input
                     isRequired
@@ -193,7 +273,11 @@ const Login = () => {
                     type="password"
                     value={formData.password}
                     onChange={handleInputChange}
+                    color={validationErrors.password ? "error" : "default"}
                   />
+                  {validationErrors.password && (
+                    <div className="text-red-500">{validationErrors.password}</div>
+                  )}
                   <p className="text-center text-small">
                     Already have an account?{" "}
                     <Link size="sm" onPress={() => setSelectedTab("login")}>

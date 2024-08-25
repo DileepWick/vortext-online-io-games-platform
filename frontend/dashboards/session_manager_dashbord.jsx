@@ -1,130 +1,319 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from 'react';
+import axios from 'axios';
 import Header from "../src/components/header";
 import Footer from "../src/components/footer";
-import useAuthCheck from "../src/utils/authCheck";
-import { Button, Card, CardBody, Input, Select, SelectItem } from "@nextui-org/react";
+import {
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Input,
+  Button,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+  Tabs,
+  Tab,
+  Select,
+  SelectItem,
+  Pagination,
+  Chip
+} from "@nextui-org/react";
+import { SearchIcon } from "../src/assets/icons/SearchIcon";
 
 const SessionManagerDash = () => {
-  useAuthCheck();
-  const [activeTab, setActiveTab] = useState("manageRentals");
-  const [rentalOptions, setRentalOptions] = useState([
-    { id: 1, time: "15min", price: 50, game: "Game 1" },
-    { id: 2, time: "30min", price: 80, game: "Game 2" },
-    { id: 3, time: "1hour", price: 150, game: "Game 1" },
-    { id: 4, time: "2hours", price: 250, game: "Game 3" }
-  ]);
-  const [newOption, setNewOption] = useState({ time: "", price: "", game: "" });
+  const [rentalTimes, setRentalTimes] = useState([]);
+  const [games, setGames] = useState([]);
+  const [formData, setFormData] = useState({ gameId: '', gameName: '', duration: '', price: '' });
   const [editingId, setEditingId] = useState(null);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("rentalTimes");
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [page, setPage] = useState(1);
+  const rowsPerPage = 4;
 
-  // Mock list of games - replace with actual data from your backend
-  const games = ["Game 1", "Game 2", "Game 3", "Game 4"];
+  useEffect(() => {
+    fetchRentalTimes();
+    fetchGames();
+  }, []);
 
-  const handleAddOption = () => {
-    if (newOption.time && newOption.price && newOption.game) {
-      setRentalOptions([...rentalOptions, { ...newOption, id: Date.now() }]);
-      setNewOption({ time: "", price: "", game: "" });
+  const fetchRentalTimes = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(`http://localhost:8098/rentalDurations/getalltimes`);
+      setRentalTimes(response.data.rentalTimes || []);
+      setError('');
+    } catch (error) {
+      console.error('Error fetching rental times:', error);
+      setError('Failed to fetch rental times. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleDeleteOption = (id) => {
-    setRentalOptions(rentalOptions.filter(option => option.id !== id));
+  const fetchGames = async () => {
+    try {
+      const response = await axios.get('http://localhost:8098/games/allGames');
+      if (response.data && Array.isArray(response.data.allGames)) {
+        setGames(response.data.allGames);
+      } else {
+        console.error('Unexpected games data structure:', response.data);
+        setGames([]);
+      }
+    } catch (error) {
+      console.error('Error fetching games:', error);
+      setError('Failed to fetch games. Please try again.');
+    }
   };
 
-  const handleEditOption = (id) => {
-    setEditingId(id);
-    const optionToEdit = rentalOptions.find(option => option.id === id);
-    setNewOption({ ...optionToEdit });
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
-  const handleUpdateOption = () => {
-    setRentalOptions(rentalOptions.map(option => 
-      option.id === editingId ? { ...newOption, id: editingId } : option
-    ));
-    setEditingId(null);
-    setNewOption({ time: "", price: "", game: "" });
+  const handleGameSelect = (e) => {
+    const selectedGame = games.find(game => game._id === e.target.value);
+    setFormData({
+      ...formData,
+      gameId: selectedGame._id,
+      gameName: selectedGame.title
+    });
   };
 
-  const renderManageRentals = () => (
-    <div>
-      <h2 className="text-xl font-bold mb-4">Manage Rental Options</h2>
-      <div className="mb-4 flex gap-2">
-        <Input
-          placeholder="Time (e.g., 15min)"
-          value={newOption.time}
-          onChange={(e) => setNewOption({ ...newOption, time: e.target.value })}
-        />
-        <Input
-          placeholder="Price"
-          type="number"
-          value={newOption.price}
-          onChange={(e) => setNewOption({ ...newOption, price: e.target.value })}
-        />
-        <Select 
-          placeholder="Select game"
-          value={newOption.game}
-          onChange={(e) => setNewOption({ ...newOption, game: e.target.value })}
-        >
-          {games.map((game) => (
-            <SelectItem key={game} value={game}>
-              {game}
-            </SelectItem>
-          ))}
-        </Select>
-        {editingId ? (
-          <Button color="primary" onPress={handleUpdateOption}>Update</Button>
-        ) : (
-          <Button color="primary" onPress={handleAddOption}>Add</Button>
-        )}
-      </div>
-      <div>
-        {rentalOptions.map(option => (
-          <div key={option.id} className="flex items-center justify-between mb-2">
-            <span>{option.time} - LKR {option.price} - {option.game}</span>
-            <div>
-              <Button color="secondary" size="sm" onPress={() => handleEditOption(option.id)} className="mr-2">Edit</Button>
-              <Button color="danger" size="sm" onPress={() => handleDeleteOption(option.id)}>Delete</Button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      if (!formData.gameId || !formData.duration || !formData.price) {
+        throw new Error('Game, duration, and price are required');
+      }
 
-  const renderAnalytics = () => (
-    <div>
-      <h2 className="text-xl font-bold mb-4">Player Analytics</h2>
-      <p>Total Players: 100</p>
-      <p>Active Rentals: 25</p>
-      <p>Total Revenue: LKR 10,000</p>
-    </div>
-  );
+      const dataToSend = {
+        gameId: formData.gameId,
+        duration: parseInt(formData.duration, 10),
+        price: parseFloat(formData.price)
+      };
+
+      let response;
+      if (editingId) {
+        response = await axios.put(`http://localhost:8098/rentalDurations/update/${editingId}`, dataToSend);
+      } else {
+        response = await axios.post('http://localhost:8098/rentalDurations/create', dataToSend);
+      }
+
+      await fetchRentalTimes();
+      setFormData({ gameId: '', gameName: '', duration: '', price: '' });
+      setEditingId(null);
+      setError('');
+      onClose();
+    } catch (error) {
+      console.error('Error saving rental time:', error);
+      setError(`Failed to save rental time. Error: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEdit = (rentalTime) => {
+    setFormData({
+      gameId: rentalTime.game._id,
+      gameName: rentalTime.game.title,
+      duration: rentalTime.duration.toString(),
+      price: rentalTime.price.toString()
+    });
+    setEditingId(rentalTime._id);
+    onOpen();
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this rental time?')) {
+      setIsLoading(true);
+      try {
+        await axios.delete(`http://localhost:8098/rentalDurations/delete/${id}`);
+        await fetchRentalTimes();
+      } catch (error) {
+        console.error('Error deleting rental time:', error);
+        setError('Failed to delete rental time. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const filteredItems = useMemo(() => {
+    return rentalTimes.filter((rentalTime) =>
+      rentalTime.game.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [rentalTimes, searchQuery]);
+
+  const items = useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    return filteredItems.slice(start, end);
+  }, [page, filteredItems]);
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+    setPage(1);
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery("");
+    setPage(1);
+  };
 
   return (
-    <div className="bg-gray-900 text-white min-h-screen">
+    <div className="flex flex-col min-h-screen">
       <Header />
-      <div className="container mx-auto px-4 py-8">
-        <Card>
-          <CardBody>
-            <div className="flex mb-4">
-              <Button
-                color={activeTab === "manageRentals" ? "primary" : "default"}
-                onPress={() => setActiveTab("manageRentals")}
-                className="mr-2"
+      <main className="flex-grow p-4">
+        <div className="flex w-full flex-col">
+          <div className="flex items-center p-4 font-primaryRegular">
+            <Tabs
+              aria-label="Session Manager Tabs"
+              className="flex-1"
+              onSelectionChange={setActiveTab}
+              selectedKey={activeTab}
+              size="lg"
+              color="primary"
+            >
+              <Tab key="rentalTimes" title="Rental Times" />
+              <Tab key="analytics" title="Analytics" />
+            </Tabs>
+          </div>
+          {activeTab === "rentalTimes" && (
+            <>
+              <div className="flex justify-between items-center mb-4">
+                <Input
+                  className="w-64"
+                  placeholder="Search by game title..."
+                  startContent={<SearchIcon />}
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  onClear={handleClearSearch}
+                />
+                <Button color="primary" onPress={() => {
+                  setFormData({ gameId: '', gameName: '', duration: '', price: '' });
+                  setEditingId(null);
+                  onOpen();
+                }}>Add New Rental Time</Button>
+              </div>
+              <Table
+                aria-label="Rental Times table"
+                bottomContent={
+                  <div className="flex w-full justify-center">
+                    <Pagination
+                      isCompact
+                      showControls
+                      showShadow
+                      color="primary"
+                      page={page}
+                      total={Math.ceil(filteredItems.length / rowsPerPage)}
+                      onChange={(page) => setPage(page)}
+                    />
+                  </div>
+                }
+                classNames={{
+                  wrapper: "min-h-[222px]",
+                }}
               >
-                Manage Rentals
-              </Button>
-              <Button
-                color={activeTab === "analytics" ? "primary" : "default"}
-                onPress={() => setActiveTab("analytics")}
-              >
-                Analytics
-              </Button>
-            </div>
-            {activeTab === "manageRentals" ? renderManageRentals() : renderAnalytics()}
-          </CardBody>
-        </Card>
-      </div>
+                <TableHeader>
+                  <TableColumn>GAME</TableColumn>
+                  <TableColumn>DURATION (MINUTES)</TableColumn>
+                  <TableColumn>PRICE</TableColumn>
+                  <TableColumn>ACTIONS</TableColumn>
+                </TableHeader>
+                <TableBody>
+                  {items.map((rentalTime) => (
+                    <TableRow key={rentalTime._id}>
+                      <TableCell>{rentalTime.game.title}</TableCell>
+                      <TableCell>
+                        <Chip color="default" variant="flat">
+                          {rentalTime.duration}
+                        </Chip>
+                      </TableCell>
+                      <TableCell>${rentalTime.price}</TableCell>
+                      <TableCell>
+                        <div style={{ display: "flex", gap: "10px" }}>
+                          <Button size="sm" color="warning" onPress={() => handleEdit(rentalTime)}>Edit</Button>
+                          <Button size="sm" color="danger" onPress={() => handleDelete(rentalTime._id)}>Delete</Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </>
+          )}
+          {activeTab === "analytics" && (
+            <div>Analytics content goes here</div>
+          )}
+        </div>
+      </main>
       <Footer />
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalContent>
+          <form onSubmit={handleSubmit}>
+            <ModalHeader>{editingId ? 'Edit Rental Time' : 'Add New Rental Time'}</ModalHeader>
+            <ModalBody>
+              <div className="mb-4">
+                <Select
+                  label="Game"
+                  placeholder="Select a game"
+                  selectedKeys={formData.gameId ? [formData.gameId] : []}
+                  onChange={handleGameSelect}
+                  required
+                >
+                  {games.map((game) => (
+                    <SelectItem key={game._id} value={game._id}>
+                      {game.title}
+                    </SelectItem>
+                  ))}
+                </Select>
+              </div>
+              <div className="mb-4">
+                <Input
+                  label="Duration (minutes)"
+                  name="duration"
+                  type="number"
+                  value={formData.duration}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <Input
+                  label="Price"
+                  name="price"
+                  type="number"
+                  value={formData.price}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+            </ModalBody>
+            <ModalFooter>
+              <Button color="danger" variant="light" onPress={() => {
+                setFormData({ gameId: '', gameName: '', duration: '', price: '' });
+                setEditingId(null);
+                onClose();
+              }}>
+                Cancel
+              </Button>
+              <Button color="primary" type="submit">
+                {editingId ? 'Update' : 'Add'}
+              </Button>
+            </ModalFooter>
+          </form>
+        </ModalContent>
+      </Modal>
     </div>
   );
 };
