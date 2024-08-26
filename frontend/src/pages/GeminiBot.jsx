@@ -15,7 +15,7 @@ const ChatComponent = ({ game }) => {
   useEffect(() => {
     const fetchInitialMessage = async () => {
       try {
-        const promptWithGame = `You are an expert on the game ${game}. Introduce yourself briefly and confidently, but avoid teaching or explaining anything. If the user asks about irrelevant topics, respond with anger and ignore their questions with very dark funny joke. Act with the confidence and demeanor of a seasoned gamer. Your name is Chad.`;
+        const promptWithGame = `You are an expert on the game "${game}". Introduce yourself and ask if the user has any questions about the game. You Only Talk about "${game}" nothing more. If the user asks about anything else be a little bit angry dont say anything about irrelevant things that user asks. Act Like a die-hard funny gamer. Your name is Chad.`;
         const response = await axios.post('http://localhost:8098/api/chat', { sessionId, prompt: promptWithGame });
         const aiMessage = { role: 'ai', text: response.data.result };
 
@@ -47,23 +47,30 @@ const ChatComponent = ({ game }) => {
     const userMessage = { role: 'user', text: input };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
 
-    try {
-      // Add game information to the prompt
-      const promptWithGame = `You are an expert on the game "${game}". ${input}`;
+    const fetchResponse = async (retryCount = 0) => {
+      try {
+        // Add game information to the prompt
+        const promptWithGame = `You are an expert on the game "${game}". ${input}`;
 
-      const response = await axios.post('http://localhost:8098/api/chat', { sessionId, prompt: promptWithGame });
-      const aiMessage = { role: 'ai', text: response.data.result };
+        const response = await axios.post('http://localhost:8098/api/chat', { sessionId, prompt: promptWithGame });
+        const aiMessage = { role: 'ai', text: response.data.result };
 
-      // Add AI response to chat
-      setMessages((prevMessages) => [...prevMessages, aiMessage]);
-      setInput('');
-    } catch (err) {
-      setError('Failed to get response');
-    } finally {
-      setLoading(false);
-    }
+        // Add AI response to chat
+        setMessages((prevMessages) => [...prevMessages, aiMessage]);
+        setInput('');
+      } catch (err) {
+        if (retryCount < 3) { // Retry up to 3 times
+          setTimeout(() => fetchResponse(retryCount + 1), 1000); // Retry after 1 second
+        } else {
+          setError('Failed to get response');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchResponse();
   };
-
 
   return (
     <div className="w-full max-w-lg mx-auto p-6 bg-customDark text-white">
@@ -83,13 +90,13 @@ const ChatComponent = ({ game }) => {
                   size="lg"
                 />
                 <span className="mt-2 font-primaryRegular text-customPink">Chad</span>
-                <div className="mt-1 p-2 bg-customDark rounded-lg text-white  font-primaryRegular">
+                <div className="mt-1 p-2 bg-customDark rounded-lg text-white font-primaryRegular">
                   {msg.text}
                 </div>
               </div>
             )}
             {msg.role === 'user' && (
-              <div className="flex flex-row bg-customDark p-3 rounded-lg ">
+              <div className="flex flex-row bg-customDark p-3 rounded-lg">
                 <div className="p-2 bg-blue-500 rounded-lg text-white font-primaryRegular text-right">
                   {msg.text}
                 </div>
@@ -116,7 +123,7 @@ const ChatComponent = ({ game }) => {
           className="bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-600 h-[80px] font-primaryRegular"
           disabled={loading}
         >
-          {loading ? 'Asking Garen...' : 'Ask'}
+          {loading ? 'Asking Chad...' : 'Ask'}
         </Button>
       </form>
     </div>
