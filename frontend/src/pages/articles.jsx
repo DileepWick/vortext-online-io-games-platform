@@ -247,28 +247,27 @@ const Articles = () => {
                 key={article._id}
                 className="bg-gray-800 border border-gray-600 rounded-lg shadow-lg p-4 flex flex-col"
               >
-                <div className="flex flex-row">
-                  <div className="flex-shrink-0 w-1/3 pr-4">
-                    <img
-                      src={article.image}
-                      alt={article.heading}
-                      className="w-full h-full object-cover rounded"
-                    />
-                  </div>
+                <div className="flex flex-row justify-between items-start mb-4">
                   <div className="flex-grow">
                     <h3 className="text-xl font-semibold mb-2">{article.heading}</h3>
                     <p className="text-gray-400">{article.articleBody}</p>
                   </div>
-                  {article.uploader === userId && (
+                  {article.uploader._id === userId && (
                     <button
-                      className="ml-auto text-red-600 hover:text-red-400"
+                      className="text-red-600 hover:text-red-400 ml-4"
                       onClick={() => handleDeleteArticle(article._id)}
                     >
                       <FaTrash className="text-lg" />
                     </button>
                   )}
                 </div>
-
+                <div className="flex-shrink-0 w-full mb-4">
+                  <img
+                    src={article.image}
+                    alt={article.heading}
+                    className="w-full h-64 object-cover rounded"
+                  />
+                </div>
                 <div className="flex justify-between items-center mt-4">
                   <div className="flex items-center">
                     <button onClick={() => handleLikeToggle(article._id)}>
@@ -301,16 +300,19 @@ const Articles = () => {
 
                   <div className="mt-4">
                     {article.comments.map((comment) => (
-                      <div key={comment._id} className="bg-gray-900 p-2 rounded-lg mb-2">
-                        <p className="text-sm">{comment.text}</p>
-                        {comment.user === userId && (
-                          <button
-                            className="text-red-600 hover:text-red-400 text-xs"
-                            onClick={() => handleDeleteComment(article._id, comment._id)}
-                          >
-                            Delete Comment
-                          </button>
-                        )}
+                      <div key={comment._id} className="bg-gray-900 p-2 rounded-lg mb-2 flex items-start">
+                        <button
+                          className="text-red-600 hover:text-red-400 text-xs mr-2"
+                          onClick={() => handleDeleteComment(article._id, comment._id)}
+                        >
+                          <FaTrash />
+                        </button>
+                        <div>
+                          <p className="text-sm">{comment.text}</p>
+                          <p className="text-xs text-gray-500">
+                            By {comment.user.name} on {new Date(comment.createdAt).toLocaleString()}
+                          </p>
+                        </div>
                       </div>
                     ))}
                   </div>
