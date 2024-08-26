@@ -9,24 +9,25 @@ const ChatComponent = ({ game }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const chatEndRef = useRef(null);
-  const [sessionId] = useState(Date.now().toString()); // Generate a unique session ID for each chat
+  const [sessionId, setSessionId] = useState(Date.now().toString()); // Generate a unique session ID for each chat
 
-  // Initialize chat with AI's welcome message
+  // Function to initialize chat with AI's welcome message
+  const fetchInitialMessage = async () => {
+    try {
+      const promptWithGame = `You are an expert on the game "${game}". Introduce yourself and ask if the user has any questions about the game. You Only Talk about "${game}" nothing more. If the user asks about other stuff be angry and mock him. Act Like a die-hard funny gamer. Your name is Chad.`;
+      const response = await axios.post('http://localhost:8098/api/chat', { sessionId, prompt: promptWithGame });
+      const aiMessage = { role: 'ai', text: response.data.result };
+
+      // Add AI's initial message to chat
+      setMessages([aiMessage]);
+    } catch (err) {
+      console.error('Failed to fetch initial message:', err);
+      setError('Failed to load initial message');
+    }
+  };
+
+  // Initialize chat when component mounts or game/sessionId changes
   useEffect(() => {
-    const fetchInitialMessage = async () => {
-      try {
-        const promptWithGame = `You are an expert on the game "${game}". Introduce yourself and ask if the user has any questions about the game. You Only Talk about "${game}" nothing more. If the user asks about anything else be a little bit angry dont say anything about irrelevant things that user asks. Act Like a die-hard funny gamer. Your name is Chad.`;
-        const response = await axios.post('http://localhost:8098/api/chat', { sessionId, prompt: promptWithGame });
-        const aiMessage = { role: 'ai', text: response.data.result };
-
-        // Add AI's initial message to chat
-        setMessages((prevMessages) => [...prevMessages, aiMessage]);
-      } catch (err) {
-        console.error('Failed to fetch initial message:', err);
-        setError('Failed to load initial message');
-      }
-    };
-
     fetchInitialMessage();
   }, [game, sessionId]);
 
@@ -62,7 +63,12 @@ const ChatComponent = ({ game }) => {
         if (retryCount < 3) { // Retry up to 3 times
           setTimeout(() => fetchResponse(retryCount + 1), 1000); // Retry after 1 second
         } else {
-          setError('Failed to get response');
+          // Restart chat if failed to get a response
+          setMessages([]); // Clear existing messages
+          setInput(''); // Clear input
+          setSessionId(Date.now().toString()); // Generate a new session ID
+          fetchInitialMessage(); // Reinitialize the chat
+          setError('Failed to get response. Restarting chat.');
         }
       } finally {
         setLoading(false);
