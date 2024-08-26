@@ -267,19 +267,16 @@ const GameDetails = () => {
     <div className="bg-customDark text-black min-h-screen font-primaryRegular">
       <Header />
       <div className="container mx-auto px-4 py-8">
-        <div className="bg-customDark rounded-lg shadow-lg p-8">
-          <h1 className="text-5xl text-white mb-4 text-left">
-            {gameStock.AssignedGame.title}
-            <br />
-          </h1>
-          <div className="flex flex-col md:flex-row items-start justify-start gap-8 bg-customDark">
+        <div className="bg-customDark rounded-lg shadow-lg ">
+
+          <div className="flex flex-col md:flex-row items-start justify-start gap-4 bg-customDark scale-80">
             <div className="flex flex-col">
               <VideoPlayer
                 videoUrl={gameStock.AssignedGame.TrailerVideo}
                 autoPlay
                 controls
                 muted
-                className="w-[900px] h-[400px] object-cover mb-4 shadow-md"
+                className="w-[600px] h-[400px] object-cover mb-4 shadow-md"
               />
               <h1 className="mt-8 text-editionColor text-5xl">About the game</h1>
               <p className="text-lg mt-4">
@@ -364,8 +361,8 @@ const GameDetails = () => {
           </div>
         </div>
 
-        <div className="mt-8">
-  <h2 className="text-3xl text-white mb-4">Ratings and Reviews</h2>
+        <div className="mt-8 scale-80">
+  <h2 className="text-3xl text-white mb-4 ">Ratings and Reviews</h2>
   <RatingSystem 
     gameId={id} 
     ratings={ratings} 
