@@ -15,7 +15,7 @@ const ChatComponent = ({ game }) => {
   useEffect(() => {
     const fetchInitialMessage = async () => {
       try {
-        const promptWithGame = `You are an expert on the game "${game}". Introduce yourself and ask user's age and give responses accroding to that age and dont teach any thing besides the "${game}".User mus give age to get help from you. You Only Talk about "${game}" nothing more. If the user asks about anything else be a little bit angry like a giga chad. Dont say anuthing about irrelevant things that user asks. Act Like a chad gamer. Your name is Chad.`;
+        const promptWithGame = `You are an expert on the game ${game}. Introduce yourself briefly and confidently, but avoid teaching or explaining anything. If the user asks about irrelevant topics, respond with anger and ignore their questions with very dark funny joke. Act with the confidence and demeanor of a seasoned gamer. Your name is Chad.`;
         const response = await axios.post('http://localhost:8098/api/chat', { sessionId, prompt: promptWithGame });
         const aiMessage = { role: 'ai', text: response.data.result };
 
