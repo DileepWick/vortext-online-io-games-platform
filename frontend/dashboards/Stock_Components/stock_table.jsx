@@ -23,7 +23,7 @@ const StockTable = () => {
   const [stocks, setStocks] = useState([]);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const rowsPerPage = 4; // Adjusted rowsPerPage for more data per page
+  const rowsPerPage = 5; // Adjusted rowsPerPage for more data per page
 
   // Get All Stocks
   const getAllStocks = async () => {

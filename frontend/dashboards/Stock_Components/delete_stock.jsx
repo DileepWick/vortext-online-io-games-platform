@@ -15,7 +15,6 @@ import React from "react";
 import axios from "axios";
 
 const delete_stock = ({ deletingStock, callBackFunction }) => {
-  
   //Delete Stock
   const {
     isOpen: isDeleteModalOpen,
@@ -77,14 +76,22 @@ const delete_stock = ({ deletingStock, callBackFunction }) => {
         }}
       >
         <ModalContent className="font-primaryRegular">
-          <ModalHeader>Confirm Removal</ModalHeader>
+          <ModalHeader>
+            Confirm Removal Of{" "}
+            <span className="text-customPink ml-2 mr-2">
+              {deletingStock.AssignedGame.title}
+            </span> From Shop
+          </ModalHeader>
           <ModalFooter>
-            <p>You can add this game if you want again after removing.</p>
-            <Button color="danger" variant="light" onPress={onDeleteModalClose}>
-              Cancel
-            </Button>
+            <p className="text-sm text-pink-500 border border-pink-500 p-2 rounded">
+              You can add this game if you want again after removing.
+            </p>
+
             <Button color="primary" onClick={deleteStock}>
               Confirm
+            </Button>
+            <Button color="danger" variant="ghost" onPress={onDeleteModalClose}>
+              Cancel
             </Button>
           </ModalFooter>
         </ModalContent>

@@ -186,7 +186,7 @@ const Blogger = () => {
   };
 
   return (
-    <div className="flex w-full flex-col dark text-foreground bg-background">
+    <div className="flex w-full flex-col text-black bg-white">
       <div className="relative">
         <Header />
       </div>
@@ -348,13 +348,15 @@ const Blogger = () => {
               }}
               className="p-4"
             >
-              <ModalContent className="font-primaryRegular bg-black">
+              
+              <ModalContent className="font-primaryRegular bg-white">
+              <ModalHeader>Game Information</ModalHeader>
                 <ModalBody>
                   {selectedGame && (
                     <div className="flex flex-col gap-4">
-                      <h2 className=" font-primaryRegular text-white text-5xl">
+                      <Chip color="primary">
                         {selectedGame.title}
-                      </h2>
+                      </Chip>
 
                       <div className="flex gap-4 items-start">
                         <div>
@@ -379,7 +381,7 @@ const Blogger = () => {
                         )}
                       </div>
 
-                      <p className="text-white text-[16px] mt-8">
+                      <p className="text-black text-[16px] mt-8">
                         {selectedGame.Description}
                       </p>
 
@@ -403,7 +405,7 @@ const Blogger = () => {
                 <ModalFooter>
                   <Button
                     color="danger"
-                    variant="bordered"
+                    variant="ghost"
                     size="sm"
                     onPress={onDetailsModalClose}
                   >
@@ -478,6 +480,8 @@ const Blogger = () => {
               <ModalContent className="font-primaryRegular">
               
                 <ModalBody className="bg-white text-black">
+                <ModalHeader>Update Game</ModalHeader>
+                  
                   <UpdateGame
                     updatingGame={selectedGame}
                     callBackFunction1={onUpdateModalClose}
@@ -487,7 +491,7 @@ const Blogger = () => {
                 <ModalFooter className="bg-white ">
                   <Button
                     color="danger"
-                    variant="bordered"
+                    variant="ghost"
                     onPress={onUpdateModalClose}
                   >
                     Close
@@ -507,6 +511,7 @@ const Blogger = () => {
               }}
             >
               <ModalContent className="font-primaryRegular">
+                <ModalHeader>Publish Game</ModalHeader>
                 <ModalBody>
                   <AddNewStock
                     gameForTheStock={selectedGame}

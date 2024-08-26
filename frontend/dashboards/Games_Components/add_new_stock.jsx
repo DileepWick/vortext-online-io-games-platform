@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import axios from "axios";
 import { toast, Flip } from "react-toastify";
 import { Input, Button, Chip } from "@nextui-org/react";
+import { Image } from "@nextui-org/react";
 
 const AddNewStock = ({ gameForTheStock, callBackFunction }) => {
   // State Variables
   const [game] = useState(gameForTheStock);
   const [title] = useState(gameForTheStock.title);
+  const [cover] = useState(gameForTheStock.coverPhoto);
   const [price, setPrice] = useState(0);
   const [discount, setDiscount] = useState("");
 
@@ -66,16 +68,24 @@ const AddNewStock = ({ gameForTheStock, callBackFunction }) => {
     <div className="p-4">
       <form onSubmit={handleAddNewStock} className="space-y-4">
         <div className="form-group space-y-4">
-          <Chip color="default" size="lg" radius="none">
+          <Chip color="primary" size="sm" radius="none">
             {title}
           </Chip>
-          <p>
-            Set price and discount to publish the game. <br></br>After
-            publishing the game will be appear in the shop.
+          <Image
+            isZoomed
+            width={100}
+            alt="Game Cover Photo"
+            src={cover}
+            className="rounded-lg shadow-md"
+          />
+          <p className="text-sm text-pink-500 border border-pink-500 p-2 rounded">
+            Set price and discount to publish the game. <br />
+            After publishing, the game will appear in the shop.
           </p>
+
           <Input
             type="number"
-            label="Price"
+            label="SET PRICE FOR THE GAME"
             value={price}
             onChange={(e) => setPrice(Number(e.target.value))}
             className="w-full"
@@ -88,7 +98,7 @@ const AddNewStock = ({ gameForTheStock, callBackFunction }) => {
           />
           <Input
             type="number"
-            label="Discount"
+            label="ADD DISCOUNT"
             value={discount}
             onChange={(e) => setDiscount(Number(e.target.value))}
             className="w-full"
