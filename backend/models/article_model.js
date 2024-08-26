@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-
 const { Schema } = mongoose;
 
 const articleSchema = new Schema({
@@ -28,6 +27,11 @@ const articleSchema = new Schema({
     ref: "User",
     required: true,
   },
+  comments: [{
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    text: String,
+    createdAt: { type: Date, default: Date.now }
+  }]
 });
 
 export const Article = mongoose.model("Article", articleSchema);

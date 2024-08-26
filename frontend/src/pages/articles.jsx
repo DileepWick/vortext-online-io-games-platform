@@ -6,7 +6,7 @@ import { getToken } from "../utils/getToken";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { User } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
-import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { FaHeart, FaRegHeart, FaTrash } from "react-icons/fa";
 
 const Articles = () => {
   const [heading, setHeading] = useState('');
@@ -18,6 +18,9 @@ const Articles = () => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [likedArticles, setLikedArticles] = useState({});
+  const [commentText, setCommentText] = useState('');
+  const [deletingArticleId, setDeletingArticleId] = useState(null);
+  const [deletingCommentId, setDeletingCommentId] = useState(null);
 
   const token = getToken();
   const userId = getUserIdFromToken(token);
@@ -94,7 +97,7 @@ const Articles = () => {
         setHeading('');
         setArticleBody('');
         setImage(null);
-        fetchArticles(); // Re-fetch articles to update the list
+        fetchArticles();
       }
     } catch (err) {
       setError('Error creating article');
@@ -109,7 +112,7 @@ const Articles = () => {
 
       setLikedArticles(prevLikedArticles => ({
         ...prevLikedArticles,
-        [articleId]: !prevLikedArticles[articleId], // Toggle like status
+        [articleId]: !prevLikedArticles[articleId],
       }));
 
       setArticles(prevArticles =>
@@ -119,6 +122,58 @@ const Articles = () => {
       );
     } catch (err) {
       console.error("Error toggling like", err);
+    }
+  };
+
+  const handleCommentSubmit = async (articleId) => {
+    try {
+      const response = await axios.post(`http://localhost:8098/articles/${articleId}/comments`, {
+        userId,
+        text: commentText
+      });
+
+      if (response.status === 201) {
+        setArticles(prevArticles =>
+          prevArticles.map(article =>
+            article._id === articleId
+              ? { ...article, comments: [...article.comments, response.data.comment] }
+              : article
+          )
+        );
+        setCommentText('');
+      }
+    } catch (err) {
+      console.error("Error adding comment", err);
+    }
+  };
+
+  const handleDeleteComment = async (articleId, commentId) => {
+    try {
+      await axios.delete(`http://localhost:8098/articles/${articleId}/comments/${commentId}`, {
+        data: { userId }
+      });
+
+      setArticles(prevArticles =>
+        prevArticles.map(article =>
+          article._id === articleId
+            ? { ...article, comments: article.comments.filter(comment => comment._id !== commentId) }
+            : article
+        )
+      );
+    } catch (err) {
+      console.error("Error deleting comment", err);
+    }
+  };
+
+  const handleDeleteArticle = async (articleId) => {
+    try {
+      await axios.delete(`http://localhost:8098/articles/deleteArticle/${articleId}`, {
+        data: { userId }
+      });
+
+      setArticles(prevArticles => prevArticles.filter(article => article._id !== articleId));
+    } catch (err) {
+      console.error("Error deleting article", err);
     }
   };
 
@@ -190,31 +245,74 @@ const Articles = () => {
             {articles.map((article) => (
               <div
                 key={article._id}
-                className="bg-gray-800 border border-gray-600 rounded-lg shadow-lg p-4 flex flex-row"
+                className="bg-gray-800 border border-gray-600 rounded-lg shadow-lg p-4 flex flex-col"
               >
-                <div className="flex-shrink-0 w-1/3 pr-4">
-                  <img
-                    src={article.image}
-                    alt={article.heading}
-                    className="w-full h-full object-cover rounded"
-                  />
-                </div>
-                <div className="flex-grow">
-                  <h3 className="text-xl font-semibold mb-2">{article.heading}</h3>
-                  <p className="text-gray-400 mb-4">{article.articleBody}</p>
-                  <div className="flex justify-between items-center">
-                    <Button
-                      onClick={() => handleLikeToggle(article._id)}
-                      className={`px-4 py-2 rounded ${
-                        likedArticles[article._id]
-                          ? "bg-red-500 hover:bg-red-600"
-                          : "bg-gray-500 hover:bg-gray-600"
-                      }`}
-                      disabled={!userId}
+                <div className="flex flex-row">
+                  <div className="flex-shrink-0 w-1/3 pr-4">
+                    <img
+                      src={article.image}
+                      alt={article.heading}
+                      className="w-full h-full object-cover rounded"
+                    />
+                  </div>
+                  <div className="flex-grow">
+                    <h3 className="text-xl font-semibold mb-2">{article.heading}</h3>
+                    <p className="text-gray-400">{article.articleBody}</p>
+                  </div>
+                  {article.uploader === userId && (
+                    <button
+                      className="ml-auto text-red-600 hover:text-red-400"
+                      onClick={() => handleDeleteArticle(article._id)}
                     >
-                      {likedArticles[article._id] ? <FaHeart className="text-white" /> : <FaRegHeart className="text-gray-400" />}
-                      <span className="ml-2 text-white">{article.likes}</span>
-                    </Button>
+                      <FaTrash className="text-lg" />
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex justify-between items-center mt-4">
+                  <div className="flex items-center">
+                    <button onClick={() => handleLikeToggle(article._id)}>
+                      {likedArticles[article._id] ? (
+                        <FaHeart className="text-red-500 mr-2" />
+                      ) : (
+                        <FaRegHeart className="text-white mr-2" />
+                      )}
+                    </button>
+                    <span>{article.likes} likes</span>
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <form onSubmit={(e) => { e.preventDefault(); handleCommentSubmit(article._id); }}>
+                    <textarea
+                      value={commentText}
+                      onChange={(e) => setCommentText(e.target.value)}
+                      placeholder="Add a comment..."
+                      className="w-full border-none bg-gray-700 text-white rounded-lg p-2"
+                      rows="2"
+                    ></textarea>
+                    <button
+                      type="submit"
+                      className="mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded"
+                    >
+                      Comment
+                    </button>
+                  </form>
+
+                  <div className="mt-4">
+                    {article.comments.map((comment) => (
+                      <div key={comment._id} className="bg-gray-900 p-2 rounded-lg mb-2">
+                        <p className="text-sm">{comment.text}</p>
+                        {comment.user === userId && (
+                          <button
+                            className="text-red-600 hover:text-red-400 text-xs"
+                            onClick={() => handleDeleteComment(article._id, comment._id)}
+                          >
+                            Delete Comment
+                          </button>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
