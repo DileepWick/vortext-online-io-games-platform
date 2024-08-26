@@ -3,7 +3,10 @@ import {
   createArticle,
   getBloggerArticles,
   getAllArticles,
-  toggleLike
+  toggleLike,
+  addComment,
+  deleteArticle,
+  deleteComment
 } from "../controllers/article_controller.js";
 import upload from "../middleware/multer.js";
 
@@ -15,6 +18,10 @@ articleRouter.post(
   createArticle
 );
 articleRouter.get("/myArticles/:uploaderid", getBloggerArticles);
-articleRouter.get('/getAllArticles',getAllArticles);
-articleRouter.put('/toggleLike/:articleId',toggleLike);
+articleRouter.get('/getAllArticles', getAllArticles);
+articleRouter.put('/toggleLike/:articleId', toggleLike);
+articleRouter.post('/:articleId/comments', addComment);
+articleRouter.delete('/deleteArticle/:articleId', deleteArticle); // Delete article
+articleRouter.delete('/deleteComment/:articleId', deleteComment); // Delete comment
+
 export default articleRouter;
