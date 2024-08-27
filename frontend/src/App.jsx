@@ -36,6 +36,7 @@ import StaffManager from "../dashboards/staff_manager_dashboard";
 import CommunityDashBoard from  "../dashboards/communityDashboard";
 import UserManagementDashboard from "../dashboards/UserManagementDashboard";
 import Payment_Manager from "../dashboards/Payment_manager_dashboard";
+import RentedGamesSection from "../dashboards/rentedGamesDash";
 
 
 const App = () => {
@@ -71,6 +72,7 @@ const App = () => {
       <Route path="/Payment_manager_dashboard" element={<Payment_Manager />} />
       <Route path="/RentalGamesEmbed/:src/:title" element={<RentalGamesEmbed />} />
       <Route path="/TailoredGames" element={<TailoredGames />} />
+      <Route path="/RentedGamesSection" element={<RentedGamesSection />} />
     </Routes>
   );
 };
