@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Header from "../components/header";
 import Footer from "../components/footer";
-import { Spinner, Card, CardBody } from "@nextui-org/react";
+import { Spinner, Card, CardBody, Button } from "@nextui-org/react";
 import Chatbot from "../components/Chatbot";
 
 const Support = () => {
@@ -10,8 +10,7 @@ const Support = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [expandedFAQ, setExpandedFAQ] = useState(null);
-
-  const maxDescriptionLength = 100;
+  const [showAllFAQs, setShowAllFAQs] = useState(false);
 
   useEffect(() => {
     const fetchFAQs = async () => {
@@ -34,6 +33,8 @@ const Support = () => {
   const handleToggleExpand = (id) => {
     setExpandedFAQ(expandedFAQ === id ? null : id);
   };
+
+  const displayedFAQs = showAllFAQs ? faqs : faqs.slice(0, 3);
 
   return (
     <div className="relative min-h-screen bg-customDark text-white">
@@ -70,48 +71,71 @@ const Support = () => {
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {faqs.length === 0 ? (
+          {displayedFAQs.length === 0 ? (
             <p className="text-center text-gray-400">No FAQs available</p>
           ) : (
-            faqs.map((faq) => {
-              const isLongDescription =
-                faq.answer && faq.answer.length > maxDescriptionLength;
-              const isExpanded = expandedFAQ === faq._id;
-
-              return (
-                <Card
-                  key={faq._id}
-                  className="bg-gray-800 rounded-lg shadow-lg text-white"
-                >
-                  <CardBody>
-                    <h2 className="text-xl font-primaryRegular mb-4">
-                      {faq.question}
-                    </h2>
-                    <p
-                      className={`transition-max-height duration-500 ease-in-out ${
-                        isExpanded ? "max-h-screen" : "max-h-24 overflow-hidden"
-                      }`}
-                    >
-                      {faq.answer || "No answer available"}
-                    </p>
-                    {isLongDescription && (
-                      <button
-                        onClick={() => handleToggleExpand(faq._id)}
-                        className="mt-2 text-blue-400 hover:text-blue-300"
-                        aria-expanded={isExpanded}
-                      >
-                        {isExpanded ? "Read Less" : "Read More"}
-                      </button>
-                    )}
-                  </CardBody>
-                </Card>
-              );
-            })
+            displayedFAQs.map((faq) => (
+              <FAQCard
+                key={faq._id}
+                faq={faq}
+                isExpanded={expandedFAQ === faq._id}
+                onToggleExpand={() => handleToggleExpand(faq._id)}
+              />
+            ))
           )}
         </div>
+
+        {faqs.length > 6 && (
+          <div className="text-center mt-8">
+            <Button
+              color="primary"
+              onClick={() => setShowAllFAQs(!showAllFAQs)}
+            >
+              {showAllFAQs ? "Show Less" : "Show More"}
+            </Button>
+          </div>
+        )}
       </div>
       <Footer />
     </div>
+  );
+};
+
+const FAQCard = ({ faq, isExpanded, onToggleExpand }) => {
+  const [isOverflowing, setIsOverflowing] = useState(false);
+  const contentRef = useRef(null);
+
+  useEffect(() => {
+    if (contentRef.current) {
+      setIsOverflowing(
+        contentRef.current.scrollHeight > contentRef.current.clientHeight
+      );
+    }
+  }, [faq.answer]);
+
+  return (
+    <Card className="bg-gray-800 rounded-lg shadow-lg text-white">
+      <CardBody>
+        <h2 className="text-xl font-primaryRegular mb-4">{faq.question}</h2>
+        <div
+          ref={contentRef}
+          className={`transition-max-height duration-500 ease-in-out ${
+            isExpanded ? "max-h-screen" : "max-h-24 overflow-hidden"
+          }`}
+        >
+          <p>{faq.answer || "No answer available"}</p>
+        </div>
+        {isOverflowing && (
+          <button
+            onClick={onToggleExpand}
+            className="mt-2 text-blue-400 hover:text-blue-300"
+            aria-expanded={isExpanded}
+          >
+            {isExpanded ? "Read Less" : "Read More"}
+          </button>
+        )}
+      </CardBody>
+    </Card>
   );
 };
 

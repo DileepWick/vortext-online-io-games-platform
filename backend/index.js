@@ -5,8 +5,6 @@ import mongoose from "mongoose";
 import cors from "cors";
 import GPTRouter from "./routes/gpt_route.js";
 
-
-
 //Route files
 import userRouter from "./routes/userAuthenticationRoutes.js";
 import bookRouter from "./routes/book_Routes.js";
@@ -19,11 +17,12 @@ import orderRouter from "./routes/order_Routes.js";
 import OrderItemsRouter from "./routes/order_items_route.js";
 import articleRouter from "./routes/article_routes.js";
 import postRouter from "./routes/communityPost_routes.js";
-import ratingRouter from "./routes/rating_routes.js"
+import ratingRouter from "./routes/rating_routes.js";
 import spookeyRouter from "./routes/spookey_guesses_routes.js";
 import faqRouter from "./routes/faq_routes.js";
 import RentalRouter from "./routes/rental_routes.js";
 import chatRouter from "./routes/chat_bot_route.js";
+import contactRouter from "./routes/contact_us_route.js";
 
 import { RentalDurationRouter } from "./routes/rentalDurationRoutes.js";
 
@@ -41,7 +40,6 @@ app.listen(PORT, () =>
   console.log(`Server running on http://localhost:${PORT}`)
 );
 
-
 //Connect DB
 mongoose
   .connect(mongoDBURL)
@@ -57,9 +55,6 @@ mongoose
     console.error("Error connecting to MongoDB");
   });
 
-
-
-
 //Routes
 app.use("/books", bookRouter); //Books
 app.use("/users", userRouter); //Users
@@ -74,16 +69,17 @@ app.use("/articles", articleRouter); //Articles
 app.use("/feed", postRouter); //Post
 app.use("/spookeyEditons", spookeyRouter); //Spookey_Game
 app.use("/faq", faqRouter);
-app.use("/gameStocks",gameStockRouter);//GameStocks
-app.use("/cart",cartRouter); //Cart
-app.use("/cartItems", cartItemsRouter);//Cart Items
-app.use("/orders",orderRouter);//Orders
-app.use("/orderItems",OrderItemsRouter)//Order Items
-app.use("/articles",articleRouter);//Articles
-app.use("/feed",postRouter); //Post
-app.use("/ratings",ratingRouter)
-app.use("/spookeyEditons",spookeyRouter) //Spookey_Game
-app.use("/Rentals",RentalRouter); //Rentals
-app.use('/api', chatRouter);// Use chatbot routes
+app.use("/gameStocks", gameStockRouter); //GameStocks
+app.use("/cart", cartRouter); //Cart
+app.use("/cartItems", cartItemsRouter); //Cart Items
+app.use("/orders", orderRouter); //Orders
+app.use("/orderItems", OrderItemsRouter); //Order Items
+app.use("/articles", articleRouter); //Articles
+app.use("/feed", postRouter); //Post
+app.use("/ratings", ratingRouter);
+app.use("/spookeyEditons", spookeyRouter); //Spookey_Game
+app.use("/Rentals", RentalRouter); //Rentals
+app.use("/api", chatRouter); // Use chatbot routes
 app.use("/rentalDurations", RentalDurationRouter);
-app.use('/api', GPTRouter);
+app.use("/api", GPTRouter);
+app.use("/contacts", contactRouter);
