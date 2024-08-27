@@ -91,7 +91,7 @@ export default function Header() {
                 location.pathname === "/articles" ? "underline" : ""
               } text-white hover:underline`}
             >
-              article
+              Community
             </Link>
           </NavbarItem>
           <NavbarItem>
@@ -102,7 +102,7 @@ export default function Header() {
                 location.pathname === "/community" ? "underline" : ""
               } text-white hover:underline`}
             >
-              Community
+              article
             </Link>
           </NavbarItem>
 
@@ -198,12 +198,12 @@ export default function Header() {
                 </DropdownItem>
 
                 {/* Admin Filter */}
-                {user.role === "Admin" && (
+                {user.role === "Product Manager" && (
                   <DropdownItem
                     key="admin-panel"
                     onClick={() => navigate("/productDashboard")}
                   >
-                    Admin Panel
+                    Products Dashboard
                   </DropdownItem>
                 )}
 

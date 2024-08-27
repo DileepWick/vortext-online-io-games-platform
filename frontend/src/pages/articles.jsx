@@ -161,6 +161,8 @@ const Articles = () => {
       setDeletingCommentId(commentId);
       await axios.delete(`http://localhost:8098/articles/deleteComment/${articleId}`, {
         data: { userId, commentId }
+      await axios.delete(`http://localhost:8098/articles/${articleId}/comments/${commentId}`, {
+        data: { userId }
       });
 
       setArticles(prevArticles =>
@@ -261,6 +263,7 @@ const Articles = () => {
           <div className="space-y-6">
             {articles.map((article) => (
               <div key={article._id} className="bg-gray-800 rounded-lg shadow-md p-4 relative">
+                {/* Post delete button */}
                 {article.uploader === userId && (
                   <button
                     className="absolute top-2 right-2 text-red-500 hover:text-red-400"
@@ -339,6 +342,11 @@ const Articles = () => {
                             ) : (
                               <FaTrash size={14} />
                             )}
+                            className="text-red-600 hover:text-red-400 text-xs ml-2"
+                            onClick={() => handleDeleteComment(article._id, comment._id)}
+                            disabled={deletingCommentId === comment._id}
+                          >
+                            {deletingCommentId === comment._id ? 'Deleting...' : <FaTrash />}
                           </button>
                         )}
                       </div>
