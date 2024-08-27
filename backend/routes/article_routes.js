@@ -21,7 +21,7 @@ articleRouter.get("/myArticles/:uploaderid", getBloggerArticles);
 articleRouter.get('/getAllArticles', getAllArticles);
 articleRouter.put('/toggleLike/:articleId', toggleLike);
 articleRouter.post('/:articleId/comments', addComment);
-articleRouter.delete('/deleteArticle/:articleId', deleteArticle); // Delete article
-articleRouter.delete('/deleteComment/:articleId', deleteComment); // Delete comment
+articleRouter.delete('/deleteArticle/:articleId', deleteArticle);
+articleRouter.delete('/:articleId/comments/:commentId', deleteComment);
 
 export default articleRouter;
