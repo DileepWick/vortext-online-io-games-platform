@@ -175,7 +175,9 @@ const Articles = () => {
         data: { userId },
       });
 
+
       setArticles((prevArticles) => prevArticles.filter((article) => article._id !== articleId));
+
     } catch (err) {
       console.error("Error deleting article", err);
     }
