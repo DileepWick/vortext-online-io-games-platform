@@ -331,7 +331,7 @@ const SessionManagerDash = () => {
                           {rentalTime.duration}
                         </Chip>
                       </TableCell>
-                      <TableCell>LKR {rentalTime.price.toFixed(2)}</TableCell>
+                      <TableCell>RS {rentalTime.price.toFixed(2)}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-4">
                           <Tooltip
