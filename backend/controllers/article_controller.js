@@ -187,8 +187,7 @@ export const deleteArticle = async (req, res) => {
 // Delete a comment from an article
 export const deleteComment = async (req, res) => {
   try {
-    const { articleId } = req.params;
-    const { commentId } = req.body;
+    const { articleId, commentId } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(articleId) || !mongoose.Types.ObjectId.isValid(commentId)) {
       return res.status(400).json({ message: "Invalid article ID or comment ID" });
