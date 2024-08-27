@@ -126,7 +126,7 @@ const GamingSessions = () => {
                     </p>
                     
                     <p className="mb-2 text-sm text-gray-300">
-                      Rental Time: {rental.time}
+                      Rental Time: {rental.time}min
                     </p>
                     
                     <div className="flex flex-wrap gap-2 mb-4 font-primaryRegular">

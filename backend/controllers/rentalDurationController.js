@@ -27,22 +27,14 @@ export const RentalTimeController = {
   //get all the rental times
   getAllRentalTimes: async (req, res) => {
     try {
-      const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 10;
-      const skip = (page - 1) * limit;
-
       const rentalTimes = await RentalTime.find()
         .populate('game', 'title') // Populate game field with title
-        .skip(skip)
-        .limit(limit)
         .sort({ game: 1, duration: 1 }); // Sort by game, then by duration
 
       const total = await RentalTime.countDocuments();
 
       res.status(200).json({
         rentalTimes,
-        currentPage: page,
-        totalPages: Math.ceil(total / limit),
         totalItems: total
       });
     } catch (error) {
