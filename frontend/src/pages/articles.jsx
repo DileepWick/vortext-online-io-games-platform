@@ -159,8 +159,6 @@ const Articles = () => {
   const handleDeleteComment = async (articleId, commentId) => {
     try {
       setDeletingCommentId(commentId);
-      await axios.delete(`http://localhost:8098/articles/deleteComment/${articleId}`, {
-        data: { userId, commentId }
       await axios.delete(`http://localhost:8098/articles/${articleId}/comments/${commentId}`, {
         data: { userId }
       });
@@ -214,8 +212,6 @@ const Articles = () => {
                 <User
                   avatarProps={{
                     src: user.profilePic,
-                    // Override disableAnimation prop
-                    disableAnimation: undefined,
                   }}
                   className="mr-3"
                 />
@@ -333,15 +329,6 @@ const Articles = () => {
                         </div>
                         {comment.user._id === userId && (
                           <button
-                            className="text-red-500 hover:text-red-400"
-                            onClick={() => handleDeleteComment(article._id, comment._id)}
-                            disabled={deletingCommentId === comment._id}
-                          >
-                            {deletingCommentId === comment._id ? (
-                              <span className="text-xs">Deleting...</span>
-                            ) : (
-                              <FaTrash size={14} />
-                            )}
                             className="text-red-600 hover:text-red-400 text-xs ml-2"
                             onClick={() => handleDeleteComment(article._id, comment._id)}
                             disabled={deletingCommentId === comment._id}
