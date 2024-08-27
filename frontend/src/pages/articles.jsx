@@ -136,7 +136,16 @@ const Articles = () => {
         setArticles(prevArticles =>
           prevArticles.map(article =>
             article._id === articleId
-              ? { ...article, comments: [...article.comments, response.data.comment] }
+              ? {
+                  ...article,
+                  comments: [
+                    ...article.comments,
+                    {
+                      ...response.data.comment,
+                      user: { _id: userId, name: user.name }
+                    }
+                  ]
+                }
               : article
           )
         );
@@ -149,8 +158,9 @@ const Articles = () => {
 
   const handleDeleteComment = async (articleId, commentId) => {
     try {
-      await axios.delete(`http://localhost:8098/articles/${articleId}/comments/${commentId}`, {
-        data: { userId }
+      setDeletingCommentId(commentId);
+      await axios.delete(`http://localhost:8098/articles/deleteComment/${articleId}`, {
+        data: { userId, commentId }
       });
 
       setArticles(prevArticles =>
@@ -160,19 +170,24 @@ const Articles = () => {
             : article
         )
       );
+      setDeletingCommentId(null);
     } catch (err) {
+      setDeletingCommentId(null);
       console.error("Error deleting comment", err);
     }
   };
 
   const handleDeleteArticle = async (articleId) => {
     try {
+      setDeletingArticleId(articleId);
       await axios.delete(`http://localhost:8098/articles/deleteArticle/${articleId}`, {
         data: { userId }
       });
 
       setArticles(prevArticles => prevArticles.filter(article => article._id !== articleId));
+      setDeletingArticleId(null);
     } catch (err) {
+      setDeletingArticleId(null);
       console.error("Error deleting article", err);
     }
   };
@@ -197,6 +212,8 @@ const Articles = () => {
                 <User
                   avatarProps={{
                     src: user.profilePic,
+                    // Override disableAnimation prop
+                    disableAnimation: undefined,
                   }}
                   className="mr-3"
                 />
@@ -206,7 +223,7 @@ const Articles = () => {
                 id="heading"
                 value={heading}
                 onChange={(e) => setHeading(e.target.value)}
-                placeholder="What's on your mind?"
+                placeholder=" What's on your mind?"
                 className="w-full border-none bg-gray-700 text-white text-lg focus:outline-none"
               />
             </div>
@@ -243,11 +260,22 @@ const Articles = () => {
         ) : (
           <div className="space-y-6">
             {articles.map((article) => (
-              <div
-                key={article._id}
-                className="bg-gray-800 border border-gray-600 rounded-lg shadow-lg p-4 flex flex-col"
-              >
-                <div className="flex flex-row">
+              <div key={article._id} className="bg-gray-800 rounded-lg shadow-md p-4 relative">
+                {article.uploader === userId && (
+                  <button
+                    className="absolute top-2 right-2 text-red-500 hover:text-red-400"
+                    onClick={() => handleDeleteArticle(article._id)}
+                    disabled={deletingArticleId === article._id}
+                  >
+                    {deletingArticleId === article._id ? (
+                      <span className="text-sm">Deleting...</span>
+                    ) : (
+                      <FaTrash size={16} />
+                    )}
+                  </button>
+                )}
+
+                <div className="flex mb-4">
                   <div className="flex-shrink-0 w-1/3 pr-4">
                     <img
                       src={article.image}
@@ -259,14 +287,6 @@ const Articles = () => {
                     <h3 className="text-xl font-semibold mb-2">{article.heading}</h3>
                     <p className="text-gray-400">{article.articleBody}</p>
                   </div>
-                  {article.uploader === userId && (
-                    <button
-                      className="ml-auto text-red-600 hover:text-red-400"
-                      onClick={() => handleDeleteArticle(article._id)}
-                    >
-                      <FaTrash className="text-lg" />
-                    </button>
-                  )}
                 </div>
 
                 <div className="flex justify-between items-center mt-4">
@@ -301,14 +321,24 @@ const Articles = () => {
 
                   <div className="mt-4">
                     {article.comments.map((comment) => (
-                      <div key={comment._id} className="bg-gray-900 p-2 rounded-lg mb-2">
-                        <p className="text-sm">{comment.text}</p>
-                        {comment.user === userId && (
+                      <div key={comment._id} className="bg-gray-900 p-2 rounded-lg mb-2 flex justify-between items-start">
+                        <div>
+                          <p className="text-sm">{comment.text}</p>
+                          <p className="text-xs text-gray-500">
+                            By {comment.user.name} on {new Date(comment.createdAt).toLocaleString()}
+                          </p>
+                        </div>
+                        {comment.user._id === userId && (
                           <button
-                            className="text-red-600 hover:text-red-400 text-xs"
+                            className="text-red-500 hover:text-red-400"
                             onClick={() => handleDeleteComment(article._id, comment._id)}
+                            disabled={deletingCommentId === comment._id}
                           >
-                            Delete Comment
+                            {deletingCommentId === comment._id ? (
+                              <span className="text-xs">Deleting...</span>
+                            ) : (
+                              <FaTrash size={14} />
+                            )}
                           </button>
                         )}
                       </div>

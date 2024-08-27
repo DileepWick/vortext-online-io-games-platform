@@ -197,7 +197,7 @@ const RentedGamesSection = () => {
                 <TableCell>{rentedGame.game?.title || 'N/A'}</TableCell>
                 <TableCell>{rentedGame.user?.username || 'N/A'}</TableCell>
                 <TableCell>{rentedGame.time || 'N/A'}</TableCell>
-                <TableCell>${rentedGame.price || 'N/A'}</TableCell>
+                <TableCell>LKR {rentedGame.price.toFixed(2) || 'N/A'}</TableCell>
                 <TableCell>{new Date(rentedGame.insertDate).toLocaleString()}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-4">

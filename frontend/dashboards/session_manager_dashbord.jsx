@@ -32,6 +32,8 @@ import { DeleteIcon } from "../src/assets/icons/DeleteIcon";
 import { EditIcon } from "../src/assets/icons/EditIcon";
 import { PlusIcon } from "../src/assets/icons/PlusIcon";
 
+import RentedGamesSection from "./sessionManagerRentedGames";
+
 const SessionManagerDash = () => {
   const [rentalTimes, setRentalTimes] = useState([]);
   const [games, setGames] = useState([]);
@@ -48,6 +50,7 @@ const SessionManagerDash = () => {
   const [activeTab, setActiveTab] = useState("rentalTimes");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [page, setPage] = useState(1);
+
   const rowsPerPage = 4;
 
   useEffect(() => {
@@ -363,7 +366,9 @@ const SessionManagerDash = () => {
               </Table>
             </>
           )}
-          {/* PASTE_RENTED_GAMES_CODE_HERE */}
+          {activeTab === "rentedGames" && (
+            <RentedGamesSection />
+          )}
         </div>
       </main>
       <Footer />
