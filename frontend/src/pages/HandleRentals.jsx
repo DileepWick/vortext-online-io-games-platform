@@ -35,13 +35,14 @@ const HandleRentals = () => {
     try {
       const response = await axios.get(`http://localhost:8098/rentalDurations/game/${gameId}`);
       setRentalOptions(response.data.map(option => ({
+        id: option._id, // Assuming each option has a unique _id field
         time: option.duration.toString(),
         price: option.price
       })));
     } catch (err) {
       console.error("Error fetching rental times:", err);
       toast.error("Failed to fetch rental options. Please try again.");
-      setRentalOptions([]); // Ensure rental options are empty on error
+      setRentalOptions([]);
     }
   };
 
@@ -63,7 +64,7 @@ const HandleRentals = () => {
 
   const handleRentalSelection = useCallback((option) => {
     setSelectedRental(prevSelected => 
-      prevSelected && prevSelected.time === option.time ? null : option
+      prevSelected && prevSelected.id === option.id ? null : option
     );
   }, []);
 
@@ -223,22 +224,22 @@ const HandleRentals = () => {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                   {rentalOptions.map((option) => (
                     <Card 
-                      key={option.time}
+                      key={option.id}
                       isPressable
                       isHoverable
                       onPress={() => handleRentalSelection(option)}
                       className={`
                         transition-all duration-300 ease-in-out
-                        ${selectedRental?.time === option.time 
+                        ${selectedRental?.id === option.id 
                           ? 'border-primary border-2 shadow-lg scale-105 bg-primary bg-opacity-20' 
                           : 'border-gray-600 hover:border-gray-400'}
                       `}
                     >
                       <CardBody className="text-center">
-                        <p className={`text-lg font-bold ${selectedRental?.time === option.time ? 'text-primary' : ''}`}>
+                        <p className={`text-lg font-bold ${selectedRental?.id === option.id ? 'text-primary' : ''}`}>
                           {parseInt(option.time) >= 60 ? `${parseInt(option.time) / 60} hour${parseInt(option.time) > 60 ? 's' : ''}` : `${option.time} min`}
                         </p>
-                        <p className={`text-sm ${selectedRental?.time === option.time ? 'text-primary' : ''}`}>
+                        <p className={`text-sm ${selectedRental?.id === option.id ? 'text-primary' : ''}`}>
                           LKR {option.price}
                         </p>
                       </CardBody>
