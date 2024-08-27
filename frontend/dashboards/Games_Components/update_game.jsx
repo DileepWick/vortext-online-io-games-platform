@@ -115,7 +115,7 @@ const UpdateGame = ({ updatingGame, callBackFunction1, callBackFunction2 }) => {
           <Chip color="primary" className="ml-4">{title}</Chip>
           <form
             onSubmit={handleUpdate}
-            className="space-y-6 p-6 bg-gray-900 rounded-lg shadow-lg"
+            className="space-y-6 p-6 bg-white rounded-lg shadow-lg"
           >
             {/* Title Section */}
             <div className="form-section">
