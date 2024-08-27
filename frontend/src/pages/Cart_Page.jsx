@@ -172,7 +172,7 @@ const CartPage = () => {
 
         // Clear cart and show success message
         setCartItems([]);
-        toast.success("Order Placed Successfully !", {
+        toast.success("Game bought successfully ..Enjoy !", {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -198,11 +198,11 @@ const CartPage = () => {
 
   if (cartItems.length === 0)
     return (
-      <div className="bg-customDark min-h-screen">
+      <div className="bg-customDark flex flex-col min-h-screen">
         <Header />
-        <p className="text-center mt-8 text-lg text-white">
-          No items in the cart
-        </p>
+        <p className="text-center text-white font-primaryRegular text-5xl mt-[100px]">
+            Cart is empty
+          </p>
         <Footer />
       </div>
     );

@@ -207,9 +207,13 @@ const Blogger = () => {
       </div>
       <div className="p-4">
         {activeTab === "analytics" && (
-          <>
-            <h1>Stats</h1>
-          </>
+          <div className="bg-white flex flex-col min-h-screen">
+
+            <p className="text-center text-black font-primaryRegular text-5xl mt-[100px]">
+              STATS 
+            </p>
+           
+          </div>
         )}
         {/*PRODUCTS*/}
         {activeTab === "products" && (
@@ -348,15 +352,12 @@ const Blogger = () => {
               }}
               className="p-4"
             >
-              
               <ModalContent className="font-primaryRegular bg-white">
-              <ModalHeader>Game Information</ModalHeader>
+                <ModalHeader>Game Information</ModalHeader>
                 <ModalBody>
                   {selectedGame && (
                     <div className="flex flex-col gap-4">
-                      <Chip color="primary">
-                        {selectedGame.title}
-                      </Chip>
+                      <Chip color="primary">{selectedGame.title}</Chip>
 
                       <div className="flex gap-4 items-start">
                         <div>
@@ -478,10 +479,9 @@ const Blogger = () => {
               }}
             >
               <ModalContent className="font-primaryRegular">
-              
                 <ModalBody className="bg-white text-black">
-                <ModalHeader>Update Game</ModalHeader>
-                  
+                  <ModalHeader>Update Game</ModalHeader>
+
                   <UpdateGame
                     updatingGame={selectedGame}
                     callBackFunction1={onUpdateModalClose}
