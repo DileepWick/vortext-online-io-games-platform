@@ -238,7 +238,7 @@ const SessionManagerDash = () => {
                           {rentalTime.duration}
                         </Chip>
                       </TableCell>
-                      <TableCell>${rentalTime.price}</TableCell>
+                      <TableCell>RS {rentalTime.price.toFixed(2)}</TableCell>
                       <TableCell>
                         <div style={{ display: "flex", gap: "10px" }}>
                           <Button size="sm" color="warning" onPress={() => handleEdit(rentalTime)}>Edit</Button>
