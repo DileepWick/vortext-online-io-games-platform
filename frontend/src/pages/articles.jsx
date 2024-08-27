@@ -168,20 +168,12 @@ const Articles = () => {
   };
 
   const handleDeleteComment = async (articleId, commentId) => {
-    console.log(`Attempting to delete comment. ArticleId: ${articleId}, CommentId: ${commentId}`);
     try {
       setDeletingCommentId(commentId);
       
-      const url = `http://localhost:8098/articles/deleteComment/${articleId}/${commentId}`;
-      
-      console.log('Delete comment request URL:', url);
-      
-      const response = await axios.delete(url);
-      
-      console.log('Delete comment response:', response);
+      const response = await axios.delete(`http://localhost:8098/articles/deleteComment/${articleId}/${commentId}`);
 
       if (response.status === 200) {
-        console.log('Comment deleted successfully');
         setArticles(prevArticles =>
           prevArticles.map(article =>
             article._id === articleId
@@ -191,21 +183,11 @@ const Articles = () => {
         );
         setDeletingCommentId(null);
       } else {
-        console.log('Unexpected response status:', response.status);
         throw new Error('Failed to delete comment');
       }
     } catch (err) {
       setDeletingCommentId(null);
       console.error("Error deleting comment", err);
-      if (err.response) {
-        console.log('Error response:', err.response.data);
-        console.log('Error status:', err.response.status);
-        console.log('Error headers:', err.response.headers);
-      } else if (err.request) {
-        console.log('Error request:', err.request);
-      } else {
-        console.log('Error message:', err.message);
-      }
       alert("Failed to delete comment. Please try again.");
     }
   };
@@ -293,7 +275,7 @@ const Articles = () => {
           <div className="space-y-6">
             {articles.map((article) => (
               <div key={article._id} className="bg-gray-800 rounded-lg shadow-md p-4 relative">
-                {article.uploader === userId && (
+                {article.uploader._id === userId && (
                   <button
                     className="absolute top-2 right-2 text-red-500 hover:text-red-400"
                     onClick={() => handleDeleteArticle(article._id)}
@@ -318,6 +300,9 @@ const Articles = () => {
                   <div className="flex-grow">
                     <h3 className="text-xl font-semibold mb-2">{article.heading}</h3>
                     <p className="text-gray-400">{article.articleBody}</p>
+                    <p className="text-sm text-gray-500 mt-2">
+                      Posted by: {article.uploader.name}
+                    </p>
                   </div>
                 </div>
 
@@ -363,10 +348,7 @@ const Articles = () => {
                         {comment.user && comment.user._id === userId && (
                           <button
                             className="text-red-600 hover:text-red-400 text-xs ml-2"
-                            onClick={() => {
-                              console.log('Delete button clicked', { articleId: article._id, commentId: comment._id });
-                              handleDeleteComment(article._id, comment._id);
-                            }}
+                            onClick={() => handleDeleteComment(article._id, comment._id)}
                             disabled={deletingCommentId === comment._id}
                           >
                             {deletingCommentId === comment._id ? 'Deleting...' : <FaTrash />}
