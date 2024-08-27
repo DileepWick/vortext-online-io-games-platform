@@ -9,16 +9,16 @@ import { Button } from "@nextui-org/button";
 import { FaHeart, FaRegHeart, FaTrash } from "react-icons/fa";
 
 const Articles = () => {
-  const [heading, setHeading] = useState('');
-  const [articleBody, setArticleBody] = useState('');
+  const [heading, setHeading] = useState("");
+  const [articleBody, setArticleBody] = useState("");
   const [image, setImage] = useState(null);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [user, setUser] = useState(null);
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [likedArticles, setLikedArticles] = useState({});
-  const [commentText, setCommentText] = useState('');
+  const [commentText, setCommentText] = useState("");
   const [deletingArticleId, setDeletingArticleId] = useState(null);
   const [deletingCommentId, setDeletingCommentId] = useState(null);
 
@@ -47,7 +47,7 @@ const Articles = () => {
       setArticles(fetchedArticles);
 
       const likedArticlesObj = {};
-      fetchedArticles.forEach(article => {
+      fetchedArticles.forEach((article) => {
         if (article.likedBy.includes(userId)) {
           likedArticlesObj[article._id] = true;
         }
@@ -71,36 +71,40 @@ const Articles = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     if (!heading || !articleBody || !image) {
-      setError('Please fill all fields and select an image');
+      setError("Please fill all fields and select an image");
       return;
     }
 
     const formData = new FormData();
-    formData.append('heading', heading);
-    formData.append('articleBody', articleBody);
-    formData.append('image', image);
-    formData.append('uploader', userId);
+    formData.append("heading", heading);
+    formData.append("articleBody", articleBody);
+    formData.append("image", image);
+    formData.append("uploader", userId);
 
     try {
-      const response = await axios.post('http://localhost:8098/articles/createNewArticle', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const response = await axios.post(
+        "http://localhost:8098/articles/createNewArticle",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       if (response.status === 201) {
-        setSuccess('Article created successfully');
-        setHeading('');
-        setArticleBody('');
+        setSuccess("Article created successfully");
+        setHeading("");
+        setArticleBody("");
         setImage(null);
         fetchArticles();
       }
     } catch (err) {
-      setError('Error creating article');
+      setError("Error creating article");
       console.error(err);
     }
   };
@@ -110,13 +114,13 @@ const Articles = () => {
       const response = await axios.put(`http://localhost:8098/articles/toggleLike/${articleId}`, { userId });
       const updatedArticle = response.data;
 
-      setLikedArticles(prevLikedArticles => ({
+      setLikedArticles((prevLikedArticles) => ({
         ...prevLikedArticles,
         [articleId]: !prevLikedArticles[articleId],
       }));
 
-      setArticles(prevArticles =>
-        prevArticles.map(article =>
+      setArticles((prevArticles) =>
+        prevArticles.map((article) =>
           article._id === articleId ? { ...article, likes: updatedArticle.likes } : article
         )
       );
@@ -129,18 +133,18 @@ const Articles = () => {
     try {
       const response = await axios.post(`http://localhost:8098/articles/${articleId}/comments`, {
         userId,
-        text: commentText
+        text: commentText,
       });
 
       if (response.status === 201) {
-        setArticles(prevArticles =>
-          prevArticles.map(article =>
+        setArticles((prevArticles) =>
+          prevArticles.map((article) =>
             article._id === articleId
               ? { ...article, comments: [...article.comments, response.data.comment] }
               : article
           )
         );
-        setCommentText('');
+        setCommentText("");
       }
     } catch (err) {
       console.error("Error adding comment", err);
@@ -150,13 +154,13 @@ const Articles = () => {
   const handleDeleteComment = async (articleId, commentId) => {
     try {
       await axios.delete(`http://localhost:8098/articles/${articleId}/comments/${commentId}`, {
-        data: { userId }
+        data: { userId },
       });
 
-      setArticles(prevArticles =>
-        prevArticles.map(article =>
+      setArticles((prevArticles) =>
+        prevArticles.map((article) =>
           article._id === articleId
-            ? { ...article, comments: article.comments.filter(comment => comment._id !== commentId) }
+            ? { ...article, comments: article.comments.filter((comment) => comment._id !== commentId) }
             : article
         )
       );
@@ -168,10 +172,12 @@ const Articles = () => {
   const handleDeleteArticle = async (articleId) => {
     try {
       await axios.delete(`http://localhost:8098/articles/deleteArticle/${articleId}`, {
-        data: { userId }
+        data: { userId },
       });
 
-      setArticles(prevArticles => prevArticles.filter(article => article._id !== articleId));
+
+      setArticles((prevArticles) => prevArticles.filter((article) => article._id !== articleId));
+
     } catch (err) {
       console.error("Error deleting article", err);
     }
@@ -221,7 +227,9 @@ const Articles = () => {
               ></textarea>
             </div>
             <div className="mb-4">
-              <label htmlFor="image" className="block text-sm font-medium text-gray-500">Add to your post</label>
+              <label htmlFor="image" className="block text-sm font-medium text-gray-500">
+                Add to your post
+              </label>
               <input
                 type="file"
                 id="image"
@@ -229,7 +237,10 @@ const Articles = () => {
                 className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-none file:bg-gray-600 file:text-blue-400 hover:file:bg-gray-700"
               />
             </div>
-            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            <button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            >
               Post
             </button>
           </form>
@@ -283,7 +294,12 @@ const Articles = () => {
                 </div>
 
                 <div className="mt-4">
-                  <form onSubmit={(e) => { e.preventDefault(); handleCommentSubmit(article._id); }}>
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      handleCommentSubmit(article._id);
+                    }}
+                  >
                     <textarea
                       value={commentText}
                       onChange={(e) => setCommentText(e.target.value)}
