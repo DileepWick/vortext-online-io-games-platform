@@ -9,16 +9,16 @@ import { Button } from "@nextui-org/button";
 import { FaHeart, FaRegHeart, FaTrash } from "react-icons/fa";
 
 const Articles = () => {
-  const [heading, setHeading] = useState("");
-  const [articleBody, setArticleBody] = useState("");
+  const [heading, setHeading] = useState('');
+  const [articleBody, setArticleBody] = useState('');
   const [image, setImage] = useState(null);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [user, setUser] = useState(null);
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [likedArticles, setLikedArticles] = useState({});
-  const [commentText, setCommentText] = useState("");
+  const [commentTexts, setCommentTexts] = useState({});
   const [deletingArticleId, setDeletingArticleId] = useState(null);
   const [deletingCommentId, setDeletingCommentId] = useState(null);
 
@@ -47,7 +47,7 @@ const Articles = () => {
       setArticles(fetchedArticles);
 
       const likedArticlesObj = {};
-      fetchedArticles.forEach((article) => {
+      fetchedArticles.forEach(article => {
         if (article.likedBy.includes(userId)) {
           likedArticlesObj[article._id] = true;
         }
@@ -71,40 +71,36 @@ const Articles = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
+    setError('');
+    setSuccess('');
 
     if (!heading || !articleBody || !image) {
-      setError("Please fill all fields and select an image");
+      setError('Please fill all fields and select an image');
       return;
     }
 
     const formData = new FormData();
-    formData.append("heading", heading);
-    formData.append("articleBody", articleBody);
-    formData.append("image", image);
-    formData.append("uploader", userId);
+    formData.append('heading', heading);
+    formData.append('articleBody', articleBody);
+    formData.append('image', image);
+    formData.append('uploader', userId);
 
     try {
-      const response = await axios.post(
-        "http://localhost:8098/articles/createNewArticle",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response = await axios.post('http://localhost:8098/articles/createNewArticle', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
 
       if (response.status === 201) {
-        setSuccess("Article created successfully");
-        setHeading("");
-        setArticleBody("");
+        setSuccess('Article created successfully');
+        setHeading('');
+        setArticleBody('');
         setImage(null);
         fetchArticles();
       }
     } catch (err) {
-      setError("Error creating article");
+      setError('Error creating article');
       console.error(err);
     }
   };
@@ -114,13 +110,13 @@ const Articles = () => {
       const response = await axios.put(`http://localhost:8098/articles/toggleLike/${articleId}`, { userId });
       const updatedArticle = response.data;
 
-      setLikedArticles((prevLikedArticles) => ({
+      setLikedArticles(prevLikedArticles => ({
         ...prevLikedArticles,
         [articleId]: !prevLikedArticles[articleId],
       }));
 
-      setArticles((prevArticles) =>
-        prevArticles.map((article) =>
+      setArticles(prevArticles =>
+        prevArticles.map(article =>
           article._id === articleId ? { ...article, likes: updatedArticle.likes } : article
         )
       );
@@ -129,22 +125,42 @@ const Articles = () => {
     }
   };
 
+  const handleCommentChange = (articleId, text) => {
+    setCommentTexts(prevTexts => ({
+      ...prevTexts,
+      [articleId]: text
+    }));
+  };
+
   const handleCommentSubmit = async (articleId) => {
     try {
+      const commentText = commentTexts[articleId] || '';
       const response = await axios.post(`http://localhost:8098/articles/${articleId}/comments`, {
         userId,
-        text: commentText,
+        text: commentText
       });
 
       if (response.status === 201) {
-        setArticles((prevArticles) =>
-          prevArticles.map((article) =>
+        setArticles(prevArticles =>
+          prevArticles.map(article =>
             article._id === articleId
-              ? { ...article, comments: [...article.comments, response.data.comment] }
+              ? {
+                  ...article,
+                  comments: [
+                    ...article.comments,
+                    {
+                      ...response.data.comment,
+                      user: { _id: userId, name: user.name }
+                    }
+                  ]
+                }
               : article
           )
         );
-        setCommentText("");
+        setCommentTexts(prevTexts => ({
+          ...prevTexts,
+          [articleId]: ''
+        }));
       }
     } catch (err) {
       console.error("Error adding comment", err);
@@ -152,34 +168,61 @@ const Articles = () => {
   };
 
   const handleDeleteComment = async (articleId, commentId) => {
+    console.log(`Attempting to delete comment. ArticleId: ${articleId}, CommentId: ${commentId}`);
     try {
-      await axios.delete(`http://localhost:8098/articles/${articleId}/comments/${commentId}`, {
-        data: { userId },
-      });
+      setDeletingCommentId(commentId);
+      
+      const url = `http://localhost:8098/articles/deleteComment/${articleId}/${commentId}`;
+      
+      console.log('Delete comment request URL:', url);
+      
+      const response = await axios.delete(url);
+      
+      console.log('Delete comment response:', response);
 
-      setArticles((prevArticles) =>
-        prevArticles.map((article) =>
-          article._id === articleId
-            ? { ...article, comments: article.comments.filter((comment) => comment._id !== commentId) }
-            : article
-        )
-      );
+      if (response.status === 200) {
+        console.log('Comment deleted successfully');
+        setArticles(prevArticles =>
+          prevArticles.map(article =>
+            article._id === articleId
+              ? { ...article, comments: article.comments.filter(comment => comment._id !== commentId) }
+              : article
+          )
+        );
+        setDeletingCommentId(null);
+      } else {
+        console.log('Unexpected response status:', response.status);
+        throw new Error('Failed to delete comment');
+      }
     } catch (err) {
+      setDeletingCommentId(null);
       console.error("Error deleting comment", err);
+      if (err.response) {
+        console.log('Error response:', err.response.data);
+        console.log('Error status:', err.response.status);
+        console.log('Error headers:', err.response.headers);
+      } else if (err.request) {
+        console.log('Error request:', err.request);
+      } else {
+        console.log('Error message:', err.message);
+      }
+      alert("Failed to delete comment. Please try again.");
     }
   };
 
   const handleDeleteArticle = async (articleId) => {
     try {
+      setDeletingArticleId(articleId);
       await axios.delete(`http://localhost:8098/articles/deleteArticle/${articleId}`, {
-        data: { userId },
+        data: { userId }
       });
 
-
-      setArticles((prevArticles) => prevArticles.filter((article) => article._id !== articleId));
-
+      setArticles(prevArticles => prevArticles.filter(article => article._id !== articleId));
+      setDeletingArticleId(null);
     } catch (err) {
+      setDeletingArticleId(null);
       console.error("Error deleting article", err);
+      alert("Failed to delete article. Please try again.");
     }
   };
 
@@ -212,7 +255,7 @@ const Articles = () => {
                 id="heading"
                 value={heading}
                 onChange={(e) => setHeading(e.target.value)}
-                placeholder="What's on your mind?"
+                placeholder=" What's on your mind?"
                 className="w-full border-none bg-gray-700 text-white text-lg focus:outline-none"
               />
             </div>
@@ -227,9 +270,7 @@ const Articles = () => {
               ></textarea>
             </div>
             <div className="mb-4">
-              <label htmlFor="image" className="block text-sm font-medium text-gray-500">
-                Add to your post
-              </label>
+              <label htmlFor="image" className="block text-sm font-medium text-gray-500">Add to your post</label>
               <input
                 type="file"
                 id="image"
@@ -237,10 +278,7 @@ const Articles = () => {
                 className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-none file:bg-gray-600 file:text-blue-400 hover:file:bg-gray-700"
               />
             </div>
-            <button
-              type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            >
+            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
               Post
             </button>
           </form>
@@ -254,11 +292,22 @@ const Articles = () => {
         ) : (
           <div className="space-y-6">
             {articles.map((article) => (
-              <div
-                key={article._id}
-                className="bg-gray-800 border border-gray-600 rounded-lg shadow-lg p-4 flex flex-col"
-              >
-                <div className="flex flex-row">
+              <div key={article._id} className="bg-gray-800 rounded-lg shadow-md p-4 relative">
+                {article.uploader === userId && (
+                  <button
+                    className="absolute top-2 right-2 text-red-500 hover:text-red-400"
+                    onClick={() => handleDeleteArticle(article._id)}
+                    disabled={deletingArticleId === article._id}
+                  >
+                    {deletingArticleId === article._id ? (
+                      <span className="text-sm">Deleting...</span>
+                    ) : (
+                      <FaTrash size={16} />
+                    )}
+                  </button>
+                )}
+
+                <div className="flex mb-4">
                   <div className="flex-shrink-0 w-1/3 pr-4">
                     <img
                       src={article.image}
@@ -270,14 +319,6 @@ const Articles = () => {
                     <h3 className="text-xl font-semibold mb-2">{article.heading}</h3>
                     <p className="text-gray-400">{article.articleBody}</p>
                   </div>
-                  {article.uploader === userId && (
-                    <button
-                      className="ml-auto text-red-600 hover:text-red-400"
-                      onClick={() => handleDeleteArticle(article._id)}
-                    >
-                      <FaTrash className="text-lg" />
-                    </button>
-                  )}
                 </div>
 
                 <div className="flex justify-between items-center mt-4">
@@ -294,15 +335,10 @@ const Articles = () => {
                 </div>
 
                 <div className="mt-4">
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      handleCommentSubmit(article._id);
-                    }}
-                  >
+                  <form onSubmit={(e) => { e.preventDefault(); handleCommentSubmit(article._id); }}>
                     <textarea
-                      value={commentText}
-                      onChange={(e) => setCommentText(e.target.value)}
+                      value={commentTexts[article._id] || ''}
+                      onChange={(e) => handleCommentChange(article._id, e.target.value)}
                       placeholder="Add a comment..."
                       className="w-full border-none bg-gray-700 text-white rounded-lg p-2"
                       rows="2"
@@ -317,14 +353,23 @@ const Articles = () => {
 
                   <div className="mt-4">
                     {article.comments.map((comment) => (
-                      <div key={comment._id} className="bg-gray-900 p-2 rounded-lg mb-2">
-                        <p className="text-sm">{comment.text}</p>
-                        {comment.user === userId && (
+                      <div key={comment._id} className="bg-gray-900 p-2 rounded-lg mb-2 flex justify-between items-start">
+                        <div>
+                          <p className="text-sm">{comment.text}</p>
+                          <p className="text-xs text-gray-500">
+                            By {comment.user?.name || 'Unknown User'} on {new Date(comment.createdAt).toLocaleString()}
+                          </p>
+                        </div>
+                        {comment.user && comment.user._id === userId && (
                           <button
-                            className="text-red-600 hover:text-red-400 text-xs"
-                            onClick={() => handleDeleteComment(article._id, comment._id)}
+                            className="text-red-600 hover:text-red-400 text-xs ml-2"
+                            onClick={() => {
+                              console.log('Delete button clicked', { articleId: article._id, commentId: comment._id });
+                              handleDeleteComment(article._id, comment._id);
+                            }}
+                            disabled={deletingCommentId === comment._id}
                           >
-                            Delete Comment
+                            {deletingCommentId === comment._id ? 'Deleting...' : <FaTrash />}
                           </button>
                         )}
                       </div>
