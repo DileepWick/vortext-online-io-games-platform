@@ -24,6 +24,7 @@ import spookeyRouter from "./routes/spookey_guesses_routes.js";
 import faqRouter from "./routes/faq_routes.js";
 import RentalRouter from "./routes/rental_routes.js";
 import chatRouter from "./routes/chat_bot_route.js";
+import CommunityPost from "./routes/communityPost_routes.js";
 
 import { RentalDurationRouter } from "./routes/rentalDurationRoutes.js";
 
@@ -80,6 +81,7 @@ app.use("/cartItems", cartItemsRouter);//Cart Items
 app.use("/orders",orderRouter);//Orders
 app.use("/orderItems",OrderItemsRouter)//Order Items
 app.use("/articles",articleRouter);//Articles
+app.use("/community",CommunityPost);//community
 app.use("/feed",postRouter); //Post
 app.use("/ratings",ratingRouter)
 app.use("/spookeyEditons",spookeyRouter) //Spookey_Game
