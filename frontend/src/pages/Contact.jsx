@@ -7,16 +7,19 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import axios from "axios";
 
-// Utils
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { getToken } from "../utils/getToken";
+import useAuthCheck from "../utils/authCheck";
 
 const Contact = () => {
+  useAuthCheck();
+
   const [userData, setUserData] = useState({
     username: "",
     email: "",
   });
   const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const token = getToken();
   const userId = getUserIdFromToken(token);
@@ -25,7 +28,12 @@ const Contact = () => {
     const fetchUserData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8098/users/profile/${userId}`
+          `http://localhost:8098/users/profile/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         setUserData({
           username: response.data.profile.username,
@@ -33,13 +41,14 @@ const Contact = () => {
         });
       } catch (error) {
         console.error("Error fetching user data:", error);
+        toast.error("Failed to fetch user data");
       }
     };
 
     if (userId) {
       fetchUserData();
     }
-  }, [userId]);
+  }, [userId, token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -61,18 +70,17 @@ const Contact = () => {
       return;
     }
 
+    setIsSubmitting(true);
+
     try {
-      // Add headers including the Authorization token
       const headers = {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       };
 
-      // Send the contact form data to your backend
       await axios.post(
         "http://localhost:8098/contacts/submitContactForm",
         {
-          userId,
           username: userData.username,
           email: userData.email,
           message,
@@ -97,24 +105,28 @@ const Contact = () => {
       setMessage("");
     } catch (error) {
       console.error("Error sending message:", error);
-      toast.error(
-        `Failed to send message: ${
-          error.response?.data?.message || error.message
-        }`,
-        {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-          transition: Flip,
-          progressBarClassName: "bg-gray-800",
-          style: { fontFamily: "Rubik" },
-        }
-      );
+      const errorMessage =
+        error.response?.status === 429
+          ? "You can only submit one message per day. Please try again later."
+          : `Failed to send message: ${
+              error.response?.data?.message || error.message
+            }`;
+
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Flip,
+        progressBarClassName: "bg-gray-800",
+        style: { fontFamily: "Rubik" },
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -138,7 +150,7 @@ const Contact = () => {
                 type="text"
                 labelPlacement="inside"
                 value={userData.username}
-                readOnly={!!userId}
+                readOnly
               />
               <Input
                 label="Email"
@@ -147,7 +159,7 @@ const Contact = () => {
                 type="email"
                 labelPlacement="inside"
                 value={userData.email}
-                readOnly={!!userId}
+                readOnly
               />
               <Textarea
                 label="Message"
@@ -162,8 +174,9 @@ const Contact = () => {
                 radius="sm"
                 size="md"
                 className="bg-black text-white font-bold mt-14"
+                disabled={isSubmitting}
               >
-                Submit
+                {isSubmitting ? "Submitting..." : "Submit"}
               </Button>
             </form>
           </div>
