@@ -29,14 +29,25 @@ export const submitContactForm = async (req, res) => {
 
     // Check if user has submitted a message in the last 24 hours
     const lastDaySubmission = await ContactUsSchema.findOne({
-      userId: userId,
+      userId,
       createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
     });
 
     if (lastDaySubmission) {
+      const timeSinceLastSubmission =
+        Date.now() - lastDaySubmission.createdAt.getTime();
+      const timeRemaining = 24 * 60 * 60 * 1000 - timeSinceLastSubmission;
+      const hoursRemaining = Math.floor(timeRemaining / (60 * 60 * 1000));
+      const minutesRemaining = Math.floor(
+        (timeRemaining % (60 * 60 * 1000)) / (60 * 1000)
+      );
+
       return res.status(429).json({
-        message:
-          "You can only submit one message per day. Please try again later.",
+        message: "You can only submit one message per day.",
+        timeRemaining: {
+          hours: hoursRemaining,
+          minutes: minutesRemaining,
+        },
       });
     }
 

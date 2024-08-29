@@ -19,7 +19,6 @@ const Contact = () => {
     email: "",
   });
   const [message, setMessage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const token = getToken();
   const userId = getUserIdFromToken(token);
@@ -70,8 +69,6 @@ const Contact = () => {
       return;
     }
 
-    setIsSubmitting(true);
-
     try {
       const headers = {
         "Content-Type": "application/json",
@@ -105,28 +102,42 @@ const Contact = () => {
       setMessage("");
     } catch (error) {
       console.error("Error sending message:", error);
-      const errorMessage =
-        error.response?.status === 429
-          ? "You can only submit one message per day. Please try again later."
-          : `Failed to send message: ${
-              error.response?.data?.message || error.message
-            }`;
-
-      toast.error(errorMessage, {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-        transition: Flip,
-        progressBarClassName: "bg-gray-800",
-        style: { fontFamily: "Rubik" },
-      });
-    } finally {
-      setIsSubmitting(false);
+      if (error.response?.status === 429) {
+        const { hours, minutes } = error.response.data.timeRemaining;
+        const timeMessage = `You can send another message in ${hours} hours and ${minutes} minutes.`;
+        toast.error(`${error.response.data.message} ${timeMessage}`, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Flip,
+          progressBarClassName: "bg-gray-800",
+          style: { fontFamily: "Rubik" },
+        });
+      } else {
+        toast.error(
+          `Failed to send message: ${
+            error.response?.data?.message || error.message
+          }`,
+          {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+            transition: Flip,
+            progressBarClassName: "bg-gray-800",
+            style: { fontFamily: "Rubik" },
+          }
+        );
+      }
     }
   };
 
@@ -174,9 +185,8 @@ const Contact = () => {
                 radius="sm"
                 size="md"
                 className="bg-black text-white font-bold mt-14"
-                disabled={isSubmitting}
               >
-                {isSubmitting ? "Submitting..." : "Submit"}
+                Submit
               </Button>
             </form>
           </div>

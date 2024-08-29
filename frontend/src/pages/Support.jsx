@@ -1,15 +1,20 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "../components/header";
 import Footer from "../components/footer";
-import { Spinner, Card, CardBody, Button } from "@nextui-org/react";
+import {
+  Spinner,
+  Card,
+  Button,
+  Accordion,
+  AccordionItem,
+} from "@nextui-org/react";
 import Chatbot from "../components/Chatbot";
 
 const Support = () => {
   const [faqs, setFaqs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [expandedFAQ, setExpandedFAQ] = useState(null);
   const [showAllFAQs, setShowAllFAQs] = useState(false);
 
   useEffect(() => {
@@ -29,10 +34,6 @@ const Support = () => {
 
   if (loading) return <Spinner size="large" />;
   if (error) return <p className="text-center text-red-500">{error}</p>;
-
-  const handleToggleExpand = (id) => {
-    setExpandedFAQ(expandedFAQ === id ? null : id);
-  };
 
   const displayedFAQs = showAllFAQs ? faqs : faqs.slice(0, 3);
 
@@ -70,22 +71,27 @@ const Support = () => {
           Frequently Asked Questions
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {displayedFAQs.length === 0 ? (
-            <p className="text-center text-gray-400">No FAQs available</p>
-          ) : (
-            displayedFAQs.map((faq) => (
-              <FAQCard
+        {displayedFAQs.length === 0 ? (
+          <p className="text-center text-gray-400">No FAQs available</p>
+        ) : (
+          <Accordion>
+            {displayedFAQs.map((faq) => (
+              <AccordionItem
                 key={faq._id}
-                faq={faq}
-                isExpanded={expandedFAQ === faq._id}
-                onToggleExpand={() => handleToggleExpand(faq._id)}
-              />
-            ))
-          )}
-        </div>
+                aria-label={faq.question}
+                title={faq.question}
+                classNames={{
+                  title: "text-white text-xl font-primaryRegular",
+                  content: "text-white",
+                }}
+              >
+                {faq.answer || "No answer available"}
+              </AccordionItem>
+            ))}
+          </Accordion>
+        )}
 
-        {faqs.length > 6 && (
+        {faqs.length > 3 && (
           <div className="text-center mt-8">
             <Button
               color="primary"
@@ -98,44 +104,6 @@ const Support = () => {
       </div>
       <Footer />
     </div>
-  );
-};
-
-const FAQCard = ({ faq, isExpanded, onToggleExpand }) => {
-  const [isOverflowing, setIsOverflowing] = useState(false);
-  const contentRef = useRef(null);
-
-  useEffect(() => {
-    if (contentRef.current) {
-      setIsOverflowing(
-        contentRef.current.scrollHeight > contentRef.current.clientHeight
-      );
-    }
-  }, [faq.answer]);
-
-  return (
-    <Card className="bg-gray-800 rounded-lg shadow-lg text-white">
-      <CardBody>
-        <h2 className="text-xl font-primaryRegular mb-4">{faq.question}</h2>
-        <div
-          ref={contentRef}
-          className={`transition-max-height duration-500 ease-in-out ${
-            isExpanded ? "max-h-screen" : "max-h-24 overflow-hidden"
-          }`}
-        >
-          <p>{faq.answer || "No answer available"}</p>
-        </div>
-        {isOverflowing && (
-          <button
-            onClick={onToggleExpand}
-            className="mt-2 text-blue-400 hover:text-blue-300"
-            aria-expanded={isExpanded}
-          >
-            {isExpanded ? "Read Less" : "Read More"}
-          </button>
-        )}
-      </CardBody>
-    </Card>
   );
 };
 

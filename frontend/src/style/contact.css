@@ -18,14 +18,14 @@
   align-items: center;
   padding: 5em;
 }
-@media(max-width:850px){
-    .image_container{
-        display: none;
-    }
-    .contact-container{
-        grid-template-columns: 1fr;
-    }
-    .contact_us_container{
-        padding: 2em;
-    }
+@media (max-width: 850px) {
+  .image_container {
+    display: none;
+  }
+  .contact-container {
+    grid-template-columns: 1fr;
+  }
+  .contact_us_container {
+    padding: 2em;
+  }
 }
