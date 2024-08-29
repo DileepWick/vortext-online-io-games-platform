@@ -9,16 +9,14 @@ import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { User } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
 import { FaHeart, FaRegHeart, FaTrash, FaComments } from "react-icons/fa";
+import ComPublic from'../pages/compublic';
+import ComPrivate from '../pages/comprivate';
 
 const Community = () => {
-  const navigate = useNavigate();
+  const [view, setView] = useState("public");
 
-  const handlePrivateClick = () => {
-    navigate('/private');
-  };
-
-  const handlePublicClick = () => {
-    navigate('/public');
+  const handleViewChange = (newView) => {
+    setView(newView);
   };
 
   return (
@@ -26,15 +24,23 @@ const Community = () => {
       <Header />
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">Community</h1>
-        <div className="space-x-4">
-          <Button onClick={handlePrivateClick} color="primary">
-            Private
-          </Button>
-          <Button onClick={handlePublicClick} color="secondary">
+        <div className="flex space-x-4 mb-6">
+          <Button
+            color={view === "public" ? "primary" : "default"}
+            onClick={() => handleViewChange("public")}
+          >
             Public
           </Button>
+          <Button
+            color={view === "private" ? "primary" : "default"}
+            onClick={() => handleViewChange("private")}
+          >
+            Private
+          </Button>
         </div>
+        {view === "public" ? <ComPublic /> : <ComPrivate />}
       </div>
+      <Footer />
     </>
   );
 };

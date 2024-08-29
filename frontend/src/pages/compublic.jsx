@@ -1,16 +1,12 @@
 import React from "react";
-import Header from '../components/header';
 
 const ComPublic = () => {
   return (
-    <>
-      <Header />
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">Public Community</h1>
-        <p>Welcome to the public community area. Everyone can access and view this content.</p>
-        {/* Add your public community content here */}
-      </div>
-    </>
+    <div className="bg-white p-6 rounded-lg shadow">
+      <h2 className="text-2xl font-bold mb-4">Public Community</h2>
+      <p className="mb-4">Welcome to the public community area. Everyone can access this content.</p>
+      {/* Add more public community content here */}
+    </div>
   );
 };
 

@@ -1,16 +1,12 @@
 import React from "react";
-import Header from '../components/header';
 
 const ComPrivate = () => {
   return (
-    <>
-      <Header />
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">Private Community</h1>
-        <p>This is the private community area. Only authorized users can access this content.</p>
-        {/* Add your private community content here */}
-      </div>
-    </>
+    <div className="bg-gray-100 p-6 rounded-lg">
+      <h2 className="text-2xl font-bold mb-4">Private Community</h2>
+      <p className="mb-4">This is the private community area. Only authorized users can see this content.</p>
+      {/* Add more private community content here */}
+    </div>
   );
 };
 
