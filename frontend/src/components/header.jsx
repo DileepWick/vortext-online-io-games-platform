@@ -198,12 +198,12 @@ export default function Header() {
                 </DropdownItem>
 
                 {/* Admin Filter */}
-                {user.role === "Admin" && (
+                {user.role === "Product Manager" && (
                   <DropdownItem
                     key="admin-panel"
                     onClick={() => navigate("/productDashboard")}
                   >
-                    Admin Panel
+                    Products Dashboard
                   </DropdownItem>
                 )}
 

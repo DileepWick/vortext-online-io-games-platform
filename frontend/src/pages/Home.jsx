@@ -27,8 +27,9 @@ const Home = () => {
   };
 
   return (
-    <div className="font-primaryRegular bg-white">
+    <div className="font-primaryRegular bg-customDark flex flex-col min-h-screen">
       <Header />
+        <h1 className="text-5xl text-white mt-[100px]">Vortex Gaming Home</h1>
       <Footer />
     </div>
   );

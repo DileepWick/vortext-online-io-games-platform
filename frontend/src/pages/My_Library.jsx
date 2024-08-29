@@ -7,8 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
-import { Card, CardBody, Chip ,Input} from "@nextui-org/react";
-import GameStartIcon from "../assets/icons/Game_Start"
+import { Card, CardBody, Chip, Input } from "@nextui-org/react";
+import GameStartIcon from "../assets/icons/Game_Start";
 
 const OrderHistory = () => {
   useAuthCheck();
@@ -43,7 +43,15 @@ const OrderHistory = () => {
   }
 
   if (error) {
-    return <div className="text-center mt-10 text-red-500">{error}</div>;
+    return (
+      <div className="bg-customDark flex flex-col min-h-screen">
+        <Header />
+        <p className="text-center text-white font-primaryRegular text-5xl mt-[100px]">
+            No Games Found In The Library
+          </p>
+        <Footer />
+      </div>
+    );
   }
 
   // Filter out removed games
@@ -126,7 +134,9 @@ const OrderHistory = () => {
             })}
           </div>
         ) : (
-          <p className="text-center text-gray-400">No Games Found In The Library</p>
+          <p className="text-center text-black font-primaryRegular text-xl">
+            No Games Found In The Library
+          </p>
         )}
       </div>
       <Footer />
