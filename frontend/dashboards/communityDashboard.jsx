@@ -24,10 +24,10 @@ const CommunityDashBoard = () => {
           size="lg"
           color="primary"
         >
-          <Tab key="tab1" title="T1" />
-          <Tab key="tab2" title="T2" />
-          <Tab key="tab3" title="T3" />
-          <Tab key="tab4" title="T4" />
+          <Tab key="tab1" title="Post" />
+          <Tab key="tab2" title="Chat" />
+          <Tab key="tab3" title="Report" />
+          <Tab key="tab4" title="Group" />
         </Tabs>
       </div>
       <div className="p-4">
