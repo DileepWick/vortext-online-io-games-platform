@@ -1,6 +1,6 @@
 import express from 'express';
 import upload from '../middleware/multer.js';
-import { uploadGame, getAllGames, deleteGame, updateGame ,addRatingPoints ,getSpecificGame,GamesShop} from '../controllers/gameController.js';
+import { uploadGame, getAllGames, deleteGame, updateGame ,addRatingPoints ,getSpecificGame,GamesShop,fetchGameById} from '../controllers/gameController.js';
 
 const gameRouter = express.Router();
 
@@ -14,5 +14,9 @@ gameRouter.put('/updateGame/:id', upload.fields([{ name: 'image', maxCount: 1 },
 gameRouter.put('/RateGame/:id', addRatingPoints);
 gameRouter.get('/allGames/selectedGame/:id',getSpecificGame);
 gameRouter.get('/allGames/ShopGames',GamesShop);
+
+
+//new route 
+gameRouter.get('/fetchGame/:id', fetchGameById);
 
 export default gameRouter;

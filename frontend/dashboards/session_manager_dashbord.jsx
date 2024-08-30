@@ -35,6 +35,7 @@ import RentedGamesSection from "./rentedGamesDash";
 
 const SessionManagerDash = () => {
   const [rentalTimes, setRentalTimes] = useState([]);
+  const [pricePerMinute, setPricePerMinute] = useState(5);
   const [games, setGames] = useState([]);
   const [formData, setFormData] = useState({
     gameId: "",
@@ -100,7 +101,28 @@ const SessionManagerDash = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    if (name === "duration") {
+      const durationValue = parseInt(value, 10);
+      const calculatedPrice = durationValue * pricePerMinute;
+      setFormData({
+        ...formData,
+        [name]: value,
+        price: calculatedPrice.toString(),
+      });
+    } else if (name === "pricePerMinute") {
+      const newPricePerMinute = parseFloat(value);
+      setPricePerMinute(newPricePerMinute);
+      if (formData.duration) {
+        const durationValue = parseInt(formData.duration, 10);
+        const calculatedPrice = durationValue * newPricePerMinute;
+        setFormData({
+          ...formData,
+          price: calculatedPrice.toString(),
+        });
+      }
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleGameSelect = (e) => {
@@ -278,6 +300,14 @@ const SessionManagerDash = () => {
                   onChange={handleSearchChange}
                   onClear={handleClearSearch}
                 />
+                <Input
+                  className="w-40 mr-4"
+                  label="Price per Minute (LKR)"
+                  name="pricePerMinute"
+                  type="number"
+                  value={pricePerMinute}
+                  onChange={handleInputChange}
+                />
                 <Button
                   color="primary"
                   onPress={() => {
@@ -365,9 +395,7 @@ const SessionManagerDash = () => {
               </Table>
             </>
           )}
-          {activeTab === "rentedGames" && (
-            <RentedGamesSection />
-          )}
+          {activeTab === "rentedGames" && <RentedGamesSection />}
         </div>
       </main>
       <Footer />
@@ -377,6 +405,7 @@ const SessionManagerDash = () => {
         onClose={() => {
           onClose();
           setError("");
+          setPricePerMinute(5); // Reset to default value
         }}
       >
         <ModalContent>
@@ -417,8 +446,7 @@ const SessionManagerDash = () => {
                   name="price"
                   type="number"
                   value={formData.price}
-                  onChange={handleInputChange}
-                  required
+                  readOnly
                 />
               </div>
             </ModalBody>
