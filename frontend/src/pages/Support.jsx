@@ -10,6 +10,7 @@ import {
   AccordionItem,
 } from "@nextui-org/react";
 import Chatbot from "../components/Chatbot";
+import { Helmet } from "react-helmet-async";
 
 const Support = () => {
   const [faqs, setFaqs] = useState([]);
@@ -39,6 +40,9 @@ const Support = () => {
 
   return (
     <div className="relative min-h-screen bg-customDark text-white">
+      <Helmet>
+        <title>Support | Vortex</title>
+      </Helmet>
       <Header />
       <section className="pt-10 text-center">
         <h1 className="text-5xl text-white mb-8 font-primaryRegular">

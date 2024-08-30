@@ -25,6 +25,7 @@ import {
 import { Flip, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Footer from "../src/components/footer";
+import { Helmet } from "react-helmet-async";
 
 const ContactDash = () => {
   const [activeTab, setActiveTab] = useState("tab1");
@@ -285,6 +286,9 @@ const ContactDash = () => {
         <div className="p-4">
           {activeTab === "FAQ" && (
             <div>
+              <Helmet>
+                <title>FAQ | Support Dashboard</title>
+              </Helmet>
               <Button
                 className="bg-primary text-foreground mb-4"
                 onPress={onAddFAQOpen}
@@ -424,6 +428,9 @@ const ContactDash = () => {
           )}
           {activeTab === "ContactUs" && (
             <div>
+              <Helmet>
+                <title>Contact | Support Dashboard</title>
+              </Helmet>
               {loading ? (
                 <Spinner />
               ) : error ? (
