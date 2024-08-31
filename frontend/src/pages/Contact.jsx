@@ -7,11 +7,13 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import axios from "axios";
 
-// Utils
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { getToken } from "../utils/getToken";
+import useAuthCheck from "../utils/authCheck";
 
 const Contact = () => {
+  useAuthCheck();
+
   const [userData, setUserData] = useState({
     username: "",
     email: "",
@@ -25,7 +27,12 @@ const Contact = () => {
     const fetchUserData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8098/users/profile/${userId}`
+          `http://localhost:8098/users/profile/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         setUserData({
           username: response.data.profile.username,
@@ -33,13 +40,14 @@ const Contact = () => {
         });
       } catch (error) {
         console.error("Error fetching user data:", error);
+        toast.error("Failed to fetch user data");
       }
     };
 
     if (userId) {
       fetchUserData();
     }
-  }, [userId]);
+  }, [userId, token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -62,17 +70,14 @@ const Contact = () => {
     }
 
     try {
-      // Add headers including the Authorization token
       const headers = {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       };
 
-      // Send the contact form data to your backend
       await axios.post(
         "http://localhost:8098/contacts/submitContactForm",
         {
-          userId,
           username: userData.username,
           email: userData.email,
           message,
@@ -97,13 +102,12 @@ const Contact = () => {
       setMessage("");
     } catch (error) {
       console.error("Error sending message:", error);
-      toast.error(
-        `Failed to send message: ${
-          error.response?.data?.message || error.message
-        }`,
-        {
+      if (error.response?.status === 429) {
+        const { hours, minutes } = error.response.data.timeRemaining;
+        const timeMessage = `You can send another message in ${hours} hours and ${minutes} minutes.`;
+        toast.error(`${error.response.data.message} ${timeMessage}`, {
           position: "top-right",
-          autoClose: 2000,
+          autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
@@ -113,8 +117,27 @@ const Contact = () => {
           transition: Flip,
           progressBarClassName: "bg-gray-800",
           style: { fontFamily: "Rubik" },
-        }
-      );
+        });
+      } else {
+        toast.error(
+          `Failed to send message: ${
+            error.response?.data?.message || error.message
+          }`,
+          {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+            transition: Flip,
+            progressBarClassName: "bg-gray-800",
+            style: { fontFamily: "Rubik" },
+          }
+        );
+      }
     }
   };
 
@@ -138,7 +161,7 @@ const Contact = () => {
                 type="text"
                 labelPlacement="inside"
                 value={userData.username}
-                readOnly={!!userId}
+                readOnly
               />
               <Input
                 label="Email"
@@ -147,7 +170,7 @@ const Contact = () => {
                 type="email"
                 labelPlacement="inside"
                 value={userData.email}
-                readOnly={!!userId}
+                readOnly
               />
               <Textarea
                 label="Message"

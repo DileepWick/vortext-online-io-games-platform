@@ -8,6 +8,7 @@ import Footer from "../components/footer";
 import { DeleteIcon } from "../assets/icons/DeleteIcon";
 import { ScrollShadow } from "@nextui-org/react";
 import { toast, Flip } from "react-toastify";
+import { Helmet } from "react-helmet-async";
 // Next UI
 import {
   Modal,
@@ -199,16 +200,22 @@ const CartPage = () => {
   if (cartItems.length === 0)
     return (
       <div className="bg-customDark flex flex-col min-h-screen">
+        <Helmet>
+          <title>My Cart</title>
+        </Helmet>
         <Header />
         <p className="text-center text-white font-primaryRegular text-5xl mt-[100px]">
-            Cart is empty
-          </p>
+          Cart is empty
+        </p>
         <Footer />
       </div>
     );
 
   return (
     <div className="min-h-screen font-primaryRegular">
+      <Helmet>
+        <title>My Cart</title>
+      </Helmet>
       <Header />
       <div className="container mx-auto px-4 py-8 bg-customDark">
         <div className="bg-customDark rounded-lg shadow-lg p-8 flex flex-row">

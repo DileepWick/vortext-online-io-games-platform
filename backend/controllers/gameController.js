@@ -110,6 +110,32 @@ export const getSpecificGame = async (req, res) => {
   }
 };
 
+// New fetchGameById function
+export const fetchGameById = async (req, res) => {
+  console.log("fetchGameById function called");
+  try {
+    const gameId = req.params.id;
+    console.log("Attempting to fetch game with ID:", gameId);
+    const pickedGame = await Game.findById(gameId);
+    
+    if (!pickedGame) {
+      console.log("Game not found for ID:", gameId);
+      return res.status(404).json({
+        message: "Game not found",
+      });
+    }
+    console.log("Game found:", pickedGame);
+    return res.status(200).json(pickedGame);
+  } catch (error) {
+    console.error("Error getting the game:", error);
+    return res.status(500).json({
+      message: "Error getting the game.",
+      error: error.message,
+      stack: error.stack
+    });
+  }
+};
+
 // Delete game
 export const deleteGame = async (req, res) => {
   try {
