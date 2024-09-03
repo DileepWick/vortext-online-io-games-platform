@@ -19,6 +19,7 @@ import RatingSystem from "../components/RatingSystem"; // New import
 import { Button, Chip } from "@nextui-org/react";
 import { Card, CardBody, CardFooter, Image, Textarea } from "@nextui-org/react";
 import { ScrollShadow } from "@nextui-org/react";
+import RatingSystemEditing from "../components/RatingSystemEditing";
 
 
 
@@ -36,6 +37,44 @@ const GameDetails = () => {
   const [checkItem, setCheckItem] = useState("not in the library");
   const [ratings, setRatings] = useState([]);
   const [averageRating, setAverageRating] = useState(0);
+
+
+
+  const [user, setUser] = useState(null);
+  const token = getToken();
+  const userId = getUserIdFromToken(token);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8098/users/profile/${userId}`
+        );
+        setUser(response.data.profile);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+
+    if (userId) {
+      fetchUser();
+    }
+   
+  }, [userId]);
+  useEffect(() => {
+    try {
+      if (user) {
+        console.log("User:", { role: user.role });
+        console.log("user.role:", user.role);
+  console.log("Type of user.role:", typeof user.role);
+      }else{
+        console.log("User not found",{role:user.role});
+      }
+    } catch (error) {
+      console.error("Error fetching user:", error);
+   
+    }
+  }, [user]);
 
 
 
@@ -73,6 +112,7 @@ const GameDetails = () => {
       try {
         const response = await axios.get(`http://localhost:8098/ratings/game/${id}`);
         setRatings(response.data);
+        console.log("id", id);
         // Calculate average rating
         const avg = response.data.reduce((sum, rating) => sum + rating.rating, 0) / response.data.length;
         setAverageRating(avg);
@@ -220,6 +260,33 @@ const GameDetails = () => {
   }
 };
 
+const handleRatingUpdate = async (ratingId, rating, comment) => {
+  try {
+    const response = await axios.put(`http://localhost:8098/ratings/game/${ratingId}`, {
+      rating,
+      comment
+    });
+    console.log("Rating update response:", response);
+    if (response.status === 200) {
+      toast.success("Rating updated successfully", {
+        // ... (keep existing toast options)
+      });
+      // Refresh ratings
+      const updatedRatings = await axios.get(`http://localhost:8098/ratings/game/${id}`);
+      console.log("Updated ratings:", updatedRatings.data);
+      setRatings(updatedRatings.data);
+      const avg = updatedRatings.data.reduce((sum, r) => sum + r.rating, 0) / updatedRatings.data.length;
+      setAverageRating(avg);
+    }
+  } catch (error) {
+    console.error("Error updating rating:", error.response || error);
+    toast.error(`Error updating rating: ${error.response?.data?.message || error.message}`, {
+      // ... (keep existing toast options)
+    });
+  }
+};
+
+
 
   // Handle Rent
   const navigate = useNavigate();
@@ -363,12 +430,23 @@ const GameDetails = () => {
 
         <div className="mt-8 scale-80">
   <h2 className="text-3xl text-white mb-4 ">Ratings and Reviews</h2>
-  <RatingSystem 
-    gameId={id} 
-    ratings={ratings} 
-    averageRating={averageRating} 
+  
+  {(user.role === "Review Manager" ? (
+    <RatingSystemEditing
+       gameId={id}
+    ratings={ratings}
+    averageRating={averageRating}
+    onSubmitRating={handleRatingSubmit}
+    onUpdateRating={handleRatingUpdate}
+    />
+) : (
+  <RatingSystem
+    gameId={id}
+    ratings={ratings}
+    averageRating={averageRating}
     onSubmitRating={handleRatingSubmit}
   />
+))}
 </div>
         {relatedGameStocks.length > 0 && (
           <div className="mt-8">
