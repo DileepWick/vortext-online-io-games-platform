@@ -2,10 +2,12 @@ import  { useEffect, useRef, useState } from "react";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { toast, Flip } from "react-toastify";
-
 import axios from "axios";
 import { Link } from "react-router-dom"
 import '../style/Slider.css'
+import Hangman from "../components/Games/Hangaman";
+import Chatbot from "../components/chatbox";
+import { Helmet } from "react-helmet-async";
 
 const Home = () => {
   const [gameStocks, setGameStocks] = useState([]);
@@ -177,6 +179,9 @@ const Home = () => {
 
   return (
     <div className="font-primaryRegular bg-customDark flex flex-col min-h-screen">
+      <Helmet>
+        <title>Welcome to Vortex</title>
+      </Helmet>
       <Header />
       <h1 className="text-5xl text-white mt-[40px]">Vortex Gaming Home</h1>
       <div className="m-auto  mt-[80px] mb-[40px]">
@@ -307,6 +312,7 @@ const Home = () => {
         </div>
       </div>
 
+      <h1 className="text-5xl text-white mt-[100px]">Vortex Gaming Home</h1>
       <Footer />
       <script src="../components/Slider.jsx"></script>
     </div>

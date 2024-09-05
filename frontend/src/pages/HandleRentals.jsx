@@ -14,7 +14,7 @@ const HandleRentals = () => {
   useAuthCheck();
   const { id } = useParams();
   const navigate = useNavigate();
-  const [gameStock, setGameStock] = useState(null);
+  const [game, setGame] = useState(null);
   const [selectedRental, setSelectedRental] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -41,16 +41,17 @@ const HandleRentals = () => {
     } catch (err) {
       console.error("Error fetching rental times:", err);
       toast.error("Failed to fetch rental options. Please try again.");
-      setRentalOptions([]); // Ensure rental options are empty on error
+      setRentalOptions([]);
     }
   };
 
   useEffect(() => {
     const fetchGameDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:8098/gameStocks/GetStockById/${id}`);
-        setGameStock(response.data);
-        await fetchRentalTimes(response.data.AssignedGame._id);
+        // Updated API endpoint
+        const response = await axios.get(`http://localhost:8098/games/fetchGame/${id}`);
+        setGame(response.data);
+        await fetchRentalTimes(id);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -97,7 +98,7 @@ const HandleRentals = () => {
 
       const rentalData = {
         user: userId,
-        game: gameStock.AssignedGame._id,
+        game: id,
         time: selectedRental.time,
         price: selectedRental.price
       };
@@ -147,7 +148,7 @@ const HandleRentals = () => {
 
   if (loading) return <div className="text-center py-8">Loading...</div>;
   if (error) return <div className="text-center py-8 text-red-500">Error: {error}</div>;
-  if (!gameStock) return <div className="text-center py-8">Game not found</div>;
+  if (!game) return <div className="text-center py-8">Game not found</div>;
 
   return (
     <div className="bg-customDark text-white min-h-screen font-primaryRegular">
@@ -160,16 +161,16 @@ const HandleRentals = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="bg-customDark rounded-lg shadow-lg p-8">
           <h1 className="text-5xl text-white mb-4">
-            {gameStock.AssignedGame.title}
+            {game.title}
             <br />
             <Chip color="primary" radius="none" className="mt-2">
-              {gameStock.AssignedGame.RatingPoints} Rating Points ⭐
+              {game.RatingPoints} Rating Points ⭐
             </Chip>
           </h1>
           <div className="flex flex-col lg:flex-row gap-8 mb-8">
             <div className="flex-1">
               <VideoPlayer
-                videoUrl={gameStock.AssignedGame.TrailerVideo}
+                videoUrl={game.TrailerVideo}
                 autoPlay
                 controls
                 muted
@@ -178,9 +179,9 @@ const HandleRentals = () => {
             </div>
             <div className="flex-1 flex">
               <Image
-                alt={gameStock.AssignedGame.title}
+                alt={game.title}
                 className="w-[300px] h-[400px] object-cover rounded-lg shadow-md"
-                src={gameStock.AssignedGame.coverPhoto}
+                src={game.coverPhoto}
               />
               <div className="ml-4 flex-1">
                 <h3 className="text-2xl font-semibold mb-4">Terms and Conditions</h3>
@@ -197,11 +198,11 @@ const HandleRentals = () => {
           <div className="mb-8">
             <h2 className="text-3xl text-editionColor mb-4">About the game</h2>
             <ScrollShadow hideScrollBar className="h-[150px]">
-              <p className="text-lg">{gameStock.AssignedGame.Description}</p>
+              <p className="text-lg">{game.Description}</p>
             </ScrollShadow>
           </div>
           <div className="flex flex-wrap gap-2 mb-8">
-            {gameStock.AssignedGame.Genre.flatMap((genre) =>
+            {game.Genre.flatMap((genre) =>
               genre.includes(",") ? genre.split(",") : genre
             ).map((genre, index) => (
               <Chip
@@ -271,7 +272,7 @@ const HandleRentals = () => {
         <ModalContent>
           <ModalHeader>Confirm Rental</ModalHeader>
           <ModalBody>
-            <p>You are about to rent {gameStock.AssignedGame.title} for {parseInt(selectedRental?.time) >= 60 ? `${parseInt(selectedRental?.time) / 60} hour${parseInt(selectedRental?.time) > 60 ? 's' : ''}` : `${selectedRental?.time} min`}.</p>
+            <p>You are about to rent {game.title} for {parseInt(selectedRental?.time) >= 60 ? `${parseInt(selectedRental?.time) / 60} hour${parseInt(selectedRental?.time) > 60 ? 's' : ''}` : `${selectedRental?.time} min`}.</p>
             <p>Price: LKR {selectedRental?.price}</p>
             <p>Please confirm to proceed with the payment.</p>
           </ModalBody>
