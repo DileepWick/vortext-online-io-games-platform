@@ -53,20 +53,18 @@ const GameDetails = () => {
     if (userId) {
       fetchUser();
     }
-   
   }, [userId]);
   useEffect(() => {
     try {
       if (user) {
         console.log("User:", { role: user.role });
         console.log("user.role:", user.role);
-  console.log("Type of user.role:", typeof user.role);
-      }else{
-        console.log("User not found",{role:user.role});
+        console.log("Type of user.role:", typeof user.role);
+      } else {
+        console.log("User not found", { role: user.role });
       }
     } catch (error) {
       console.error("Error fetching user:", error);
-   
     }
   }, [user]);
 
@@ -234,33 +232,6 @@ const GameDetails = () => {
         comment,
       });
 
-const handleRatingUpdate = async (ratingId, rating, comment) => {
-  try {
-    const response = await axios.put(`http://localhost:8098/ratings/game/${ratingId}`, {
-      rating,
-      comment
-    });
-    console.log("Rating update response:", response);
-    if (response.status === 200) {
-      toast.success("Rating updated successfully", {
-        // ... (keep existing toast options)
-      });
-      // Refresh ratings
-      const updatedRatings = await axios.get(`http://localhost:8098/ratings/game/${id}`);
-      console.log("Updated ratings:", updatedRatings.data);
-      setRatings(updatedRatings.data);
-      const avg = updatedRatings.data.reduce((sum, r) => sum + r.rating, 0) / updatedRatings.data.length;
-      setAverageRating(avg);
-    }
-  } catch (error) {
-    console.error("Error updating rating:", error.response || error);
-    toast.error(`Error updating rating: ${error.response?.data?.message || error.message}`, {
-      // ... (keep existing toast options)
-    });
-  }
-};
-
-
       console.log("Rating submission response:", response);
 
       if (response.status === 201) {
@@ -316,6 +287,32 @@ const handleRatingUpdate = async (ratingId, rating, comment) => {
   const handleQuantityChange = (stockId, newQuantity) => {
     // Update quantityByStockId state
     setQuantityByStockId({ ...quantityByStockId, [stockId]: newQuantity });
+  };
+
+  const handleRateUpdate = async (ratingId, rating, comment) => {
+    try {
+      const response = await axios.put(`http://localhost:8098/ratings/game/${ratingId}`, {
+        rating,
+        comment
+      });
+      console.log("Rating update response:", response);
+      if (response.status === 200) {
+        toast.success("Rating updated successfully", {
+          // ... (keep existing toast options)
+        });
+        // Refresh ratings
+        const updatedRatings = await axios.get(`http://localhost:8098/ratings/game/${id}`);
+        console.log("Updated ratings:", updatedRatings.data);
+        setRatings(updatedRatings.data);
+        const avg = updatedRatings.data.reduce((sum, r) => sum + r.rating, 0) / updatedRatings.data.length;
+        setAverageRating(avg);
+      }
+    } catch (error) {
+      console.error("Error updating rating:", error.response || error);
+      toast.error(`Error updating rating: ${error.response?.data?.message || error.message}`, {
+        // ... (keep existing toast options)
+      });
+    }
   };
 
   if (loading) return <p className="text-center mt-8 text-black">Loading...</p>;
@@ -428,90 +425,80 @@ const handleRatingUpdate = async (ratingId, rating, comment) => {
         </div>
 
         <div className="mt-8 scale-80">
-  <h2 className="text-3xl text-white mb-4 ">Ratings and Reviews</h2>
-  
-  {(user.role === "Review Manager" ? (
-    <RatingSystemEditing
-       gameId={id}
-    ratings={ratings}
-    averageRating={averageRating}
-    onSubmitRating={handleRatingSubmit}
-    onUpdateRating={handleRatingUpdate}
-    />
-) : (
-  <RatingSystem
-    gameId={id}
-    ratings={ratings}
-    averageRating={averageRating}
-    onSubmitRating={handleRatingSubmit}
-  />
-))}
-</div>
           <h2 className="text-3xl text-white mb-4 ">Ratings and Reviews</h2>
-          <RatingSystem
-            gameId={id}
-            ratings={ratings}
-            averageRating={averageRating}
-            onSubmitRating={handleRatingSubmit}
-          />
+
+          {user.role === "Review Manager" ? (
+            <RatingSystemEditing
+              gameId={id}
+              ratings={ratings}
+              averageRating={averageRating}
+              onSubmitRating={handleRatingSubmit}
+              onUpdateRating={handleRateUpdate}
+            />
+          ) : (
+            <RatingSystem
+              gameId={id}
+              ratings={ratings}
+              averageRating={averageRating}
+              onSubmitRating={handleRatingSubmit}
+            />
+          )}
         </div>
-        {relatedGameStocks.length > 0 && (
-          <div className="mt-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">
-              Related Editions
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-              {relatedGameStocks.map((stock) => (
-                <div
-                  key={stock._id}
-                  className="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center text-center"
-                >
-                  <img
-                    src={stock.AssignedGame.coverPhoto}
-                    alt={stock.AssignedGame.title}
-                    className="w-40 h-52 object-cover rounded-lg mb-2"
-                  />
-                  <h2 className="text-xl font-bold text-gray-900 mb-2">
-                    {stock.AssignedGame.title} {stock.Edition} Edition
-                  </h2>
-                  <Link
-                    to={`/game/${stock._id}`}
-                    className="block text-center bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300"
-                  >
-                    View Details
-                  </Link>
-                  <div className="mt-4">
-                    <label className="block text-gray-700 mb-2">
-                      Quantity:
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      value={quantityByStockId[stock._id] || 1}
-                      onChange={(e) =>
-                        handleQuantityChange(stock._id, Number(e.target.value))
-                      }
-                      className="block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 bg-gray-100 text-black px-3 py-2"
-                    />
-                  </div>
-                  <button
-                    onClick={() => handleAddToCart(stock._id)}
-                    className="block w-full text-center bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300 mt-4"
-                  >
-                    Add to Cart
-                  </button>
-                  <button
-                    onClick={() => handleRent(gameStock.AssignedGame._id)}
-                    className="block w-full text-center bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition duration-300 mt-4"
-                  >
-                    Rent
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
+      {relatedGameStocks.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">
+            Related Editions
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            {relatedGameStocks.map((stock) => (
+              <div
+                key={stock._id}
+                className="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center text-center"
+              >
+                <img
+                  src={stock.AssignedGame.coverPhoto}
+                  alt={stock.AssignedGame.title}
+                  className="w-40 h-52 object-cover rounded-lg mb-2"
+                />
+                <h2 className="text-xl font-bold text-gray-900 mb-2">
+                  {stock.AssignedGame.title} {stock.Edition} Edition
+                </h2>
+                <Link
+                  to={`/game/${stock._id}`}
+                  className="block text-center bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300"
+                >
+                  View Details
+                </Link>
+                <div className="mt-4">
+                  <label className="block text-gray-700 mb-2">Quantity:</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={quantityByStockId[stock._id] || 1}
+                    onChange={(e) =>
+                      handleQuantityChange(stock._id, Number(e.target.value))
+                    }
+                    className="block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 bg-gray-100 text-black px-3 py-2"
+                  />
+                </div>
+                <button
+                  onClick={() => handleAddToCart(stock._id)}
+                  className="block w-full text-center bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300 mt-4"
+                >
+                  Add to Cart
+                </button>
+                <button
+                  onClick={() => handleRent(gameStock.AssignedGame._id)}
+                  className="block w-full text-center bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition duration-300 mt-4"
+                >
+                  Rent
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       <Footer />
     </div>
   );
