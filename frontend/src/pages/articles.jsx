@@ -22,6 +22,7 @@ const Articles = () => {
   const [deletingArticleId, setDeletingArticleId] = useState(null);
   const [deletingCommentId, setDeletingCommentId] = useState(null);
   const [expandedComments, setExpandedComments] = useState({});
+  const [reportingArticleId, setReportingArticleId] = useState(null);
 
   const token = getToken();
   const userId = getUserIdFromToken(token);
@@ -218,6 +219,20 @@ const Articles = () => {
     }
   };
 
+  const handleReportArticle = async (articleId) => {
+    try {
+      setReportingArticleId(articleId);
+      await axios.post(`http://localhost:8098/articles/report/${articleId}`, { userId });
+      alert("Article reported successfully");
+      setReportingArticleId(null);
+    } catch (err) {
+      setReportingArticleId(null);
+      console.error("Error reporting article", err);
+      alert("Failed to report article. Please try again.");
+    }
+  };
+
+
   const toggleComments = (articleId) => {
     setExpandedComments(prev => ({
       ...prev,
@@ -302,6 +317,20 @@ const Articles = () => {
                       <span className="text-sm">Deleting...</span>
                     ) : (
                       <FaTrash size={16} />
+                    )}
+                  </button>
+                )}
+
+              {article.uploader._id !== userId && (
+                  <button
+                    className="absolute top-2 right-2 text-yellow-500 hover:text-yellow-400"
+                    onClick={() => handleReportArticle(article._id)}
+                    disabled={reportingArticleId === article._id}
+                  >
+                    {reportingArticleId === article._id ? (
+                      <span className="text-sm">Reporting...</span>
+                    ) : (
+                      <FaFlag size={16} />
                     )}
                   </button>
                 )}
