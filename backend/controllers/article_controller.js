@@ -213,4 +213,57 @@ export const deleteComment = async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "An error occurred", error });
   }
+
+  
+};
+//report article
+export const reportArticle = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.body;
+
+    const article = await Article.findById(id);
+    if (!article) {
+      return res.status(404).json({ message: "Article not found" });
+    }
+
+    if (!article.reportedBy.includes(userId)) {
+      article.reportedBy.push(userId);
+      await article.save();
+    }
+
+    res.status(200).json({ message: "Article reported successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error reporting article", error });
+  }
+};
+
+export const getReportedArticles = async (req, res) => {
+  try {
+    const reportedArticles = await Article.find({ reportedBy: { $ne: [] } })
+      .populate("uploader", "name")
+      .populate("reportedBy", "name");
+
+    res.status(200).json({ reportedArticles });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching reported articles", error });
+  }
+};
+
+export const dismissReport = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const article = await Article.findById(id);
+    if (!article) {
+      return res.status(404).json({ message: "Article not found" });
+    }
+
+    article.reportedBy = [];
+    await article.save();
+
+    res.status(200).json({ message: "Report dismissed successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error dismissing report", error });
+  }
 };
