@@ -8,7 +8,20 @@ import { toast, Flip } from "react-toastify";
 import VideoPlayer from "../components/videoPlayer";
 import Header from "../components/header";
 import Footer from "../components/footer";
-import { Button, Card, CardBody, Chip, Image, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, ScrollShadow } from "@nextui-org/react";
+import {
+  Button,
+  Card,
+  CardBody,
+  Chip,
+  Image,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+  ScrollShadow,
+} from "@nextui-org/react";
 
 const HandleRentals = () => {
   useAuthCheck();
@@ -33,11 +46,15 @@ const HandleRentals = () => {
 
   const fetchRentalTimes = async (gameId) => {
     try {
-      const response = await axios.get(`http://localhost:8098/rentalDurations/game/${gameId}`);
-      setRentalOptions(response.data.map(option => ({
-        time: option.duration.toString(),
-        price: option.price
-      })));
+      const response = await axios.get(
+        `http://localhost:8098/rentalDurations/game/${gameId}`
+      );
+      setRentalOptions(
+        response.data.map((option) => ({
+          time: option.duration.toString(),
+          price: option.price,
+        }))
+      );
     } catch (err) {
       console.error("Error fetching rental times:", err);
       toast.error("Failed to fetch rental options. Please try again.");
@@ -49,7 +66,9 @@ const HandleRentals = () => {
     const fetchGameDetails = async () => {
       try {
         // Updated API endpoint
-        const response = await axios.get(`http://localhost:8098/games/fetchGame/${id}`);
+        const response = await axios.get(
+          `http://localhost:8098/games/fetchGame/${id}`
+        );
         setGame(response.data);
         await fetchRentalTimes(id);
       } catch (err) {
@@ -63,7 +82,7 @@ const HandleRentals = () => {
   }, [id]);
 
   const handleRentalSelection = useCallback((option) => {
-    setSelectedRental(prevSelected => 
+    setSelectedRental((prevSelected) =>
       prevSelected && prevSelected.time === option.time ? null : option
     );
   }, []);
@@ -91,7 +110,7 @@ const HandleRentals = () => {
     try {
       const token = getToken();
       const userId = getUserIdFromToken(token);
-      
+
       if (!userId) {
         throw new Error("User ID not found. Please log in again.");
       }
@@ -100,16 +119,20 @@ const HandleRentals = () => {
         user: userId,
         game: id,
         time: selectedRental.time,
-        price: selectedRental.price
+        price: selectedRental.price,
       };
 
       console.log("Rental data being sent:", rentalData);
 
-      const response = await axios.post('http://localhost:8098/Rentals/createRental', rentalData, {
-        headers: {
-          'Authorization': `Bearer ${token}`
+      const response = await axios.post(
+        "http://localhost:8098/Rentals/createRental",
+        rentalData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
+      );
 
       if (response.status === 201) {
         toast.success("Rental successful!", {
@@ -125,7 +148,7 @@ const HandleRentals = () => {
           style: { fontFamily: "Rubik" },
         });
         onClose();
-        navigate('/GamingSessions');
+        navigate("/GamingSessions");
       } else {
         throw new Error("Failed to create rental");
       }
@@ -147,7 +170,8 @@ const HandleRentals = () => {
   };
 
   if (loading) return <div className="text-center py-8">Loading...</div>;
-  if (error) return <div className="text-center py-8 text-red-500">Error: {error}</div>;
+  if (error)
+    return <div className="text-center py-8 text-red-500">Error: {error}</div>;
   if (!game) return <div className="text-center py-8">Game not found</div>;
 
   return (
@@ -155,7 +179,9 @@ const HandleRentals = () => {
       <Header />
       <div className="bg-primary py-4">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold text-white text-center">Rent the Game</h1>
+          <h1 className="text-4xl font-bold text-white text-center">
+            Rent the Game
+          </h1>
         </div>
       </div>
       <div className="container mx-auto px-4 py-8">
@@ -184,11 +210,15 @@ const HandleRentals = () => {
                 src={game.coverPhoto}
               />
               <div className="ml-4 flex-1">
-                <h3 className="text-2xl font-semibold mb-4">Terms and Conditions</h3>
+                <h3 className="text-2xl font-semibold mb-4">
+                  Terms and Conditions
+                </h3>
                 <ScrollShadow className="h-[350px]">
                   <ul className="list-disc pl-5 space-y-2">
                     {termsAndConditions.map((term, index) => (
-                      <li key={index} className="text-sm">{term}</li>
+                      <li key={index} className="text-sm">
+                        {term}
+                      </li>
                     ))}
                   </ul>
                 </ScrollShadow>
@@ -218,28 +248,48 @@ const HandleRentals = () => {
             ))}
           </div>
           <div>
-            <h3 className="text-2xl font-semibold mb-4">Select Rental Duration</h3>
+            <h3 className="text-2xl font-semibold mb-4">
+              Select Rental Duration
+            </h3>
             {rentalOptions.length > 0 ? (
               <>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                   {rentalOptions.map((option) => (
-                    <Card 
+                    <Card
                       key={option.time}
                       isPressable
                       isHoverable
                       onPress={() => handleRentalSelection(option)}
                       className={`
                         transition-all duration-300 ease-in-out
-                        ${selectedRental?.time === option.time 
-                          ? 'border-primary border-2 shadow-lg scale-105 bg-primary bg-opacity-20' 
-                          : 'border-gray-600 hover:border-gray-400'}
+                        ${
+                          selectedRental?.time === option.time
+                            ? "border-primary border-2 shadow-lg scale-105 bg-primary bg-opacity-20"
+                            : "border-gray-600 hover:border-gray-400"
+                        }
                       `}
                     >
                       <CardBody className="text-center">
-                        <p className={`text-lg font-bold ${selectedRental?.time === option.time ? 'text-primary' : ''}`}>
-                          {parseInt(option.time) >= 60 ? `${parseInt(option.time) / 60} hour${parseInt(option.time) > 60 ? 's' : ''}` : `${option.time} min`}
+                        <p
+                          className={`text-lg font-bold ${
+                            selectedRental?.time === option.time
+                              ? "text-primary"
+                              : ""
+                          }`}
+                        >
+                          {parseInt(option.time) >= 60
+                            ? `${parseInt(option.time) / 60} hour${
+                                parseInt(option.time) > 60 ? "s" : ""
+                              }`
+                            : `${option.time} min`}
                         </p>
-                        <p className={`text-sm ${selectedRental?.time === option.time ? 'text-primary' : ''}`}>
+                        <p
+                          className={`text-sm ${
+                            selectedRental?.time === option.time
+                              ? "text-primary"
+                              : ""
+                          }`}
+                        >
                           LKR {option.price}
                         </p>
                       </CardBody>
@@ -252,7 +302,7 @@ const HandleRentals = () => {
                   className="w-full"
                   disabled={!selectedRental}
                 >
-                  Rent Now for LKR {selectedRental?.price || ''}
+                  Rent Now for LKR {selectedRental?.price || ""}
                 </Button>
               </>
             ) : (
@@ -261,18 +311,36 @@ const HandleRentals = () => {
                   This game is not available for rent at the moment.
                 </p>
                 <p className="text-sm text-gray-400 mt-2">
-                  Please check back later or contact support for more information.
+                  Please check back later or contact support for more
+                  information.
                 </p>
               </div>
             )}
           </div>
         </div>
       </div>
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        classNames={{
+          body: "text-white",
+          header: "text-white",
+          footer: "text-white",
+          base: "bg-gray-800",
+        }}
+      >
         <ModalContent>
-          <ModalHeader>Confirm Rental</ModalHeader>
+          <ModalHeader className="text-white">Confirm Rental</ModalHeader>
           <ModalBody>
-            <p>You are about to rent {game.title} for {parseInt(selectedRental?.time) >= 60 ? `${parseInt(selectedRental?.time) / 60} hour${parseInt(selectedRental?.time) > 60 ? 's' : ''}` : `${selectedRental?.time} min`}.</p>
+            <p>
+              You are about to rent {game.title} for{" "}
+              {parseInt(selectedRental?.time) >= 60
+                ? `${parseInt(selectedRental?.time) / 60} hour${
+                    parseInt(selectedRental?.time) > 60 ? "s" : ""
+                  }`
+                : `${selectedRental?.time} min`}
+              .
+            </p>
             <p>Price: LKR {selectedRental?.price}</p>
             <p>Please confirm to proceed with the payment.</p>
           </ModalBody>
