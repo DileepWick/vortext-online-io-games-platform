@@ -24,8 +24,9 @@ import RentalRouter from "./routes/rental_routes.js";
 import chatRouter from "./routes/chat_bot_route.js";
 import CommunityPost from "./routes/communityPost_routes.js";
 import contactRouter from "./routes/contact_us_route.js";
-
+import messageRoutes from './routes/messageRoutes.js';
 import { RentalDurationRouter } from "./routes/rentalDurationRoutes.js";
+
 
 //Create the app
 const app = express();
@@ -96,3 +97,4 @@ app.use("/api", chatRouter); // Use chatbot routes
 app.use("/rentalDurations", RentalDurationRouter);
 app.use("/api", GPTRouter);
 app.use("/contacts", contactRouter);
+app.use('/api/messages', messageRoutes);
