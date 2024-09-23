@@ -1,3 +1,4 @@
+//article_controller.js
 import { Article } from "../models/article_model.js";
 import mongoose from "mongoose";
 import cloudinary from "../utils/cloudinary.js";

@@ -1,11 +1,8 @@
+//communityDashboard.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
-
-// Next UI
 import { Tabs, Tab, Card, CardBody, CardFooter, Button } from "@nextui-org/react";
 import Header from "../src/components/header";
-
 
 const CommunityDashBoard = () => {
   const [activeTab, setActiveTab] = useState("tab1");
