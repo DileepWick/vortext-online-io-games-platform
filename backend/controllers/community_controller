@@ -1,0 +1,199 @@
+//community_controller
+import { Community } from "../models/community_model.js";
+import mongoose from "mongoose";
+import cloudinary from "../utils/cloudinary.js";
+import fs from "fs";
+
+export const createCommunity = async (req, res) => {
+  try {
+    if (!req.body.name || !req.body.description || !req.body.creator) {
+      return res.status(400).json({
+        message: "Name, description, and creator are required",
+      });
+    }
+
+    const imageResult = await cloudinary.uploader.upload(
+      req.files.image[0].path,
+      {
+        folder: "community images",
+        resource_type: "image",
+      }
+    );
+
+    if (!imageResult || !imageResult.secure_url) {
+      return res.status(500).json({
+        message: "Could not upload the image",
+      });
+    }
+
+    const newCommunity = new Community({
+      name: req.body.name,
+      description: req.body.description,
+      creator: req.body.creator,
+      image: imageResult.secure_url,
+      rules: req.body.rules || [],
+    });
+
+    const createdCommunity = await newCommunity.save();
+
+    if (createdCommunity) {
+      return res.status(201).json({
+        message: "Community created successfully",
+        community: createdCommunity,
+      });
+    }
+
+    fs.unlinkSync(req.files.image[0].path);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "An error occurred", error });
+  }
+};
+
+export const joinCommunity = async (req, res) => {
+  try {
+    const { communityId } = req.params;
+    const { userId } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(communityId)) {
+      return res.status(400).json({ message: "Invalid community ID" });
+    }
+
+    const community = await Community.findById(communityId);
+
+    if (!community) {
+      return res.status(404).json({ message: "Community not found" });
+    }
+
+    if (!community.members.includes(userId)) {
+      community.members.push(userId);
+      await community.save();
+    }
+
+    res.status(200).json({ message: "Joined community successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "An error occurred", error });
+  }
+};
+
+export const getAllCommunities = async (req, res) => {
+  try {
+    const communities = await Community.find().populate("creator").populate("members");
+
+    if (communities && communities.length > 0) {
+      return res.json({
+        communities,
+      });
+    } else {
+      return res.json({
+        message: "No communities found",
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
+
+export const getCommunityDetails = async (req, res) => {
+  try {
+    const { communityId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(communityId)) {
+      return res.status(400).json({ message: "Invalid community ID" });
+    }
+
+    const community = await Community.findById(communityId)
+      .populate("creator")
+      .populate("members")
+      .populate("posts");
+
+    if (!community) {
+      return res.status(404).json({ message: "Community not found" });
+    }
+
+    res.status(200).json({ community });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "An error occurred", error });
+  }
+};
+
+export const updateCommunityRules = async (req, res) => {
+  try {
+    const { communityId } = req.params;
+    const { rules } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(communityId)) {
+      return res.status(400).json({ message: "Invalid community ID" });
+    }
+
+    const community = await Community.findById(communityId);
+
+    if (!community) {
+      return res.status(404).json({ message: "Community not found" });
+    }
+
+    community.rules = rules;
+    await community.save();
+
+    res.status(200).json({ message: "Community rules updated successfully", rules: community.rules });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "An error occurred", error });
+  }
+};
+
+export const reportCommunity = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.body;
+
+    const community = await Community.findById(id);
+    if (!community) {
+      return res.status(404).json({ message: "Community not found" });
+    }
+
+    if (!community.reportedBy.includes(userId)) {
+      community.reportedBy.push(userId);
+      await community.save();
+    }
+
+    res.status(200).json({ message: "Community reported successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error reporting community", error });
+  }
+};
+
+export const getReportedCommunities = async (req, res) => {
+  try {
+    const reportedCommunities = await Community.find({ reportedBy: { $ne: [] } })
+      .populate("creator", "name")
+      .populate("reportedBy", "name");
+
+    res.status(200).json({ reportedCommunities });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching reported communities", error });
+  }
+};
+
+export const dismissCommunityReport = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const community = await Community.findById(id);
+    if (!community) {
+      return res.status(404).json({ message: "Community not found" });
+    }
+
+    community.reportedBy = [];
+    await community.save();
+
+    res.status(200).json({ message: "Report dismissed successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error dismissing report", error });
+  }
+};
