@@ -31,4 +31,5 @@ articleRouter.post("/report/:id", reportArticle);
 articleRouter.get("/reported", getReportedArticles);
 articleRouter.post("/dismissReport/:id", dismissReport);
 
+
 export default articleRouter;

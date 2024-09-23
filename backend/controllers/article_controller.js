@@ -185,6 +185,70 @@ export const deleteArticle = async (req, res) => {
   }
 };
 
+//update article
+
+export const updateArticle = async (req, res) => {
+  try {
+    const { articleId } = req.params;
+    const { heading, articleBody } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(articleId)) {
+      return res.status(400).json({ message: "Invalid article ID" });
+    }
+
+    const article = await Article.findById(articleId);
+
+    if (!article) {
+      return res.status(404).json({ message: "Article not found" });
+    }
+
+    // Update text fields
+    if (heading) article.heading = heading;
+    if (articleBody) article.articleBody = articleBody;
+
+    // Update image if a new one is provided
+    if (req.files && req.files.image) {
+      // Delete the old image from Cloudinary
+      if (article.image) {
+        const publicId = article.image.split('/').pop().split('.')[0];
+        await cloudinary.uploader.destroy(publicId);
+      }
+
+      // Upload the new image
+      const imageResult = await cloudinary.uploader.upload(
+        req.files.image[0].path,
+        {
+          folder: "article images",
+          resource_type: "image",
+        }
+      );
+
+      if (!imageResult || !imageResult.secure_url) {
+        return res.status(500).json({
+          message: "Could not upload the new image",
+        });
+      }
+
+      article.image = imageResult.secure_url;
+
+      // Remove the temporary file
+      fs.unlinkSync(req.files.image[0].path);
+    }
+
+    // Save the updated article
+    const updatedArticle = await article.save();
+
+    res.status(200).json({
+      message: "Article updated successfully",
+      article: updatedArticle
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "An error occurred while updating the article", error });
+  }
+};
+
 // Delete a comment from an article
 export const deleteComment = async (req, res) => {
   try {

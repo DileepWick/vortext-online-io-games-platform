@@ -1,112 +1,263 @@
-//communityDashboard.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
-import { Tabs, Tab, Card, CardBody, CardFooter, Button } from "@nextui-org/react";
 import Header from "../src/components/header";
+import Footer from "../src/components/footer";
+import { toast, Flip } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import {
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Input,
+  Button,
+  Tabs,
+  Tab,
+  Pagination,
+  Chip,
+  Tooltip,
+} from "@nextui-org/react";
+import { SearchIcon } from "../src/assets/icons/SearchIcon";
+import { DeleteIcon } from "../src/assets/icons/DeleteIcon";
 
-const CommunityDashBoard = () => {
-  const [activeTab, setActiveTab] = useState("tab1");
-  const [reportedPosts, setReportedPosts] = useState([]);
+const CommunityDashboard = () => {
+  const [articles, setArticles] = useState([]);
+  const [reportedArticles, setReportedArticles] = useState([]);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("allArticles");
+  const [page, setPage] = useState(1);
+
+  const rowsPerPage = 5;
 
   useEffect(() => {
-    if (activeTab === "tab3") {
-      fetchReportedPosts();
+    if (activeTab === "allArticles") {
+      fetchAllArticles();
+    } else if (activeTab === "reportedArticles") {
+      fetchReportedArticles();
     }
   }, [activeTab]);
 
-  const fetchReportedPosts = async () => {
+  const fetchAllArticles = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get("http://localhost:8098/articles/getAllArticles");
+      setArticles(response.data.articles || []);
+      setError("");
+    } catch (error) {
+      console.error("Error fetching articles:", error);
+      setError("Failed to fetch articles. Please try again.");
+      toast.error("Failed to fetch articles. Please try again.", {
+        theme: "dark",
+        transition: Flip,
+        style: { fontFamily: "Rubik" },
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchReportedArticles = async () => {
+    setIsLoading(true);
     try {
       const response = await axios.get("http://localhost:8098/articles/reported");
-      setReportedPosts(response.data.reportedArticles);
+      setReportedArticles(response.data.reportedArticles || []);
+      setError("");
     } catch (error) {
-      console.error("Error fetching reported posts:", error);
+      console.error("Error fetching reported articles:", error);
+      setError("Failed to fetch reported articles. Please try again.");
+      toast.error("Failed to fetch reported articles. Please try again.", {
+        theme: "dark",
+        transition: Flip,
+        style: { fontFamily: "Rubik" },
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteArticle = async (articleId) => {
+    if (window.confirm("Are you sure you want to delete this article?")) {
+      try {
+        await axios.delete(`http://localhost:8098/articles/deleteArticle/${articleId}`);
+        toast.success("Article deleted successfully", {
+          theme: "dark",
+          transition: Flip,
+          style: { fontFamily: "Rubik" },
+        });
+        if (activeTab === "allArticles") {
+          fetchAllArticles();
+        } else {
+          fetchReportedArticles();
+        }
+      } catch (error) {
+        console.error("Error deleting article:", error);
+        toast.error("Failed to delete article. Please try again.", {
+          theme: "dark",
+          transition: Flip,
+          style: { fontFamily: "Rubik" },
+        });
+      }
     }
   };
 
   const handleDismissReport = async (articleId) => {
     try {
       await axios.post(`http://localhost:8098/articles/dismissReport/${articleId}`);
-      fetchReportedPosts(); // Refresh the list after dismissing
+      toast.success("Report dismissed successfully", {
+        theme: "dark",
+        transition: Flip,
+        style: { fontFamily: "Rubik" },
+      });
+      fetchReportedArticles();
     } catch (error) {
       console.error("Error dismissing report:", error);
+      toast.error("Failed to dismiss report. Please try again.", {
+        theme: "dark",
+        transition: Flip,
+        style: { fontFamily: "Rubik" },
+      });
     }
   };
 
-  const handleRemovePost = async (articleId) => {
-    try {
-      await axios.delete(`http://localhost:8098/articles/deleteArticle/${articleId}`);
-      fetchReportedPosts(); // Refresh the list after removing
-    } catch (error) {
-      console.error("Error removing post:", error);
-    }
+  const filteredItems = useMemo(() => {
+    const currentArticles = activeTab === "allArticles" ? articles : reportedArticles;
+    return currentArticles.filter((article) =>
+      article.heading.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [activeTab, articles, reportedArticles, searchQuery]);
+
+  const items = useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    return filteredItems.slice(start, end);
+  }, [page, filteredItems]);
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+    setPage(1);
   };
+
+  const handleClearSearch = () => {
+    setSearchQuery("");
+    setPage(1);
+  };
+
+  // Columns definition
+  const columns = [
+    { key: "title", label: "TITLE" },
+    { key: "author", label: "AUTHOR" },
+    { key: "likes", label: "LIKES" },
+    { key: "comments", label: "COMMENTS" },
+    ...(activeTab === "reportedArticles" ? [{ key: "reports", label: "REPORTS" }] : []),
+    { key: "actions", label: "ACTIONS" },
+  ];
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Header />
-      <div className="flex w-full flex-col">
-        <h1 className="text-2xl font-bold mb-4 p-4">Community Dashboard</h1>
-        <div className="flex items-center p-4 font-primaryRegular">
-          <Tabs
-            aria-label="Community Dashboard Tabs"
-            className="flex-1"
-            onSelectionChange={setActiveTab}
-            selectedKey={activeTab}
-            size="lg"
-            color="primary"
+      <main className="flex-grow p-4">
+        <div className="flex w-full flex-col">
+          <div className="flex items-center p-4 font-primaryRegular">
+            <Tabs
+              aria-label="Community Dashboard Tabs"
+              className="flex-1"
+              onSelectionChange={setActiveTab}
+              selectedKey={activeTab}
+              size="lg"
+              color="primary"
+            >
+              <Tab key="allArticles" title="All Articles" />
+              <Tab key="reportedArticles" title="Reported Articles" />
+            </Tabs>
+          </div>
+          <div className="flex justify-between items-center mb-4">
+            <Input
+              className="w-64"
+              placeholder="Search by article title..."
+              startContent={<SearchIcon />}
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onClear={handleClearSearch}
+            />
+          </div>
+          <Table
+            aria-label="Articles table"
+            bottomContent={
+              <div className="flex w-full justify-center">
+                <Pagination
+                  isCompact
+                  showControls
+                  showShadow
+                  color="primary"
+                  page={page}
+                  total={Math.ceil(filteredItems.length / rowsPerPage)}
+                  onChange={(page) => setPage(page)}
+                />
+              </div>
+            }
+            classNames={{
+              wrapper: "min-h-[222px]",
+            }}
           >
-            <Tab key="tab1" title="Post" />
-            <Tab key="tab2" title="Chat" />
-            <Tab key="tab3" title="Report" />
-            <Tab key="tab4" title="Group" />
-          </Tabs>
-        </div>
-        <div className="p-4">
-          {activeTab === "tab1" && <div>Still Developing</div>}
-          {activeTab === "tab2" && <div>Still Developing</div>}
-          {activeTab === "tab3" && (
-            <div>
-              <h2 className="text-xl font-semibold mb-4">Reported Posts</h2>
-              {reportedPosts.length === 0 ? (
-                <p>No reported posts.</p>
-              ) : (
-                <div className="space-y-4">
-                  {reportedPosts.map((post) => (
-                    <Card key={post._id} className="bg-gray-800 text-white">
-                      <CardBody>
-                        <h3 className="text-lg font-semibold">{post.heading}</h3>
-                        <p className="text-sm text-gray-400">{post.articleBody.substring(0, 100)}...</p>
-                        <p className="text-xs text-gray-500 mt-2">
-                          Reported by: {post.reportedBy.length} user(s)
-                        </p>
-                      </CardBody>
-                      <CardFooter className="justify-end space-x-2">
-                        <Button
-                          size="sm"
-                          color="warning"
-                          onClick={() => handleDismissReport(post._id)}
-                        >
-                          Dismiss Report
-                        </Button>
-                        <Button
-                          size="sm"
-                          color="danger"
-                          onClick={() => handleRemovePost(post._id)}
-                        >
-                          Remove Post
-                        </Button>
-                      </CardFooter>
-                    </Card>
-                  ))}
-                </div>
+            <TableHeader columns={columns}>
+              {(column) => (
+                <TableColumn key={column.key}>{column.label}</TableColumn>
               )}
-            </div>
-          )}
-          {activeTab === "tab4" && <div>Still Developing</div>}
+            </TableHeader>
+            <TableBody items={items}>
+              {(item) => (
+                <TableRow key={item._id}>
+                  {(columnKey) => (
+                    <TableCell>
+                      {columnKey === "title" && item.heading}
+                      {columnKey === "author" && item.uploader.username}
+                      {columnKey === "likes" && item.likes.length}
+                      {columnKey === "comments" && item.comments.length}
+                      {columnKey === "reports" && (
+                        <Chip color="danger" variant="flat">
+                          {item.reportedBy.length}
+                        </Chip>
+                      )}
+                      {columnKey === "actions" && (
+                        <div className="flex items-center gap-4">
+                          <Tooltip
+                            content="Delete article"
+                            color="danger"
+                            className="font-primaryRegular"
+                          >
+                            <span
+                              className="text-lg text-danger cursor-pointer active:opacity-50"
+                              onClick={() => handleDeleteArticle(item._id)}
+                            >
+                              <DeleteIcon />
+                            </span>
+                          </Tooltip>
+                          {activeTab === "reportedArticles" && (
+                            <Button
+                              size="sm"
+                              color="warning"
+                              onClick={() => handleDismissReport(item._id)}
+                            >
+                              Dismiss Report
+                            </Button>
+                          )}
+                        </div>
+                      )}
+                    </TableCell>
+                  )}
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         </div>
-      </div>
-    </>
+      </main>
+      <Footer />
+    </div>
   );
 };
 
-export default CommunityDashBoard;
+export default CommunityDashboard;
