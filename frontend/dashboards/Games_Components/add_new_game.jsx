@@ -183,11 +183,11 @@ const UploadGame = ({ FunctionToCallAfterUpload }) => {
                 value={ageGroup}
                 onChange={setAgeGroup}
                 required
-                className="mb-4 w-[300px]"
+                className="mb-4 w-[300px] text-black"
                 
               >
                 {ageGroups.map((group) => (
-                  <SelectItem key={group.value} value={group.value} className="font-primaryRegular">
+                  <SelectItem key={group.value} value={group.value} className="font-primaryRegular text-black">
                     {group.label}
                   </SelectItem>
                 ))}
@@ -207,7 +207,7 @@ const UploadGame = ({ FunctionToCallAfterUpload }) => {
             <div>
               <Button
                 type="submit"
-                
+                className="mb-8"
                 color="primary"
                 size="lg"
               >
