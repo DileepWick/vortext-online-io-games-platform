@@ -92,15 +92,42 @@ const ContactDash = () => {
 
   // FAQ functions
   const handleAddFAQ = async () => {
+    // Check if either the question or answer fields are empty
+    if (!newFAQQuestion.trim() || !newFAQAnswer.trim()) {
+      // Show error toast when fields are empty
+      toast.error("Both Question and Answer fields are required", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Flip,
+        progressBarClassName: "bg-gray-800",
+        style: { fontFamily: "Rubik" },
+      });
+      return; // Stop the submission if the fields are empty
+    }
+
     try {
       const response = await axios.post("http://localhost:8098/faq/createFAQ", {
         question: newFAQQuestion,
         answer: newFAQAnswer,
       });
 
-      if (response.data && response.data.newFAQ) {
-        setFaqs((prevFaqs) => [...prevFaqs, response.data.newFAQ]);
-        toast.success("FAQ Added", {
+      console.log("Response:", response);
+
+      if (
+        response.status >= 200 &&
+        response.status < 300 &&
+        response.data.faq
+      ) {
+        setFaqs((prevFaqs) => [...prevFaqs, response.data.faq]);
+
+        // Show success toast
+        toast.success("FAQ added", {
           position: "top-right",
           autoClose: 2000,
           hideProgressBar: false,
@@ -114,12 +141,16 @@ const ContactDash = () => {
           style: { fontFamily: "Rubik" },
         });
       }
+
+      // Clear input fields and close modal
       setNewFAQQuestion("");
       setNewFAQAnswer("");
       onAddFAQOpenChange(false);
     } catch (error) {
       console.error("Error adding FAQ:", error);
       setError("Failed to add FAQ");
+
+      // Show error toast
       toast.error("Failed to add FAQ", {
         position: "top-right",
         autoClose: 2000,
@@ -137,6 +168,28 @@ const ContactDash = () => {
   };
 
   const handleUpdateFAQ = async () => {
+    // Check if the current question and answer are different from the original
+    if (
+      editFAQQuestion.trim() === editingFAQ.question.trim() &&
+      editFAQAnswer.trim() === editingFAQ.answer.trim()
+    ) {
+      // Show error toast when there are no changes
+      toast.error("No changes detected", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Flip,
+        progressBarClassName: "bg-gray-800",
+        style: { fontFamily: "Rubik" },
+      });
+      return; // Stop submission if no changes are made
+    }
+
     try {
       const response = await axios.put(
         `http://localhost:8098/faq/updateFAQ/${editingFAQ._id}`,
@@ -146,28 +199,36 @@ const ContactDash = () => {
         }
       );
 
-      if (response.data && response.data.updatedFAQ) {
-        setFaqs((prevFaqs) =>
-          prevFaqs.map((faq) =>
-            faq._id === response.data.updatedFAQ._id
-              ? response.data.updatedFAQ
-              : faq
-          )
-        );
-        toast.success("FAQ Updated", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-          transition: Flip,
-          progressBarClassName: "bg-gray-800",
-          style: { fontFamily: "Rubik" },
-        });
+      console.log("Response Data:", response.data);
+
+      if (response.status >= 200 && response.status < 300) {
+        console.log("Updated FAQ Data:", response.data);
+
+        if (response.data.faq) {
+          setFaqs((prevFaqs) =>
+            prevFaqs.map((faq) =>
+              faq._id === response.data.faq._id ? response.data.faq : faq
+            )
+          );
+
+          // Show success toast after FAQ is updated
+          toast.success("FAQ Updated", {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+            transition: Flip,
+            progressBarClassName: "bg-gray-800",
+            style: { fontFamily: "Rubik" },
+          });
+        }
       }
+
+      // Clear the input fields and reset the editing state
       setEditFAQQuestion("");
       setEditFAQAnswer("");
       setEditingFAQ(null);
@@ -175,6 +236,8 @@ const ContactDash = () => {
     } catch (error) {
       console.error("Error updating FAQ:", error);
       setError("Failed to update FAQ");
+
+      // Show error toast in case of failure
       toast.error("Failed to update FAQ", {
         position: "top-right",
         autoClose: 2000,
