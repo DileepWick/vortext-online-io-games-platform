@@ -62,8 +62,8 @@ const CommunityDashBoard = () => {
           </Tabs>
         </div>
         <div className="p-4">
-          {activeTab === "tab1" && <div>Tab1 Content</div>}
-          {activeTab === "tab2" && <div>Tab2 Content</div>}
+          {activeTab === "tab1" && <div>Still Developing</div>}
+          {activeTab === "tab2" && <div>Still Developing</div>}
           {activeTab === "tab3" && (
             <div>
               <h2 className="text-xl font-semibold mb-4">Reported Posts</h2>
@@ -102,7 +102,7 @@ const CommunityDashBoard = () => {
               )}
             </div>
           )}
-          {activeTab === "tab4" && <div>Tab4 Content</div>}
+          {activeTab === "tab4" && <div>Still Developing</div>}
         </div>
       </div>
     </>
