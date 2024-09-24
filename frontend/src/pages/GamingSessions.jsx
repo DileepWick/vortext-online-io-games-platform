@@ -53,7 +53,7 @@ const GamingSessions = () => {
     if (currentGame) {
       const rentalTimeInSeconds = convertTimeToSeconds(currentGame.time);
       console.log("Rental time in seconds:", rentalTimeInSeconds);
-      navigate(`/RentalGamesEmbed/${encodeURIComponent(currentGame.game.PlayLink)}/${encodeURIComponent(currentGame.game.title)}/${encodeURIComponent(rentalTimeInSeconds || 14400)}`);
+      navigate(`/RentalGamesEmbed/${encodeURIComponent(currentGame.game.PlayLink)}/${encodeURIComponent(currentGame.game.title)}/${encodeURIComponent(rentalTimeInSeconds || 14400)}/${currentGame._id}`);
     }
     closeModal();
   }, [currentGame, navigate, closeModal]);

@@ -72,10 +72,7 @@ const App = () => {
       <Route path="/SessionHistory" element={<SessionHistory />} />
       <Route path="/HandleRentals/:id" element={<HandleRentals />} />
       <Route path="/Payment_manager_dashboard" element={<Payment_Manager />} />
-      <Route
-        path="/RentalGamesEmbed/:src/:title/:rentalTime"
-        element={<RentalGamesEmbed />}
-      />
+      <Route path="/RentalGamesEmbed/:src/:title/:rentalTime/:rentalId" element={<RentalGamesEmbed />} />
       <Route path="/TailoredGames" element={<TailoredGames />} />
       <Route path="/RentedGamesSection" element={<RentedGamesSection />} />
     </Routes>

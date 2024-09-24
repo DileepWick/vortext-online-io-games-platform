@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { Button, Progress } from "@nextui-org/react";
@@ -31,7 +32,7 @@ const exitFullScreen = () => {
 };
 
 const RentalGamesEmbed = () => {
-  const { src, title, rentalTime } = useParams();
+  const { src, title, rentalTime, rentalId } = useParams();
   const navigate = useNavigate();
   const decodedSrc = decodeURIComponent(src);
   const decodedTitle = decodeURIComponent(title);
@@ -44,6 +45,27 @@ const RentalGamesEmbed = () => {
   const [timeLeft, setTimeLeft] = useState(initialTimeSeconds);
   const totalTime = initialTimeSeconds;
 
+  const deleteRental = async () => {
+    try {
+      await axios.delete(`http://localhost:8098/Rentals/deleteRentalByID/${rentalId}`);
+      console.log("Rental deleted successfully");
+    } catch (error) {
+      console.error("Error deleting rental:", error);
+    }
+  };
+
+  const updateRentalTime = async (remainingTimeInSeconds) => {
+    try {
+      const remainingTimeInMinutes = Math.ceil(remainingTimeInSeconds / 60);
+      await axios.put(`http://localhost:8098/Rentals/updateRentalTime/${rentalId}`, {
+        remainingTime: remainingTimeInMinutes
+      });
+      console.log("Rental time updated successfully");
+    } catch (error) {
+      console.error("Error updating rental time:", error);
+    }
+  };
+
   useEffect(() => {
     console.log("Initial rental time (minutes):", rentalTimeMinutes);
     console.log("Initial rental time (seconds):", initialTimeSeconds);
@@ -53,6 +75,7 @@ const RentalGamesEmbed = () => {
       setTimeLeft((prevTime) => {
         if (prevTime <= 1) {
           clearInterval(timer);
+          deleteRental(); // Delete the rental when time expires
           window.alert("Your rental time has expired");
           navigate("/GamingSessions");
           return 0;
@@ -62,7 +85,7 @@ const RentalGamesEmbed = () => {
     }, 1000);
 
     return () => clearInterval(timer); // Clean up the timer on component unmount
-  }, [navigate, initialTimeSeconds, rentalTimeMinutes]);
+  }, [navigate, initialTimeSeconds, rentalTimeMinutes, rentalId]);
 
   useEffect(() => {
     const handleFullScreenChange = () => {
@@ -95,7 +118,10 @@ const RentalGamesEmbed = () => {
     }
   };
 
-  const handleCut = () => {
+  const handleCut = async () => {
+    if (timeLeft > 0) {
+      await updateRentalTime(timeLeft);
+    }
     navigate("/GamingSessions");
   };
 
