@@ -7,7 +7,7 @@ import { getToken } from "../utils/getToken";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { User } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
-import { FaHeart, FaRegHeart, FaTrash, FaComments } from "react-icons/fa";
+import { FaHeart, FaRegHeart, FaTrash, FaComments ,FaFlag } from "react-icons/fa";
 
 const Articles = () => {
   const [heading, setHeading] = useState('');
