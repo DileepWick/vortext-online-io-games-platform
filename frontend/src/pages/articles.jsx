@@ -7,13 +7,11 @@ import { getToken } from "../utils/getToken";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { User } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
-<<<<<<< Updated upstream
 import { FaHeart, FaRegHeart, FaTrash, FaComments } from "react-icons/fa";
-=======
 import { FaHeart, FaRegHeart, FaTrash, FaComments ,FaFlag } from "react-icons/fa";
 import { toast, Flip } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
->>>>>>> Stashed changes
+
 
 const Articles = () => {
   const [heading, setHeading] = useState('');
