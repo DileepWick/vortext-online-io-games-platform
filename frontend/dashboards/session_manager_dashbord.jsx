@@ -35,6 +35,7 @@ import RentedGamesSection from "./rentedGamesDash";
 
 const SessionManagerDash = () => {
   const [rentalTimes, setRentalTimes] = useState([]);
+  const [pricePerMinute, setPricePerMinute] = useState(5);
   const [games, setGames] = useState([]);
   const [formData, setFormData] = useState({
     gameId: "",
@@ -100,7 +101,28 @@ const SessionManagerDash = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    if (name === "duration") {
+      const durationValue = parseInt(value, 10);
+      const calculatedPrice = durationValue * pricePerMinute;
+      setFormData({
+        ...formData,
+        [name]: value,
+        price: calculatedPrice.toString(),
+      });
+    } else if (name === "pricePerMinute") {
+      const newPricePerMinute = parseFloat(value);
+      setPricePerMinute(newPricePerMinute);
+      if (formData.duration) {
+        const durationValue = parseInt(formData.duration, 10);
+        const calculatedPrice = durationValue * newPricePerMinute;
+        setFormData({
+          ...formData,
+          price: calculatedPrice.toString(),
+        });
+      }
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleGameSelect = (e) => {
@@ -278,6 +300,18 @@ const SessionManagerDash = () => {
                   onChange={handleSearchChange}
                   onClear={handleClearSearch}
                 />
+                <div className="p-4 shadow-lg rounded-lg border border-gray-200 bg-white flex flex-col w-52">
+                  <label className="text-sm font-medium text-primary mb-1">
+                    Price per Minute (LKR)
+                  </label>
+                  <Input
+                    className="w-full"
+                    name="pricePerMinute"
+                    type="number"
+                    value={pricePerMinute}
+                    onChange={handleInputChange}
+                  />
+                </div>
                 <Button
                   color="primary"
                   onPress={() => {
@@ -324,13 +358,21 @@ const SessionManagerDash = () => {
                 <TableBody>
                   {items.map((rentalTime) => (
                     <TableRow key={rentalTime._id}>
-                      <TableCell>{rentalTime.game.title}</TableCell>
+                      <TableCell>
+                        <span className="text-primary font-medium">
+                          {rentalTime.game.title}
+                        </span>
+                      </TableCell>
                       <TableCell>
                         <Chip color="default" variant="flat">
-                          {rentalTime.duration}
+                          {rentalTime.duration} min
                         </Chip>
                       </TableCell>
-                      <TableCell>LKR {rentalTime.price.toFixed(2)}</TableCell>
+                      <TableCell>
+                        <span className="text-primary font-medium">
+                          LKR {rentalTime.price.toFixed(2)}
+                        </span>
+                      </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-4">
                           <Tooltip
@@ -365,88 +407,101 @@ const SessionManagerDash = () => {
               </Table>
             </>
           )}
-          {activeTab === "rentedGames" && (
-            <RentedGamesSection />
-          )}
+          {activeTab === "rentedGames" && <RentedGamesSection />}
         </div>
       </main>
       <Footer />
 
       <Modal
-        isOpen={isOpen}
-        onClose={() => {
-          onClose();
-          setError("");
-        }}
-      >
-        <ModalContent>
-          <form onSubmit={handleSubmit}>
-            <ModalHeader>
+      isOpen={isOpen}
+      onClose={() => {
+        onClose();
+        setPricePerMinute(5); // Reset to default value
+      }}
+    >
+      <ModalContent>
+        <form onSubmit={handleSubmit}>
+          <ModalHeader>
+            <h3 className="text-xl font-bold text-primary">
               {editingId ? "Edit Rental Time" : "Add New Rental Time"}
-            </ModalHeader>
-            <ModalBody>
-              {error && <div className="text-red-500 mb-4">{error}</div>}
-              <div className="mb-4">
-                <Select
+            </h3>
+          </ModalHeader>
+          <ModalBody>
+            {error && <div className="text-red-500 mb-4">{error}</div>}
+            <div className="mb-4">
+              {editingId ? (
+                <Input
                   label="Game"
-                  placeholder="Select a game"
-                  selectedKeys={formData.gameId ? [formData.gameId] : []}
-                  onChange={handleGameSelect}
-                  required
-                >
-                  {games.map((game) => (
-                    <SelectItem key={game._id} value={game._id}>
-                      {game.title}
-                    </SelectItem>
-                  ))}
-                </Select>
-              </div>
-              <div className="mb-4">
-                <Input
-                  label="Duration (minutes)"
-                  name="duration"
-                  type="number"
-                  value={formData.duration}
-                  onChange={handleInputChange}
-                  required
+                  value={formData.gameName}
+                  readOnly
+                  classNames={{
+                    label: "text-primary",
+                    input: "text-primary",
+                  }}
                 />
-              </div>
-              <div className="mb-4">
-                <Input
-                  label="Price (LKR)"
-                  name="price"
-                  type="number"
-                  value={formData.price}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-            </ModalBody>
-            <ModalFooter>
-              <Button
-                color="danger"
-                variant="light"
-                onPress={() => {
-                  setFormData({
-                    gameId: "",
-                    gameName: "",
-                    duration: "",
-                    price: "",
-                  });
-                  setEditingId(null);
-                  setError("");
-                  onClose();
-                }}
-              >
-                Cancel
-              </Button>
-              <Button color="primary" type="submit">
-                {editingId ? "Update" : "Add"}
-              </Button>
-            </ModalFooter>
-          </form>
-        </ModalContent>
-      </Modal>
+              ) : (
+                <Select
+  label="Game"
+  placeholder="Select a game"
+  selectedKeys={formData.gameId ? [formData.gameId] : []}
+  onChange={handleGameSelect}
+  required
+  classNames={{
+    label: "text-primary",
+    trigger: "text-primary",
+    listbox: "text-primary",
+    popover: "text-primary",
+  }}
+>
+  {games.map((game) => (
+    <SelectItem 
+      key={game._id} 
+      value={game._id}
+      className="text-primary"
+    >
+      {game.title}
+    </SelectItem>
+  ))}
+</Select>
+              )}
+            </div>
+            <div className="mb-4">
+              <Input
+                label="Duration (minutes)"
+                name="duration"
+                type="number"
+                value={formData.duration}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <Input
+                label="Price (LKR)"
+                name="price"
+                type="number"
+                value={formData.price}
+                readOnly
+              />
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              color="danger"
+              variant="light"
+              onPress={() => {
+                onClose();
+              }}
+            >
+              Cancel
+            </Button>
+            <Button color="primary" type="submit">
+              {editingId ? "Update" : "Add"}
+            </Button>
+          </ModalFooter>
+        </form>
+      </ModalContent>
+    </Modal>
     </div>
   );
 };

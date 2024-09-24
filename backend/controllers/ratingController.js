@@ -33,3 +33,28 @@ export const getRatings = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+export const updateRating = async (req, res) => {
+  try {
+    const { ratingId } = req.params;
+    const { rating, comment } = req.body;
+    console.log("Received updated rating data:", { ratingId, rating, comment });
+
+    const updatedRating = await Rating.findByIdAndUpdate(ratingId, { rating, comment }, { new: true });
+    if (!updatedRating) {
+      throw new Error(`Rating with ID ${ratingId} not found`);
+    }
+
+    // Update game's average rating
+    const gameDoc = await Game.findById(updatedRating.game);
+    if (gameDoc) {
+      await gameDoc.updateAverageRating();
+    }
+
+    console.log("Rating updated successfully");
+    res.json(updatedRating);
+  } catch (error) {
+    console.error("Error in updateRating:", error);
+    res.status(400).json({ message: error.message });
+  }
+}
