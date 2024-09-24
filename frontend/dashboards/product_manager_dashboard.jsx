@@ -201,7 +201,7 @@ const Blogger = () => {
           color="primary"
         >
           <Tab key="analytics" title="Analytics" />
-          <Tab key="products" title="Unpublished Games" />
+          <Tab key="products" title="All Games" />
           <Tab key="stock" title="Published Games" />
         </Tabs>
       </div>
@@ -282,7 +282,7 @@ const Blogger = () => {
                         <Tooltip
                           content="Show details"
                           showArrow
-                          className="font-primaryRegular"
+                          className="font-primaryRegular text-black"
                           color="default"
                           placement="top-end"
                         >
@@ -324,7 +324,7 @@ const Blogger = () => {
                           content="Publish This Games"
                           showArrow
                           color="default"
-                          className="font-primaryRegular"
+                          className="font-primaryRegular text-black"
                         >
                           <Button
                             color="primary"
@@ -350,7 +350,7 @@ const Blogger = () => {
                 backdrop:
                   "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20",
               }}
-              className="p-4"
+              className="p-4 text-black"
             >
               <ModalContent className="font-primaryRegular bg-white">
                 <ModalHeader>Game Information</ModalHeader>
@@ -426,7 +426,7 @@ const Blogger = () => {
                   "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20",
               }}
             >
-              <ModalContent className="font-primaryRegular">
+              <ModalContent className="font-primaryRegular text-black">
                 <ModalHeader>Add New Game</ModalHeader>
                 <ModalBody>
                   <UploadGame
@@ -446,7 +446,7 @@ const Blogger = () => {
                   "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20",
               }}
             >
-              <ModalContent className="font-primaryRegular">
+              <ModalContent className="font-primaryRegular text-black">
                 <ModalHeader>Confirm Game Deletion</ModalHeader>
                 <ModalBody>
                   <p>
@@ -500,7 +500,7 @@ const Blogger = () => {
               </ModalContent>
             </Modal>
 
-            {/*Add New Stock Modal*/}
+            {/*Publish Game*/}
             <Modal
               isOpen={isAddStockModalOpen}
               size="lg"
@@ -510,7 +510,7 @@ const Blogger = () => {
                   "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20",
               }}
             >
-              <ModalContent className="font-primaryRegular">
+              <ModalContent className="font-primaryRegular text-black">
                 <ModalHeader>Publish Game</ModalHeader>
                 <ModalBody>
                   <AddNewStock

@@ -360,7 +360,7 @@ const Hangman = () => {
             <h1 className="text-customPink text-5xl font-scary2 mb-8">
               Spookey Gusses
             </h1>
-            <p className="mb-8 font-scary2 text-2xl">
+            <p className="mb-8 font-scary2 text-2xl text-black">
               Prepare to embark on an epic adventure where your only enemy is
               your own inability to choose! Whether you’re a seasoned hero or a
               curious newbie, each edition of this game promises a unique blend

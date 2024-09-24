@@ -20,6 +20,8 @@ const Shop = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [ratingsData, setRatingsData] = useState([]);
+  const [showtoprated, setShowTopRated] = useState(false);
 
   useEffect(() => {
     const fetchGameStocks = async () => {
@@ -47,6 +49,54 @@ const Shop = () => {
     fetchGameStocks();
   }, []);
 
+  const fetchRatings = async (id) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8098/ratings/game/${id}`
+      );
+      const ratings = response.data;
+
+      // Calculate average rating
+      const avg =
+        ratings.length > 0
+          ? ratings.reduce((sum, rating) => sum + rating.rating, 0) /
+            ratings.length
+          : undefined;
+
+      // Check if avg is defined
+      if (avg !== undefined) {
+        // Create a new entry with gameId and averageRating
+        const newRatingData = { gameId: id, averageRating: avg };
+
+        // Update the state with the new entry
+        setRatingsData((prevData) => {
+          const updatedData = [...prevData, newRatingData];
+
+          // Filter out entries where averageRating is undefined
+          const filteredData = updatedData.filter(
+            (data) => data.averageRating !== undefined
+          );
+
+          // Sort by averageRating in descending order
+          const sortedData = filteredData.sort(
+            (a, b) => b.averageRating - a.averageRating
+          );
+
+          return sortedData;
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching ratings:", error);
+    }
+  };
+
+  useEffect(() => {
+    gameStocks.forEach((game) => {
+      console.log(game._id);
+      fetchRatings(game._id);
+    });
+  }, [setShowTopRated, showtoprated]);
+
   useEffect(() => {
     if (searchTerm === "") {
       setFilteredStocks(gameStocks);
@@ -60,6 +110,27 @@ const Shop = () => {
       );
     }
   }, [searchTerm, gameStocks]);
+
+  useEffect(() => {
+    console.log("Ratings Data: ");
+    ratingsData.map((rating) => {
+      console.log(rating);
+    });
+  }, [ratingsData]);
+
+  useEffect(() => {
+    const orderedFilteredStocks = ratingsData
+      .map((rating) => gameStocks.find((stock) => stock._id === rating.gameId))
+      .filter((stock) => stock !== undefined);
+
+    if (showtoprated) {
+      setFilteredStocks(orderedFilteredStocks);
+      console.log("Filtered Stocks: ");
+      filteredStocks.map((stock) => {
+        console.log(stock);
+      });
+    }
+  }, [ratingsData, gameStocks]);
 
   if (loading) return <Loader />;
   if (error) return <p>Error: {error}</p>;
@@ -76,28 +147,41 @@ const Shop = () => {
             placeholder="SEARCH GAMES ..."
             className="w-[400px] font-primaryRegular dark ml-[50px] mt-8"
             size="lg"
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setShowTopRated(false);
+            }}
             value={searchTerm}
           />
         </div>
+
+        <button
+          className="text-[#f21160] px-16 pb-8"
+          onClick={() => {
+            setShowTopRated(true);
+          }}
+        >
+          Show Top Rated This week...
+        </button>
+
+
 
         {filteredStocks.length === 0 ? (
           <p className="text-gray-400 text-center">No Games Found</p>
         ) : (
           <ScrollShadow hideScrollBar>
-          <div className="flex flex-wrap justify-center gap-8">
-            {" "}
-            {/* Adjusted gap */}
-            {filteredStocks.map((stock) => {
-              const originalPrice = stock.UnitPrice;
-              const discount = stock.discount;
-              const discountedPrice =
-                discount > 0
-                  ? originalPrice - (originalPrice * discount) / 100
-                  : originalPrice;
+            <div className="flex flex-wrap justify-center gap-8">
+              {" "}
+              {/* Adjusted gap */}
+              {filteredStocks.map((stock) => {
+                const originalPrice = stock.UnitPrice;
+                const discount = stock.discount;
+                const discountedPrice =
+                  discount > 0
+                    ? originalPrice - (originalPrice * discount) / 100
+                    : originalPrice;
 
-              return (
-                
+                return (
                   <Card
                     key={stock._id}
                     className="relative  bg-opacity-20 rounded-lg shadow-lg text-white transform transition-transform duration-300 hover:scale-105 hover:z-10 hover:shadow-2xl hover:bg-opacity-80 w-[250px] h-[500px]"
@@ -171,10 +255,10 @@ const Shop = () => {
                       </CardBody>
                     </Link>
                   </Card>
-                
-              );
-            })}
-          </div></ScrollShadow>
+                );
+              })}
+            </div>
+          </ScrollShadow>
         )}
       </div>
       <Footer />

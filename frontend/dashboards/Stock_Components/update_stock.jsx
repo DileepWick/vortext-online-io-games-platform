@@ -112,7 +112,7 @@ export const update_stock = ({ updatingStock, callBackFunction }) => {
             "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20",
         }}
       >
-        <ModalContent className="font-primaryRegular">
+        <ModalContent className="font-primaryRegular text-black">
           <ModalHeader>Edit Pricings For <span className="text-customPink ml-2">{updatingStock.AssignedGame.title}</span></ModalHeader>
           <ModalBody className="p-4">
             
