@@ -172,7 +172,11 @@ const Articles = () => {
                     ...article.comments,
                     {
                       ...response.data.comment,
-                      user: { _id: userId, name: user.name }
+                      user: { 
+                        _id: userId, 
+                        name: user.name,
+                        profilePic: user.profilePic  // Include the user's profile picture
+                      }
                     }
                   ]
                 }
