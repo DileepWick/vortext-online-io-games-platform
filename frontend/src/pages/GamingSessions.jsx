@@ -15,10 +15,6 @@ const GamingSessions = () => {
   const [rentals, setRentals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [timeLeft, setTimeLeft] = useState(100);
-  const [remainingTime, setRemainingTime] = useState("00:00:00");
-  const [currentDate, setCurrentDate] = useState("");
-
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentGame, setCurrentGame] = useState(null);
 
@@ -42,29 +38,9 @@ const GamingSessions = () => {
     fetchRentals();
   }, [fetchRentals]);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      const now = new Date();
-      const endOfDay = new Date();
-      endOfDay.setHours(23, 59, 59, 999);
-
-      const timeDifference = endOfDay - now;
-      const hours = Math.floor(timeDifference / (1000 * 60 * 60));
-      const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
-
-      setRemainingTime(`${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`);
-      setTimeLeft((timeDifference / (1000 * 60 * 60 * 24)) * 100);
-
-      setCurrentDate(now.toLocaleDateString());
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  const openModal = useCallback((game) => {
-    console.log("Opening modal for game:", game);
-    setCurrentGame(game);
+  const openModal = useCallback((rental) => {
+    console.log("Opening modal for rental:", rental);
+    setCurrentGame(rental);
     setIsModalVisible(true);
   }, []);
 
@@ -75,10 +51,46 @@ const GamingSessions = () => {
 
   const handleStartSession = useCallback(() => {
     if (currentGame) {
-      navigate(`/RentalGamesEmbed/${encodeURIComponent(currentGame.PlayLink)}/${encodeURIComponent(currentGame.title)}`);
+      const rentalTimeInSeconds = convertTimeToSeconds(currentGame.time);
+      console.log("Rental time in seconds:", rentalTimeInSeconds);
+      navigate(`/RentalGamesEmbed/${encodeURIComponent(currentGame.game.PlayLink)}/${encodeURIComponent(currentGame.game.title)}/${encodeURIComponent(rentalTimeInSeconds || 14400)}`);
     }
     closeModal();
   }, [currentGame, navigate, closeModal]);
+
+  // Helper function to convert time string to seconds
+  const convertTimeToSeconds = (timeString) => {
+    if (!timeString) return 14400; // Default to 4 hours if timeString is undefined
+    
+    console.log("Original time string:", timeString);
+
+    // Check if timeString is already in seconds
+    if (!isNaN(timeString)) {
+      const seconds = parseInt(timeString, 10);
+      console.log("Parsed as seconds:", seconds);
+      return seconds;
+    }
+
+    // Handle "HH:MM" format
+    const [hours, minutes] = timeString.split(':').map(Number);
+    if (!isNaN(hours) && !isNaN(minutes)) {
+      const seconds = (hours * 3600) + (minutes * 60);
+      console.log("Parsed as HH:MM format:", seconds);
+      return seconds;
+    }
+    
+    // Handle "X hours" or "X hour" format
+    const hourMatch = timeString.match(/(\d+)\s*hour/i);
+    if (hourMatch) {
+      const seconds = parseInt(hourMatch[1], 10) * 3600;
+      console.log("Parsed as 'X hours' format:", seconds);
+      return seconds;
+    }
+    
+    // If we can't parse the time, return default 4 hours
+    console.log("Could not parse time, defaulting to 4 hours");
+    return 14400;
+  };
 
   if (loading) {
     return <div className="text-center mt-10">Loading...</div>;
@@ -92,18 +104,6 @@ const GamingSessions = () => {
     <div className="bg-customDark min-h-screen font-sans text-white">
       <Header />
       <div className="relative">
-        {/* Progress Bar */}
-        <div className="absolute top-4 right-4 w-[200px] bg-gray-300 rounded-full h-4">
-          <div
-            className="bg-green-500 h-full rounded-full"
-            style={{ width: `${timeLeft}%` }}
-          ></div>
-        </div>
-        <div className="absolute top-12 right-4 text-white text-sm">
-          <div>Remaining Time: {remainingTime}</div>
-          <div>Date: {currentDate}</div>
-        </div>
-        
         <div className="container mx-auto p-6">
           <div className="text-2xl font-primaryRegular mb-6">MY RENTED GAMES</div>
           {rentals.length > 0 ? (
@@ -117,7 +117,7 @@ const GamingSessions = () => {
                     isBlurred
                     radius="none"
                     alt={rental.game.title}
-                    className="w-[100px] h-[100px] object-cover"
+                    className="w-[200px] h-[200px] object-cover"
                     src={rental.game.coverPhoto}
                   />
                   <CardBody className="p-4">
@@ -148,7 +148,7 @@ const GamingSessions = () => {
                     
                     <div className="flex flex-col gap-2">
                       <Button
-                        onClick={() => openModal(rental.game)}
+                        onClick={() => openModal(rental)}
                         color="primary"
                         className="font-primaryRegular"
                         radius="none"
@@ -160,7 +160,7 @@ const GamingSessions = () => {
 
                       <Button
                         as={Link}
-                        to={`/GameDetails/${rental.game._id}`}
+                        to={`/Shop`}
                         color="secondary"
                         className="font-primaryRegular"
                         radius="none"
@@ -187,10 +187,13 @@ const GamingSessions = () => {
           <ModalContent>
             {(onClose) => (
               <>
-                <ModalHeader className="flex flex-col gap-1">Start Session</ModalHeader>
+                <ModalHeader className="flex flex-col gap-1"><span style={{ color: '#0072F5', fontWeight: 'bold'}}>Start Session</span></ModalHeader>
                 <ModalBody>
                   {currentGame ? (
-                    <p>Are you sure you want to start a session for {currentGame.title}?</p>
+                    <span style={{ color: '#0072F5'}}>
+                    <p>Are you sure you want to start a session for {currentGame.game.title}?</p>
+                    <p>Rental Time: {currentGame.time}</p>
+                    </span>
                   ) : (
                     <p>Loading game details...</p>
                   )}

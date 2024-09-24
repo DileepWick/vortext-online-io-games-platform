@@ -73,7 +73,7 @@ const App = () => {
       <Route path="/HandleRentals/:id" element={<HandleRentals />} />
       <Route path="/Payment_manager_dashboard" element={<Payment_Manager />} />
       <Route
-        path="/RentalGamesEmbed/:src/:title"
+        path="/RentalGamesEmbed/:src/:title/:rentalTime"
         element={<RentalGamesEmbed />}
       />
       <Route path="/TailoredGames" element={<TailoredGames />} />
