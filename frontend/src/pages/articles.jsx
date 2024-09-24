@@ -7,7 +7,7 @@ import { getToken } from "../utils/getToken";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { User } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
-import { FaHeart, FaRegHeart, FaTrash, FaComments ,FaFlag } from "react-icons/fa";
+import { FaHeart, FaRegHeart, FaTrash, FaComments ,FaFlag, FaEdit} from "react-icons/fa";
 import { toast, Flip } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -26,6 +26,9 @@ const Articles = () => {
   const [deletingCommentId, setDeletingCommentId] = useState(null);
   const [expandedComments, setExpandedComments] = useState({});
   const [reportingArticleId, setReportingArticleId] = useState(null);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editedCommentText, setEditedCommentText] = useState('');
+
 
   const token = getToken();
   const userId = getUserIdFromToken(token);
@@ -247,6 +250,46 @@ const Articles = () => {
     }
   };
 
+  const handleEditComment = async (articleId, commentId, newText) => {
+    try {
+      const response = await axios.put(`http://localhost:8098/articles/editComment/${articleId}/${commentId}`, {
+        userId,
+        text: newText
+      });
+
+      if (response.status === 200) {
+        setArticles(prevArticles =>
+          prevArticles.map(article =>
+            article._id === articleId
+              ? {
+                  ...article,
+                  comments: article.comments.map(comment =>
+                    comment._id === commentId
+                      ? { ...comment, text: newText, editedAt: new Date() }
+                      : comment
+                  )
+                }
+              : article
+          )
+        );
+        setEditingCommentId(null);
+        setEditedCommentText('');
+        toast.success("Comment updated successfully", {
+          theme: "dark",
+          transition: Flip,
+          style: { fontFamily: "Rubik" },
+        });
+      }
+    } catch (err) {
+      console.error("Error editing comment", err);
+      toast.error("Failed to edit comment. Please try again.", {
+        theme: "dark",
+        transition: Flip,
+        style: { fontFamily: "Rubik" },
+      });
+    }
+  };
+
 
   const toggleComments = (articleId) => {
     setExpandedComments(prev => ({
@@ -408,9 +451,9 @@ const Articles = () => {
                     </form>
 
                     <div className="mt-4">
-                      {article.comments.map((comment) => (
+                    {article.comments.map((comment) => (
                         <div key={comment._id} className="bg-gray-900 p-2 rounded-lg mb-2 flex justify-between items-start">
-                          <div>
+                          <div className="w-full">
                             <div className="flex items-center mb-1">
                               {comment.user && (
                                 <User
@@ -426,19 +469,58 @@ const Articles = () => {
                                 {new Date(comment.createdAt).toLocaleString()}
                               </p>
                             </div>
-                            <p className="text-sm">{comment.text}</p>
+                            {editingCommentId === comment._id ? (
+                              <form onSubmit={(e) => { e.preventDefault(); handleEditComment(article._id, comment._id, editedCommentText); }}>
+                                <textarea
+                                  value={editedCommentText}
+                                  onChange={(e) => setEditedCommentText(e.target.value)}
+                                  className="w-full border-none bg-gray-700 text-white rounded-lg p-2 mb-2"
+                                  rows="2"
+                                ></textarea>
+                                <div>
+                                  <button
+                                    type="submit"
+                                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded mr-2"
+                                  >
+                                    Save
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => { setEditingCommentId(null); setEditedCommentText(''); }}
+                                    className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1 px-3 rounded"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              </form>
+                            ) : (
+                              <p className="text-sm">{comment.text}</p>
+                            )}
+                            {comment.editedAt && (
+                              <p className="text-xs text-gray-500 mt-1">
+                                (Edited: {new Date(comment.editedAt).toLocaleString()})
+                              </p>
+                            )}
                           </div>
                           {comment.user && comment.user._id === userId && (
-                            <button
-                              className="text-red-600 hover:text-red-400 text-xs ml-2"
-                              onClick={() => handleDeleteComment(article._id, comment._id)}
-                              disabled={deletingCommentId === comment._id}
-                            >
-                              {deletingCommentId === comment._id ? 'Deleting...' : <FaTrash />}
-                            </button>
+                            <div className="flex">
+                              <button
+                                className="text-blue-500 hover:text-blue-400 text-xs mr-2"
+                                onClick={() => { setEditingCommentId(comment._id); setEditedCommentText(comment.text); }}
+                              >
+                                <FaEdit />
+                              </button>
+                              <button
+                                className="text-red-600 hover:text-red-400 text-xs"
+                                onClick={() => handleDeleteComment(article._id, comment._id)}
+                                disabled={deletingCommentId === comment._id}
+                              >
+                                {deletingCommentId === comment._id ? 'Deleting...' : <FaTrash />}
+                              </button>
+                            </div>
                           )}
                         </div>
-                      ))}
+                      ))}                   
                     </div>
                   </div>
                 )}
