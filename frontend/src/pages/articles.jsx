@@ -7,7 +7,13 @@ import { getToken } from "../utils/getToken";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { User } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
+<<<<<<< Updated upstream
 import { FaHeart, FaRegHeart, FaTrash, FaComments } from "react-icons/fa";
+=======
+import { FaHeart, FaRegHeart, FaTrash, FaComments ,FaFlag } from "react-icons/fa";
+import { toast, Flip } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+>>>>>>> Stashed changes
 
 const Articles = () => {
   const [heading, setHeading] = useState('');
@@ -99,14 +105,22 @@ const Articles = () => {
       });
 
       if (response.status === 201) {
-        setSuccess('Article created successfully');
+        toast.success("Article created successfully", {
+          theme: "dark",
+          transition: Flip,
+          style: { fontFamily: "Rubik" },
+        });
         setHeading('');
         setArticleBody('');
         setImage(null);
         fetchArticles();
       }
     } catch (err) {
-      setError('Error creating article');
+      toast.error("Error creating article. Please try again.", {
+        theme: "dark",
+        transition: Flip,
+        style: { fontFamily: "Rubik" },
+      });
       console.error(err);
     }
   };
@@ -252,6 +266,7 @@ const Articles = () => {
   return (
     <div className="bg-customDark min-h-screen text-white font-sans">
       <Header />
+      
       <div className="container mx-auto p-4">
         <div className="max-w-lg mx-auto bg-gray-800 rounded-lg shadow-md p-4 mb-6">
           <h2 className="text-2xl font-bold mb-4">Create Post</h2>

@@ -185,6 +185,7 @@ const CommunityDashboard = () => {
             />
           </div>
           <Table
+          className="text-black"
             aria-label="Articles table"
             bottomContent={
               <div className="flex w-full justify-center">
