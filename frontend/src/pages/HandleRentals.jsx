@@ -333,13 +333,8 @@ const HandleRentals = () => {
           <ModalHeader className="text-white">Confirm Rental</ModalHeader>
           <ModalBody>
             <p>
-              You are about to rent {game.title} for{" "}
-              {parseInt(selectedRental?.time) >= 60
-                ? `${parseInt(selectedRental?.time) / 60} hour${
-                    parseInt(selectedRental?.time) > 60 ? "s" : ""
-                  }`
-                : `${selectedRental?.time} min`}
-              .
+              You are about to buy {selectedRental?.time || 10} minutes of
+              playtime for {game?.title || "League of Legends"}.
             </p>
             <p>Price: LKR {selectedRental?.price}</p>
             <p>Please confirm to proceed with the payment.</p>

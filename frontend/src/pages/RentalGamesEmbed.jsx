@@ -31,16 +31,23 @@ const exitFullScreen = () => {
 };
 
 const RentalGamesEmbed = () => {
-  const { src, title } = useParams();
+  const { src, title, rentalTime } = useParams();
   const navigate = useNavigate();
   const decodedSrc = decodeURIComponent(src);
   const decodedTitle = decodeURIComponent(title);
+  const rentalTimeMinutes = parseInt(decodeURIComponent(rentalTime), 10);
+  const initialTimeSeconds = !isNaN(rentalTimeMinutes) && rentalTimeMinutes > 0 
+    ? rentalTimeMinutes * 60  // Convert minutes to seconds
+    : 14400;  // Default to 4 hours (240 minutes) if invalid
   const iframeRef = useRef(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(10); // 4 hours in seconds
-  const totalTime = 14400; // 4 hours in seconds
+  const [timeLeft, setTimeLeft] = useState(initialTimeSeconds);
+  const totalTime = initialTimeSeconds;
 
   useEffect(() => {
+    console.log("Initial rental time (minutes):", rentalTimeMinutes);
+    console.log("Initial rental time (seconds):", initialTimeSeconds);
+    
     // Countdown timer
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
@@ -55,7 +62,7 @@ const RentalGamesEmbed = () => {
     }, 1000);
 
     return () => clearInterval(timer); // Clean up the timer on component unmount
-  }, [navigate]);
+  }, [navigate, initialTimeSeconds, rentalTimeMinutes]);
 
   useEffect(() => {
     const handleFullScreenChange = () => {
