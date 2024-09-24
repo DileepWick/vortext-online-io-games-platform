@@ -147,14 +147,14 @@ const CommunityDashboard = () => {
   };
 
   // Columns definition
-  const columns = [
+  const columns = useMemo(() => [
     { key: "title", label: "TITLE" },
-    { key: "author", label: "AUTHOR" },
+    ...(activeTab === "allArticles" ? [{ key: "author", label: "AUTHOR" }] : []),
     { key: "likes", label: "LIKES" },
     { key: "comments", label: "COMMENTS" },
     ...(activeTab === "reportedArticles" ? [{ key: "reports", label: "REPORTS" }] : []),
     { key: "actions", label: "ACTIONS" },
-  ];
+  ], [activeTab]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -185,7 +185,7 @@ const CommunityDashboard = () => {
             />
           </div>
           <Table
-          className="text-black"
+            className="text-black"
             aria-label="Articles table"
             bottomContent={
               <div className="flex w-full justify-center">
@@ -215,8 +215,8 @@ const CommunityDashboard = () => {
                   {(columnKey) => (
                     <TableCell>
                       {columnKey === "title" && item.heading}
-                      {columnKey === "author" && item.uploader.username}
-                      {columnKey === "likes" && item.likes.length}
+                      {columnKey === "author" && activeTab === "allArticles" && (item.uploader?.name || item.uploader?.username)}
+                      {columnKey === "likes" && item.likes}
                       {columnKey === "comments" && item.comments.length}
                       {columnKey === "reports" && (
                         <Chip color="danger" variant="flat">
