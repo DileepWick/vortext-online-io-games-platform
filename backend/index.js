@@ -96,4 +96,4 @@ app.use("/api", chatRouter); // Use chatbot routes
 app.use("/rentalDurations", RentalDurationRouter);
 app.use("/api", GPTRouter);
 app.use("/contacts", contactRouter);
-app.use("/messages", messageRoutes);
+app.use("/api/messages", messageRoutes); // Changed the path to "/api/messages"

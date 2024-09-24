@@ -93,13 +93,13 @@ export default function Header() {
           </NavbarItem>
           <NavbarItem>
             <Link
-              color={location.pathname === "/community" ? "primary" : "white"}
-              href="/community"
+              color={location.pathname === "/chat" ? "primary" : "white"}
+              href="/chat"
               className={`${
-                location.pathname === "/community" ? "underline" : ""
+                location.pathname === "/chat" ? "underline" : ""
               } text-white hover:underline`}
             >
-              Community
+              Chat
             </Link>
           </NavbarItem>
 
