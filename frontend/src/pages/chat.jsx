@@ -3,6 +3,25 @@ import axios from 'axios';
 import { getToken } from '../utils/getToken';
 import { getUserIdFromToken } from '../utils/user_id_decoder';
 import Header from "../components/header";
+import { User, Input, Button, Card, Spacer, Select, SelectItem } from "@nextui-org/react";
+
+const SendIcon = (props) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={24}
+    height={24}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <line x1={22} y1={2} x2={11} y2={13} />
+    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+  </svg>
+);
 
 const Chat = () => {
   const [messages, setMessages] = useState([]);
@@ -11,7 +30,7 @@ const Chat = () => {
   const [newMessage, setNewMessage] = useState('');
   const [recipientId, setRecipientId] = useState('');
   const token = getToken();
-  const currentUserId = getUserIdFromToken(token);  // Get current user ID from the token
+  const currentUserId = getUserIdFromToken(token);
 
   useEffect(() => {
     fetchUsers();
@@ -45,9 +64,8 @@ const Chat = () => {
     try {
       const response = await axios.get(`http://localhost:8098/api/messages/${recipientId}`, {
         headers: { Authorization: `Bearer ${token}` },
-        params: { currentUserId } // Pass currentUserId as query param
+        params: { currentUserId }
       });
-      console.log('Fetched messages:', response.data);
       setMessages(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching messages:', error);
@@ -56,10 +74,7 @@ const Chat = () => {
   };
 
   const handleSendMessage = async () => {
-    if (!recipientId) {
-      alert('Please select a recipient');
-      return;
-    }
+    if (!recipientId || !newMessage.trim()) return;
     try {
       const response = await axios.post('http://localhost:8098/api/messages', {
         content: newMessage,
@@ -68,65 +83,74 @@ const Chat = () => {
       }, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log('Message sent:', response.data);
       setNewMessage('');
-      setMessages(prevMessages => [...prevMessages, response.data]); // Update with the new message
+      setMessages(prevMessages => [...prevMessages, response.data]);
     } catch (error) {
       console.error('Error sending message:', error);
-      alert('Failed to send message. Please try again.');
     }
   };
 
-  const handleUserSelect = (event) => {
-    const userId = event.target.value;
+  const handleUserSelect = (userId) => {
     const user = users.find(u => u._id === userId);
     setSelectedUser(user);
     setRecipientId(userId);
+    setMessages([]);  // Clear previous messages instantly
     if (userId) {
-      fetchMessages();
+      fetchMessages();  // Fetch messages for the newly selected user
     }
   };
 
   return (
-    <div style={{ color: 'black' }}>
+    <div className="min-h-screen bg-gray-50">
       <Header />
-      <h1>Chat</h1>
-      <div style={{ display: 'flex' }}>
-        <div style={{ width: '30%', marginRight: '20px' }}>
-          <h2>Select User</h2>
-          <select onChange={handleUserSelect} value={recipientId} style={{ color: 'black' }}>
-            <option value="">Select a user</option>
-            {users.map((user) => (
-              <option key={user._id} value={user._id}>
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-semibold mb-6 text-gray-800">Messaging Center</h1>
+        <div className="flex flex-col md:flex-row gap-6">
+          <Card className="p-6 w-full md:w-1/3 shadow-md">
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">Contact List</h2>
+            <Select 
+              placeholder="Select a contact"
+              onChange={(e) => handleUserSelect(e.target.value)}
+              className="w-full"
+            >
+              {users.map((user) => (
+                <SelectItem key={user._id} value={user._id} style={{ color: 'black' }}>
                 {user.username || user.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div style={{ width: '70%' }}>
-          {selectedUser ? (
-            <>
-              <h2>Chat with {selectedUser.username || selectedUser.name}</h2>
-              <div style={{ height: '300px', overflowY: 'auto', border: '1px solid #ccc', padding: '10px', marginBottom: '10px' }}>
-                {messages.map((message) => (
-                  <div key={message._id} style={{ marginBottom: '10px', textAlign: message.messageUser._id === currentUserId ? 'right' : 'left' }}>
-                    <p style={{ background: message.messageUser._id === currentUserId ? '#dcf8c6' : '#f2f2f2', display: 'inline-block', padding: '5px 10px', borderRadius: '10px', color: 'black' }}>
-                      {message.content}
-                    </p>
-                  </div>
-                ))}
-              </div>
-              <input
-                type="text"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                style={{ width: 'calc(100% - 70px)', marginRight: '10px', color: 'black' }}
-              />
-              <button onClick={handleSendMessage} style={{ color: 'black' }}>Send</button>
-            </>
-          ) : (
-            <p>Select a user to start chatting</p>
-          )}
+              </SelectItem>
+              ))}
+            </Select>
+          </Card>
+          <Card className="p-6 w-full md:w-2/3 shadow-md">
+            {selectedUser ? (
+              <>
+                <h2 className="text-xl font-semibold mb-4 text-gray-800">Conversation with {selectedUser.username || selectedUser.name}</h2>
+                <div className="h-96 overflow-y-auto mb-4 p-4 bg-white rounded-lg border border-gray-200">
+                  {messages.map((message) => (
+                    <div key={message._id} className={`mb-4 ${message.messageUser._id === currentUserId ? 'text-right' : 'text-left'}`}>
+                      <div className={`inline-block p-3 rounded-lg ${message.messageUser._id === currentUserId ? 'bg-blue-100 text-black' : 'bg-gray-100 text-black'}`}>
+                        <p>{message.content}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <Input
+                    fullWidth
+                    placeholder="Type your message..."
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                    className="flex-grow"
+                  />
+                  <Button auto onClick={handleSendMessage} icon={<SendIcon />} className="bg-blue-500 text-white">
+                    Send
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <p className="text-gray-600">Select a contact to start a conversation</p>
+            )}
+          </Card>
         </div>
       </div>
     </div>
