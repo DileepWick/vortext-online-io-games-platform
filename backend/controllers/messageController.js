@@ -1,37 +1,39 @@
-// controllers/messageController.js
-import { Message } from "../models/message.js";
+// messageController.js
+import Message from '../models/message.js';
 
-export const sendMessage = async (req, res) => {
-  try {
-    const { senderId, recipientId, content } = req.body;
+const messageController = {
+  getMessages: async (req, res) => {
+    try {
+      const recipientId = req.params.recipientId; // Get recipientId from URL params
+      const currentUserId = req.query.currentUserId; // Get currentUserId from query params
 
-    const newMessage = new Message({
-      sender: senderId,
-      recipient: recipientId,
-      content: content
-    });
+      // Find messages either sent by or received by the current user
+      const messages = await Message.find({
+        $or: [
+          { messageUser: currentUserId, recipient: recipientId },
+          { messageUser: recipientId, recipient: currentUserId }
+        ]
+      }).populate('messageUser').sort('createdAt');
+      
+      res.json(messages);
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+      res.status(500).json({ error: 'Error fetching messages' });
+    }
+  },
 
-    await newMessage.save();
-
-    res.status(201).json({ message: "Message sent successfully", data: newMessage });
-  } catch (error) {
-    res.status(500).json({ message: "Error sending message", error: error.message });
+  createMessage: async (req, res) => {
+    try {
+      const { content, recipientId, messageUser } = req.body; // Get messageUser from the request body
+      const message = new Message({ content, messageUser, recipient: recipientId });
+      await message.save();
+      const populatedMessage = await Message.findById(message._id).populate('messageUser');
+      res.status(201).json(populatedMessage);
+    } catch (error) {
+      console.error('Error creating message:', error);
+      res.status(500).json({ error: 'Error creating message' });
+    }
   }
 };
 
-export const getMessages = async (req, res) => {
-  try {
-    const { userId, otherUserId } = req.params;
-
-    const messages = await Message.find({
-      $or: [
-        { sender: userId, recipient: otherUserId },
-        { sender: otherUserId, recipient: userId }
-      ]
-    }).sort({ createdAt: 1 });
-
-    res.json({ messages });
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching messages", error: error.message });
-  }
-};
+export default messageController;
