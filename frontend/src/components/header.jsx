@@ -14,6 +14,7 @@ import {
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate, useLocation } from "react-router-dom";
+import { NotificationIcon } from "../assets/icons/NotificationIcon.jsx";
 
 // Utils
 import { getUserIdFromToken } from "../utils/user_id_decoder";
@@ -142,6 +143,29 @@ export default function Header() {
               </DropdownItem>
               <DropdownItem key="about" onClick={() => navigate("/about")}>
                 About Vortex
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+          <Dropdown placement="bottom-start">
+            <DropdownTrigger>
+              <NavbarItem className="cursor-pointer flex items-center">
+                <NotificationIcon style={{ marginRight: "8px" }} />
+                <span
+                  className={`${
+                    location.pathname === "/Notification" ? "underline" : ""
+                  } text-white hover:underline`}
+                >
+                  {" "}
+                </span>
+              </NavbarItem>
+            </DropdownTrigger>
+            <DropdownMenu
+              aria-label="Notification Actions"
+              variant="flat"
+              className="font-primaryRegular text-black"
+            >
+              <DropdownItem onClick={() => navigate("/Notification")}>
+                View All Notifications
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
