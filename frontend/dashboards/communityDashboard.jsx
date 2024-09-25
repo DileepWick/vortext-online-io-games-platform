@@ -157,7 +157,7 @@ const CommunityDashboard = () => {
   ], [activeTab]);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-black">
       <Header />
       <main className="flex-grow p-4">
         <div className="flex w-full flex-col">
