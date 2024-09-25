@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { getToken } from '../utils/getToken';
 import { getUserIdFromToken } from '../utils/user_id_decoder';
@@ -32,17 +32,7 @@ const Chat = () => {
   const token = getToken();
   const currentUserId = getUserIdFromToken(token);
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  useEffect(() => {
-    if (selectedUser) {
-      fetchMessages();
-    }
-  }, [selectedUser]);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       const response = await axios.get('http://localhost:8098/users/allusers', {
         headers: { Authorization: `Bearer ${token}` },
@@ -57,9 +47,9 @@ const Chat = () => {
       console.error('Error fetching users:', error);
       setUsers([]);
     }
-  };
+  }, [token, currentUserId]);
 
-  const fetchMessages = async () => {
+  const fetchMessages = useCallback(async () => {
     if (!recipientId) return;
     try {
       const response = await axios.get(`http://localhost:8098/api/messages/${recipientId}`, {
@@ -71,7 +61,19 @@ const Chat = () => {
       console.error('Error fetching messages:', error);
       setMessages([]);
     }
-  };
+  }, [recipientId, token, currentUserId]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  useEffect(() => {
+    if (recipientId) {
+      fetchMessages();
+    } else {
+      setMessages([]);
+    }
+  }, [recipientId, fetchMessages]);
 
   const handleSendMessage = async () => {
     if (!recipientId || !newMessage.trim()) return;
@@ -91,12 +93,15 @@ const Chat = () => {
   };
 
   const handleUserSelect = (userId) => {
-    const user = users.find(u => u._id === userId);
-    setSelectedUser(user);
-    setRecipientId(userId);
-    setMessages([]);  // Clear previous messages instantly
-    if (userId) {
-      fetchMessages();  // Fetch messages for the newly selected user
+    setMessages([]); // Clear messages immediately
+    setNewMessage(''); // Clear the message input
+    if (userId === '') {
+      setSelectedUser(null);
+      setRecipientId('');
+    } else {
+      const user = users.find(u => u._id === userId);
+      setSelectedUser(user);
+      setRecipientId(userId);
     }
   };
 
@@ -113,10 +118,11 @@ const Chat = () => {
               onChange={(e) => handleUserSelect(e.target.value)}
               className="w-full"
             >
+              <SelectItem key="default" value="">Select a contact</SelectItem>
               {users.map((user) => (
                 <SelectItem key={user._id} value={user._id} style={{ color: 'black' }}>
-                {user.username || user.name}
-              </SelectItem>
+                  {user.username || user.name}
+                </SelectItem>
               ))}
             </Select>
           </Card>
