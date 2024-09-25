@@ -20,7 +20,10 @@ import FAQsPage from "./pages/FAQsPage";
 import HandleRentals from "./pages/HandleRentals";
 import RentalGamesEmbed from "./pages/RentalGamesEmbed";
 import TailoredGames from "./pages/tailoredGames";
+
 import Snake from "../Games/Snake";
+
+import Chat from "./pages/chat";
 
 //Gameplay
 import GameEmbed from "./pages/GameEmbed";
@@ -66,6 +69,13 @@ const App = () => {
       <Route path="/playgame/:src/:title" element={<GameEmbed />} />
       <Route path="/faq" element={<FAQsPage />} />
       <Route path="/community" element={<Community />} />
+
+      <Route path="/chat" element={<Chat />} />
+
+
+    
+
+
       <Route
         path="/UserManagementDashboard"
         element={<UserManagementDashboard />}
