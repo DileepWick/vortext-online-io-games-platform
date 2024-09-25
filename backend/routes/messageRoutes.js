@@ -4,8 +4,7 @@ import messageController from '../controllers/messageController.js';
 
 const router = express.Router();
 
-router.get('/:userId', messageController.getMessages);
-router.get('/user/:userId', messageController.getMessagesByUser); // New route for getting messages by user
+router.get('/:recipientId', messageController.getMessages); // Use recipientId in the URL
 router.post('/', messageController.createMessage);
 
 export default router;

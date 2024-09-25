@@ -4,16 +4,20 @@ import Message from '../models/message.js';
 const messageController = {
   getMessages: async (req, res) => {
     try {
-      const { userId, currentUserId } = req.body; // Get both user IDs from the request body
+      const recipientId = req.params.recipientId; // Get recipientId from URL params
+      const currentUserId = req.query.currentUserId; // Get currentUserId from query params
+
+      // Find messages either sent by or received by the current user
       const messages = await Message.find({
         $or: [
-          { messageUser: currentUserId, recipient: userId },
-          { messageUser: userId, recipient: currentUserId }
+          { messageUser: currentUserId, recipient: recipientId },
+          { messageUser: recipientId, recipient: currentUserId }
         ]
       }).populate('messageUser').sort('createdAt');
+      
       res.json(messages);
     } catch (error) {
-      console.error('Error fetching messages:', error); // Log the actual error
+      console.error('Error fetching messages:', error);
       res.status(500).json({ error: 'Error fetching messages' });
     }
   },
@@ -26,29 +30,10 @@ const messageController = {
       const populatedMessage = await Message.findById(message._id).populate('messageUser');
       res.status(201).json(populatedMessage);
     } catch (error) {
-      console.error('Error creating message:', error); // Log the actual error
+      console.error('Error creating message:', error);
       res.status(500).json({ error: 'Error creating message' });
     }
-  },
-
-
-  getMessagesByUser: async (req, res) => {
-    try {
-      const { userId } = req.params; // Get userId from route params
-      const messages = await Message.find({
-        $or: [
-          { messageUser: userId },
-          { recipient: userId }
-        ]
-      }).populate('messageUser recipient').sort('createdAt'); // Populate both messageUser and recipient
-      res.json(messages);
-    } catch (error) {
-      console.error('Error fetching messages by user:', error);
-      res.status(500).json({ error: 'Error fetching messages by user' });
-    }
-  },
-  
-  
+  }
 };
 
 export default messageController;

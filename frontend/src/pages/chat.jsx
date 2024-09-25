@@ -11,7 +11,7 @@ const Chat = () => {
   const [newMessage, setNewMessage] = useState('');
   const [recipientId, setRecipientId] = useState('');
   const token = getToken();
-  const currentUserId = getUserIdFromToken(token);
+  const currentUserId = getUserIdFromToken(token);  // Get current user ID from the token
 
   useEffect(() => {
     fetchUsers();
@@ -43,9 +43,9 @@ const Chat = () => {
   const fetchMessages = async () => {
     if (!recipientId) return;
     try {
-      const response = await axios.get(`http://localhost:8098/api/messages`, {
+      const response = await axios.get(`http://localhost:8098/api/messages/${recipientId}`, {
         headers: { Authorization: `Bearer ${token}` },
-        params: { userId: recipientId, currentUserId: currentUserId }
+        params: { currentUserId } // Pass currentUserId as query param
       });
       console.log('Fetched messages:', response.data);
       setMessages(Array.isArray(response.data) ? response.data : []);
@@ -70,8 +70,7 @@ const Chat = () => {
       });
       console.log('Message sent:', response.data);
       setNewMessage('');
-      // Update the messages state with the new message
-      setMessages(prevMessages => [...prevMessages, response.data]);
+      setMessages(prevMessages => [...prevMessages, response.data]); // Update with the new message
     } catch (error) {
       console.error('Error sending message:', error);
       alert('Failed to send message. Please try again.');
@@ -110,8 +109,8 @@ const Chat = () => {
               <h2>Chat with {selectedUser.username || selectedUser.name}</h2>
               <div style={{ height: '300px', overflowY: 'auto', border: '1px solid #ccc', padding: '10px', marginBottom: '10px' }}>
                 {messages.map((message) => (
-                  <div key={message._id} style={{ marginBottom: '10px', textAlign: message.messageUser === currentUserId ? 'right' : 'left' }}>
-                    <p style={{ background: message.messageUser === currentUserId ? '#dcf8c6' : '#f2f2f2', display: 'inline-block', padding: '5px 10px', borderRadius: '10px', color: 'black' }}>
+                  <div key={message._id} style={{ marginBottom: '10px', textAlign: message.messageUser._id === currentUserId ? 'right' : 'left' }}>
+                    <p style={{ background: message.messageUser._id === currentUserId ? '#dcf8c6' : '#f2f2f2', display: 'inline-block', padding: '5px 10px', borderRadius: '10px', color: 'black' }}>
                       {message.content}
                     </p>
                   </div>
