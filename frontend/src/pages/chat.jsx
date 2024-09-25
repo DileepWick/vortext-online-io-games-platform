@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { getToken } from '../utils/getToken';
 import { getUserIdFromToken } from '../utils/user_id_decoder';
@@ -31,6 +31,9 @@ const Chat = () => {
   const [recipientId, setRecipientId] = useState('');
   const token = getToken();
   const currentUserId = getUserIdFromToken(token);
+
+  // Ref for the message container
+  const messageContainerRef = useRef(null);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -74,6 +77,13 @@ const Chat = () => {
       setMessages([]);
     }
   }, [recipientId, fetchMessages]);
+
+  // Scroll to bottom whenever the messages change
+  useEffect(() => {
+    if (messageContainerRef.current) {
+      messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   const handleSendMessage = async () => {
     if (!recipientId || !newMessage.trim()) return;
@@ -130,7 +140,7 @@ const Chat = () => {
             {selectedUser ? (
               <>
                 <h2 className="text-xl font-semibold mb-4 text-gray-800">Conversation with {selectedUser.username || selectedUser.name}</h2>
-                <div className="h-96 overflow-y-auto mb-4 p-4 bg-white rounded-lg border border-gray-200">
+                <div ref={messageContainerRef} className="h-96 overflow-y-auto mb-4 p-4 bg-white rounded-lg border border-gray-200">
                   {messages.map((message) => (
                     <div key={message._id} className={`mb-4 ${message.messageUser._id === currentUserId ? 'text-right' : 'text-left'}`}>
                       <div className={`inline-block p-3 rounded-lg ${message.messageUser._id === currentUserId ? 'bg-blue-100 text-black' : 'bg-gray-100 text-black'}`}>
