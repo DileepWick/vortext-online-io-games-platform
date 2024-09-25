@@ -116,10 +116,10 @@ const Chat = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen  bg-black ">
       <Header />
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-semibold mb-6 text-gray-800">Messaging Center</h1>
+      <div className="container mx-auto px-4 py-8 ">
+        <h1 className="text-3xl font-semibold mb-6 text-white-800">Messaging Center</h1>
         <div className="flex flex-col md:flex-row gap-6">
           <Card className="p-6 w-full md:w-1/3 shadow-md">
             <h2 className="text-xl font-semibold mb-4 text-gray-800">Contact List</h2>
@@ -128,7 +128,7 @@ const Chat = () => {
               onChange={(e) => handleUserSelect(e.target.value)}
               className="w-full"
             >
-              <SelectItem key="default" value="">Select a contact</SelectItem>
+              <SelectItem key="default" value="" style={{ color: 'blue' }}>Select a contact</SelectItem>
               {users.map((user) => (
                 <SelectItem key={user._id} value={user._id} style={{ color: 'black' }}>
                   {user.username || user.name}
