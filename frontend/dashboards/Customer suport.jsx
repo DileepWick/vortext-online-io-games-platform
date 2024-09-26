@@ -59,6 +59,14 @@ const ContactDash = () => {
   } = useDisclosure();
   const [viewingMessage, setViewingMessage] = useState(null);
 
+  const [replyMessage, setReplyMessage] = useState("");
+  const {
+    isOpen: isReplyModalOpen,
+    onOpen: onReplyModalOpen,
+    onOpenChange: onReplyModalOpenChange,
+  } = useDisclosure();
+  const [replyingTo, setReplyingTo] = useState(null);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -89,6 +97,53 @@ const ContactDash = () => {
 
     fetchData();
   }, []);
+
+  const handleReply = async () => {
+    try {
+      const response = await axios.post(
+        `http://localhost:8098/contacts/reply/${replyingTo._id}`,
+        { message: replyMessage }
+      );
+      if (response.status === 200) {
+        setContactMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg._id === replyingTo._id ? response.data.contact : msg
+          )
+        );
+        toast.success("Reply sent successfully", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Flip,
+          progressBarClassName: "bg-gray-800",
+          style: { fontFamily: "Rubik" },
+        });
+        setReplyMessage("");
+        setReplyingTo(null);
+        onReplyModalOpenChange(false);
+      }
+    } catch (error) {
+      console.error("Error sending reply:", error);
+      toast.error("Failed to send reply", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Flip,
+        progressBarClassName: "bg-gray-800",
+        style: { fontFamily: "Rubik" },
+      });
+    }
+  };
 
   // FAQ functions
   const handleAddFAQ = async () => {
@@ -511,29 +566,43 @@ const ContactDash = () => {
                     <TableColumn>ACTIONS</TableColumn>
                   </TableHeader>
                   <TableBody>
-                    {contactMessages.map((message) => (
-                      <TableRow key={message._id}>
-                        <TableCell>{message.username}</TableCell>
-                        <TableCell>{message.email}</TableCell>
+                    {contactMessages.map((contact) => (
+                      <TableRow key={contact._id}>
+                        <TableCell>{contact.username}</TableCell>
+                        <TableCell>{contact.email}</TableCell>
                         <TableCell>
-                          {message.message.length > 50
-                            ? `${message.message.substring(0, 50)}...`
-                            : message.message}
+                          {contact.messages[0]?.content.length > 50
+                            ? `${contact.messages[0].content.substring(
+                                0,
+                                50
+                              )}...`
+                            : contact.messages[0]?.content ||
+                              "No message content"}
                         </TableCell>
                         <TableCell>
                           <Button
                             color="primary"
                             className="mr-2"
                             onPress={() => {
-                              setViewingMessage(message);
+                              setViewingMessage(contact);
                               onViewMessageOpen();
                             }}
                           >
                             View
                           </Button>
                           <Button
+                            color="secondary"
+                            className="mr-2"
+                            onPress={() => {
+                              setReplyingTo(contact);
+                              onReplyModalOpen();
+                            }}
+                          >
+                            Reply
+                          </Button>
+                          <Button
                             color="danger"
-                            onPress={() => handleDeleteMessage(message._id)}
+                            onPress={() => handleDeleteMessage(contact._id)}
                           >
                             Delete
                           </Button>
@@ -569,6 +638,49 @@ const ContactDash = () => {
                       <ModalFooter>
                         <Button color="primary" onPress={onClose}>
                           Close
+                        </Button>
+                      </ModalFooter>
+                    </>
+                  )}
+                </ModalContent>
+              </Modal>
+              <Modal
+                isOpen={isReplyModalOpen}
+                onOpenChange={onReplyModalOpenChange}
+                className="dark text-foreground bg-background"
+              >
+                <ModalContent>
+                  {(onClose) => (
+                    <>
+                      <ModalHeader className="flex flex-col gap-1">
+                        Reply to Message
+                      </ModalHeader>
+                      <ModalBody>
+                        <p>
+                          <strong>Replying to:</strong> {replyingTo?.username}
+                        </p>
+                        <p>
+                          <strong>Original Message:</strong>
+                        </p>
+                        <p>{replyingTo?.message}</p>
+                        <Textarea
+                          label="Your Reply"
+                          placeholder="Enter your reply"
+                          value={replyMessage}
+                          onChange={(e) => setReplyMessage(e.target.value)}
+                          fullWidth
+                        />
+                      </ModalBody>
+                      <ModalFooter>
+                        <Button
+                          color="danger"
+                          variant="light"
+                          onPress={onClose}
+                        >
+                          Cancel
+                        </Button>
+                        <Button color="primary" onPress={handleReply}>
+                          Send Reply
                         </Button>
                       </ModalFooter>
                     </>

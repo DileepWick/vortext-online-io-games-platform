@@ -167,6 +167,9 @@ export default function Header() {
               <DropdownItem onClick={() => navigate("/Notification")}>
                 View All Notifications
               </DropdownItem>
+              <DropdownItem onClick={() => navigate("/UserMessage")}>
+                View All Messages
+              </DropdownItem>
             </DropdownMenu>
           </Dropdown>
         </NavbarContent>

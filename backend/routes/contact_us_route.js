@@ -5,6 +5,8 @@ import {
   getContactById,
   updateContact,
   deleteContact,
+  replyToContact,
+  fetchContactByUserId,
 } from "../controllers/contact_us_controller.js";
 
 const contactRouter = express.Router();
@@ -17,5 +19,6 @@ contactRouter.get("/fetchContacts", getAllContacts);
 contactRouter.get("/fetchContactById/:id", getContactById);
 contactRouter.put("/updateContact/:id", updateContact);
 contactRouter.delete("/deleteContact/:id", deleteContact);
-
+contactRouter.post("/reply/:id", replyToContact);
+contactRouter.get("/fetchContactByUserId/:userId", fetchContactByUserId);
 export default contactRouter;
