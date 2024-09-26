@@ -1,6 +1,22 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
 
+const MessageSchema = new Schema({
+  sender: {
+    type: String,
+    enum: ["user", "agent"],
+    required: true,
+  },
+  content: {
+    type: String,
+    required: true,
+  },
+  timestamp: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
 const ContactUs = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
@@ -15,11 +31,17 @@ const ContactUs = new Schema({
     type: String,
     required: true,
   },
-  message: {
+  status: {
     type: String,
-    required: true,
+    enum: ["open", "closed"],
+    default: "open",
   },
+  messages: [MessageSchema],
   createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
     type: Date,
     default: Date.now,
   },

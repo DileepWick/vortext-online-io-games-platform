@@ -20,6 +20,7 @@ import FAQsPage from "./pages/FAQsPage";
 import HandleRentals from "./pages/HandleRentals";
 import RentalGamesEmbed from "./pages/RentalGamesEmbed";
 import TailoredGames from "./pages/tailoredGames";
+import UserMessages from "./pages/UserMessage";
 
 import Snake from "../Games/Snake";
 
@@ -69,12 +70,9 @@ const App = () => {
       <Route path="/playgame/:src/:title" element={<GameEmbed />} />
       <Route path="/faq" element={<FAQsPage />} />
       <Route path="/community" element={<Community />} />
+      <Route path="/UserMessage" element={<UserMessages />} />
 
       <Route path="/chat" element={<Chat />} />
-
-
-    
-
 
       <Route
         path="/UserManagementDashboard"
@@ -83,12 +81,13 @@ const App = () => {
       <Route path="/SessionHistory" element={<SessionHistory />} />
       <Route path="/HandleRentals/:id" element={<HandleRentals />} />
       <Route path="/Payment_manager_dashboard" element={<Payment_Manager />} />
-      <Route path="/RentalGamesEmbed/:src/:title/:rentalTime/:rentalId" element={<RentalGamesEmbed />} />
+      <Route
+        path="/RentalGamesEmbed/:src/:title/:rentalTime/:rentalId"
+        element={<RentalGamesEmbed />}
+      />
       <Route path="/TailoredGames" element={<TailoredGames />} />
       <Route path="/RentedGamesSection" element={<RentedGamesSection />} />
       <Route path="/Snakegame" element={<Snake />} />
-
-
     </Routes>
   );
 };
