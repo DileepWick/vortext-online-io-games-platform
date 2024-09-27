@@ -20,6 +20,7 @@ import FAQsPage from "./pages/FAQsPage";
 import HandleRentals from "./pages/HandleRentals";
 import RentalGamesEmbed from "./pages/RentalGamesEmbed";
 import TailoredGames from "./pages/tailoredGames";
+import DeveloperLoginSignup from "./pages/DeveloperLoginSignup";
 
 //Gameplay
 import GameEmbed from "./pages/GameEmbed";
@@ -36,6 +37,8 @@ import StaffManager from "../dashboards/staff_manager_dashboard";
 import CommunityDashBoard from  "../dashboards/communityDashboard";
 import UserManagementDashboard from "../dashboards/UserManagementDashboard";
 import Payment_Manager from "../dashboards/Payment_manager_dashboard";
+import DeveloperDashboard from "../dashboards/usermanage_component/DeveloperDashboard";
+import GameDeveloperDashboard from "../dashboards/gamedeveloperdashboard";
 
 
 const App = () => {
@@ -71,6 +74,9 @@ const App = () => {
       <Route path="/Payment_manager_dashboard" element={<Payment_Manager />} />
       <Route path="/RentalGamesEmbed/:src/:title" element={<RentalGamesEmbed />} />
       <Route path="/TailoredGames" element={<TailoredGames />} />
+      <Route path="/DeveloperLoginSignup" element={<DeveloperLoginSignup />} />
+      <Route path="/DeveloperDashboard" element={<DeveloperDashboard />} />
+      <Route path="/GameDeveloperDashboard" element={<GameDeveloperDashboard />} />
     </Routes>
   );
 };

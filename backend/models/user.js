@@ -1,51 +1,31 @@
-// user.js
+import mongoose from 'mongoose';
 
-import mongoose from "mongoose";
-
+// Main User schema
 const UserSchema = new mongoose.Schema({
-  firstname: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  lastname: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  username: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
+  firstname: { type: String, required: true, unique: true },
+  lastname: { type: String, required: true, unique: true },
+  username: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
   role: {
     type: String,
     required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
+    default: 'User',
   },
   profilePic: {
     type: String,
-    default: "https://res.cloudinary.com/dhcawltsr/image/upload/v1719572309/user_swzm7h.webp",
+    default: 'https://res.cloudinary.com/dhcawltsr/image/upload/v1719572309/user_swzm7h.webp',
   },
-  birthday: {
-    type: Date,
-    required: true,
-  },
-  age: {
-    type: Number,
-  },
-  playerType: {
-    type: String,
-    enum: ["Kid", "Teenager", "Adult"],
+  birthday: { type: Date, required: false },
+  age: { type: Number },
+  createdAt: { type: Date, default: Date.now },
+  
+  // Developer-specific fields, only required if role is 'Developer'
+  developerAttributes: {
+    portfolioLinks: [{ type: String, required: function() { return this.role === 'Developer'; } }], // Required if role is Developer
+    status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending', required: function() { return this.role === 'Developer'; } }, // Required if role is Developer
   },
 });
 
-export const User = mongoose.model("User", UserSchema);
+// No need for a pre-save hook, Mongoose will enforce conditions
+export const User = mongoose.model('User', UserSchema);
