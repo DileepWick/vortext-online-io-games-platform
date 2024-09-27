@@ -1,8 +1,17 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Progress, Input, Button, Textarea, Select, SelectItem } from "@nextui-org/react";
+import {
+  Progress,
+  Input,
+  Button,
+  Textarea,
+  Select,
+  SelectItem,
+  ScrollShadow,
+} from "@nextui-org/react";
 import { CheckboxGroup, Checkbox } from "@nextui-org/checkbox";
+import { Label } from "recharts";
 
 const UploadGame = ({ FunctionToCallAfterUpload }) => {
   const [title, setTitle] = useState("");
@@ -16,12 +25,13 @@ const UploadGame = ({ FunctionToCallAfterUpload }) => {
 
   // Fixed categories list
   const categoriesList = [
-    { _id: "Action", categoryName: "Action" },
-    { _id: "Adventure", categoryName: "Adventure" },
-    { _id: "Racing", categoryName: "Racing" },
-    { _id: "Puzzle", categoryName: "Puzzle" },
-    { _id: "Fighting", categoryName: "Fighting" },
-    { _id: "Strategy", categoryName: "Strategy" },
+    { _id: "Action", categoryName: "Action ⚔️" },
+    { _id: "Adventure", categoryName: "Adventure 🐾" },
+    { _id: "Racing", categoryName: "Racing 🏎️" },
+    { _id: "Puzzle", categoryName: "Puzzle 🧩" },
+    { _id: "Fighting", categoryName: "Fighting 🥷🏻" },
+    { _id: "Strategy", categoryName: "Strategy 🙄" },
+    { _id: "Sport", categoryName: "Sport 🏅" },
   ];
 
   // Fixed age groups list
@@ -103,100 +113,108 @@ const UploadGame = ({ FunctionToCallAfterUpload }) => {
         />
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Input
-              label="Game Title"
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <Textarea
-              label="Description"
-              variant="bordered"
-              placeholder="About the game"
-              disableAnimation
-              maxLength={390}
-              disableAutosize
-              classNames={{
-                base: "max-w-xs",
-                input: "resize-y min-h-[40px]",
-              }}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-            ></Textarea>
-          </div>
-          <div>
-            <CheckboxGroup
-              value={selectedCategories}
-              onChange={setSelectedCategories}
-              label="Select categories"
-            >
-              {categoriesList.map((cat) => (
-                <Checkbox key={cat._id} value={cat._id}>
-                  {cat.categoryName}
-                </Checkbox>
-              ))}
-            </CheckboxGroup>
-          </div>
-          <div>
-            <Input
-              label="Cover image"
-              labelPlacement="outside-left"
-              type="file"
-              name="image"
-              onChange={handleFileChange}
-              accept="image/*"
-              required
-            />
-          </div>
-          <div>
-            <Input
-              label="Trailer Video"
-              labelPlacement="outside-left"
-              type="file"
-              name="video"
-              onChange={handleFileChange}
-              accept="video/*"
-              required
-            />
-          </div>
-          <div>
-            <Select
-              label="Age Group"
-              value={ageGroup}
-              onChange={setAgeGroup}
-              required
-            >
-              {ageGroups.map((group) => (
-                <SelectItem key={group.value} value={group.value}>
-                  {group.label}
-                </SelectItem>
-              ))}
-            </Select>
-          </div>
-          <div>
-            <Input
-              label="Play Link"
-              type="text"
-              value={playLink}
-              onChange={(e) => setPlayLink(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <Button
-              type="submit"
-              className="w-full p-2 rounded "
-              color="primary"
-              size="lg"
-            >
-              Upload Game
-            </Button>
-          </div>
+          <ScrollShadow className="w-[480px] h-[400px]" >
+            <div>
+              <Input
+                label="Enter Game Title"
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                size="lg"
+                className="mb-4 w-[400px]"
+              />
+            </div>
+            <div>
+              <Textarea
+                label="Enter About The Game (max 390)"
+                variant="bordered"
+                placeholder="About the game"
+                disableAnimation
+                maxLength={390}
+                size="lg"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                required
+                className="mb-4 w-[400px]"
+              ></Textarea>
+            </div>
+            <div>
+              <CheckboxGroup
+                value={selectedCategories}
+                onChange={setSelectedCategories}
+                label="Select categories"
+                className="mb-4 ml-2"
+              >
+                {categoriesList.map((cat) => (
+                  <Checkbox key={cat._id} value={cat._id}>
+                    {cat.categoryName}
+                  </Checkbox>
+                ))}
+              </CheckboxGroup>
+            </div>
+            <div className="mb-4">
+              <label>Upload Cover Image</label>
+              <input
+                label="Cover image"
+                labelPlacement="outside-left"
+                type="file"
+                name="image"
+                onChange={handleFileChange}
+                accept="image/*"
+                required
+              />
+            </div>
+            <div className="mb-8">
+            <label>Upload Trailer Video</label>
+              <input
+                label="Trailer Video"
+                labelPlacement="outside-left"
+                type="file"
+                name="video"
+                onChange={handleFileChange}
+                accept="video/*"
+                required
+              />
+            </div>
+            <div>
+              <Select
+                label="Select Age Group"
+                value={ageGroup}
+                onChange={setAgeGroup}
+                required
+                className="mb-4 w-[300px] text-black"
+                
+              >
+                {ageGroups.map((group) => (
+                  <SelectItem key={group.value} value={group.value} className="font-primaryRegular text-black">
+                    {group.label}
+                  </SelectItem>
+                ))}
+              </Select>
+            </div>
+            <div>
+              <Input
+                label="Enter Hosting Link"
+                type="text"
+                value={playLink}
+                onChange={(e) => setPlayLink(e.target.value)}
+                required
+                className="mb-4 w-[400px]"
+                
+              />
+            </div>
+            <div>
+              <Button
+                type="submit"
+                className="mb-8"
+                color="primary"
+                size="lg"
+              >
+                Upload Game
+              </Button>
+            </div>
+          </ScrollShadow>
         </form>
       )}
     </div>

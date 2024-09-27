@@ -186,7 +186,7 @@ const Blogger = () => {
   };
 
   return (
-    <div className="flex w-full flex-col dark text-foreground bg-background">
+    <div className="flex w-full flex-col text-black bg-white">
       <div className="relative">
         <Header />
       </div>
@@ -201,15 +201,19 @@ const Blogger = () => {
           color="primary"
         >
           <Tab key="analytics" title="Analytics" />
-          <Tab key="products" title="Unpublished Games" />
+          <Tab key="products" title="All Games" />
           <Tab key="stock" title="Published Games" />
         </Tabs>
       </div>
       <div className="p-4">
         {activeTab === "analytics" && (
-          <>
-            <h1>Stats</h1>
-          </>
+          <div className="bg-white flex flex-col min-h-screen">
+
+            <p className="text-center text-black font-primaryRegular text-5xl mt-[100px]">
+              STATS 
+            </p>
+           
+          </div>
         )}
         {/*PRODUCTS*/}
         {activeTab === "products" && (
@@ -278,7 +282,7 @@ const Blogger = () => {
                         <Tooltip
                           content="Show details"
                           showArrow
-                          className="font-primaryRegular"
+                          className="font-primaryRegular text-black"
                           color="default"
                           placement="top-end"
                         >
@@ -320,7 +324,7 @@ const Blogger = () => {
                           content="Publish This Games"
                           showArrow
                           color="default"
-                          className="font-primaryRegular"
+                          className="font-primaryRegular text-black"
                         >
                           <Button
                             color="primary"
@@ -346,15 +350,14 @@ const Blogger = () => {
                 backdrop:
                   "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20",
               }}
-              className="p-4"
+              className="p-4 text-black"
             >
-              <ModalContent className="font-primaryRegular bg-black">
+              <ModalContent className="font-primaryRegular bg-white">
+                <ModalHeader>Game Information</ModalHeader>
                 <ModalBody>
                   {selectedGame && (
                     <div className="flex flex-col gap-4">
-                      <h2 className=" font-primaryRegular text-white text-5xl">
-                        {selectedGame.title}
-                      </h2>
+                      <Chip color="primary">{selectedGame.title}</Chip>
 
                       <div className="flex gap-4 items-start">
                         <div>
@@ -379,7 +382,7 @@ const Blogger = () => {
                         )}
                       </div>
 
-                      <p className="text-white text-[16px] mt-8">
+                      <p className="text-black text-[16px] mt-8">
                         {selectedGame.Description}
                       </p>
 
@@ -403,7 +406,7 @@ const Blogger = () => {
                 <ModalFooter>
                   <Button
                     color="danger"
-                    variant="bordered"
+                    variant="ghost"
                     size="sm"
                     onPress={onDetailsModalClose}
                   >
@@ -423,7 +426,7 @@ const Blogger = () => {
                   "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20",
               }}
             >
-              <ModalContent className="font-primaryRegular">
+              <ModalContent className="font-primaryRegular text-black">
                 <ModalHeader>Add New Game</ModalHeader>
                 <ModalBody>
                   <UploadGame
@@ -443,7 +446,7 @@ const Blogger = () => {
                   "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20",
               }}
             >
-              <ModalContent className="font-primaryRegular">
+              <ModalContent className="font-primaryRegular text-black">
                 <ModalHeader>Confirm Game Deletion</ModalHeader>
                 <ModalBody>
                   <p>
@@ -476,8 +479,9 @@ const Blogger = () => {
               }}
             >
               <ModalContent className="font-primaryRegular">
-              
                 <ModalBody className="bg-white text-black">
+                  <ModalHeader>Update Game</ModalHeader>
+
                   <UpdateGame
                     updatingGame={selectedGame}
                     callBackFunction1={onUpdateModalClose}
@@ -487,7 +491,7 @@ const Blogger = () => {
                 <ModalFooter className="bg-white ">
                   <Button
                     color="danger"
-                    variant="bordered"
+                    variant="ghost"
                     onPress={onUpdateModalClose}
                   >
                     Close
@@ -496,7 +500,7 @@ const Blogger = () => {
               </ModalContent>
             </Modal>
 
-            {/*Add New Stock Modal*/}
+            {/*Publish Game*/}
             <Modal
               isOpen={isAddStockModalOpen}
               size="lg"
@@ -506,7 +510,8 @@ const Blogger = () => {
                   "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20",
               }}
             >
-              <ModalContent className="font-primaryRegular">
+              <ModalContent className="font-primaryRegular text-black">
+                <ModalHeader>Publish Game</ModalHeader>
                 <ModalBody>
                   <AddNewStock
                     gameForTheStock={selectedGame}

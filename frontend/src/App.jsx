@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-
+import { Helmet } from "react-helmet-async";
 //Pages
 import Home from "./pages/Home";
 import Login from "./pages/login";
@@ -20,7 +20,17 @@ import FAQsPage from "./pages/FAQsPage";
 import HandleRentals from "./pages/HandleRentals";
 import RentalGamesEmbed from "./pages/RentalGamesEmbed";
 import TailoredGames from "./pages/tailoredGames";
+
 import DeveloperLoginSignup from "./pages/DeveloperLoginSignup";
+
+import UserMessages from "./pages/UserMessage";
+
+//Games
+import Snake from "../Games/Snake";
+import PuzzlePlatformGame from "./components/Games/PuzzlePlatformGame";
+
+import Chat from "./pages/chat";
+
 
 //Gameplay
 import GameEmbed from "./pages/GameEmbed";
@@ -34,11 +44,15 @@ import Review_manager from "../dashboards/review_dashboard";
 import ContactDash from "../dashboards/Customer suport";
 import SessionManagerDash from "../dashboards/session_manager_dashbord";
 import StaffManager from "../dashboards/staff_manager_dashboard";
-import CommunityDashBoard from  "../dashboards/communityDashboard";
+import CommunityDashBoard from "../dashboards/communityDashboard";
 import UserManagementDashboard from "../dashboards/UserManagementDashboard";
 import Payment_Manager from "../dashboards/Payment_manager_dashboard";
+
 import DeveloperDashboard from "../dashboards/usermanage_component/DeveloperDashboard";
 import GameDeveloperDashboard from "../dashboards/gamedeveloperdashboard";
+
+
+import RentedGamesSection from "../dashboards/rentedGamesDash";
 
 
 const App = () => {
@@ -68,15 +82,31 @@ const App = () => {
       <Route path="/playgame/:src/:title" element={<GameEmbed />} />
       <Route path="/faq" element={<FAQsPage />} />
       <Route path="/community" element={<Community />} />
-      <Route path="/UserManagementDashboard"element={<UserManagementDashboard />}/>
+      <Route path="/UserMessage" element={<UserMessages />} />
+
+      <Route path="/chat" element={<Chat />} />
+
+      <Route
+        path="/UserManagementDashboard"
+        element={<UserManagementDashboard />}
+      />
       <Route path="/SessionHistory" element={<SessionHistory />} />
       <Route path="/HandleRentals/:id" element={<HandleRentals />} />
       <Route path="/Payment_manager_dashboard" element={<Payment_Manager />} />
-      <Route path="/RentalGamesEmbed/:src/:title" element={<RentalGamesEmbed />} />
+      <Route
+        path="/RentalGamesEmbed/:src/:title/:rentalTime/:rentalId"
+        element={<RentalGamesEmbed />}
+      />
       <Route path="/TailoredGames" element={<TailoredGames />} />
+
       <Route path="/DeveloperLoginSignup" element={<DeveloperLoginSignup />} />
       <Route path="/DeveloperDashboard" element={<DeveloperDashboard />} />
       <Route path="/GameDeveloperDashboard" element={<GameDeveloperDashboard />} />
+
+      <Route path="/RentedGamesSection" element={<RentedGamesSection />} />
+      <Route path="/Snakegame" element={<Snake />} />
+      <Route path="/PuzzlePlatformGame" element={<PuzzlePlatformGame />} />
+
     </Routes>
   );
 };

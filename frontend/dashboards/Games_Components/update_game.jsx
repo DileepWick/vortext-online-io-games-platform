@@ -111,14 +111,15 @@ const UpdateGame = ({ updatingGame, callBackFunction1, callBackFunction2 }) => {
           />
         </div>
       ) : (
-        <ScrollShadow className="w-[700px] h-[400px]" hideScrollBar>
+        <ScrollShadow className="w-[700px] h-[400px]" >
+          <Chip color="primary" className="ml-4">{title}</Chip>
           <form
             onSubmit={handleUpdate}
-            className="space-y-6 p-6 bg-gray-900 rounded-lg shadow-lg"
+            className="space-y-6 p-6 bg-white rounded-lg shadow-lg"
           >
             {/* Title Section */}
             <div className="form-section">
-              <h3 className="text-2xl font-semibold text-black mb-4">
+              <h3 className="text-sm font-semibold text-black mb-4">
                 Change Title
               </h3>
               <Input
@@ -132,8 +133,8 @@ const UpdateGame = ({ updatingGame, callBackFunction1, callBackFunction2 }) => {
 
             {/* Description Section */}
             <div className="form-section">
-              <label className="text-2xl font-semibold text-black mb-4">
-                Change Description
+              <label className="text-sm font-semibold text-black mb-4">
+                Change Description (max 390)
               </label>
               <Textarea
                 value={description}
@@ -146,7 +147,7 @@ const UpdateGame = ({ updatingGame, callBackFunction1, callBackFunction2 }) => {
 
             {/* Cover Photo Section */}
             <div className="form-section">
-              <label className="text-2xl font-semibold text-black mb-4">
+              <label className="text-sm font-semibold text-black mb-4">
                 Change Cover Photo
               </label>
               <input
@@ -159,7 +160,7 @@ const UpdateGame = ({ updatingGame, callBackFunction1, callBackFunction2 }) => {
 
             {/* Trailer Video Section */}
             <div className="form-section">
-              <label className="text-2xl font-semibold text-black mb-4">
+              <label className="text-sm font-semibold text-black mb-4">
                 Change Trailer Video
               </label>
               <input
@@ -172,7 +173,7 @@ const UpdateGame = ({ updatingGame, callBackFunction1, callBackFunction2 }) => {
 
             {/* Current Categories Section */}
             <div className="form-section mb-4">
-              <h4 className="text-2xl font-semibold text-black mb-4">
+              <h4 className="text-sm font-semibold text-black mb-4">
                 Current Categories
               </h4>
               <div className="flex flex-wrap gap-2">
@@ -183,7 +184,7 @@ const UpdateGame = ({ updatingGame, callBackFunction1, callBackFunction2 }) => {
 
             {/* Select Other Categories Section */}
             <div className="form-section  rounded-lg ">
-              <h4 className="text-2xl font-semibold text-black">
+              <h4 className="text-sm font-semibold text-black">
                 Select Other Categories
               </h4>
               <p className="text-gray-400 mb-4">

@@ -14,6 +14,7 @@ import {
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate, useLocation } from "react-router-dom";
+import { NotificationIcon } from "../assets/icons/NotificationIcon.jsx";
 
 // Utils
 import { getUserIdFromToken } from "../utils/user_id_decoder";
@@ -51,11 +52,8 @@ export default function Header() {
   };
 
   return (
-    <div className="bg-headerDark">
-      <Navbar
-        className="font-primaryRegular bg-headerDark text-white"
-        position="sticky"
-      >
+    <div className="bg-headerDark h-[50px]">
+      <Navbar className="font-primaryRegular bg-headerDark text-white">
         <NavbarBrand>
           <p className="font-bold text-white">VORTEX GAMING</p>
         </NavbarBrand>
@@ -96,19 +94,21 @@ export default function Header() {
           </NavbarItem>
           <NavbarItem>
             <Link
-              color={location.pathname === "/community" ? "primary" : "white"}
-              href="/community"
+              color={location.pathname === "/chat" ? "primary" : "white"}
+              href="/chat"
               className={`${
-                location.pathname === "/community" ? "underline" : ""
+                location.pathname === "/chat" ? "underline" : ""
               } text-white hover:underline`}
             >
-              Community
+              Chat
             </Link>
           </NavbarItem>
 
           <NavbarItem>
             <Link
-              color={location.pathname === "/TailoredGames" ? "primary" : "white"}
+              color={
+                location.pathname === "/TailoredGames" ? "primary" : "white"
+              }
               href="/TailoredGames"
               className={`${
                 location.pathname === "/TailoredGames" ? "underline" : ""
@@ -117,28 +117,23 @@ export default function Header() {
               Tailored Games
             </Link>
           </NavbarItem>
-          <NavbarItem>
-            <Link
-              color={location.pathname === "/contact" ? "primary" : "white"}
-              href="/contact"
-              className={`${
-                location.pathname === "/contact" ? "underline" : ""
-              } text-white hover:underline`}
-            >
-              Contact
-            </Link>
-          </NavbarItem>
           <Dropdown placement="bottom-start">
             <DropdownTrigger>
-              <NavbarItem>Help</NavbarItem>
+              <NavbarItem className="cursor-pointer">Help</NavbarItem>
             </DropdownTrigger>
             <DropdownMenu
               aria-label="Profile Actions"
               variant="flat"
-              className="font-primaryRegular text-black"
+              className="font-primaryRegular text-black "
             >
               <DropdownItem key="support" onClick={() => navigate("/support")}>
                 Vortex Support
+              </DropdownItem>
+              <DropdownItem
+                Key="contactus"
+                onClick={() => navigate("/contact")}
+              >
+                Contact Us
               </DropdownItem>
               <DropdownItem
                 key="privacy"
@@ -148,6 +143,32 @@ export default function Header() {
               </DropdownItem>
               <DropdownItem key="about" onClick={() => navigate("/about")}>
                 About Vortex
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+          <Dropdown placement="bottom-start">
+            <DropdownTrigger>
+              <NavbarItem className="cursor-pointer flex items-center">
+                <NotificationIcon style={{ marginRight: "8px" }} />
+                <span
+                  className={`${
+                    location.pathname === "/Notification" ? "underline" : ""
+                  } text-white hover:underline`}
+                >
+                  {" "}
+                </span>
+              </NavbarItem>
+            </DropdownTrigger>
+            <DropdownMenu
+              aria-label="Notification Actions"
+              variant="flat"
+              className="font-primaryRegular text-black"
+            >
+              <DropdownItem onClick={() => navigate("/Notification")}>
+                View All Notifications
+              </DropdownItem>
+              <DropdownItem onClick={() => navigate("/UserMessage")}>
+                View All Messages
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
@@ -208,12 +229,12 @@ export default function Header() {
                 )}
 
                 {/* Admin Filter */}
-                {user.role === "Admin" && (
+                {user.role === "Product Manager" && (
                   <DropdownItem
                     key="admin-panel"
                     onClick={() => navigate("/productDashboard")}
                   >
-                    Admin Panel
+                    Products Dashboard
                   </DropdownItem>
                 )}
 

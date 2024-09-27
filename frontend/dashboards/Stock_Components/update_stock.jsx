@@ -1,4 +1,4 @@
-import { Tooltip } from "@nextui-org/react";
+import { Chip, Tooltip } from "@nextui-org/react";
 import { toast, Flip } from "react-toastify";
 import { EditIcon } from "../../src/assets/icons/EditIcon";
 import {
@@ -112,9 +112,10 @@ export const update_stock = ({ updatingStock, callBackFunction }) => {
             "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20",
         }}
       >
-        <ModalContent className="font-primaryRegular">
-          <ModalHeader>Pricing</ModalHeader>
-          <ModalBody>
+        <ModalContent className="font-primaryRegular text-black">
+          <ModalHeader>Edit Pricings For <span className="text-customPink ml-2">{updatingStock.AssignedGame.title}</span></ModalHeader>
+          <ModalBody className="p-4">
+            
             <form onSubmit={updateStock}>
               <p>Current Price {updatingStock.UnitPrice}$</p>
               <Input

@@ -85,6 +85,30 @@ export const updateRental = async (req, res) => {
   }
 };
 
+export const updateRentalTime = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { remainingTime } = req.body;
+    console.log("Updating rental time:", { id, remainingTime });
+
+    const updatedRental = await Rental.findByIdAndUpdate(
+      id,
+      { time: remainingTime },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedRental) {
+      return res.status(404).json({ message: "Rental not found" });
+    }
+
+    console.log("Rental time updated successfully");
+    res.json(updatedRental);
+  } catch (error) {
+    console.error("Error in updateRentalTime:", error);
+    res.status(400).json({ message: error.message });
+  }
+};
+
 export const deleteRental = async (req, res) => {
   try {
     const { id } = req.params;

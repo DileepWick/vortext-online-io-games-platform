@@ -1,5 +1,5 @@
 // controllers/faqController.js
-import { FAQ } from "../models/FAQ.js";
+import { FAQ } from "../models/faq.js";
 import mongoose from "mongoose";
 
 // Create new FAQ

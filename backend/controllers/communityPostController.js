@@ -1,3 +1,5 @@
+//communityPostController.js
+
 // Model
 import { CommunityPost } from "../models/communityPost.js";
 import mongoose from "mongoose";
