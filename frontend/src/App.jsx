@@ -22,7 +22,9 @@ import RentalGamesEmbed from "./pages/RentalGamesEmbed";
 import TailoredGames from "./pages/tailoredGames";
 import UserMessages from "./pages/UserMessage";
 
+//Games
 import Snake from "../Games/Snake";
+import PuzzlePlatformGame from "./components/Games/PuzzlePlatformGame";
 
 import Chat from "./pages/chat";
 
@@ -88,6 +90,7 @@ const App = () => {
       <Route path="/TailoredGames" element={<TailoredGames />} />
       <Route path="/RentedGamesSection" element={<RentedGamesSection />} />
       <Route path="/Snakegame" element={<Snake />} />
+      <Route path="/PuzzlePlatformGame" element={<PuzzlePlatformGame />} />
     </Routes>
   );
 };
