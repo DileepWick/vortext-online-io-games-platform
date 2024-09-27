@@ -89,7 +89,7 @@ export default function Header() {
                 location.pathname === "/articles" ? "underline" : ""
               } text-white hover:underline`}
             >
-              article
+              Article
             </Link>
           </NavbarItem>
           <NavbarItem>
@@ -218,6 +218,16 @@ export default function Header() {
                   My Cart
                 </DropdownItem>
 
+                {/* Developer Filter */}
+                {user.role === "Developer" && (
+                  <DropdownItem
+                    key="developer-panel"
+                    onClick={() => navigate("/GamedeveloperDashboard")}
+                  >
+                    Developer Dashboard
+                  </DropdownItem>
+                )}
+
                 {/* Admin Filter */}
                 {user.role === "Product Manager" && (
                   <DropdownItem
@@ -234,7 +244,7 @@ export default function Header() {
                     key="Admin-panel"
                     onClick={() => navigate("/UserManagementDashboard")}
                   >
-                    User Managemnt
+                    User Management
                   </DropdownItem>
                 )}
 
@@ -268,7 +278,7 @@ export default function Header() {
                   </DropdownItem>
                 )}
 
-                {/* community Manager Filter */}
+                {/* Community Manager Filter */}
                 {user.role === "Community Manager" && (
                   <DropdownItem
                     key="community-panel"
@@ -278,7 +288,7 @@ export default function Header() {
                   </DropdownItem>
                 )}
 
-                {/*Review manager*/}
+                {/* Review Manager */}
                 {user.role === "Review Manager" && (
                   <DropdownItem
                     key="Review-panel"
@@ -328,9 +338,17 @@ export default function Header() {
               </DropdownMenu>
             </Dropdown>
           ) : (
-            <Link className="text-white" href="/login">
-              Login
-            </Link>
+            <>
+              {/* Normal Login Button */}
+              <Link className="text-white" href="/login">
+                Login
+              </Link>
+
+              {/* Developer Login Button */}
+              <Link className="text-white ml-4" href="/DeveloperLoginSignup">
+                Developer Login
+              </Link>
+            </>
           )}
         </NavbarContent>
       </Navbar>

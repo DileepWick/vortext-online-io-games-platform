@@ -22,9 +22,14 @@ import spookeyRouter from "./routes/spookey_guesses_routes.js";
 import faqRouter from "./routes/faq_routes.js";
 import RentalRouter from "./routes/rental_routes.js";
 import chatRouter from "./routes/chat_bot_route.js";
+
+import developerRouter from "./routes/developer_routes.js";
+
+
 import CommunityPost from "./routes/communityPost_routes.js";
 import contactRouter from "./routes/contact_us_route.js";
 import messageRoutes from './routes/messageRoutes.js';
+
 import { RentalDurationRouter } from "./routes/rentalDurationRoutes.js";
 
 //Create the app
@@ -94,6 +99,12 @@ app.use("/spookeyEditons", spookeyRouter); //Spookey_Game
 app.use("/Rentals", RentalRouter); //Rentals
 app.use("/api", chatRouter); // Use chatbot routes
 app.use("/rentalDurations", RentalDurationRouter);
+
+app.use('/api', GPTRouter);
+app.use('/developers', developerRouter); // Developer route
+
+
 app.use("/api", GPTRouter);
 app.use("/contacts", contactRouter);
 app.use('/api/messages', messageRoutes); // Changed the path to "/api/messages"
+

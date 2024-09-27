@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate, useLocation } from "react-router-dom";
-
+import { toast, Flip } from "react-toastify";
 
 // Next UI
 import { Input, Button, Tabs, Tab, Link, Card, CardBody } from "@nextui-org/react";
@@ -16,8 +16,17 @@ import { getUserRoleFromToken } from "../utils/user_role_decoder"; // Role decod
 
 const Login = () => {
   const [selectedTab, setSelectedTab] = useState("login");
+  const [selectedRole, setSelectedRole] = useState("User"); // New state for role selection
+  const [portfolioLinks, setPortfolioLinks] = useState([""]); // Initialize with one empty input
+
   const navigate = useNavigate();
   const location = useLocation();
+
+
+  //Check the user is developer or not
+  //if user is a developer check account status 
+  //if account status is approved then navigate to developer dashboard
+  //if account status is pending then navigate to developer login page
 
   const [formData, setFormData] = useState({
     firstname: "",
@@ -43,6 +52,18 @@ const Login = () => {
         ? filterLettersOnly(value)
         : value,
     }));
+  };
+
+  // Add input fields for developer portfolio links
+  const handlePortfolioLinksChange = (e, index) => {
+    const updatedLinks = [...portfolioLinks];
+    updatedLinks[index] = e.target.value;
+    setPortfolioLinks(updatedLinks);
+  };
+
+  // Add a new portfolio link input field
+  const addPortfolioLink = () => {
+    setPortfolioLinks([...portfolioLinks, ""]);
   };
 
   // Validation functions
@@ -98,7 +119,18 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Login error:", error);
-      setAlertMessage("Login failed");
+      toast.warning(error.response.data.message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Flip,
+        style: { fontFamily: "Rubik" },
+      });
     } finally {
       // Clear password field after attempt
       setFormData({ ...formData, password: "" });
@@ -108,12 +140,12 @@ const Login = () => {
   // Handle sign-up submission
   const handleSignUp = async () => {
     if (!validateForm()) {
-      return;
+      return; // Prevent signup if validation fails
     }
-
+  
     try {
       const { firstname, lastname, username, email, password, birthday } = formData;
-
+  
       // Calculate age
       const today = new Date();
       const birthDate = new Date(birthday);
@@ -122,11 +154,11 @@ const Login = () => {
       if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
         age--;
       }
-
+  
       // Determine player category
       const playerCategory = age <= 12 ? "Kid" : age <= 18 ? "Teenager" : "Adult";
-
-      const response = await axios.post("http://localhost:8098/users/register", {
+  
+      const data = {
         firstname,
         lastname,
         username,
@@ -135,19 +167,39 @@ const Login = () => {
         birthday,
         age,
         playerCategory,
-      });
-
+        role: selectedRole,
+      };
+  
+      // Add developer-specific fields if selectedRole is Developer
+      if (selectedRole === "Developer") {
+        data.portfolioLinks = portfolioLinks.filter(link => link.trim() !== ""); // Filter out empty links
+      }
+  
+      // Make the signup API request
+      const response = await axios.post("http://localhost:8098/users/register", data);
+  
       if (response.data.success) {
         setAlertMessage("Registration successful! Please log in.");
-        setSelectedTab("login");
+        setSelectedTab("login"); // Switch to login tab
+        // Optionally, clear the form data
+        setFormData({
+          firstname: "",
+          lastname: "",
+          username: "",
+          password: "",
+          email: "",
+          birthday: "",
+        });
+        setPortfolioLinks([""]); // Reset portfolio links
       } else {
         setAlertMessage(response.data.message);
       }
     } catch (error) {
       console.error("Registration error:", error);
-      setAlertMessage("Registration failed");
+      setAlertMessage("Registration failed. Please try again.");
     }
   };
+  
 
   // Get today's date and calculate the max date for the birthday input
   const today = new Date();
@@ -157,7 +209,7 @@ const Login = () => {
     <div>
       <Header />
       <div className="flex items-center justify-center min-h-screen bg-gray-20">
-        <Card className="w-[340px] h-[650px]">
+        <Card className="w-[340px] h-[750px]">
           <CardBody className="overflow-hidden">
             <Tabs
               fullWidth
@@ -204,97 +256,213 @@ const Login = () => {
                   </div>
                 </form>
               </Tab>
+
               <Tab key="sign-up" title="Sign up">
-                <form className="flex flex-col gap-4 h-[400px]">
-                  <Input
-                    isRequired
-                    label="Firstname"
-                    placeholder="Enter your first name"
-                    name="firstname"
-                    type="text"
-                    value={formData.firstname}
-                    onChange={handleInputChange}
-                    color={validationErrors.firstname ? "error" : "default"}
-                  />
-                  {validationErrors.firstname && (
-                    <div className="text-red-500">{validationErrors.firstname}</div>
-                  )}
-                  <Input
-                    isRequired
-                    label="Lastname"
-                    placeholder="Enter your lastname"
-                    name="lastname"
-                    type="text"
-                    value={formData.lastname}
-                    onChange={handleInputChange}
-                    color={validationErrors.lastname ? "error" : "default"}
-                  />
-                  {validationErrors.lastname && (
-                    <div className="text-red-500">{validationErrors.lastname}</div>
-                  )}
-                  <Input
-                    isRequired
-                    label="Username"
-                    placeholder="Enter your username"
-                    name="username"
-                    type="text"
-                    value={formData.username}
-                    onChange={handleInputChange}
-                    // Removed validation-related props for username
-                  />
-                  <Input
-                    isRequired
-                    label="Email"
-                    placeholder="Enter your email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    color={validationErrors.email ? "error" : "default"}
-                  />
-                  {validationErrors.email && (
-                    <div className="text-red-500">{validationErrors.email}</div>
-                  )}
-                  <Input
-                    isRequired
-                    label="Birthday"
-                    placeholder="Enter your birthday"
-                    name="birthday"
-                    type="date"
-                    value={formData.birthday}
-                    onChange={handleInputChange}
-                    max={maxDate} // Set max date to 5 years before today
-                  />
-                  <Input
-                    isRequired
-                    label="Password"
-                    placeholder="Enter your password"
-                    name="password"
-                    type="password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    color={validationErrors.password ? "error" : "default"}
-                  />
-                  {validationErrors.password && (
-                    <div className="text-red-500">{validationErrors.password}</div>
-                  )}
-                  <p className="text-center text-small">
-                    Already have an account?{" "}
-                    <Link size="sm" onPress={() => setSelectedTab("login")}>
-                      Login
-                    </Link>
-                  </p>
-                  {alertMessage && (
-                    <div className="mt-4 text-center text-red-500">
-                      {alertMessage}
-                    </div>
-                  )}
-                  <div className="flex gap-2 justify-end">
-                    <Button fullWidth color="primary" onClick={handleSignUp}>
-                      Sign up
-                    </Button>
-                  </div>
-                </form>
+                <Tabs
+                  fullWidth
+                  size="lg"
+                  aria-label="Signup Tabs"
+                  selectedKey={selectedRole}
+                  onSelectionChange={setSelectedRole}
+                >
+                  <Tab key="user" title="User">
+                    <form className="flex flex-col gap-4 h-[500px]">
+                      <Input
+                        isRequired
+                        label="Firstname"
+                        placeholder="Enter your first name"
+                        name="firstname"
+                        type="text"
+                        value={formData.firstname}
+                        onChange={handleInputChange}
+                        color={validationErrors.firstname ? "error" : "default"}
+                      />
+                      {validationErrors.firstname && (
+                        <div className="text-red-500">{validationErrors.firstname}</div>
+                      )}
+                      <Input
+                        isRequired
+                        label="Lastname"
+                        placeholder="Enter your lastname"
+                        name="lastname"
+                        type="text"
+                        value={formData.lastname}
+                        onChange={handleInputChange}
+                        color={validationErrors.lastname ? "error" : "default"}
+                      />
+                      {validationErrors.lastname && (
+                        <div className="text-red-500">{validationErrors.lastname}</div>
+                      )}
+                      <Input
+                        isRequired
+                        label="Username"
+                        placeholder="Enter your username"
+                        name="username"
+                        type="text"
+                        value={formData.username}
+                        onChange={handleInputChange}
+                      />
+                      <Input
+                        isRequired
+                        label="Email"
+                        placeholder="Enter your email"
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        color={validationErrors.email ? "error" : "default"}
+                      />
+                      {validationErrors.email && (
+                        <div className="text-red-500">{validationErrors.email}</div>
+                      )}
+                      <Input
+                        isRequired
+                        label="Birthday"
+                        placeholder="Enter your birthday"
+                        name="birthday"
+                        type="date"
+                        value={formData.birthday}
+                        onChange={handleInputChange}
+                        max={maxDate} // Set max date to 5 years before today
+                      />
+                      <Input
+                        isRequired
+                        label="Password"
+                        placeholder="Enter your password"
+                        name="password"
+                        type="password"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        color={validationErrors.password ? "error" : "default"}
+                      />
+                      {validationErrors.password && (
+                        <div className="text-red-500">{validationErrors.password}</div>
+                      )}
+                      <p className="text-center text-small">
+                        Already have an account?{" "}
+                        <Link size="sm" onPress={() => setSelectedTab("login")}>
+                          Login
+                        </Link>
+                      </p>
+                      {alertMessage && (
+                        <div className="mt-4 text-center text-red-500">
+                          {alertMessage}
+                        </div>
+                      )}
+                      <div className="flex gap-2 justify-end">
+                        <Button fullWidth color="primary" onClick={handleSignUp}>
+                          Sign up
+                        </Button>
+                      </div>
+                    </form>
+                  </Tab>
+
+                  <Tab key="developer" title="Developer">
+                    <form className="flex flex-col gap-4 h-[500px]">
+                      <Input
+                        isRequired
+                        label="Firstname"
+                        placeholder="Enter your first name"
+                        name="firstname"
+                        type="text"
+                        value={formData.firstname}
+                        onChange={handleInputChange}
+                        color={validationErrors.firstname ? "error" : "default"}
+                      />
+                      {validationErrors.firstname && (
+                        <div className="text-red-500">{validationErrors.firstname}</div>
+                      )}
+                      <Input
+                        isRequired
+                        label="Lastname"
+                        placeholder="Enter your lastname"
+                        name="lastname"
+                        type="text"
+                        value={formData.lastname}
+                        onChange={handleInputChange}
+                        color={validationErrors.lastname ? "error" : "default"}
+                      />
+                      {validationErrors.lastname && (
+                        <div className="text-red-500">{validationErrors.lastname}</div>
+                      )}
+                      <Input
+                        isRequired
+                        label="Username"
+                        placeholder="Enter your username"
+                        name="username"
+                        type="text"
+                        value={formData.username}
+                        onChange={handleInputChange}
+                      />
+                      <Input
+                        isRequired
+                        label="Email"
+                        placeholder="Enter your email"
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        color={validationErrors.email ? "error" : "default"}
+                      />
+                      {validationErrors.email && (
+                        <div className="text-red-500">{validationErrors.email}</div>
+                      )}
+                      <Input
+                        isRequired
+                        label="Birthday"
+                        placeholder="Enter your birthday"
+                        name="birthday"
+                        type="date"
+                        value={formData.birthday}
+                        onChange={handleInputChange}
+                        max={maxDate} // Set max date to 5 years before today
+                      />
+                      <Input
+                        isRequired
+                        label="Password"
+                        placeholder="Enter your password"
+                        name="password"
+                        type="password"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        color={validationErrors.password ? "error" : "default"}
+                      />
+                      {validationErrors.password && (
+                        <div className="text-red-500">{validationErrors.password}</div>
+                      )}
+                      {/* Portfolio link inputs */}
+                      <Button onClick={addPortfolioLink} color="primary" size="sm">
+                        Add Portfolio Link
+                      </Button>
+                      {portfolioLinks.map((link, index) => (
+                        <Input
+                          key={index}
+                          label={`Portfolio Link ${index + 1}`}
+
+                          placeholder="Enter your portfolio link"
+                          value={link}
+                          onChange={(e) => handlePortfolioLinksChange(e, index)}
+                        />
+                      ))}
+                      <p className="text-center text-small">
+                        Already have an account?{" "}
+                        <Link size="sm" onPress={() => setSelectedTab("login")}>
+                          Login
+                        </Link>
+                      </p>
+                      {alertMessage && (
+                        <div className="mt-4 text-center text-red-500">
+                          {alertMessage}
+                        </div>
+                      )}
+                      <div className="flex gap-2 justify-end">
+                        <Button fullWidth color="primary" onClick={handleSignUp}>
+                          Sign up
+                        </Button>
+                      </div>
+                    </form>
+                  </Tab>
+                </Tabs>
               </Tab>
             </Tabs>
           </CardBody>

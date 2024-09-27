@@ -1,13 +1,12 @@
 import mongoose from "mongoose";
-
-const {Schema} = mongoose;
+const { Schema } = mongoose;
 
 const cartSchema = Schema({
-    owner:{
+    owner: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:"User",
-        require:true
+        ref: "User",
+        required: true // Changed 'require' to 'required'
     }
-})
+});
 
-export const Cart = mongoose.model("Cart",cartSchema);
+export const Cart = mongoose.model("Cart", cartSchema);
