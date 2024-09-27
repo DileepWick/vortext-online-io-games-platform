@@ -219,7 +219,7 @@ export default function Header() {
                 </DropdownItem>
 
                 {/* Developer Filter */}
-                {user.role === "Developer" && (
+                {user.role === "developer" && (
                   <DropdownItem
                     key="developer-panel"
                     onClick={() => navigate("/GamedeveloperDashboard")}
