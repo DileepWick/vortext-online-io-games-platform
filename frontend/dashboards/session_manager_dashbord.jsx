@@ -413,95 +413,95 @@ const SessionManagerDash = () => {
       <Footer />
 
       <Modal
-      isOpen={isOpen}
-      onClose={() => {
-        onClose();
-        setPricePerMinute(5); // Reset to default value
-      }}
-    >
-      <ModalContent>
-        <form onSubmit={handleSubmit}>
-          <ModalHeader>
-            <h3 className="text-xl font-bold text-primary">
-              {editingId ? "Edit Rental Time" : "Add New Rental Time"}
-            </h3>
-          </ModalHeader>
-          <ModalBody>
-            {error && <div className="text-red-500 mb-4">{error}</div>}
-            <div className="mb-4">
-              {editingId ? (
+        isOpen={isOpen}
+        onClose={() => {
+          onClose();
+          setPricePerMinute(5); // Reset to default value
+        }}
+      >
+        <ModalContent>
+          <form onSubmit={handleSubmit}>
+            <ModalHeader>
+              <h3 className="text-xl font-bold text-primary">
+                {editingId ? "Edit Rental Time" : "Add New Rental Time"}
+              </h3>
+            </ModalHeader>
+            <ModalBody>
+              {error && <div className="text-red-500 mb-4">{error}</div>}
+              <div className="mb-4">
+                {editingId ? (
+                  <Input
+                    label="Game"
+                    value={formData.gameName}
+                    readOnly
+                    classNames={{
+                      label: "text-primary",
+                      input: "text-primary",
+                    }}
+                  />
+                ) : (
+                  <Select
+                    label="Game"
+                    placeholder="Select a game"
+                    selectedKeys={formData.gameId ? [formData.gameId] : []}
+                    onChange={handleGameSelect}
+                    required
+                    classNames={{
+                      label: "text-primary",
+                      trigger: "text-primary",
+                      listbox: "text-primary",
+                      popover: "text-primary",
+                    }}
+                  >
+                    {games.map((game) => (
+                      <SelectItem
+                        key={game._id}
+                        value={game._id}
+                        className="text-primary"
+                      >
+                        {game.title}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                )}
+              </div>
+              <div className="mb-4">
                 <Input
-                  label="Game"
-                  value={formData.gameName}
-                  readOnly
-                  classNames={{
-                    label: "text-primary",
-                    input: "text-primary",
-                  }}
+                  label="Duration (minutes)"
+                  name="duration"
+                  type="number"
+                  value={formData.duration}
+                  onChange={handleInputChange}
+                  required
                 />
-              ) : (
-                <Select
-  label="Game"
-  placeholder="Select a game"
-  selectedKeys={formData.gameId ? [formData.gameId] : []}
-  onChange={handleGameSelect}
-  required
-  classNames={{
-    label: "text-primary",
-    trigger: "text-primary",
-    listbox: "text-primary",
-    popover: "text-primary",
-  }}
->
-  {games.map((game) => (
-    <SelectItem 
-      key={game._id} 
-      value={game._id}
-      className="text-primary"
-    >
-      {game.title}
-    </SelectItem>
-  ))}
-</Select>
-              )}
-            </div>
-            <div className="mb-4">
-              <Input
-                label="Duration (minutes)"
-                name="duration"
-                type="number"
-                value={formData.duration}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <Input
-                label="Price (LKR)"
-                name="price"
-                type="number"
-                value={formData.price}
-                readOnly
-              />
-            </div>
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              color="danger"
-              variant="light"
-              onPress={() => {
-                onClose();
-              }}
-            >
-              Cancel
-            </Button>
-            <Button color="primary" type="submit">
-              {editingId ? "Update" : "Add"}
-            </Button>
-          </ModalFooter>
-        </form>
-      </ModalContent>
-    </Modal>
+              </div>
+              <div className="mb-4">
+                <Input
+                  label="Price (LKR)"
+                  name="price"
+                  type="number"
+                  value={formData.price}
+                  readOnly
+                />
+              </div>
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                color="danger"
+                variant="light"
+                onPress={() => {
+                  onClose();
+                }}
+              >
+                Cancel
+              </Button>
+              <Button color="primary" type="submit">
+                {editingId ? "Update" : "Add"}
+              </Button>
+            </ModalFooter>
+          </form>
+        </ModalContent>
+      </Modal>
     </div>
   );
 };
