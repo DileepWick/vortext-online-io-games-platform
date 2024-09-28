@@ -151,3 +151,26 @@ export const getRentalsByGame = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+export const getLatestRental = async (req, res) => {
+  try {
+    const { userId, gameId } = req.params;
+    console.log(`Fetching latest rental for user ${userId} and game ${gameId}`);
+
+    const latestRental = await Rental.findOne({ 
+      user: userId, 
+      game: gameId 
+    }).sort({ insertDate: -1 }).populate('game', 'title');
+
+    if (!latestRental) {
+      console.log('No rental found for this user and game');
+      return res.status(404).json({ message: 'No rental found for this user and game' });
+    }
+
+    console.log('Latest rental fetched successfully');
+    res.status(200).json(latestRental);
+  } catch (error) {
+    console.error("Error in getLatestRental:", error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
