@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "../src/components/header";
 import useAuthCheck from "../src/utils/authCheck";
+import { Link } from "react-router-dom";
 import {
   Tabs,
   Tab,
@@ -21,10 +22,12 @@ import {
   ModalBody,
   ModalFooter,
   Textarea,
+  Chip,
 } from "@nextui-org/react";
 import { Flip, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Footer from "../src/components/footer";
+import ChatModal from "../src/components/ChatModal";
 import { Helmet } from "react-helmet-async";
 
 const ContactDash = () => {
@@ -33,6 +36,20 @@ const ContactDash = () => {
   const [contactMessages, setContactMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  //chat open
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [selectedContactId, setSelectedContactId] = useState(null);
+
+  const handleChatOpen = (contactId) => {
+    setSelectedContactId(contactId);
+    setIsChatOpen(true);
+  };
+
+  const statusColorMap = {
+    open: "success",
+    closed: "danger",
+  };
 
   // FAQ state
   const {
@@ -50,14 +67,6 @@ const ContactDash = () => {
   const [editingFAQ, setEditingFAQ] = useState(null);
   const [editFAQQuestion, setEditFAQQuestion] = useState("");
   const [editFAQAnswer, setEditFAQAnswer] = useState("");
-
-  // Contact message state
-  const {
-    isOpen: isViewMessageOpen,
-    onOpen: onViewMessageOpen,
-    onOpenChange: onViewMessageOpenChange,
-  } = useDisclosure();
-  const [viewingMessage, setViewingMessage] = useState(null);
 
   const [replyMessage, setReplyMessage] = useState("");
   const {
@@ -104,6 +113,7 @@ const ContactDash = () => {
         `http://localhost:8098/contacts/reply/${replyingTo._id}`,
         { message: replyMessage }
       );
+
       if (response.status === 200) {
         setContactMessages((prevMessages) =>
           prevMessages.map((msg) =>
@@ -563,6 +573,7 @@ const ContactDash = () => {
                     <TableColumn>USERNAME</TableColumn>
                     <TableColumn>EMAIL</TableColumn>
                     <TableColumn>MESSAGE</TableColumn>
+                    <TableColumn>Status</TableColumn>
                     <TableColumn>ACTIONS</TableColumn>
                   </TableHeader>
                   <TableBody>
@@ -580,16 +591,15 @@ const ContactDash = () => {
                               "No message content"}
                         </TableCell>
                         <TableCell>
-                          <Button
-                            color="primary"
-                            className="mr-2"
-                            onPress={() => {
-                              setViewingMessage(contact);
-                              onViewMessageOpen();
-                            }}
+                          <Chip
+                            color={statusColorMap[contact.status]}
+                            className="capitalize"
+                            variant="flat"
                           >
-                            View
-                          </Button>
+                            {contact.status}
+                          </Chip>
+                        </TableCell>
+                        <TableCell>
                           <Button
                             color="secondary"
                             className="mr-2"
@@ -602,9 +612,19 @@ const ContactDash = () => {
                           </Button>
                           <Button
                             color="danger"
+                            className="mr-2"
                             onPress={() => handleDeleteMessage(contact._id)}
                           >
                             Delete
+                          </Button>
+
+                          <Button
+                            onPress={() => {
+                              handleChatOpen(contact._id);
+                              // setReplyingTo(contact);
+                            }}
+                          >
+                            Chat
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -612,38 +632,6 @@ const ContactDash = () => {
                   </TableBody>
                 </Table>
               )}
-              <Modal
-                isOpen={isViewMessageOpen}
-                onOpenChange={onViewMessageOpenChange}
-                className="dark text-foreground bg-background"
-              >
-                <ModalContent>
-                  {(onClose) => (
-                    <>
-                      <ModalHeader className="flex flex-col gap-1">
-                        View Message
-                      </ModalHeader>
-                      <ModalBody>
-                        <p>
-                          <strong>Username:</strong> {viewingMessage?.username}
-                        </p>
-                        <p>
-                          <strong>Email:</strong> {viewingMessage?.email}
-                        </p>
-                        <p>
-                          <strong>Message:</strong>
-                        </p>
-                        <p>{viewingMessage?.message}</p>
-                      </ModalBody>
-                      <ModalFooter>
-                        <Button color="primary" onPress={onClose}>
-                          Close
-                        </Button>
-                      </ModalFooter>
-                    </>
-                  )}
-                </ModalContent>
-              </Modal>
               <Modal
                 isOpen={isReplyModalOpen}
                 onOpenChange={onReplyModalOpenChange}
@@ -687,6 +675,11 @@ const ContactDash = () => {
                   )}
                 </ModalContent>
               </Modal>
+              <ChatModal
+                isOpen={isChatOpen}
+                onOpenChange={() => setIsChatOpen(false)}
+                contactId={selectedContactId}
+              />
             </div>
           )}
         </div>

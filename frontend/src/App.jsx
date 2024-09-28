@@ -21,6 +21,7 @@ import HandleRentals from "./pages/HandleRentals";
 import RentalGamesEmbed from "./pages/RentalGamesEmbed";
 import TailoredGames from "./pages/tailoredGames";
 import UserMessages from "./pages/UserMessage";
+import SupportChat from "./pages/SupportChat";
 
 //Games
 import Snake from "../Games/Snake";
@@ -73,6 +74,7 @@ const App = () => {
       <Route path="/faq" element={<FAQsPage />} />
       <Route path="/community" element={<Community />} />
       <Route path="/UserMessage" element={<UserMessages />} />
+      <Route path="/SupportChat" element={<SupportChat />} />
 
       <Route path="/chat" element={<Chat />} />
 
