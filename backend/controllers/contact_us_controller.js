@@ -75,6 +75,48 @@ export const submitContactForm = async (req, res) => {
   }
 };
 
+export const replyToAgent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { message, sender } = req.body; // Add sender to the request body
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid Contact ID" });
+    }
+
+    const contact = await ContactUsSchema.findById(id);
+
+    if (!contact) {
+      return res.status(404).json({ message: "Contact not found" });
+    }
+
+    contact.messages.push({ sender, content: message });
+    contact.updatedAt = new Date();
+    await contact.save();
+
+    // Create a notification only if the sender is an agent
+    if (sender === "agent") {
+      const notification = new Notification({
+        userId: contact.userId,
+        type: "contact_reply",
+        content: "You have received a reply to your contact message",
+        contactId: contact._id,
+      });
+      await notification.save();
+    }
+
+    res.status(200).json({
+      message: "Reply sent successfully",
+      contact: contact,
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "An error occurred", error: error.message });
+  }
+};
+
 export const replyToContact = async (req, res) => {
   try {
     const { id } = req.params;

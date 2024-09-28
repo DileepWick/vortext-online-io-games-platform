@@ -24,14 +24,12 @@ import TailoredGames from "./pages/tailoredGames";
 import DeveloperLoginSignup from "./pages/DeveloperLoginSignup";
 
 import UserMessages from "./pages/UserMessage";
-import SupportChat from "./pages/SupportChat";
 
 //Games
 import Snake from "../Games/Snake";
 import PuzzlePlatformGame from "./components/Games/PuzzlePlatformGame";
 
 import Chat from "./pages/chat";
-
 
 //Gameplay
 import GameEmbed from "./pages/GameEmbed";
@@ -52,9 +50,7 @@ import Payment_Manager from "../dashboards/Payment_manager_dashboard";
 import DeveloperDashboard from "../dashboards/usermanage_component/DeveloperDashboard";
 import GameDeveloperDashboard from "../dashboards/gamedeveloperdashboard";
 
-
 import RentedGamesSection from "../dashboards/rentedGamesDash";
-
 
 const App = () => {
   return (
@@ -84,7 +80,6 @@ const App = () => {
       <Route path="/faq" element={<FAQsPage />} />
       <Route path="/community" element={<Community />} />
       <Route path="/UserMessage" element={<UserMessages />} />
-      <Route path="/SupportChat" element={<SupportChat />} />
 
       <Route path="/chat" element={<Chat />} />
 
@@ -103,12 +98,14 @@ const App = () => {
 
       <Route path="/DeveloperLoginSignup" element={<DeveloperLoginSignup />} />
       <Route path="/DeveloperDashboard" element={<DeveloperDashboard />} />
-      <Route path="/GameDeveloperDashboard" element={<GameDeveloperDashboard />} />
+      <Route
+        path="/GameDeveloperDashboard"
+        element={<GameDeveloperDashboard />}
+      />
 
       <Route path="/RentedGamesSection" element={<RentedGamesSection />} />
       <Route path="/Snakegame" element={<Snake />} />
       <Route path="/PuzzlePlatformGame" element={<PuzzlePlatformGame />} />
-
     </Routes>
   );
 };

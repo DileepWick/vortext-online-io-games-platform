@@ -7,12 +7,14 @@ import {
   ModalFooter,
   Button,
   Input,
+  Divider,
 } from "@nextui-org/react";
 import axios from "axios";
 
 const ChatModal = ({ isOpen, onOpenChange, contactId }) => {
   const [messages, setMessages] = useState([]);
   const [userName, setUserName] = useState("");
+  const [createdAt, setCreatedAt] = useState("");
   const [replyMessage, setReplyMessage] = useState("");
   const messagesEndRef = useRef(null);
   const [replyingTo, setReplyingTo] = useState(null);
@@ -20,6 +22,11 @@ const ChatModal = ({ isOpen, onOpenChange, contactId }) => {
   useEffect(() => {
     if (isOpen && contactId) {
       fetchMessages(contactId);
+      const intervalId = setInterval(() => {
+        fetchMessages(contactId); // Poll every 5 seconds
+      }, 5000); // 5000 milliseconds = 5 seconds
+
+      return () => clearInterval(intervalId); // Clear the interval when the modal is closed
     }
   }, [isOpen, contactId]);
 
@@ -41,8 +48,14 @@ const ChatModal = ({ isOpen, onOpenChange, contactId }) => {
         ...msg,
         timestamp: msg.timestamp || new Date().toISOString(),
       }));
-      setMessages(formattedMessages);
+
+      // Update state only if new messages are fetched
+      if (formattedMessages.length !== messages.length) {
+        setMessages(formattedMessages);
+      }
+
       setUserName(data.contact.username);
+      setCreatedAt(data.contact.createdAt);
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
@@ -95,8 +108,12 @@ const ChatModal = ({ isOpen, onOpenChange, contactId }) => {
         {(onClose) => (
           <>
             <ModalHeader className="flex flex-col gap-1">
-              Chat with {userName}
+              <div className="text-small mb-21">Chat with {userName}</div>
+              <div className="text-small mb-21">
+                Raised at {new Date(createdAt).toLocaleString()}
+              </div>
             </ModalHeader>
+            <Divider className="my-4" />
             <ModalBody className="flex flex-col">
               <div
                 className="flex-grow overflow-y-auto"
