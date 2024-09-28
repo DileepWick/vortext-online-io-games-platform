@@ -22,14 +22,13 @@ import spookeyRouter from "./routes/spookey_guesses_routes.js";
 import faqRouter from "./routes/faq_routes.js";
 import RentalRouter from "./routes/rental_routes.js";
 import chatRouter from "./routes/chat_bot_route.js";
-import rentalPaymentsRouter from"./routes/rentalPaymentRoutes.js"
+import rentalPaymentsRouter from "./routes/rentalPaymentRoutes.js";
 
 import developerRouter from "./routes/developer_routes.js";
 
-
 import CommunityPost from "./routes/communityPost_routes.js";
 import contactRouter from "./routes/contact_us_route.js";
-import messageRoutes from './routes/messageRoutes.js';
+import messageRoutes from "./routes/messageRoutes.js";
 
 import { RentalDurationRouter } from "./routes/rentalDurationRoutes.js";
 
@@ -76,18 +75,18 @@ app.use("/articles", articleRouter); //Articles
 app.use("/feed", postRouter); //Post
 app.use("/spookeyEditons", spookeyRouter); //Spookey_Game
 app.use("/faq", faqRouter);
-app.use("/gameStocks",gameStockRouter);//GameStocks
-app.use("/cart",cartRouter); //Cart
-app.use("/cartItems", cartItemsRouter);//Cart Items
-app.use("/orders",orderRouter);//Orders
-app.use("/orderItems",OrderItemsRouter)//Order Items
-app.use("/articles",articleRouter);//Articles
-app.use("/community",CommunityPost);//community
-app.use("/feed",postRouter); //Post
-app.use("/ratings",ratingRouter)
-app.use("/spookeyEditons",spookeyRouter) //Spookey_Game
-app.use("/Rentals",RentalRouter); //Rentals
-app.use('/api', chatRouter);// Use chatbot routes
+app.use("/gameStocks", gameStockRouter); //GameStocks
+app.use("/cart", cartRouter); //Cart
+app.use("/cartItems", cartItemsRouter); //Cart Items
+app.use("/orders", orderRouter); //Orders
+app.use("/orderItems", OrderItemsRouter); //Order Items
+app.use("/articles", articleRouter); //Articles
+app.use("/community", CommunityPost); //community
+app.use("/feed", postRouter); //Post
+app.use("/ratings", ratingRouter);
+app.use("/spookeyEditons", spookeyRouter); //Spookey_Game
+app.use("/Rentals", RentalRouter); //Rentals
+app.use("/api", chatRouter); // Use chatbot routes
 app.use("/gameStocks", gameStockRouter); //GameStocks
 app.use("/cart", cartRouter); //Cart
 app.use("/cartItems", cartItemsRouter); //Cart Items
@@ -100,13 +99,11 @@ app.use("/spookeyEditons", spookeyRouter); //Spookey_Game
 app.use("/Rentals", RentalRouter); //Rentals
 app.use("/api", chatRouter); // Use chatbot routes
 app.use("/rentalDurations", RentalDurationRouter);
-app.use("/rentalPayments",rentalPaymentsRouter) //payments for the rentals
+app.use("/rentalPayments", rentalPaymentsRouter); //payments for the rentals
 
-app.use('/api', GPTRouter);
-app.use('/developers', developerRouter); // Developer route
-
+app.use("/api", GPTRouter);
+app.use("/developers", developerRouter); // Developer route
 
 app.use("/api", GPTRouter);
 app.use("/contacts", contactRouter);
-app.use('/api/messages', messageRoutes); // Changed the path to "/api/messages"
-
+app.use("/api/messages", messageRoutes); // Changed the path to "/api/messages"

@@ -68,14 +68,6 @@ const ContactDash = () => {
   const [editFAQQuestion, setEditFAQQuestion] = useState("");
   const [editFAQAnswer, setEditFAQAnswer] = useState("");
 
-  const [replyMessage, setReplyMessage] = useState("");
-  const {
-    isOpen: isReplyModalOpen,
-    onOpen: onReplyModalOpen,
-    onOpenChange: onReplyModalOpenChange,
-  } = useDisclosure();
-  const [replyingTo, setReplyingTo] = useState(null);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -106,54 +98,6 @@ const ContactDash = () => {
 
     fetchData();
   }, []);
-
-  const handleReply = async () => {
-    try {
-      const response = await axios.post(
-        `http://localhost:8098/contacts/reply/${replyingTo._id}`,
-        { message: replyMessage }
-      );
-
-      if (response.status === 200) {
-        setContactMessages((prevMessages) =>
-          prevMessages.map((msg) =>
-            msg._id === replyingTo._id ? response.data.contact : msg
-          )
-        );
-        toast.success("Reply sent successfully", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-          transition: Flip,
-          progressBarClassName: "bg-gray-800",
-          style: { fontFamily: "Rubik" },
-        });
-        setReplyMessage("");
-        setReplyingTo(null);
-        onReplyModalOpenChange(false);
-      }
-    } catch (error) {
-      console.error("Error sending reply:", error);
-      toast.error("Failed to send reply", {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-        transition: Flip,
-        progressBarClassName: "bg-gray-800",
-        style: { fontFamily: "Rubik" },
-      });
-    }
-  };
 
   // FAQ functions
   const handleAddFAQ = async () => {
@@ -601,16 +545,6 @@ const ContactDash = () => {
                         </TableCell>
                         <TableCell>
                           <Button
-                            color="secondary"
-                            className="mr-2"
-                            onPress={() => {
-                              setReplyingTo(contact);
-                              onReplyModalOpen();
-                            }}
-                          >
-                            Reply
-                          </Button>
-                          <Button
                             color="danger"
                             className="mr-2"
                             onPress={() => handleDeleteMessage(contact._id)}
@@ -621,7 +555,6 @@ const ContactDash = () => {
                           <Button
                             onPress={() => {
                               handleChatOpen(contact._id);
-                              // setReplyingTo(contact);
                             }}
                           >
                             Chat
@@ -632,49 +565,6 @@ const ContactDash = () => {
                   </TableBody>
                 </Table>
               )}
-              <Modal
-                isOpen={isReplyModalOpen}
-                onOpenChange={onReplyModalOpenChange}
-                className="dark text-foreground bg-background"
-              >
-                <ModalContent>
-                  {(onClose) => (
-                    <>
-                      <ModalHeader className="flex flex-col gap-1">
-                        Reply to Message
-                      </ModalHeader>
-                      <ModalBody>
-                        <p>
-                          <strong>Replying to:</strong> {replyingTo?.username}
-                        </p>
-                        <p>
-                          <strong>Original Message:</strong>
-                        </p>
-                        <p>{replyingTo?.message}</p>
-                        <Textarea
-                          label="Your Reply"
-                          placeholder="Enter your reply"
-                          value={replyMessage}
-                          onChange={(e) => setReplyMessage(e.target.value)}
-                          fullWidth
-                        />
-                      </ModalBody>
-                      <ModalFooter>
-                        <Button
-                          color="danger"
-                          variant="light"
-                          onPress={onClose}
-                        >
-                          Cancel
-                        </Button>
-                        <Button color="primary" onPress={handleReply}>
-                          Send Reply
-                        </Button>
-                      </ModalFooter>
-                    </>
-                  )}
-                </ModalContent>
-              </Modal>
               <ChatModal
                 isOpen={isChatOpen}
                 onOpenChange={() => setIsChatOpen(false)}
