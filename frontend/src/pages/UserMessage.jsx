@@ -4,6 +4,8 @@ import { Card, CardBody, CardHeader, Spinner } from "@nextui-org/react";
 import { getToken } from "../utils/getToken";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 
+import Header from "../components/header";
+
 const UserMessages = () => {
   const [userContact, setUserContact] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -59,36 +61,39 @@ const UserMessages = () => {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <h3 className="text-lg font-semibold">
-          Message Thread for {userContact.username}
-        </h3>
-        <p className="text-sm text-gray-500">
-          Started: {new Date(userContact.createdAt).toLocaleString()}
-        </p>
-      </CardHeader>
-      <CardBody>
-        {userContact.messages.map((message) => (
-          <div
-            key={message._id}
-            className="mb-4 p-2 rounded"
-            style={{
-              backgroundColor:
-                message.sender === "user" ? "#f0f0f0" : "#e6f7ff",
-            }}
-          >
-            <p className="font-semibold">
-              {message.sender === "user" ? userContact.username : "Agent"}
-            </p>
-            <p>{message.content}</p>
-            <small className="text-gray-500">
-              {new Date(message.timestamp).toLocaleString()}
-            </small>
-          </div>
-        ))}
-      </CardBody>
-    </Card>
+    <div>
+      <Header />
+      <Card>
+        <CardHeader>
+          <h3 className="text-lg font-semibold">
+            Message Thread for {userContact.username}
+          </h3>
+          <p className="text-sm text-gray-500">
+            Started: {new Date(userContact.createdAt).toLocaleString()}
+          </p>
+        </CardHeader>
+        <CardBody>
+          {userContact.messages.map((message) => (
+            <div
+              key={message._id}
+              className="mb-4 p-2 rounded"
+              style={{
+                backgroundColor:
+                  message.sender === "user" ? "#f0f0f0" : "#e6f7ff",
+              }}
+            >
+              <p className="font-semibold">
+                {message.sender === "user" ? userContact.username : "Agent"}
+              </p>
+              <p>{message.content}</p>
+              <small className="text-gray-500">
+                {new Date(message.timestamp).toLocaleString()}
+              </small>
+            </div>
+          ))}
+        </CardBody>
+      </Card>
+    </div>
   );
 };
 
