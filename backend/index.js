@@ -22,6 +22,7 @@ import spookeyRouter from "./routes/spookey_guesses_routes.js";
 import faqRouter from "./routes/faq_routes.js";
 import RentalRouter from "./routes/rental_routes.js";
 import chatRouter from "./routes/chat_bot_route.js";
+import rentalPaymentsRouter from"./routes/rentalPaymentRoutes.js"
 
 import developerRouter from "./routes/developer_routes.js";
 
@@ -99,6 +100,7 @@ app.use("/spookeyEditons", spookeyRouter); //Spookey_Game
 app.use("/Rentals", RentalRouter); //Rentals
 app.use("/api", chatRouter); // Use chatbot routes
 app.use("/rentalDurations", RentalDurationRouter);
+app.use("/rentalPayments",rentalPaymentsRouter) //payments for the rentals
 
 app.use('/api', GPTRouter);
 app.use('/developers', developerRouter); // Developer route
