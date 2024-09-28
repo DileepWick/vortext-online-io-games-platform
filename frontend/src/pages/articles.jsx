@@ -406,7 +406,7 @@ const Articles = () => {
                     <h3 className="text-xl font-semibold mb-2">{article.heading}</h3>
                     <p className="text-gray-400">{article.articleBody}</p>
                     <p className="text-sm text-gray-500 mt-2">
-                      Posted by: {article.uploader.name}
+                      Posted by: {article.uploader.username}
                     </p>
                   </div>
                 </div>
