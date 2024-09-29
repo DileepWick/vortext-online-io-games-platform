@@ -208,11 +208,9 @@ const Blogger = () => {
       <div className="p-4">
         {activeTab === "analytics" && (
           <div className="bg-white flex flex-col min-h-screen">
-
             <p className="text-center text-black font-primaryRegular text-5xl mt-[100px]">
-              STATS 
+              STATS
             </p>
-           
           </div>
         )}
         {/*PRODUCTS*/}
@@ -227,16 +225,7 @@ const Blogger = () => {
                 onChange={handleSearchChange}
                 onClear={handleClearSearch}
               />
-              <Button
-                className="font-primaryRegular"
-                color="primary"
-                variant="shadow"
-                endContent={<PlusIcon />}
-                size="lg"
-                onPress={onAddModalOpen}
-              >
-                Add New
-              </Button>
+
             </div>
             {/*Product Table*/}
             <Table
@@ -263,6 +252,7 @@ const Blogger = () => {
             >
               <TableHeader className="bg-foreground">
                 <TableColumn key="name">TITLE</TableColumn>
+                <TableColumn key="develoepr">DEVELOPER</TableColumn>
                 <TableColumn key="date">RELEASE DATE</TableColumn>
                 <TableColumn key="actions">ACTIONS</TableColumn>
               </TableHeader>
@@ -270,6 +260,20 @@ const Blogger = () => {
                 {items.map((game) => (
                   <TableRow key={game.id}>
                     <TableCell>{game.title}</TableCell>
+                    <TableCell>
+                      {game.developer?.username ? (
+                        <User
+                          name={game.developer.username}
+                          description={game.developer.email}
+                          avatarProps={{
+                            src: game.developer.profilePic,
+                          }}
+                        />
+                      ) : (
+                        "Not Found"
+                      )}
+                    </TableCell>
+
                     <TableCell>
                       {new Date(game.insertDate).toLocaleDateString("en-US", {
                         year: "numeric",

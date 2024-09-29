@@ -50,6 +50,10 @@ const gameSchema = new Schema({
   totalRatings: { 
     type: Number,
     default: 0,
+  },
+  developer:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
   }
 });
 
