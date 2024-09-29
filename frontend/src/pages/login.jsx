@@ -429,15 +429,7 @@ if (selectedRole === "Developer") {
                       {validationErrors.password && (
                         <div className="text-red-500">{validationErrors.password}</div>
                       )}
-                       <Input
-                        isRequired
-                        label="Portfolio Link"
-                        placeholder="Enter portfolio link"
-                        name="portfolioLink"
-                        type="url"
-                        value={portfolioLink}
-                        onChange={handlePortfolioLinkChange}
-                      />
+                       
                       <p className="text-center text-small">
                         Already have an account?{" "}
                         <Link size="sm" onPress={() => setSelectedTab("login")}>

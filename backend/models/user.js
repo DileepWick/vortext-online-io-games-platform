@@ -23,10 +23,7 @@ const UserSchema = new mongoose.Schema({
   
   // Developer-specific fields, only required if role is 'Developer'
   developerAttributes: {
-    portfolioLink: { 
-      type: String, 
-      required: function() { return this.role === 'Developer'; }  // Required if role is Developer
-    },
+    
     status: { 
       type: String, 
       enum: ['pending', 'approved', 'rejected'], 
@@ -37,5 +34,5 @@ const UserSchema = new mongoose.Schema({
   
 });
 
-// No need for a pre-save hook, Mongoose will enforce conditions
+// No need for a pre-save hook, Mongoose will enforce condition
 export const User = mongoose.model('User', UserSchema);
