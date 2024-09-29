@@ -364,17 +364,17 @@ const SessionManagerDash = () => {
                     <TableRow key={rentalTime._id}>
                       <TableCell>
                         <span className="text-primary font-medium">
-                          {rentalTime.game.title||'Unknown game'}
+                          {rentalTime.game?.title||'Unknown game'}
                         </span>
                       </TableCell>
                       <TableCell>
                         <Chip color="default" variant="flat">
-                          {rentalTime.duration||'Unknown duration'} min
+                          {rentalTime.duration} min
                         </Chip>
                       </TableCell>
                       <TableCell>
                         <span className="text-primary font-medium">
-                          LKR {rentalTime.price.toFixed(2)||'unknown price'}
+                          LKR {rentalTime.price.toFixed(2)}
                         </span>
                       </TableCell>
                       <TableCell>
