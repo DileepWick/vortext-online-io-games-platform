@@ -150,7 +150,7 @@ const SessionManagerDash = () => {
 
       const existingRentalTime = rentalTimes.find(
         (rt) =>
-          rt.game._id === formData.gameId &&
+          rt.game && rt.game._id === formData.gameId &&
           rt.duration === parseInt(formData.duration, 10)
       );
 
@@ -250,9 +250,13 @@ const SessionManagerDash = () => {
   };
 
   const filteredItems = useMemo(() => {
-    return rentalTimes.filter((rentalTime) =>
-      rentalTime.game.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    return rentalTimes.filter((rentalTime) => {
+      // Check if game object and title exist before filtering
+      if (rentalTime && rentalTime.game && rentalTime.game.title) {
+        return rentalTime.game.title.toLowerCase().includes(searchQuery.toLowerCase());
+      }
+      return false; // Exclude items with missing game or title
+    });
   }, [rentalTimes, searchQuery]);
 
   const items = useMemo(() => {
@@ -360,17 +364,17 @@ const SessionManagerDash = () => {
                     <TableRow key={rentalTime._id}>
                       <TableCell>
                         <span className="text-primary font-medium">
-                          {rentalTime.game.title}
+                          {rentalTime.game.title||'Unknown game'}
                         </span>
                       </TableCell>
                       <TableCell>
                         <Chip color="default" variant="flat">
-                          {rentalTime.duration} min
+                          {rentalTime.duration||'Unknown duration'} min
                         </Chip>
                       </TableCell>
                       <TableCell>
                         <span className="text-primary font-medium">
-                          LKR {rentalTime.price.toFixed(2)}
+                          LKR {rentalTime.price.toFixed(2)||'unknown price'}
                         </span>
                       </TableCell>
                       <TableCell>
