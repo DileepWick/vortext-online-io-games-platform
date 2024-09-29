@@ -23,10 +23,7 @@ const UserSchema = new mongoose.Schema({
   
   // Developer-specific fields, only required if role is 'Developer'
   developerAttributes: {
-    portfolioLink: { 
-      type: String, 
-      required: function() { return this.role === 'Developer'; }  // Required if role is Developer
-    },
+    
     status: { 
       type: String, 
       enum: ['pending', 'approved', 'rejected'], 
