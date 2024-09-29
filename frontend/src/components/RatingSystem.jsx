@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Textarea } from "@nextui-org/react";
+import { User } from "@nextui-org/react";
 
 const RatingSystem = ({ gameId,userid, ratings, averageRating, onSubmitRating ,onUpdateRating}) => {
   const [userRating, setUserRating] = useState(0);
@@ -46,8 +47,7 @@ const RatingSystem = ({ gameId,userid, ratings, averageRating, onSubmitRating ,o
 
   
   return (
-    <div className="p-6 rounded-lg shadow-lg" style={{ backgroundColor: '#131213' }}>
-      <h3 className="text-2xl font-bold text-white mb-6">User Ratings</h3>
+    <div className="mt-4  rounded-lg shadow-lg" style={{ backgroundColor: '#131213' }}>
 
       {/* Main User Rating */}
       <div className="flex items-center mb-6">
@@ -127,8 +127,20 @@ const RatingSystem = ({ gameId,userid, ratings, averageRating, onSubmitRating ,o
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {ratings.map((rating, index) => (
             <div key={index} className={`p-6 rounded-lg `} style={{ backgroundColor: '#333333' }}>
-              <div className="flex items-center mb-2">
-                <div className="flex">
+              <div className="flex items-center mb-2" style={{fontSize:'20px'}}>
+                <span className=" text-gray-400">
+                <User
+                
+                  className="cursor-pointer text-white"
+                  name={rating.user.username}
+                  description={rating.user.role}
+                  avatarProps={{
+                    src: rating.user.profilePic,
+                  }}
+                />
+                </span>
+              </div>
+              <div className="flex">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <svg
                       key={star}
@@ -141,9 +153,7 @@ const RatingSystem = ({ gameId,userid, ratings, averageRating, onSubmitRating ,o
                     </svg>
                   ))}
                 </div>
-                <span className="ml-2 text-gray-400">by {rating.user.username}</span>
-              </div>
-              <p className="text-white mb-4">{rating.comment}</p>
+              <p className="text-white mb-4" style={{fontSize:'20px'}}>{rating.comment}</p>
               {(userid === rating.user._id ? (          
                 <div>
                 <div
@@ -231,7 +241,7 @@ const RatingSystem = ({ gameId,userid, ratings, averageRating, onSubmitRating ,o
               >
                 Edit Review
               </button>
-                </div> ) : ( <a href="#" className="text-blue-400 hover:underline">Read Full Review</a> ))}
+                </div> ) : ( <a href="#" className="text-blue-400 hover:underline" style={{fontSize:'20px'}}>Read Full Review</a> ))}
 
               
               
