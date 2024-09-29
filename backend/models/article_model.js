@@ -1,3 +1,4 @@
+//article_model.js
 import mongoose from "mongoose";
 const { Schema } = mongoose;
 
@@ -31,6 +32,10 @@ const articleSchema = new Schema({
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     text: String,
     createdAt: { type: Date, default: Date.now }
+  }],
+  reportedBy: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
   }]
 });
 

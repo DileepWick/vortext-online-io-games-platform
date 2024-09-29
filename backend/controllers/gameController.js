@@ -35,7 +35,7 @@ export const uploadGame = async (req, res) => {
     );
 
     // Check required fields
-    if (!req.body.title || !req.body.Description || !req.body.Genre || !req.body.PlayLink || !req.body.AgeGroup) {
+    if (!req.body.title || !req.body.Description || !req.body.Genre || !req.body.PlayLink || !req.body.AgeGroup ||!req.body.developer) {
       // Clean up uploaded files before returning error response
       fs.unlinkSync(req.files.image[0].path);
       fs.unlinkSync(req.files.video[0].path);
@@ -55,6 +55,7 @@ export const uploadGame = async (req, res) => {
       Genre: req.body.Genre,
       PlayLink: req.body.PlayLink,
       AgeGroup: req.body.AgeGroup,
+      developer:req.body.developer,
     });
 
     // Save the new game to the database
@@ -82,7 +83,7 @@ export const uploadGame = async (req, res) => {
 //Get all games
 export const getAllGames = async (req, res) => {
   try {
-    const allGames = await Game.find();
+    const allGames = await Game.find().populate("developer");
     return res.status(200).json({
       total_games: allGames.length,
       allGames,
@@ -94,7 +95,34 @@ export const getAllGames = async (req, res) => {
   }
 };
 
-export const getGameNameById = async (req, res) => {
+
+// Get games by developer
+export const getGamesByDeveloper = async (req, res) => {
+  try {
+    const { developerId } = req.params; // Get developer ID from route params
+
+    const allGames = await Game.find({ developer: developerId }).populate("developer");
+
+    if (!allGames.length) {
+      return res.status(404).json({
+        message: "No games found for this developer.",
+      });
+    }
+
+    return res.status(200).json({
+      total_games: allGames.length,
+      allGames,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Error getting games for this developer.",
+    });
+  }
+};
+
+
+//Get specific game details by id
+export const getSpecificGame = async (req, res) => {
   try {
     const { gameId } = req.params;
     const game = await Game.findById(gameId); 
@@ -155,9 +183,6 @@ export const getGameNameByAssignedGameId = async (req, res) => {
     });
   }
 };
-
-// export const getUserEmailbyId = async (req, res) => {
-//   try {
 
 
 

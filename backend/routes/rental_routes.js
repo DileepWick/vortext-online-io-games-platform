@@ -1,19 +1,28 @@
 import express from 'express';
-import { createRental,getRentals,getRentalsByUser,deleteRental } from '../controllers/rentals_controller.js';
-
+import { createRental, getRentals, getRentalsByUser, deleteRental, updateRental, updateRentalTime, getLatestRental } from '../controllers/rentals_controller.js';
 
 const RentalRouter = express.Router();
 
-//Create rental
-RentalRouter.post("/createRental",createRental);
+// Create rental
+RentalRouter.post("/createRental", createRental);
 
-//fetch rentals
-RentalRouter.get("/getAllRentals",getRentals)
+// Fetch rentals
+RentalRouter.get("/getAllRentals", getRentals);
 
-//fetch rentals by id
-RentalRouter.get("/getRentalsByUser/:userId",getRentalsByUser)
+// Fetch rentals by id
+RentalRouter.get("/getRentalsByUser/:userId", getRentalsByUser);
 
-//Delete Rental
-RentalRouter.delete("/deleteRentalByID/:id",deleteRental)
+// Delete Rental
+RentalRouter.delete("/deleteRentalByID/:id", deleteRental);
+
+// Update Rental
+RentalRouter.put("/updateRental/:id", updateRental);
+
+// Update Rental Time
+RentalRouter.put("/updateRentalTime/:id", updateRentalTime);
+
+
+//get latest rental
+RentalRouter.get("/getLatestRental/:userId/:gameId", getLatestRental);
 
 export default RentalRouter;

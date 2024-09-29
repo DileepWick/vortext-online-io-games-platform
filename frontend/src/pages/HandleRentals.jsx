@@ -8,7 +8,21 @@ import { toast, Flip } from "react-toastify";
 import VideoPlayer from "../components/videoPlayer";
 import Header from "../components/header";
 import Footer from "../components/footer";
-import { Button, Card, CardBody, Chip, Image, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, ScrollShadow } from "@nextui-org/react";
+import {
+  Button,
+  Card,
+  CardBody,
+  Chip,
+  Image,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+  ScrollShadow,
+  Input, // Add this line
+} from "@nextui-org/react";
 
 const HandleRentals = () => {
   useAuthCheck();
@@ -31,13 +45,47 @@ const HandleRentals = () => {
     "Rented games cannot be transferred to other accounts.",
   ];
 
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [cardDetails, setCardDetails] = useState({
+    cardNumber: "",
+    cvv: "",
+    expiryDate: "",
+  });
+  const [cardErrors, setCardErrors] = useState({});
+
+  const handleCardInputChange = (e) => {
+    const { name, value } = e.target;
+    setCardDetails(prev => ({ ...prev, [name]: value }));
+  };
+
+  const validateCardDetails = () => {
+    const errors = {};
+    if (!/^\d{16}$/.test(cardDetails.cardNumber)) {
+      errors.cardNumber = "Card number must be 16 digits";
+    }
+    if (!/^\d{3}$/.test(cardDetails.cvv)) {
+      errors.cvv = "CVV must be 3 digits";
+    }
+    if (!/^\d{2}\/\d{2}$/.test(cardDetails.expiryDate)) {
+      errors.expiryDate = "Expiry date must be in MM/YY format";
+    }
+    setCardErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+
+
   const fetchRentalTimes = async (gameId) => {
     try {
-      const response = await axios.get(`http://localhost:8098/rentalDurations/game/${gameId}`);
-      setRentalOptions(response.data.map(option => ({
-        time: option.duration.toString(),
-        price: option.price
-      })));
+      const response = await axios.get(
+        `http://localhost:8098/rentalDurations/game/${gameId}`
+      );
+      setRentalOptions(
+        response.data.map((option) => ({
+          time: option.duration.toString(),
+          price: option.price,
+        }))
+      );
     } catch (err) {
       console.error("Error fetching rental times:", err);
       toast.error("Failed to fetch rental options. Please try again.");
@@ -49,7 +97,9 @@ const HandleRentals = () => {
     const fetchGameDetails = async () => {
       try {
         // Updated API endpoint
-        const response = await axios.get(`http://localhost:8098/games/fetchGame/${id}`);
+        const response = await axios.get(
+          `http://localhost:8098/games/fetchGame/${id}`
+        );
         setGame(response.data);
         await fetchRentalTimes(id);
       } catch (err) {
@@ -63,7 +113,7 @@ const HandleRentals = () => {
   }, [id]);
 
   const handleRentalSelection = useCallback((option) => {
-    setSelectedRental(prevSelected => 
+    setSelectedRental((prevSelected) =>
       prevSelected && prevSelected.time === option.time ? null : option
     );
   }, []);
@@ -87,67 +137,134 @@ const HandleRentals = () => {
     }
   }, [selectedRental, onOpen]);
 
+
+
+
+
   const handlePayment = async () => {
+    if (!validateCardDetails()) {
+      return;
+    }
+  
     try {
       const token = getToken();
       const userId = getUserIdFromToken(token);
-      
+  
       if (!userId) {
         throw new Error("User ID not found. Please log in again.");
       }
-
+  
       const rentalData = {
         user: userId,
         game: id,
-        time: selectedRental.time,
-        price: selectedRental.price
+        time: parseInt(selectedRental.time),
+        price: parseFloat(selectedRental.price)
       };
-
-      console.log("Rental data being sent:", rentalData);
-
-      const response = await axios.post('http://localhost:8098/Rentals/createRental', rentalData, {
-        headers: {
-          'Authorization': `Bearer ${token}`
+  
+      console.log("Sending rental data:", rentalData);
+  
+      // Create the rental
+      const rentalResponse = await axios.post(
+        "http://localhost:8098/Rentals/createRental",
+        rentalData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
-
-      if (response.status === 201) {
-        toast.success("Rental successful!", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-          transition: Flip,
-          style: { fontFamily: "Rubik" },
-        });
-        onClose();
-        navigate('/GamingSessions');
-      } else {
+      );
+  
+      console.log("Rental response:", rentalResponse);
+  
+      if (rentalResponse.status !== 201) {
         throw new Error("Failed to create rental");
       }
+  
+      // Fetch the latest rental to get the rental ID
+      const latestRentalResponse = await axios.get(
+        `http://localhost:8098/Rentals/getLatestRental/${userId}/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      console.log("Latest rental response:", latestRentalResponse);
+  
+      if (latestRentalResponse.status !== 200 || !latestRentalResponse.data._id) {
+        throw new Error("Failed to fetch the latest rental ID");
+      }
+  
+      const rentalId = latestRentalResponse.data._id;
+  
+      // Create the payment
+      const paymentData = {
+        user: userId,
+        game: id,
+        rental: rentalId,
+        amount: parseFloat(selectedRental.price)
+      };
+  
+      console.log("Sending payment data:", paymentData);
+  
+      const paymentResponse = await axios.post(
+        "http://localhost:8098/rentalPayments/create",
+        paymentData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      console.log("Payment response:", paymentResponse);
+  
+      if (paymentResponse.status === 201) {
+        toast.success("Payment successful! Game added to your rentals.");
+        setIsPaymentModalOpen(false);
+        onClose();
+        navigate("/GamingSessions");
+      } else {
+        throw new Error("Payment failed");
+      }
     } catch (error) {
-      console.error("Error creating rental:", error);
-      toast.error(error.message || "Rental failed. Please try again.", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-        transition: Flip,
-        style: { fontFamily: "Rubik" },
-      });
+      console.error("Error processing payment:", error);
+      console.error("Error details:", error.response?.data);
+      
+      // More specific error messages
+      if (error.response) {
+        if (error.response.status === 400) {
+          toast.error("Invalid data submitted. Please check your inputs and try again.");
+        } else if (error.response.status === 401) {
+          toast.error("Authentication failed. Please log in again.");
+        } else if (error.response.status === 404) {
+          toast.error("Rental not found. Please try again.");
+        } else if (error.response.status === 500) {
+          toast.error("Server error. Please try again later or contact support.");
+        } else {
+          toast.error(`Operation failed: ${error.response.data.message || 'Unknown error'}`);
+        }
+      } else if (error.request) {
+        toast.error("No response from server. Please check your internet connection.");
+      } else {
+        toast.error(error.message || "Operation failed. Please try again.");
+      }
+      
+      setIsPaymentModalOpen(false);
+      onClose();
     }
   };
 
+
+
+
+
+
+
   if (loading) return <div className="text-center py-8">Loading...</div>;
-  if (error) return <div className="text-center py-8 text-red-500">Error: {error}</div>;
+  if (error)
+    return <div className="text-center py-8 text-red-500">Error: {error}</div>;
   if (!game) return <div className="text-center py-8">Game not found</div>;
 
   return (
@@ -155,7 +272,9 @@ const HandleRentals = () => {
       <Header />
       <div className="bg-primary py-4">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold text-white text-center">Rent the Game</h1>
+          <h1 className="text-4xl font-bold text-white text-center">
+            Rent the Game
+          </h1>
         </div>
       </div>
       <div className="container mx-auto px-4 py-8">
@@ -184,11 +303,15 @@ const HandleRentals = () => {
                 src={game.coverPhoto}
               />
               <div className="ml-4 flex-1">
-                <h3 className="text-2xl font-semibold mb-4">Terms and Conditions</h3>
+                <h3 className="text-2xl font-semibold mb-4">
+                  Terms and Conditions
+                </h3>
                 <ScrollShadow className="h-[350px]">
                   <ul className="list-disc pl-5 space-y-2">
                     {termsAndConditions.map((term, index) => (
-                      <li key={index} className="text-sm">{term}</li>
+                      <li key={index} className="text-sm">
+                        {term}
+                      </li>
                     ))}
                   </ul>
                 </ScrollShadow>
@@ -218,28 +341,48 @@ const HandleRentals = () => {
             ))}
           </div>
           <div>
-            <h3 className="text-2xl font-semibold mb-4">Select Rental Duration</h3>
+            <h3 className="text-2xl font-semibold mb-4">
+              Select Rental Duration
+            </h3>
             {rentalOptions.length > 0 ? (
               <>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                   {rentalOptions.map((option) => (
-                    <Card 
+                    <Card
                       key={option.time}
                       isPressable
                       isHoverable
                       onPress={() => handleRentalSelection(option)}
                       className={`
                         transition-all duration-300 ease-in-out
-                        ${selectedRental?.time === option.time 
-                          ? 'border-primary border-2 shadow-lg scale-105 bg-primary bg-opacity-20' 
-                          : 'border-gray-600 hover:border-gray-400'}
+                        ${
+                          selectedRental?.time === option.time
+                            ? "border-primary border-2 shadow-lg scale-105 bg-primary bg-opacity-20"
+                            : "border-gray-600 hover:border-gray-400"
+                        }
                       `}
                     >
                       <CardBody className="text-center">
-                        <p className={`text-lg font-bold ${selectedRental?.time === option.time ? 'text-primary' : ''}`}>
-                          {parseInt(option.time) >= 60 ? `${parseInt(option.time) / 60} hour${parseInt(option.time) > 60 ? 's' : ''}` : `${option.time} min`}
+                        <p
+                          className={`text-lg font-bold ${
+                            selectedRental?.time === option.time
+                              ? "text-primary"
+                              : ""
+                          }`}
+                        >
+                          {parseInt(option.time) >= 60
+                            ? `${parseInt(option.time) / 60} hour${
+                                parseInt(option.time) > 60 ? "s" : ""
+                              }`
+                            : `${option.time} min`}
                         </p>
-                        <p className={`text-sm ${selectedRental?.time === option.time ? 'text-primary' : ''}`}>
+                        <p
+                          className={`text-sm ${
+                            selectedRental?.time === option.time
+                              ? "text-primary"
+                              : ""
+                          }`}
+                        >
                           LKR {option.price}
                         </p>
                       </CardBody>
@@ -252,7 +395,7 @@ const HandleRentals = () => {
                   className="w-full"
                   disabled={!selectedRental}
                 >
-                  Rent Now for LKR {selectedRental?.price || ''}
+                  Rent Now for LKR {selectedRental?.price || ""}
                 </Button>
               </>
             ) : (
@@ -261,23 +404,91 @@ const HandleRentals = () => {
                   This game is not available for rent at the moment.
                 </p>
                 <p className="text-sm text-gray-400 mt-2">
-                  Please check back later or contact support for more information.
+                  Please check back later or contact support for more
+                  information.
                 </p>
               </div>
             )}
           </div>
         </div>
       </div>
-      <Modal isOpen={isOpen} onClose={onClose}>
+      
+      {/* Rental Confirmation Modal */}
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        classNames={{
+          body: "text-white",
+          header: "text-white",
+          footer: "text-white",
+          base: "bg-gray-800",
+        }}
+      >
         <ModalContent>
-          <ModalHeader>Confirm Rental</ModalHeader>
+          <ModalHeader className="text-white">Confirm Rental</ModalHeader>
           <ModalBody>
-            <p>You are about to rent {game.title} for {parseInt(selectedRental?.time) >= 60 ? `${parseInt(selectedRental?.time) / 60} hour${parseInt(selectedRental?.time) > 60 ? 's' : ''}` : `${selectedRental?.time} min`}.</p>
+            <p>
+              You are about to buy {selectedRental?.time || 10} minutes of
+              playtime for {game?.title || "League of Legends"}.
+            </p>
             <p>Price: LKR {selectedRental?.price}</p>
             <p>Please confirm to proceed with the payment.</p>
           </ModalBody>
           <ModalFooter>
             <Button color="danger" variant="light" onPress={onClose}>
+              Cancel
+            </Button>
+            <Button color="primary" onPress={() => {
+              onClose();
+              setIsPaymentModalOpen(true);
+            }}>
+              Proceed to Payment
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+  
+      {/* Payment Modal */}
+      <Modal
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        classNames={{
+          body: "text-white",
+          header: "text-white",
+          footer: "text-white",
+          base: "bg-gray-800",
+        }}
+      >
+        <ModalContent>
+          <ModalHeader className="text-white">Enter Payment Details</ModalHeader>
+          <ModalBody>
+            <Input
+              name="cardNumber"
+              label="Card Number"
+              placeholder="1234 5678 9012 3456"
+              value={cardDetails.cardNumber}
+              onChange={handleCardInputChange}
+              error={cardErrors.cardNumber}
+            />
+            <Input
+              name="cvv"
+              label="CVV"
+              placeholder="123"
+              value={cardDetails.cvv}
+              onChange={handleCardInputChange}
+              error={cardErrors.cvv}
+            />
+            <Input
+              name="expiryDate"
+              label="Expiry Date"
+              placeholder="MM/YY"
+              value={cardDetails.expiryDate}
+              onChange={handleCardInputChange}
+              error={cardErrors.expiryDate}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button color="danger" variant="light" onPress={() => setIsPaymentModalOpen(false)}>
               Cancel
             </Button>
             <Button color="primary" onPress={handlePayment}>
@@ -286,6 +497,7 @@ const HandleRentals = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
+  
       <Footer />
     </div>
   );

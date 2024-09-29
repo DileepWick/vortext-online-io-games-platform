@@ -1,4 +1,5 @@
 import { ContactUsSchema } from "../models/contact_us_model.js";
+import { Notification } from "../models/notification_model.js";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config.js";
@@ -55,7 +56,7 @@ export const submitContactForm = async (req, res) => {
       userId,
       username,
       email,
-      message,
+      messages: [{ sender: "user", content: message }],
     });
 
     const createdContact = await newContact.save();
@@ -74,9 +75,91 @@ export const submitContactForm = async (req, res) => {
   }
 };
 
+export const replyToAgent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { message, sender } = req.body; // Add sender to the request body
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid Contact ID" });
+    }
+
+    const contact = await ContactUsSchema.findById(id);
+
+    if (!contact) {
+      return res.status(404).json({ message: "Contact not found" });
+    }
+
+    contact.messages.push({ sender, content: message });
+    contact.updatedAt = new Date();
+    await contact.save();
+
+    // Create a notification only if the sender is an agent
+    if (sender === "agent") {
+      const notification = new Notification({
+        userId: contact.userId,
+        type: "contact_reply",
+        content: "You have received a reply to your contact message",
+        contactId: contact._id,
+      });
+      await notification.save();
+    }
+
+    res.status(200).json({
+      message: "Reply sent successfully",
+      contact: contact,
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "An error occurred", error: error.message });
+  }
+};
+
+export const replyToContact = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { message } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid Contact ID" });
+    }
+
+    const contact = await ContactUsSchema.findById(id);
+
+    if (!contact) {
+      return res.status(404).json({ message: "Contact not found" });
+    }
+
+    contact.messages.push({ sender: "agent", content: message });
+    contact.updatedAt = new Date();
+    await contact.save();
+
+    // Create a notification for the user
+    const notification = new Notification({
+      userId: contact.userId,
+      type: "contact_reply",
+      content: "You have received a reply to your contact message",
+      contactId: contact._id,
+    });
+    await notification.save();
+
+    res.status(200).json({
+      message: "Reply sent successfully",
+      contact: contact,
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "An error occurred", error: error.message });
+  }
+};
+
 export const getAllContacts = async (req, res) => {
   try {
-    const allContacts = await ContactUsSchema.find();
+    const allContacts = await ContactUsSchema.find().sort({ updatedAt: -1 });
     return res.status(200).json({
       allContacts,
     });
@@ -85,6 +168,32 @@ export const getAllContacts = async (req, res) => {
     return res.status(500).json({
       message: "Server error",
     });
+  }
+};
+
+export const fetchContactByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log("Received userId:", userId);
+
+    // Validate userId format
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid User ID" });
+    }
+
+    // Correct usage of ObjectId with 'new'
+    const contact = await ContactUsSchema.findOne({
+      userId: new mongoose.Types.ObjectId(userId),
+    });
+
+    if (!contact) {
+      return res.status(404).json({ message: "Contact not found" });
+    }
+
+    res.status(200).json({ contact });
+  } catch (error) {
+    console.error("Error fetching contact by userId:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -109,10 +218,46 @@ export const getContactById = async (req, res) => {
   }
 };
 
+export const setStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    // Validate the status - allow only "closed"
+    if (status !== "closed") {
+      return res
+        .status(400)
+        .json({ message: "Invalid status. Only 'closed' is allowed." });
+    }
+
+    // Check if the provided ID is valid
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid Message ID" });
+    }
+
+    // Update the status to 'closed' and the updatedAt field
+    const updateContactStatus = await ContactUsSchema.findByIdAndUpdate(
+      id,
+      { status: "closed", updatedAt: new Date() }, // Force status to 'closed'
+      { new: true }
+    );
+
+    // If no document is found with the given ID
+    if (!updateContactStatus) {
+      return res.status(404).json({ message: "Message not found!" });
+    }
+
+    // Return the updated document
+    res.status(200).json({ updateContactStatus });
+  } catch (error) {
+    res.status(500).json({ message: "An error occurred", error });
+  }
+};
+
 export const updateContact = async (req, res) => {
   try {
     const { id } = req.params;
-    const { username, email, message } = req.body;
+    const { status } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid Contact ID" });
@@ -120,7 +265,7 @@ export const updateContact = async (req, res) => {
 
     const updatedContact = await ContactUsSchema.findByIdAndUpdate(
       id,
-      { username, email, message },
+      { status, updatedAt: new Date() },
       { new: true }
     );
 

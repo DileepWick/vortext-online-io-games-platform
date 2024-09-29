@@ -15,7 +15,7 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
-  Button
+  Button,
 } from "@nextui-org/react";
 import { SearchIcon } from "../src/assets/icons/SearchIcon";
 import { DeleteIcon } from "../src/assets/icons/DeleteIcon";
@@ -37,7 +37,9 @@ const RentedGamesSection = () => {
   const fetchRentedGames = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get(`http://localhost:8098/Rentals/getAllRentals`);
+      const response = await axios.get(
+        `http://localhost:8098/Rentals/getAllRentals`
+      );
       console.log("API response:", response.data);
       setRentedGames(response.data || []);
       setError("");
@@ -58,7 +60,9 @@ const RentedGamesSection = () => {
     if (window.confirm("Are you sure you want to delete this rented game?")) {
       setIsLoading(true);
       try {
-        await axios.delete(`http://localhost:8098/Rentals/deleteRentalByID/${id}`);
+        await axios.delete(
+          `http://localhost:8098/Rentals/deleteRentalByID/${id}`
+        );
         await fetchRentedGames();
         toast.success("Rented game deleted successfully", {
           theme: "dark",
@@ -80,14 +84,17 @@ const RentedGamesSection = () => {
   };
 
   const uniqueUsers = useMemo(() => {
-    const users = new Set(rentedGames.map(game => game.user?.username));
+    const users = new Set(rentedGames.map((game) => game.user?.username));
     return ["all", ...Array.from(users)];
   }, [rentedGames]);
 
   const filteredRentedGames = useMemo(() => {
     return rentedGames.filter((rentedGame) => {
-      const matchesSearch = rentedGame.game?.title?.toLowerCase().includes(rentedGamesSearchQuery.toLowerCase());
-      const matchesUser = selectedUser === "all" || rentedGame.user?.username === selectedUser;
+      const matchesSearch = rentedGame.game?.title
+        ?.toLowerCase()
+        .includes(rentedGamesSearchQuery.toLowerCase());
+      const matchesUser =
+        selectedUser === "all" || rentedGame.user?.username === selectedUser;
       return matchesSearch && matchesUser;
     });
   }, [rentedGames, rentedGamesSearchQuery, selectedUser]);
@@ -130,14 +137,11 @@ const RentedGamesSection = () => {
         />
         <Dropdown>
           <DropdownTrigger>
-            <Button 
-              variant="bordered" 
-              className="capitalize"
-            >
+            <Button variant="bordered" className="capitalize">
               {selectedUser === "all" ? "All Users" : selectedUser}
             </Button>
           </DropdownTrigger>
-          <DropdownMenu 
+          <DropdownMenu
             aria-label="Sort by user"
             variant="flat"
             disallowEmptySelection
@@ -146,7 +150,7 @@ const RentedGamesSection = () => {
             onSelectionChange={(keys) => handleUserSelect(Array.from(keys)[0])}
           >
             {uniqueUsers.map((user) => (
-              <DropdownItem key={user}>
+              <DropdownItem key={user} style={{ color: "black" }}>
                 {user === "all" ? "All Users" : user}
               </DropdownItem>
             ))}
@@ -194,12 +198,22 @@ const RentedGamesSection = () => {
           ) : (
             rentedGamesItems.map((rentedGame) => (
               <TableRow key={rentedGame._id}>
-                <TableCell>{rentedGame.game?.title || 'N/A'}</TableCell>
-                <TableCell>{rentedGame.user?.username || 'N/A'}</TableCell>
-                <TableCell>{rentedGame.time || 'N/A'}</TableCell>
-                <TableCell>${rentedGame.price || 'N/A'}</TableCell>
-                <TableCell>{new Date(rentedGame.insertDate).toLocaleString()}</TableCell>
-                <TableCell>
+                <TableCell style={{ color: "black" }}>
+                  {rentedGame.game?.title || "N/A"}
+                </TableCell>
+                <TableCell style={{ color: "black" }}>
+                  {rentedGame.user?.username || "N/A"}
+                </TableCell>
+                <TableCell style={{ color: "black" }}>
+                  {rentedGame.time || "N/A"} min
+                </TableCell>
+                <TableCell style={{ color: "black" }}>
+                  LKR {rentedGame.price || "N/A"}.00
+                </TableCell>
+                <TableCell style={{ color: "black" }}>
+                  {new Date(rentedGame.insertDate).toLocaleString()}
+                </TableCell>
+                <TableCell style={{ color: "black" }}>
                   <div className="flex items-center gap-4">
                     <Tooltip
                       content="Remove rented game"

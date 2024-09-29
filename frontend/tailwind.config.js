@@ -30,7 +30,15 @@ export default {
           '50%': { backgroundColor: 'red' },
           '100%': { backgroundColor: 'white' },
         },
-      }
+      },
+      theme: {
+        extend: {
+          textColor: {
+            DEFAULT: '#000', // Black text by default
+            dark: '#fff',    // White text in dark mode
+          },
+        },
+      },
     },
   },
   
