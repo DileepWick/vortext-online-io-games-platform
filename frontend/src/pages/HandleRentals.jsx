@@ -118,9 +118,47 @@ const HandleRentals = () => {
     );
   }, []);
 
-  const handleRentClick = useCallback(() => {
+  const handleRentClick = useCallback(async () => {
     if (selectedRental) {
-      onOpen();
+      try {
+        const token = getToken();
+        const userId = getUserIdFromToken(token);
+
+        if (!userId) {
+          throw new Error("User ID not found. Please log in again.");
+        }
+
+        // Check for existing rental
+        const checkResponse = await axios.get(
+          `http://localhost:8098/Rentals/checkExistingRental/${userId}/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (checkResponse.data.hasExistingRental) {
+          toast.warning(`You already have an existing rental for ${game.title}.`, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+            transition: Flip,
+            style: { fontFamily: "Rubik" },
+          });
+        } else {
+          // If no existing rental, proceed to open the confirmation modal
+          onOpen();
+        }
+      } catch (error) {
+        console.error("Error checking existing rental:", error);
+        toast.error("Failed to check existing rentals. Please try again.");
+      }
     } else {
       toast.warning("Please select a rental duration.", {
         position: "top-right",
@@ -135,7 +173,7 @@ const HandleRentals = () => {
         style: { fontFamily: "Rubik" },
       });
     }
-  }, [selectedRental, onOpen]);
+  }, [selectedRental, onOpen, id, game]);
 
 
 

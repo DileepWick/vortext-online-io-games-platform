@@ -52,6 +52,7 @@ import DeveloperDashboard from "../dashboards/usermanage_component/DeveloperDash
 import GameDeveloperDashboard from "../dashboards/gamedeveloperdashboard";
 
 import RentedGamesSection from "../dashboards/rentedGamesDash";
+import RentalPaymentsDash from "../dashboards/rentalPaymentsDashboard"
 
 const App = () => {
   return (
@@ -108,7 +109,7 @@ const App = () => {
       <Route path="/Transaction" element={<TransactionHistory />} />
       <Route path="/Snakegame" element={<Snake />} />
       <Route path="/PuzzlePlatformGame" element={<PuzzlePlatformGame />} />
-
+      <Route path="/RentalPayments" element={<RentalPaymentsDash />} />
     </Routes>
   );
 };

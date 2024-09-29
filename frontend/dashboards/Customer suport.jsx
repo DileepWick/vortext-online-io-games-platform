@@ -36,6 +36,7 @@ const ContactDash = () => {
   const [contactMessages, setContactMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [contact, setContact] = useState([]);
 
   //chat open
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -260,6 +261,67 @@ const ContactDash = () => {
         progressBarClassName: "bg-gray-800",
         style: { fontFamily: "Rubik" },
       });
+    }
+  };
+
+  const handleUpdateStatus = async (contactId) => {
+    try {
+      setLoading(true);
+
+      const response = await axios.put(
+        `http://localhost:8098/contacts/setStatus/${contactId}`,
+        {
+          status: "closed",
+        }
+      );
+
+      console.log(contactId);
+      console.log("Response Data:", response.data);
+
+      if (response.status >= 200 && response.status < 300) {
+        console.log("Status updated to closed:", response.data);
+
+        // Update the local state immediately
+        setContact((prevContact) => ({
+          ...prevContact,
+          status: "closed",
+        }));
+
+        // Show success toast after the status is updated
+        toast.success("Status updated to closed", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Flip,
+          progressBarClassName: "bg-gray-800",
+          style: { fontFamily: "Rubik" },
+        });
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
+      setError("Failed to update status");
+
+      // Show error toast in case of failure
+      toast.error("Failed to update status", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Flip,
+        progressBarClassName: "bg-gray-800",
+        style: { fontFamily: "Rubik" },
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -553,11 +615,22 @@ const ContactDash = () => {
                           </Button>
 
                           <Button
+                            color="success"
+                            className="mr-2"
                             onPress={() => {
                               handleChatOpen(contact._id);
                             }}
                           >
-                            Chat
+                            {contact.status === "closed" ? "View" : "Reply"}
+                          </Button>
+                          <Button
+                            color="primary"
+                            className="mr-2"
+                            onClick={() => handleUpdateStatus(contact._id)}
+                            isDisabled={contact.status === "closed"}
+                          >
+                            {console.log(contact.status)}
+                            {contact.status === "closed" ? "Closed" : "Close"}
                           </Button>
                         </TableCell>
                       </TableRow>

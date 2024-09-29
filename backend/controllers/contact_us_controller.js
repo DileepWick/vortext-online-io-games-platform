@@ -218,6 +218,42 @@ export const getContactById = async (req, res) => {
   }
 };
 
+export const setStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    // Validate the status - allow only "closed"
+    if (status !== "closed") {
+      return res
+        .status(400)
+        .json({ message: "Invalid status. Only 'closed' is allowed." });
+    }
+
+    // Check if the provided ID is valid
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid Message ID" });
+    }
+
+    // Update the status to 'closed' and the updatedAt field
+    const updateContactStatus = await ContactUsSchema.findByIdAndUpdate(
+      id,
+      { status: "closed", updatedAt: new Date() }, // Force status to 'closed'
+      { new: true }
+    );
+
+    // If no document is found with the given ID
+    if (!updateContactStatus) {
+      return res.status(404).json({ message: "Message not found!" });
+    }
+
+    // Return the updated document
+    res.status(200).json({ updateContactStatus });
+  } catch (error) {
+    res.status(500).json({ message: "An error occurred", error });
+  }
+};
+
 export const updateContact = async (req, res) => {
   try {
     const { id } = req.params;

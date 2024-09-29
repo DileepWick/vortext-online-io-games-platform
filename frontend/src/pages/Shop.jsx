@@ -164,8 +164,6 @@ const Shop = () => {
           Show Top Rated This week...
         </button>
 
-
-
         {filteredStocks.length === 0 ? (
           <p className="text-gray-400 text-center">No Games Found</p>
         ) : (
@@ -190,9 +188,14 @@ const Shop = () => {
                       <div className="relative">
                         <img
                           alt={stock.AssignedGame.title}
-                          className="w-full h-2/3 object-cover"
+                          style={{
+                            width: "250px",
+                            height: "350px",
+                            objectFit: "cover",
+                          }}
                           src={stock.AssignedGame.coverPhoto}
                         />
+
                         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity duration-300 hover:opacity-100">
                           <GameIcon />
                         </div>
@@ -214,12 +217,17 @@ const Shop = () => {
                               >
                                 -{stock.discount}% off
                               </Chip>
-                              <span className="line-through mr-1 text-editionColor">
+                              <span
+                                className="line-through mr-1 text-editionColor"
+                                style={{ fontSize: "15px" }}
+                              >
                                 LKR.{originalPrice}
                               </span>
                             </>
                           )}
-                          <span>LKR.{discountedPrice}</span>
+                          <span style={{ fontSize: "15px" }}>
+                            LKR.{discountedPrice}
+                          </span>
                         </p>
                         <div className="flex flex-wrap mb-1 text-white">
                           {stock.AssignedGame.Genre.flatMap((genre) =>

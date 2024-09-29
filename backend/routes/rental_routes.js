@@ -1,5 +1,5 @@
 import express from 'express';
-import { createRental, getRentals, getRentalsByUser, deleteRental, updateRental, updateRentalTime, getLatestRental } from '../controllers/rentals_controller.js';
+import { createRental, getRentals, getRentalsByUser, deleteRental, updateRental, updateRentalTime, getLatestRental, checkExistingRental, extendRentalTime } from '../controllers/rentals_controller.js';
 
 const RentalRouter = express.Router();
 
@@ -24,5 +24,12 @@ RentalRouter.put("/updateRentalTime/:id", updateRentalTime);
 
 //get latest rental
 RentalRouter.get("/getLatestRental/:userId/:gameId", getLatestRental);
+
+//check existing rental
+RentalRouter.get('/checkExistingRental/:userId/:gameId', checkExistingRental);
+
+
+//update rental time
+RentalRouter.put('/extendRentalTime/:userId/:gameId', extendRentalTime);
 
 export default RentalRouter;
