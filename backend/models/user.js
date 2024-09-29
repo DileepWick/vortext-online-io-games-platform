@@ -34,5 +34,5 @@ const UserSchema = new mongoose.Schema({
   
 });
 
-// No need for a pre-save hook, Mongoose will enforce conditions
+// No need for a pre-save hook, Mongoose will enforce condition
 export const User = mongoose.model('User', UserSchema);
