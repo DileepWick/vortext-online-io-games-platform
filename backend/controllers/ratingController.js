@@ -27,7 +27,7 @@ export const createRating = async (req, res) => {
 export const getRatings = async (req, res) => {
   try {
     const { gameId } = req.params;
-    const ratings = await Rating.find({ game: gameId }).populate('user', 'username');
+    const ratings = await Rating.find({ game: gameId }).populate('user');
     console.log(`Fetched ${ratings.length} ratings for game ${gameId}`);
     res.json(ratings);
   } catch (error) {

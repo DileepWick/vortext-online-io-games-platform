@@ -341,11 +341,10 @@ const GameDetails = () => {
   return (
     <div className="bg-customDark text-black min-h-screen font-primaryRegular">
       <Header />
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-customDark rounded-lg shadow-lg ">
-          <div className="flex flex-col md:flex-row items-start justify-start gap-4 bg-customDark scale-80">
+      <div className="container">
+        <div className="bg-customDark rounded-lg shadow-lg h-[800px]">
+          <div className="flex flex-col md:flex-row items-start justify-start gap-4 bg-customDark scale-90 m-8">
             <div className="flex flex-col">
-              <h1>Hello</h1>
               <VideoPlayer
                 videoUrl={gameStock.AssignedGame.TrailerVideo}
                 autoPlay
@@ -356,7 +355,10 @@ const GameDetails = () => {
               <h1 className="mt-8 text-editionColor text-5xl">
                 About the game
               </h1>
-              <p className="text-lg mt-4">
+              <p
+                className="text-lg mt-4"
+                style={{ fontSize: "24px", padding: "4px" }}
+              >
                 <ScrollShadow
                   hideScrollBar
                   className="w-[1000px] h-[200px] text-white"
@@ -375,11 +377,24 @@ const GameDetails = () => {
                   src={gameStock.AssignedGame.coverPhoto}
                 />
                 <CardBody>
-                  <h2 className="text-xl font-primaryRegular text-white mb-2">
+                  <h2
+                    className="text-xl font-primaryRegular text-white mb-2"
+                    style={{ fontSize: "20px" }}
+                  >
                     {gameStock.AssignedGame.title} <br />
                     {gameStock.discount > 0 && (
                       <>
+                        <Chip
+                          color="primary"
+                          radius="none"
+                          style={{ fontSize: "20px" }}
+                        >
+                          -{gameStock.discount}% off
+                        </Chip>
                         <div className="flex items-center mt-2">
+                          <span className="line-through mr-4 text-editionColor">
+                            LKR .{originalPrice.toFixed(2)}
+                          </span>
                           <span className="text-lg">
                             LKR .{discountedPrice.toFixed(2)}
                           </span>
@@ -393,16 +408,17 @@ const GameDetails = () => {
                     <Button
                       onClick={() => handleAddToCart(gameStock._id)}
                       color="primary"
-                      className="w-[300px] mt-2 h-[70px] text-lg"
-                      
+                      style={{ height: "50px", fontSize: "20px" }}
+                      className="w-[300px] mb-2"
+                      variant="solid"
                     >
                       Add to Cart
                     </Button>
                     <Button
                       onClick={() => handleRent(gameStock.AssignedGame._id)}
                       color="default"
-                      className="w-[300px] mt-2 h-[70px] text-lg"
-                      
+                      style={{ height: "50px", fontSize: "20px" }}
+                      className="w-[300px] mt-2 "
                     >
                       Rent Game
                     </Button>
@@ -413,8 +429,10 @@ const GameDetails = () => {
           </div>
         </div>
 
-        <div className="mt-8 scale-80">
-          <h2 className="text-3xl text-white mb-4 ">Ratings and Reviews</h2>
+        <div className="mt-4 m-8 scale-90">
+          <h2 className="mt-8 text-editionColor text-5xl">
+            Ratings and Reviews
+          </h2>
 
           {user.role === "Review Manager" ? (
             <RatingSystemEditing
