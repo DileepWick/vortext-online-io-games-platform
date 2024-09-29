@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "../src/components/header";
 import useAuthCheck from "../src/utils/authCheck";
+import { Link } from "react-router-dom";
 import {
   Tabs,
   Tab,
@@ -21,10 +22,12 @@ import {
   ModalBody,
   ModalFooter,
   Textarea,
+  Chip,
 } from "@nextui-org/react";
 import { Flip, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Footer from "../src/components/footer";
+import ChatModal from "../src/components/ChatModal";
 import { Helmet } from "react-helmet-async";
 
 const ContactDash = () => {
@@ -33,6 +36,20 @@ const ContactDash = () => {
   const [contactMessages, setContactMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  //chat open
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [selectedContactId, setSelectedContactId] = useState(null);
+
+  const handleChatOpen = (contactId) => {
+    setSelectedContactId(contactId);
+    setIsChatOpen(true);
+  };
+
+  const statusColorMap = {
+    open: "success",
+    closed: "danger",
+  };
 
   // FAQ state
   const {
@@ -50,14 +67,6 @@ const ContactDash = () => {
   const [editingFAQ, setEditingFAQ] = useState(null);
   const [editFAQQuestion, setEditFAQQuestion] = useState("");
   const [editFAQAnswer, setEditFAQAnswer] = useState("");
-
-  // Contact message state
-  const {
-    isOpen: isViewMessageOpen,
-    onOpen: onViewMessageOpen,
-    onOpenChange: onViewMessageOpenChange,
-  } = useDisclosure();
-  const [viewingMessage, setViewingMessage] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -92,15 +101,42 @@ const ContactDash = () => {
 
   // FAQ functions
   const handleAddFAQ = async () => {
+    // Check if either the question or answer fields are empty
+    if (!newFAQQuestion.trim() || !newFAQAnswer.trim()) {
+      // Show error toast when fields are empty
+      toast.error("Both Question and Answer fields are required", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Flip,
+        progressBarClassName: "bg-gray-800",
+        style: { fontFamily: "Rubik" },
+      });
+      return; // Stop the submission if the fields are empty
+    }
+
     try {
       const response = await axios.post("http://localhost:8098/faq/createFAQ", {
         question: newFAQQuestion,
         answer: newFAQAnswer,
       });
 
-      if (response.data && response.data.newFAQ) {
-        setFaqs((prevFaqs) => [...prevFaqs, response.data.newFAQ]);
-        toast.success("FAQ Added", {
+      console.log("Response:", response);
+
+      if (
+        response.status >= 200 &&
+        response.status < 300 &&
+        response.data.faq
+      ) {
+        setFaqs((prevFaqs) => [...prevFaqs, response.data.faq]);
+
+        // Show success toast
+        toast.success("FAQ added", {
           position: "top-right",
           autoClose: 2000,
           hideProgressBar: false,
@@ -114,12 +150,16 @@ const ContactDash = () => {
           style: { fontFamily: "Rubik" },
         });
       }
+
+      // Clear input fields and close modal
       setNewFAQQuestion("");
       setNewFAQAnswer("");
       onAddFAQOpenChange(false);
     } catch (error) {
       console.error("Error adding FAQ:", error);
       setError("Failed to add FAQ");
+
+      // Show error toast
       toast.error("Failed to add FAQ", {
         position: "top-right",
         autoClose: 2000,
@@ -137,6 +177,28 @@ const ContactDash = () => {
   };
 
   const handleUpdateFAQ = async () => {
+    // Check if the current question and answer are different from the original
+    if (
+      editFAQQuestion.trim() === editingFAQ.question.trim() &&
+      editFAQAnswer.trim() === editingFAQ.answer.trim()
+    ) {
+      // Show error toast when there are no changes
+      toast.error("No changes detected", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Flip,
+        progressBarClassName: "bg-gray-800",
+        style: { fontFamily: "Rubik" },
+      });
+      return; // Stop submission if no changes are made
+    }
+
     try {
       const response = await axios.put(
         `http://localhost:8098/faq/updateFAQ/${editingFAQ._id}`,
@@ -146,28 +208,36 @@ const ContactDash = () => {
         }
       );
 
-      if (response.data && response.data.updatedFAQ) {
-        setFaqs((prevFaqs) =>
-          prevFaqs.map((faq) =>
-            faq._id === response.data.updatedFAQ._id
-              ? response.data.updatedFAQ
-              : faq
-          )
-        );
-        toast.success("FAQ Updated", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-          transition: Flip,
-          progressBarClassName: "bg-gray-800",
-          style: { fontFamily: "Rubik" },
-        });
+      console.log("Response Data:", response.data);
+
+      if (response.status >= 200 && response.status < 300) {
+        console.log("Updated FAQ Data:", response.data);
+
+        if (response.data.faq) {
+          setFaqs((prevFaqs) =>
+            prevFaqs.map((faq) =>
+              faq._id === response.data.faq._id ? response.data.faq : faq
+            )
+          );
+
+          // Show success toast after FAQ is updated
+          toast.success("FAQ Updated", {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+            transition: Flip,
+            progressBarClassName: "bg-gray-800",
+            style: { fontFamily: "Rubik" },
+          });
+        }
       }
+
+      // Clear the input fields and reset the editing state
       setEditFAQQuestion("");
       setEditFAQAnswer("");
       setEditingFAQ(null);
@@ -175,6 +245,8 @@ const ContactDash = () => {
     } catch (error) {
       console.error("Error updating FAQ:", error);
       setError("Failed to update FAQ");
+
+      // Show error toast in case of failure
       toast.error("Failed to update FAQ", {
         position: "top-right",
         autoClose: 2000,
@@ -445,34 +517,47 @@ const ContactDash = () => {
                     <TableColumn>USERNAME</TableColumn>
                     <TableColumn>EMAIL</TableColumn>
                     <TableColumn>MESSAGE</TableColumn>
+                    <TableColumn>Status</TableColumn>
                     <TableColumn>ACTIONS</TableColumn>
                   </TableHeader>
                   <TableBody>
-                    {contactMessages.map((message) => (
-                      <TableRow key={message._id}>
-                        <TableCell>{message.username}</TableCell>
-                        <TableCell>{message.email}</TableCell>
+                    {contactMessages.map((contact) => (
+                      <TableRow key={contact._id}>
+                        <TableCell>{contact.username}</TableCell>
+                        <TableCell>{contact.email}</TableCell>
                         <TableCell>
-                          {message.message.length > 50
-                            ? `${message.message.substring(0, 50)}...`
-                            : message.message}
+                          {contact.messages[0]?.content.length > 50
+                            ? `${contact.messages[0].content.substring(
+                                0,
+                                50
+                              )}...`
+                            : contact.messages[0]?.content ||
+                              "No message content"}
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            color={statusColorMap[contact.status]}
+                            className="capitalize"
+                            variant="flat"
+                          >
+                            {contact.status}
+                          </Chip>
                         </TableCell>
                         <TableCell>
                           <Button
-                            color="primary"
-                            className="mr-2"
-                            onPress={() => {
-                              setViewingMessage(message);
-                              onViewMessageOpen();
-                            }}
-                          >
-                            View
-                          </Button>
-                          <Button
                             color="danger"
-                            onPress={() => handleDeleteMessage(message._id)}
+                            className="mr-2"
+                            onPress={() => handleDeleteMessage(contact._id)}
                           >
                             Delete
+                          </Button>
+
+                          <Button
+                            onPress={() => {
+                              handleChatOpen(contact._id);
+                            }}
+                          >
+                            Chat
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -480,38 +565,11 @@ const ContactDash = () => {
                   </TableBody>
                 </Table>
               )}
-              <Modal
-                isOpen={isViewMessageOpen}
-                onOpenChange={onViewMessageOpenChange}
-                className="dark text-foreground bg-background"
-              >
-                <ModalContent>
-                  {(onClose) => (
-                    <>
-                      <ModalHeader className="flex flex-col gap-1">
-                        View Message
-                      </ModalHeader>
-                      <ModalBody>
-                        <p>
-                          <strong>Username:</strong> {viewingMessage?.username}
-                        </p>
-                        <p>
-                          <strong>Email:</strong> {viewingMessage?.email}
-                        </p>
-                        <p>
-                          <strong>Message:</strong>
-                        </p>
-                        <p>{viewingMessage?.message}</p>
-                      </ModalBody>
-                      <ModalFooter>
-                        <Button color="primary" onPress={onClose}>
-                          Close
-                        </Button>
-                      </ModalFooter>
-                    </>
-                  )}
-                </ModalContent>
-              </Modal>
+              <ChatModal
+                isOpen={isChatOpen}
+                onOpenChange={() => setIsChatOpen(false)}
+                contactId={selectedContactId}
+              />
             </div>
           )}
         </div>

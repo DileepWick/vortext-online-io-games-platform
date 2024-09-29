@@ -11,9 +11,18 @@ import {
   ScrollShadow,
 } from "@nextui-org/react";
 import { CheckboxGroup, Checkbox } from "@nextui-org/checkbox";
-import { Label } from "recharts";
+import useAuthCheck from "../../src/utils/authCheck";
+import { getUserIdFromToken } from "../../src/utils/user_id_decoder";
+import { getToken } from "../../src/utils/getToken";
 
 const UploadGame = ({ FunctionToCallAfterUpload }) => {
+  // Authenticate user
+  useAuthCheck();
+
+  //Get the logged in developer
+  const token = getToken();
+  const userId = getUserIdFromToken(token);
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
@@ -61,7 +70,8 @@ const UploadGame = ({ FunctionToCallAfterUpload }) => {
     formData.append("video", video);
     formData.append("Genre", selectedCategories);
     formData.append("AgeGroup", ageGroup);
-    formData.append("PlayLink", playLink); // Add PlayLink to formData
+    formData.append("PlayLink", playLink);
+    formData.append("developer",userId);
 
     try {
       const response = await axios.post(
@@ -113,7 +123,7 @@ const UploadGame = ({ FunctionToCallAfterUpload }) => {
         />
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
-          <ScrollShadow className="w-[480px] h-[400px]" >
+          <ScrollShadow className="w-[480px] h-[400px]">
             <div>
               <Input
                 label="Enter Game Title"
@@ -166,7 +176,7 @@ const UploadGame = ({ FunctionToCallAfterUpload }) => {
               />
             </div>
             <div className="mb-8">
-            <label>Upload Trailer Video</label>
+              <label>Upload Trailer Video</label>
               <input
                 label="Trailer Video"
                 labelPlacement="outside-left"
@@ -183,11 +193,14 @@ const UploadGame = ({ FunctionToCallAfterUpload }) => {
                 value={ageGroup}
                 onChange={setAgeGroup}
                 required
-                className="mb-4 w-[300px]"
-                
+                className="mb-4 w-[300px] text-black"
               >
                 {ageGroups.map((group) => (
-                  <SelectItem key={group.value} value={group.value} className="font-primaryRegular">
+                  <SelectItem
+                    key={group.value}
+                    value={group.value}
+                    className="font-primaryRegular text-black"
+                  >
                     {group.label}
                   </SelectItem>
                 ))}
@@ -201,16 +214,10 @@ const UploadGame = ({ FunctionToCallAfterUpload }) => {
                 onChange={(e) => setPlayLink(e.target.value)}
                 required
                 className="mb-4 w-[400px]"
-                
               />
             </div>
             <div>
-              <Button
-                type="submit"
-                
-                color="primary"
-                size="lg"
-              >
+              <Button type="submit" className="mb-8" color="primary" size="lg">
                 Upload Game
               </Button>
             </div>

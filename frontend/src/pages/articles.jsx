@@ -1,3 +1,4 @@
+//articles.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Header from "../components/header";
@@ -6,7 +7,9 @@ import { getToken } from "../utils/getToken";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { User } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
-import { FaHeart, FaRegHeart, FaTrash, FaComments } from "react-icons/fa";
+import { FaHeart, FaRegHeart, FaTrash, FaComments ,FaFlag, FaEdit} from "react-icons/fa";
+import { toast, Flip } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Articles = () => {
   const [heading, setHeading] = useState('');
@@ -22,6 +25,10 @@ const Articles = () => {
   const [deletingArticleId, setDeletingArticleId] = useState(null);
   const [deletingCommentId, setDeletingCommentId] = useState(null);
   const [expandedComments, setExpandedComments] = useState({});
+  const [reportingArticleId, setReportingArticleId] = useState(null);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editedCommentText, setEditedCommentText] = useState('');
+
 
   const token = getToken();
   const userId = getUserIdFromToken(token);
@@ -97,14 +104,22 @@ const Articles = () => {
       });
 
       if (response.status === 201) {
-        setSuccess('Article created successfully');
+        toast.success("Article created successfully", {
+          theme: "dark",
+          transition: Flip,
+          style: { fontFamily: "Rubik" },
+        });
         setHeading('');
         setArticleBody('');
         setImage(null);
         fetchArticles();
       }
     } catch (err) {
-      setError('Error creating article');
+      toast.error("Error creating article. Please try again.", {
+        theme: "dark",
+        transition: Flip,
+        style: { fontFamily: "Rubik" },
+      });
       console.error(err);
     }
   };
@@ -160,7 +175,11 @@ const Articles = () => {
                     ...article.comments,
                     {
                       ...response.data.comment,
-                      user: { _id: userId, name: user.name }
+                      user: { 
+                        _id: userId, 
+                        name: user.name,
+                        profilePic: user.profilePic  // Include the user's profile picture
+                      }
                     }
                   ]
                 }
@@ -218,6 +237,60 @@ const Articles = () => {
     }
   };
 
+  const handleReportArticle = async (articleId) => {
+    try {
+      setReportingArticleId(articleId);
+      await axios.post(`http://localhost:8098/articles/report/${articleId}`, { userId });
+      alert("Article reported successfully");
+      setReportingArticleId(null);
+    } catch (err) {
+      setReportingArticleId(null);
+      console.error("Error reporting article", err);
+      alert("Failed to report article. Please try again.");
+    }
+  };
+
+  const handleEditComment = async (articleId, commentId, newText) => {
+    try {
+      const response = await axios.put(`http://localhost:8098/articles/editComment/${articleId}/${commentId}`, {
+        userId,
+        text: newText
+      });
+
+      if (response.status === 200) {
+        setArticles(prevArticles =>
+          prevArticles.map(article =>
+            article._id === articleId
+              ? {
+                  ...article,
+                  comments: article.comments.map(comment =>
+                    comment._id === commentId
+                      ? { ...comment, text: newText, editedAt: new Date() }
+                      : comment
+                  )
+                }
+              : article
+          )
+        );
+        setEditingCommentId(null);
+        setEditedCommentText('');
+        toast.success("Comment updated successfully", {
+          theme: "dark",
+          transition: Flip,
+          style: { fontFamily: "Rubik" },
+        });
+      }
+    } catch (err) {
+      console.error("Error editing comment", err);
+      toast.error("Failed to edit comment. Please try again.", {
+        theme: "dark",
+        transition: Flip,
+        style: { fontFamily: "Rubik" },
+      });
+    }
+  };
+
+
   const toggleComments = (articleId) => {
     setExpandedComments(prev => ({
       ...prev,
@@ -236,6 +309,7 @@ const Articles = () => {
   return (
     <div className="bg-customDark min-h-screen text-white font-sans">
       <Header />
+      
       <div className="container mx-auto p-4">
         <div className="max-w-lg mx-auto bg-gray-800 rounded-lg shadow-md p-4 mb-6">
           <h2 className="text-2xl font-bold mb-4">Create Post</h2>
@@ -306,6 +380,20 @@ const Articles = () => {
                   </button>
                 )}
 
+              {article.uploader._id !== userId && (
+                  <button
+                    className="absolute top-2 right-2 text-yellow-500 hover:text-yellow-400"
+                    onClick={() => handleReportArticle(article._id)}
+                    disabled={reportingArticleId === article._id}
+                  >
+                    {reportingArticleId === article._id ? (
+                      <span className="text-sm">Reporting...</span>
+                    ) : (
+                      <FaFlag size={16} />
+                    )}
+                  </button>
+                )}
+
                 <div className="flex mb-4">
                   <div className="flex-shrink-0 w-1/3 pr-4">
                     <img
@@ -318,7 +406,7 @@ const Articles = () => {
                     <h3 className="text-xl font-semibold mb-2">{article.heading}</h3>
                     <p className="text-gray-400">{article.articleBody}</p>
                     <p className="text-sm text-gray-500 mt-2">
-                      Posted by: {article.uploader.name}
+                      Posted by: {article.uploader.username}
                     </p>
                   </div>
                 </div>
@@ -363,9 +451,9 @@ const Articles = () => {
                     </form>
 
                     <div className="mt-4">
-                      {article.comments.map((comment) => (
+                    {article.comments.map((comment) => (
                         <div key={comment._id} className="bg-gray-900 p-2 rounded-lg mb-2 flex justify-between items-start">
-                          <div>
+                          <div className="w-full">
                             <div className="flex items-center mb-1">
                               {comment.user && (
                                 <User
@@ -381,19 +469,58 @@ const Articles = () => {
                                 {new Date(comment.createdAt).toLocaleString()}
                               </p>
                             </div>
-                            <p className="text-sm">{comment.text}</p>
+                            {editingCommentId === comment._id ? (
+                              <form onSubmit={(e) => { e.preventDefault(); handleEditComment(article._id, comment._id, editedCommentText); }}>
+                                <textarea
+                                  value={editedCommentText}
+                                  onChange={(e) => setEditedCommentText(e.target.value)}
+                                  className="w-full border-none bg-gray-700 text-white rounded-lg p-2 mb-2"
+                                  rows="2"
+                                ></textarea>
+                                <div>
+                                  <button
+                                    type="submit"
+                                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded mr-2"
+                                  >
+                                    Save
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => { setEditingCommentId(null); setEditedCommentText(''); }}
+                                    className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1 px-3 rounded"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              </form>
+                            ) : (
+                              <p className="text-sm">{comment.text}</p>
+                            )}
+                            {comment.editedAt && (
+                              <p className="text-xs text-gray-500 mt-1">
+                                (Edited: {new Date(comment.editedAt).toLocaleString()})
+                              </p>
+                            )}
                           </div>
                           {comment.user && comment.user._id === userId && (
-                            <button
-                              className="text-red-600 hover:text-red-400 text-xs ml-2"
-                              onClick={() => handleDeleteComment(article._id, comment._id)}
-                              disabled={deletingCommentId === comment._id}
-                            >
-                              {deletingCommentId === comment._id ? 'Deleting...' : <FaTrash />}
-                            </button>
+                            <div className="flex">
+                              <button
+                                className="text-blue-500 hover:text-blue-400 text-xs mr-2"
+                                onClick={() => { setEditingCommentId(comment._id); setEditedCommentText(comment.text); }}
+                              >
+                                <FaEdit />
+                              </button>
+                              <button
+                                className="text-red-600 hover:text-red-400 text-xs"
+                                onClick={() => handleDeleteComment(article._id, comment._id)}
+                                disabled={deletingCommentId === comment._id}
+                              >
+                                {deletingCommentId === comment._id ? 'Deleting...' : <FaTrash />}
+                              </button>
+                            </div>
                           )}
                         </div>
-                      ))}
+                      ))}                   
                     </div>
                   </div>
                 )}

@@ -14,6 +14,7 @@ import {
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate, useLocation } from "react-router-dom";
+import { NotificationIcon } from "../assets/icons/NotificationIcon.jsx";
 
 // Utils
 import { getUserIdFromToken } from "../utils/user_id_decoder";
@@ -88,18 +89,18 @@ export default function Header() {
                 location.pathname === "/articles" ? "underline" : ""
               } text-white hover:underline`}
             >
-              article
+              Article
             </Link>
           </NavbarItem>
           <NavbarItem>
             <Link
-              color={location.pathname === "/community" ? "primary" : "white"}
-              href="/community"
+              color={location.pathname === "/chat" ? "primary" : "white"}
+              href="/chat"
               className={`${
-                location.pathname === "/community" ? "underline" : ""
+                location.pathname === "/chat" ? "underline" : ""
               } text-white hover:underline`}
             >
-              Community
+              Chat
             </Link>
           </NavbarItem>
 
@@ -142,6 +143,32 @@ export default function Header() {
               </DropdownItem>
               <DropdownItem key="about" onClick={() => navigate("/about")}>
                 About Vortex
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+          <Dropdown placement="bottom-start">
+            <DropdownTrigger>
+              <NavbarItem className="cursor-pointer flex items-center">
+                <NotificationIcon style={{ marginRight: "8px" }} />
+                <span
+                  className={`${
+                    location.pathname === "/Notification" ? "underline" : ""
+                  } text-white hover:underline`}
+                >
+                  {" "}
+                </span>
+              </NavbarItem>
+            </DropdownTrigger>
+            <DropdownMenu
+              aria-label="Notification Actions"
+              variant="flat"
+              className="font-primaryRegular text-black"
+            >
+              <DropdownItem onClick={() => navigate("/Notification")}>
+                View All Notifications
+              </DropdownItem>
+              <DropdownItem onClick={() => navigate("/UserMessage")}>
+                View All Messages
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
@@ -191,6 +218,16 @@ export default function Header() {
                   My Cart
                 </DropdownItem>
 
+                {/* Developer Filter */}
+                {user.role === "developer" && (
+                  <DropdownItem
+                    key="developer-panel"
+                    onClick={() => navigate("/GamedeveloperDashboard")}
+                  >
+                    Developer Dashboard
+                  </DropdownItem>
+                )}
+
                 {/* Admin Filter */}
                 {user.role === "Product Manager" && (
                   <DropdownItem
@@ -207,7 +244,7 @@ export default function Header() {
                     key="Admin-panel"
                     onClick={() => navigate("/UserManagementDashboard")}
                   >
-                    User Managemnt
+                    User Management
                   </DropdownItem>
                 )}
 
@@ -241,7 +278,7 @@ export default function Header() {
                   </DropdownItem>
                 )}
 
-                {/* community Manager Filter */}
+                {/* Community Manager Filter */}
                 {user.role === "Community Manager" && (
                   <DropdownItem
                     key="community-panel"
@@ -251,7 +288,7 @@ export default function Header() {
                   </DropdownItem>
                 )}
 
-                {/*Review manager*/}
+                {/* Review Manager */}
                 {user.role === "Review Manager" && (
                   <DropdownItem
                     key="Review-panel"
@@ -301,9 +338,17 @@ export default function Header() {
               </DropdownMenu>
             </Dropdown>
           ) : (
-            <Link className="text-white" href="/login">
-              Login
-            </Link>
+            <>
+              {/* Normal Login Button */}
+              <Link className="text-white" href="/login">
+                Login
+              </Link>
+
+              {/* Developer Login Button */}
+              <Link className="text-white ml-4" href="/DeveloperLoginSignup">
+                Developer Login
+              </Link>
+            </>
           )}
         </NavbarContent>
       </Navbar>

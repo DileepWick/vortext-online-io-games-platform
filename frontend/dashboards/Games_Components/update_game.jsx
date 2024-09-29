@@ -111,7 +111,7 @@ const UpdateGame = ({ updatingGame, callBackFunction1, callBackFunction2 }) => {
           />
         </div>
       ) : (
-        <ScrollShadow className="w-[700px] h-[400px]" hideScrollBar>
+        <ScrollShadow className="w-[700px] h-[400px]" >
           <Chip color="primary" className="ml-4">{title}</Chip>
           <form
             onSubmit={handleUpdate}
