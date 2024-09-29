@@ -35,6 +35,7 @@ const GameDetails = () => {
   const [ratings, setRatings] = useState([]);
   const [averageRating, setAverageRating] = useState(0);
   const [user, setUser] = useState(null);
+
   const token = getToken();
   const userId = getUserIdFromToken(token);
 
@@ -289,6 +290,8 @@ const GameDetails = () => {
     setQuantityByStockId({ ...quantityByStockId, [stockId]: newQuantity });
   };
 
+
+  //Rating Update Function
   const handleRateUpdate = async (ratingId, rating, comment) => {
     try {
       const response = await axios.put(
@@ -445,9 +448,11 @@ const GameDetails = () => {
           ) : (
             <RatingSystem
               gameId={id}
+              userid={userId}
               ratings={ratings}
               averageRating={averageRating}
               onSubmitRating={handleRatingSubmit}
+              onUpdateRating={handleRateUpdate}
             />
           )}
         </div>
