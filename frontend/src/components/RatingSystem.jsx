@@ -130,7 +130,8 @@ const RatingSystem = ({ gameId,userid, ratings, averageRating, onSubmitRating ,o
               <div className="flex items-center mb-2" style={{fontSize:'20px'}}>
                 <span className=" text-gray-400">
                 <User
-                
+                isBordered 
+                color="primary"
                   className="cursor-pointer text-white"
                   name={rating.user.username}
                   description={rating.user.role}
