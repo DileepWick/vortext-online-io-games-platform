@@ -15,10 +15,18 @@ const userRouter = express.Router();
 // User Registration
 userRouter.post("/register", async (request, response) => {
   try {
-    const { firstname,lastname,username, password, email, birthday, role } = request.body;
+    const { firstname, lastname, username, password, email, birthday, role } =
+      request.body;
 
     // Validate input
-    if ( !firstname || !lastname || !username || !password || !email || !birthday) {
+    if (
+      !firstname ||
+      !lastname ||
+      !username ||
+      !password ||
+      !email ||
+      !birthday
+    ) {
       return response.status(400).json({ message: "All fields are required" });
     }
 
@@ -74,7 +82,17 @@ userRouter.post("/register", async (request, response) => {
     const cartCreation = await Cart.create(newCart);
 
     if (createdUser && cartCreation) {
-      return response.status(201).json({ message: "User created successfully." });
+      if (role === "Developer") {
+        return response
+          .status(201)
+          .json({
+            message: "Developer account created successfully.",
+          });
+      } else {
+        return response
+          .status(201)
+          .json({ message: "User account created successfully." });
+      }
     } else {
       return response.status(500).json({ message: "Failed to create account" });
     }
@@ -84,20 +102,83 @@ userRouter.post("/register", async (request, response) => {
   }
 });
 
+// Get all developers with pending status
+userRouter.get("/developers/requests", async (req, res) => {
+  try {
+    const pendingDevelopers = await User.find({ 
+      role: 'Developer', 
+      "developerAttributes.status": 'pending' 
+    });
+
+    if (!pendingDevelopers.length) {
+      return res.status(404).json({ message: "No pending developers found" });
+    }
+
+    res.status(200).json({ pendingDevelopers });
+  } catch (error) {
+    console.error("Error fetching pending developers:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+// Approve Developer
+userRouter.put("/developers/approve/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedDeveloper = await User.findByIdAndUpdate(
+      id,
+      { "developerAttributes.status": "approved" },
+      { new: true }
+    );
+
+    if (!updatedDeveloper) {
+      return res.status(404).json({ message: "Developer not found" });
+    }
+
+    res.status(200).json({ message: "Developer approved successfully" });
+  } catch (error) {
+    console.error("Error approving developer:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Reject Developer
+userRouter.put("/developers/reject/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedDeveloper = await User.findByIdAndUpdate(
+      id,
+      { "developerAttributes.status": "rejected" },
+      { new: true }
+    );
+
+    if (!updatedDeveloper) {
+      return res.status(404).json({ message: "Developer not found" });
+    }
+
+    res.status(200).json({ message: "Developer rejected successfully" });
+  } catch (error) {
+    console.error("Error rejecting developer:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
 // Helper function to calculate age from birthday
 function calculateAge(birthday) {
   const birthDate = new Date(birthday);
   const today = new Date();
   let age = today.getFullYear() - birthDate.getFullYear();
   const monthDifference = today.getMonth() - birthDate.getMonth();
-  
-  if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+
+  if (
+    monthDifference < 0 ||
+    (monthDifference === 0 && today.getDate() < birthDate.getDate())
+  ) {
     age--;
   }
 
   return age;
 }
-
 // Login route
 userRouter.post("/login", async (req, res) => {
   const { username, password } = req.body;
@@ -115,29 +196,72 @@ userRouter.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Invalid password" });
     }
 
-    // If credentials are correct, generate a JWT token
-    const payload = {
-      user: {
-        id: user.id,
-        username: user.username,
-        role: user.role,
-      },
-    };
+    // Check if the user is a developer
+    if (user.role === "developer") {
+      // Check the developer account status
+      const developerStatus = user.developerAttributes?.status;
 
-    jwt.sign(
-      payload,
-      JWT_SECRET,
-      { expiresIn: "1h" }, // Token expires in 1 hour
-      (err, token) => {
-        if (err) throw err;
-        res.json({ token });
+      // If the developer's account status is pending, reject login
+      if (developerStatus === "pending") {
+        return res.status(403).json({ 
+          message: "Your account is still pending approval. Please wait for confirmation." 
+        });
       }
-    );
+
+      // If the developer's account status is rejected, reject login
+      if (developerStatus === "rejected") {
+        return res.status(403).json({
+          message: "Your developer account has been rejected. Please contact support."
+        });
+      }
+
+      // If the developer's account status is approved, proceed with login
+      if (developerStatus === "approved") {
+        // Generate JWT token for an approved developer
+        const payload = {
+          user: {
+            id: user.id,
+            username: user.username,
+            role: user.role,
+          },
+        };
+
+        jwt.sign(
+          payload,
+          JWT_SECRET,
+          { expiresIn: "1h" }, // Token expires in 1 hour
+          (err, token) => {
+            if (err) throw err;
+            res.json({ token });
+          }
+        );
+      }
+    } else {
+      // Normal user login, proceed with generating JWT token
+      const payload = {
+        user: {
+          id: user.id,
+          username: user.username,
+          role: user.role,
+        },
+      };
+
+      jwt.sign(
+        payload,
+        JWT_SECRET,
+        { expiresIn: "1h" }, // Token expires in 1 hour
+        (err, token) => {
+          if (err) throw err;
+          res.json({ token });
+        }
+      );
+    }
   } catch (error) {
     console.error("Error in login:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
+
 
 // Get all users
 userRouter.get("/allusers", async (request, response) => {
@@ -151,6 +275,22 @@ userRouter.get("/allusers", async (request, response) => {
     console.log(error.message);
   }
 });
+
+// Get all developers
+userRouter.get("/allDevelopers", async (request, response) => {
+  try {
+    // Find users where the role is 'developer'
+    const allUsers = await User.find({ role: "developer" });
+    return response.status(200).json({
+      total_users: allUsers.length,
+      allUsers: allUsers,
+    });
+  } catch (error) {
+    console.log(error.message);
+    return response.status(500).json({ message: "Internal server error" }); // Return error response
+  }
+});
+
 
 // Get user profile
 userRouter.get("/profile/:id", async (request, response) => {
@@ -268,7 +408,9 @@ userRouter.put("/changeStatus/:id", async (request, response) => {
     );
 
     if (updatedUser.nModified === 0) {
-      return response.status(404).json({ message: "User not found or status unchanged" });
+      return response
+        .status(404)
+        .json({ message: "User not found or status unchanged" });
     }
 
     response.status(200).json({ message: "Status updated successfully" });

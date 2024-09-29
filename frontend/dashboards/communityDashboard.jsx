@@ -18,9 +18,62 @@ import {
   Pagination,
   Chip,
   Tooltip,
+  Card,
+  CardBody,
 } from "@nextui-org/react";
 import { SearchIcon } from "../src/assets/icons/SearchIcon";
 import { DeleteIcon } from "../src/assets/icons/DeleteIcon";
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip as ChartTooltip, Legend } from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, ChartTooltip, Legend);
+
+const CommunityPostsChart = ({ data }) => {
+  if (!data || data.length === 0) {
+    return <div>No data available for the chart</div>;
+  }
+
+  const chartData = {
+    labels: data.map(item => item.heading || 'Untitled Post'),
+    datasets: [
+      {
+        label: 'Likes',
+        data: data.map(item => item.likes || 0),
+        backgroundColor: 'rgba(53, 162, 235, 0.5)',
+      },
+      {
+        label: 'Reports',
+        data: data.map(item => item.reportedBy?.length || 0),
+        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Community Posts: Likes vs Reports',
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Count',
+        },
+      },
+    },
+  };
+
+  return <Bar data={chartData} options={options} style={{ height: '400px' }} />;
+};
 
 const CommunityDashboard = () => {
   const [articles, setArticles] = useState([]);
@@ -34,12 +87,9 @@ const CommunityDashboard = () => {
   const rowsPerPage = 5;
 
   useEffect(() => {
-    if (activeTab === "allArticles") {
-      fetchAllArticles();
-    } else if (activeTab === "reportedArticles") {
-      fetchReportedArticles();
-    }
-  }, [activeTab]);
+    fetchAllArticles();
+    fetchReportedArticles();
+  }, []);
 
   const fetchAllArticles = async () => {
     setIsLoading(true);
@@ -88,11 +138,8 @@ const CommunityDashboard = () => {
           transition: Flip,
           style: { fontFamily: "Rubik" },
         });
-        if (activeTab === "allArticles") {
-          fetchAllArticles();
-        } else {
-          fetchReportedArticles();
-        }
+        fetchAllArticles();
+        fetchReportedArticles();
       } catch (error) {
         console.error("Error deleting article:", error);
         toast.error("Failed to delete article. Please try again.", {
@@ -146,18 +193,17 @@ const CommunityDashboard = () => {
     setPage(1);
   };
 
-  // Columns definition
-  const columns = [
+  const columns = useMemo(() => [
     { key: "title", label: "TITLE" },
-    { key: "author", label: "AUTHOR" },
+    ...(activeTab === "allArticles" ? [{ key: "author", label: "AUTHOR" }] : []),
     { key: "likes", label: "LIKES" },
     { key: "comments", label: "COMMENTS" },
     ...(activeTab === "reportedArticles" ? [{ key: "reports", label: "REPORTS" }] : []),
     { key: "actions", label: "ACTIONS" },
-  ];
+  ], [activeTab]);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-black">
       <Header />
       <main className="flex-grow p-4">
         <div className="flex w-full flex-col">
@@ -172,87 +218,99 @@ const CommunityDashboard = () => {
             >
               <Tab key="allArticles" title="All Articles" />
               <Tab key="reportedArticles" title="Reported Articles" />
+              <Tab key="analytics" title="Analytics" />
             </Tabs>
           </div>
-          <div className="flex justify-between items-center mb-4">
-            <Input
-              className="w-64"
-              placeholder="Search by article title..."
-              startContent={<SearchIcon />}
-              value={searchQuery}
-              onChange={handleSearchChange}
-              onClear={handleClearSearch}
-            />
-          </div>
-          <Table
-            aria-label="Articles table"
-            bottomContent={
-              <div className="flex w-full justify-center">
-                <Pagination
-                  isCompact
-                  showControls
-                  showShadow
-                  color="primary"
-                  page={page}
-                  total={Math.ceil(filteredItems.length / rowsPerPage)}
-                  onChange={(page) => setPage(page)}
-                />
-              </div>
-            }
-            classNames={{
-              wrapper: "min-h-[222px]",
-            }}
-          >
-            <TableHeader columns={columns}>
-              {(column) => (
-                <TableColumn key={column.key}>{column.label}</TableColumn>
-              )}
-            </TableHeader>
-            <TableBody items={items}>
-              {(item) => (
-                <TableRow key={item._id}>
-                  {(columnKey) => (
-                    <TableCell>
-                      {columnKey === "title" && item.heading}
-                      {columnKey === "author" && item.uploader.username}
-                      {columnKey === "likes" && item.likes.length}
-                      {columnKey === "comments" && item.comments.length}
-                      {columnKey === "reports" && (
-                        <Chip color="danger" variant="flat">
-                          {item.reportedBy.length}
-                        </Chip>
-                      )}
-                      {columnKey === "actions" && (
-                        <div className="flex items-center gap-4">
-                          <Tooltip
-                            content="Delete article"
-                            color="danger"
-                            className="font-primaryRegular"
-                          >
-                            <span
-                              className="text-lg text-danger cursor-pointer active:opacity-50"
-                              onClick={() => handleDeleteArticle(item._id)}
+          {activeTab !== "analytics" && (
+            <div className="flex justify-between items-center mb-4">
+              <Input
+                className="w-64"
+                placeholder="Search by article title..."
+                startContent={<SearchIcon />}
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onClear={handleClearSearch}
+              />
+            </div>
+          )}
+          {activeTab === "analytics" ? (
+            <Card>
+              <CardBody>
+                <CommunityPostsChart data={articles} />
+              </CardBody>
+            </Card>
+          ) : (
+            <Table
+              className="text-black"
+              aria-label="Articles table"
+              bottomContent={
+                <div className="flex w-full justify-center">
+                  <Pagination
+                    isCompact
+                    showControls
+                    showShadow
+                    color="primary"
+                    page={page}
+                    total={Math.ceil(filteredItems.length / rowsPerPage)}
+                    onChange={(page) => setPage(page)}
+                  />
+                </div>
+              }
+              classNames={{
+                wrapper: "min-h-[222px]",
+              }}
+            >
+              <TableHeader columns={columns}>
+                {(column) => (
+                  <TableColumn key={column.key}>{column.label}</TableColumn>
+                )}
+              </TableHeader>
+              <TableBody items={items}>
+                {(item) => (
+                  <TableRow key={item._id}>
+                    {(columnKey) => (
+                      <TableCell>
+                        {columnKey === "title" && item.heading}
+                        {columnKey === "author" && activeTab === "allArticles" && (item.uploader?.name || item.uploader?.username)}
+                        {columnKey === "likes" && item.likes}
+                        {columnKey === "comments" && item.comments.length}
+                        {columnKey === "reports" && (
+                          <Chip color="danger" variant="flat">
+                            {item.reportedBy.length}
+                          </Chip>
+                        )}
+                        {columnKey === "actions" && (
+                          <div className="flex items-center gap-4">
+                            <Tooltip
+                              content="Delete article"
+                              color="danger"
+                              className="font-primaryRegular"
                             >
-                              <DeleteIcon />
-                            </span>
-                          </Tooltip>
-                          {activeTab === "reportedArticles" && (
-                            <Button
-                              size="sm"
-                              color="warning"
-                              onClick={() => handleDismissReport(item._id)}
-                            >
-                              Dismiss Report
-                            </Button>
-                          )}
-                        </div>
-                      )}
-                    </TableCell>
-                  )}
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                              <span
+                                className="text-lg text-danger cursor-pointer active:opacity-50"
+                                onClick={() => handleDeleteArticle(item._id)}
+                              >
+                                <DeleteIcon />
+                              </span>
+                            </Tooltip>
+                            {activeTab === "reportedArticles" && (
+                              <Button
+                                size="sm"
+                                color="warning"
+                                onClick={() => handleDismissReport(item._id)}
+                              >
+                                Dismiss Report
+                              </Button>
+                            )}
+                          </div>
+                        )}
+                      </TableCell>
+                    )}
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          )}
         </div>
       </main>
       <Footer />

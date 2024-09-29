@@ -1,0 +1,29 @@
+.app {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin-top: 50px;
+}
+
+.question-section {
+  margin-bottom: 20px;
+}
+
+.question-count {
+  font-size: 20px;
+}
+
+.question-text {
+  font-size: 24px;
+}
+
+.answer-section button {
+  width: 200px;
+  padding: 10px;
+  margin: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.score-section {
+  font-size: 24px;
+}

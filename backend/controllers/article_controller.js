@@ -332,3 +332,42 @@ export const dismissReport = async (req, res) => {
     res.status(500).json({ message: "Error dismissing report", error });
   }
 };
+
+// Edit a comment
+export const editComment = async (req, res) => {
+  try {
+    const { articleId, commentId } = req.params;
+    const { text, userId } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(articleId) || !mongoose.Types.ObjectId.isValid(commentId)) {
+      return res.status(400).json({ message: "Invalid article ID or comment ID" });
+    }
+
+    const article = await Article.findById(articleId);
+
+    if (!article) {
+      return res.status(404).json({ message: "Article not found" });
+    }
+
+    const comment = article.comments.id(commentId);
+
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    // Check if the user trying to edit is the original commenter
+    if (comment.user.toString() !== userId) {
+      return res.status(403).json({ message: "You are not authorized to edit this comment" });
+    }
+
+    comment.text = text;
+    comment.editedAt = Date.now();
+
+    await article.save();
+
+    res.status(200).json({ message: "Comment updated successfully", comment });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "An error occurred while editing the comment", error });
+  }
+};

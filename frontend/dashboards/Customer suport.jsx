@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "../src/components/header";
 import useAuthCheck from "../src/utils/authCheck";
+import { Link } from "react-router-dom";
 import {
   Tabs,
   Tab,
@@ -21,10 +22,12 @@ import {
   ModalBody,
   ModalFooter,
   Textarea,
+  Chip,
 } from "@nextui-org/react";
 import { Flip, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Footer from "../src/components/footer";
+import ChatModal from "../src/components/ChatModal";
 import { Helmet } from "react-helmet-async";
 
 const ContactDash = () => {
@@ -33,6 +36,20 @@ const ContactDash = () => {
   const [contactMessages, setContactMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  //chat open
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [selectedContactId, setSelectedContactId] = useState(null);
+
+  const handleChatOpen = (contactId) => {
+    setSelectedContactId(contactId);
+    setIsChatOpen(true);
+  };
+
+  const statusColorMap = {
+    open: "success",
+    closed: "danger",
+  };
 
   // FAQ state
   const {
@@ -50,14 +67,6 @@ const ContactDash = () => {
   const [editingFAQ, setEditingFAQ] = useState(null);
   const [editFAQQuestion, setEditFAQQuestion] = useState("");
   const [editFAQAnswer, setEditFAQAnswer] = useState("");
-
-  // Contact message state
-  const {
-    isOpen: isViewMessageOpen,
-    onOpen: onViewMessageOpen,
-    onOpenChange: onViewMessageOpenChange,
-  } = useDisclosure();
-  const [viewingMessage, setViewingMessage] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -508,34 +517,47 @@ const ContactDash = () => {
                     <TableColumn>USERNAME</TableColumn>
                     <TableColumn>EMAIL</TableColumn>
                     <TableColumn>MESSAGE</TableColumn>
+                    <TableColumn>Status</TableColumn>
                     <TableColumn>ACTIONS</TableColumn>
                   </TableHeader>
                   <TableBody>
-                    {contactMessages.map((message) => (
-                      <TableRow key={message._id}>
-                        <TableCell>{message.username}</TableCell>
-                        <TableCell>{message.email}</TableCell>
+                    {contactMessages.map((contact) => (
+                      <TableRow key={contact._id}>
+                        <TableCell>{contact.username}</TableCell>
+                        <TableCell>{contact.email}</TableCell>
                         <TableCell>
-                          {message.message.length > 50
-                            ? `${message.message.substring(0, 50)}...`
-                            : message.message}
+                          {contact.messages[0]?.content.length > 50
+                            ? `${contact.messages[0].content.substring(
+                                0,
+                                50
+                              )}...`
+                            : contact.messages[0]?.content ||
+                              "No message content"}
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            color={statusColorMap[contact.status]}
+                            className="capitalize"
+                            variant="flat"
+                          >
+                            {contact.status}
+                          </Chip>
                         </TableCell>
                         <TableCell>
                           <Button
-                            color="primary"
-                            className="mr-2"
-                            onPress={() => {
-                              setViewingMessage(message);
-                              onViewMessageOpen();
-                            }}
-                          >
-                            View
-                          </Button>
-                          <Button
                             color="danger"
-                            onPress={() => handleDeleteMessage(message._id)}
+                            className="mr-2"
+                            onPress={() => handleDeleteMessage(contact._id)}
                           >
                             Delete
+                          </Button>
+
+                          <Button
+                            onPress={() => {
+                              handleChatOpen(contact._id);
+                            }}
+                          >
+                            Chat
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -543,38 +565,11 @@ const ContactDash = () => {
                   </TableBody>
                 </Table>
               )}
-              <Modal
-                isOpen={isViewMessageOpen}
-                onOpenChange={onViewMessageOpenChange}
-                className="dark text-foreground bg-background"
-              >
-                <ModalContent>
-                  {(onClose) => (
-                    <>
-                      <ModalHeader className="flex flex-col gap-1">
-                        View Message
-                      </ModalHeader>
-                      <ModalBody>
-                        <p>
-                          <strong>Username:</strong> {viewingMessage?.username}
-                        </p>
-                        <p>
-                          <strong>Email:</strong> {viewingMessage?.email}
-                        </p>
-                        <p>
-                          <strong>Message:</strong>
-                        </p>
-                        <p>{viewingMessage?.message}</p>
-                      </ModalBody>
-                      <ModalFooter>
-                        <Button color="primary" onPress={onClose}>
-                          Close
-                        </Button>
-                      </ModalFooter>
-                    </>
-                  )}
-                </ModalContent>
-              </Modal>
+              <ChatModal
+                isOpen={isChatOpen}
+                onOpenChange={() => setIsChatOpen(false)}
+                contactId={selectedContactId}
+              />
             </div>
           )}
         </div>

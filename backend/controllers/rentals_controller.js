@@ -85,6 +85,30 @@ export const updateRental = async (req, res) => {
   }
 };
 
+export const updateRentalTime = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { remainingTime } = req.body;
+    console.log("Updating rental time:", { id, remainingTime });
+
+    const updatedRental = await Rental.findByIdAndUpdate(
+      id,
+      { time: remainingTime },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedRental) {
+      return res.status(404).json({ message: "Rental not found" });
+    }
+
+    console.log("Rental time updated successfully");
+    res.json(updatedRental);
+  } catch (error) {
+    console.error("Error in updateRentalTime:", error);
+    res.status(400).json({ message: error.message });
+  }
+};
+
 export const deleteRental = async (req, res) => {
   try {
     const { id } = req.params;
@@ -125,5 +149,28 @@ export const getRentalsByGame = async (req, res) => {
   } catch (error) {
     console.error("Error in getRentalsByGame:", error);
     res.status(400).json({ message: error.message });
+  }
+};
+
+export const getLatestRental = async (req, res) => {
+  try {
+    const { userId, gameId } = req.params;
+    console.log(`Fetching latest rental for user ${userId} and game ${gameId}`);
+
+    const latestRental = await Rental.findOne({ 
+      user: userId, 
+      game: gameId 
+    }).sort({ insertDate: -1 }).populate('game', 'title');
+
+    if (!latestRental) {
+      console.log('No rental found for this user and game');
+      return res.status(404).json({ message: 'No rental found for this user and game' });
+    }
+
+    console.log('Latest rental fetched successfully');
+    res.status(200).json(latestRental);
+  } catch (error) {
+    console.error("Error in getLatestRental:", error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };

@@ -10,7 +10,8 @@ import {
   reportArticle,
   getReportedArticles,
   dismissReport,
-  deleteComment
+  deleteComment,
+  editComment
 } from "../controllers/article_controller.js";
 import upload from "../middleware/multer.js";
 
@@ -30,6 +31,6 @@ articleRouter.delete('/deleteComment/:articleId/:commentId', deleteComment);
 articleRouter.post("/report/:id", reportArticle);
 articleRouter.get("/reported", getReportedArticles);
 articleRouter.post("/dismissReport/:id", dismissReport);
-
+articleRouter.put('/editComment/:articleId/:commentId', editComment); // Add this new route
 
 export default articleRouter;
