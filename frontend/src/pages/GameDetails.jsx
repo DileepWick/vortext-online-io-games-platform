@@ -342,7 +342,7 @@ const GameDetails = () => {
     <div className="bg-customDark text-black min-h-screen font-primaryRegular">
       <Header />
       <div className="container">
-        <div className="bg-customDark rounded-lg shadow-lg h-[800px]">
+        <div className="bg-customDark rounded-lg shadow-lg h-[850px]">
           <div className="flex flex-col md:flex-row items-start justify-start gap-4 bg-customDark scale-90 m-8">
             <div className="flex flex-col">
               <VideoPlayer
