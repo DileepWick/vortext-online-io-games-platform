@@ -17,6 +17,7 @@ const ChatModal = ({ isOpen, onOpenChange, contactId }) => {
   const [createdAt, setCreatedAt] = useState("");
   const [replyMessage, setReplyMessage] = useState("");
   const messagesEndRef = useRef(null);
+  const [status, setStatus] = useState("open");
   const [replyingTo, setReplyingTo] = useState(null);
 
   useEffect(() => {
@@ -53,7 +54,7 @@ const ChatModal = ({ isOpen, onOpenChange, contactId }) => {
       if (formattedMessages.length !== messages.length) {
         setMessages(formattedMessages);
       }
-
+      setStatus(data.contact.status);
       setUserName(data.contact.username);
       setCreatedAt(data.contact.createdAt);
     } catch (error) {
@@ -112,6 +113,9 @@ const ChatModal = ({ isOpen, onOpenChange, contactId }) => {
               <div className="text-small mb-21">
                 Raised at {new Date(createdAt).toLocaleString()}
               </div>
+              <div className="text-small mb-21">
+                Status: {status.charAt(0).toUpperCase() + status.slice(1)}
+              </div>
             </ModalHeader>
             <Divider className="my-4" />
             <ModalBody className="flex flex-col">
@@ -154,6 +158,7 @@ const ChatModal = ({ isOpen, onOpenChange, contactId }) => {
                   value={replyMessage}
                   onChange={(e) => setReplyMessage(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleReply()}
+                  isDisabled={status === "closed"}
                 />
               </div>
             </ModalBody>
@@ -161,7 +166,11 @@ const ChatModal = ({ isOpen, onOpenChange, contactId }) => {
               <Button color="danger" variant="light" onPress={onClose}>
                 Close
               </Button>
-              <Button color="primary" onPress={handleReply}>
+              <Button
+                color="primary"
+                onPress={handleReply}
+                isDisabled={status === "closed" || !replyMessage.trim()}
+              >
                 Send
               </Button>
             </ModalFooter>
