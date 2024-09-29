@@ -99,6 +99,7 @@ const AllPayments = () => {
       >
         <TableHeader>
           <TableColumn key="GAME">GAME</TableColumn>
+          <TableColumn key="GAME">DEVELOPER</TableColumn>
           <TableColumn key="RETAILPRICE">RETAIL PRICE</TableColumn>
           <TableColumn key="DISCOUNT">DISCOUNT</TableColumn>
           <TableColumn key="RETAILPRICE">SALE PRICE</TableColumn>
@@ -106,11 +107,20 @@ const AllPayments = () => {
           <TableColumn key="CUSTOMER">CUSTOMER</TableColumn>
           <TableColumn key="CUSTOMER">Actions</TableColumn>
         </TableHeader>
-        <TableBody>
+        <TableBody className="text-black">
           {items.map((item) => (
-            <TableRow key={item._id}>
+            <TableRow key={item._id} className="text-black">
               <TableCell>
                 {item.stockid?.AssignedGame?.title || "N/A"}
+              </TableCell>
+              <TableCell>
+                <User
+                  name={item.order?.user?.username || "N/A"}
+                  description={item.order?.user?.email || "N/A"}
+                  avatarProps={{
+                    src: item.order?.user?.profilePic,
+                  }}
+                />
               </TableCell>
               <TableCell>Rs.{item.stockid?.UnitPrice || "N/A"}</TableCell>
               <TableCell>{item.stockid?.discount || "N/A"} %</TableCell>

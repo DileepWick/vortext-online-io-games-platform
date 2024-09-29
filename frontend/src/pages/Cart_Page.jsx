@@ -9,7 +9,6 @@ import { DeleteIcon } from "../assets/icons/DeleteIcon";
 import { ScrollShadow } from "@nextui-org/react";
 import { toast, Flip } from "react-toastify";
 import { Helmet } from "react-helmet-async";
-// Next UI
 import {
   Modal,
   ModalContent,
@@ -20,14 +19,29 @@ import {
   useDisclosure,
   Image,
   Chip,
+  Input,
+  Checkbox,
+  Radio,
+  RadioGroup
 } from "@nextui-org/react";
-import { Input } from "@nextui-org/input";
+
+const CreditCardIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+    <line x1="1" y1="10" x2="23" y2="10"></line>
+  </svg>
+);
+
+const PayPalIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M7 14c-1.66 0-3-1.34-3-3 0-1.31.84-2.41 2-2.83V3.65C2.5 4.18 0 6.6 0 9.5c0 3.03 2.47 5.5 5.5 5.5h3.07c-.07-.32-.07-.66 0-1H7z"></path>
+    <path d="M17 9.5c0-2.9-2.5-5.32-5.5-5.85v4.52c1.16.42 2 1.52 2 2.83 0 1.66-1.34 3-3 3H7.07c.07.34.07.68 0 1H10.5c3.03 0 5.5-2.47 5.5-5.5z"></path>
+  </svg>
+);
 
 const CartPage = () => {
-  // Authenticate user
   useAuthCheck();
 
-  // Modal
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -35,50 +49,26 @@ const CartPage = () => {
   const [subtotal, setSubtotal] = useState(0);
   const [totalDiscountedTotal, setTotalDiscountedTotal] = useState(0);
 
-  // Payment form state
-  const [cardNumber, setCardNumber] = useState("");
-  const [expiryDate, setExpiryDate] = useState("");
-  const [cvv, setCvv] = useState("");
-  const [paymentAmount, setPaymentAmount] = useState(0); // This will be set dynamically
-  const [errors, setErrors] = useState({});
+  // Checkout state
+  const [paymentMethod, setPaymentMethod] = useState('creditCard');
+  const [cardNumber, setCardNumber] = useState('');
+  const [expirationDate, setExpirationDate] = useState('');
+  const [cvv, setCvv] = useState('');
+  const [savePaymentMethod, setSavePaymentMethod] = useState(false);
+  const [creatorCode, setCreatorCode] = useState('');
+  const [agreeToShare, setAgreeToShare] = useState(false);
+  const [paypalEmail, setPaypalEmail] = useState('');
 
-  const validateForm = () => {
-    const newErrors = {};
 
-    // Card Number validation
-    const cardNumberPattern = /^[0-9]{16}$/;
-    if (!cardNumberPattern.test(cardNumber)) {
-      newErrors.cardNumber = "Card Number must be 16 digits";
-    }
-
-    // Expiry Date validation
-    const expiryDatePattern = /^(0[1-9]|1[0-2])\/\d{2}$/; // MM/YY format
-    if (!expiryDatePattern.test(expiryDate)) {
-      newErrors.expiryDate = "Expiry Date must be in MM/YY format";
-    }
-
-    // CVV validation
-    const cvvPattern = /^[0-9]{3,4}$/; // 3 or 4 digits
-    if (!cvvPattern.test(cvv)) {
-      newErrors.cvv = "CVV must be 3 or 4 digits";
-    }
-
-    setErrors(newErrors);
-
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // Get CartItems
+  //Get cart items
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
         const token = getToken();
         const userId = getUserIdFromToken(token);
-
         const response = await axios.get(
           `http://localhost:8098/cartItems/getCartItemsByUserId/${userId}`
         );
-
         setCartItems(response.data.cartItems);
         calculateTotal(response.data.cartItems);
       } catch (err) {
@@ -91,7 +81,7 @@ const CartPage = () => {
     fetchCartItems();
   }, []);
 
-  // Calculate total, subtotal, and total of Discounted Totals
+   // Calculate total, subtotal, and total of Discounted Totals
   const calculateTotal = (items) => {
     let subTotal = 0;
     let totalDiscountedTotal = 0;
@@ -104,10 +94,9 @@ const CartPage = () => {
 
     setSubtotal(subTotal);
     setTotalDiscountedTotal(totalDiscountedTotal);
-    setPaymentAmount(subTotal); // Set payment amount to subtotal initially
   };
 
-  // Calculate discounted price
+   // Calculate discounted price
   const calculateDiscountedPrice = (item) => {
     const discount = item.stockid.discount || 0;
     return discount > 0
@@ -115,7 +104,7 @@ const CartPage = () => {
       : item.stockid.UnitPrice;
   };
 
-  // Handle Remove Item
+  //Handle Remove Items
   const handleRemoveItem = async (stockid) => {
     try {
       const response = await axios.delete(
@@ -134,46 +123,126 @@ const CartPage = () => {
     }
   };
 
-  // Handle Payment form submission
-  const handlePaymentSubmit = async (event) => {
-    event.preventDefault();
+  const handleCardNumberChange = (e) => {
+    const value = e.target.value.replace(/\D/g, '');
+    const formattedValue = value.replace(/(\d{4})(?=\d)/g, '$1-');
+    setCardNumber(formattedValue.slice(0, 19));
+  };
 
-    if (validateForm()) {
-      try {
-        const token = getToken();
-        const userId = getUserIdFromToken(token);
+  const handleExpirationDateChange = (e) => {
+    const value = e.target.value.replace(/\D/g, '');
+    if (value.length <= 2) {
+      setExpirationDate(value);
+    } else {
+      const month = value.slice(0, 2);
+      const year = value.slice(2, 4);
+      if (parseInt(month) > 12) {
+        setExpirationDate('12/' + year);
+      } else {
+        setExpirationDate(`${month}/${year}`);
+      }
+    }
+  };
 
-        // Order data
-        const orderData = {
-          paymentAmount: totalDiscountedTotal,
-        };
+  const handleCvvChange = (e) => {
+    const value = e.target.value.replace(/\D/g, '');
+    setCvv(value.slice(0, 3));
+  };
 
-        // Add new order
-        const response = await axios.post(
-          `http://localhost:8098/orders/create/${userId}`,
-          orderData
-        );
+  const validateForm = () => {
+    if (paymentMethod === 'creditCard') {
+      if (cardNumber.replace(/-/g, '').length !== 16) {
+        toast.error("Invalid card number");
+        return false;
+      }
+      if (expirationDate.length !== 5) {
+        toast.error("Invalid expiration date");
+        return false;
+      }
+      const [month, year] = expirationDate.split('/');
+      if (parseInt(month) < 1 || parseInt(month) > 12) {
+        toast.error("Invalid month in expiration date");
+        return false;
+      }
+      if (cvv.length !== 3) {
+        toast.error("Invalid CVV");
+        return false;
+      }
+    } else if (paymentMethod === 'paypal') {
+      if (!paypalEmail || !paypalEmail.includes('@')) {
+        toast.error("Invalid PayPal email");
+        return false;
+      }
+    }
+    return true;
+  };
 
-        const orderid = response.data._id; // Assuming the created order ID is returned in the response
+  const handlePlaceOrder = async () => {
+    if (!validateForm()) return;
+    if ((paymentMethod === 'creditCard' && (!cardNumber || !expirationDate || !cvv)) ||
+        (paymentMethod === 'paypal' && !paypalEmail)) {
+      toast.error("Please fill in your payment details before placing the order.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Flip,
+        style: { fontFamily: "Rubik" },
+      });
+      return;
+    }
 
-        // Create order items for each cart item
-        await Promise.all(
-          cartItems.map((item) => {
-            const orderItemData = {
-              order: orderid,
-              stockid: item.stockid._id,
-              price: item.stockid.UnitPrice,
-            };
-            return axios.post(
-              `http://localhost:8098/orderItems/`,
-              orderItemData
-            );
-          })
-        );
+    try {
+      const token = getToken();
+      const userId = getUserIdFromToken(token);
+      const orderData = {
+        userId,
+        paymentAmount: totalDiscountedTotal,
+        paymentMethod: paymentMethod,
+        paymentDetails: paymentMethod === 'creditCard' 
+          ? { cardNumber, expirationDate, cvv }
+          : { paypalEmail },
+        creatorCode,
+        agreeToShare,
+        items: cartItems.map(item => ({
+          gameId: item.stockid.AssignedGame._id,
+          quantity: 1,
+          price: item.stockid.UnitPrice
+        }))
+      };
 
-        // Clear cart and show success message
-        setCartItems([]);
-        toast.success("Game bought successfully ..Enjoy !", {
+      const response = await axios.post(
+        `http://localhost:8098/orders/create/${userId}`,
+        orderData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+
+      const orderid = response.data._id; // Assuming the created order ID is returned in the response
+
+      // Create order items for each cart item
+      await Promise.all(
+        cartItems.map((item) => {
+          const orderItemData = {
+            order: orderid,
+            stockid: item.stockid._id,
+            price: item.stockid.UnitPrice,
+          };
+          return axios.post(`http://localhost:8098/orderItems/`,
+            orderItemData
+          );
+        })
+      );
+
+      if (response.status === 200) {
+        toast.success("Order placed successfully!", {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -185,9 +254,24 @@ const CartPage = () => {
           transition: Flip,
           style: { fontFamily: "Rubik" },
         });
-      } catch (err) {
-        setError("Error placing order");
+        // Clear cart items and close modal
+        setCartItems([]);
+        onOpenChange(false);
       }
+    } catch (error) {
+      console.error("Error placing order:", error);
+      toast.error("Error placing order. Please try again.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Flip,
+        style: { fontFamily: "Rubik" },
+      });
     }
   };
 
@@ -222,9 +306,8 @@ const CartPage = () => {
           <ScrollShadow hideScrollBar className="w-full h-[500px]">
             <div className="flex flex-col">
               {cartItems.map((item) => {
-                // Check if the game information exists
                 const game = item.stockid.AssignedGame;
-                const gameExists = game && game._id; // Adjust this if your ID field name is different
+                const gameExists = game && game._id;
 
                 return (
                   <div
@@ -240,7 +323,7 @@ const CartPage = () => {
                             className="w-[180px] h-[220px]"
                             radius="none"
                             alt={game.title || "Game Cover"}
-                            src={game.coverPhoto || "default-image-url"} // Replace with a default image URL if needed
+                            src={game.coverPhoto || "default-image-url"}
                           />
                           <div className="flex flex-col m-4 p-4">
                             <h2 className="text-xl text-white">
@@ -301,9 +384,9 @@ const CartPage = () => {
           </ScrollShadow>
           <div className="mt-8 p-4 m-8 w-[30%] rounded-md bg-customCardDark h-[500px]">
             <h2 className="text-lg font-bold mb-4 text-white">Summary</h2>
-            <p className="text-sm mb-2 text-white">Total: LKR.{subtotal}</p>
+            <p className="text-sm mb-2 text-white">Total: LKR.{subtotal.toFixed(2)}</p>
             <p className="text-sm mb-2 text-white">
-              Discounted Total: LKR.{totalDiscountedTotal}
+              Discounted Total: LKR.{totalDiscountedTotal.toFixed(2)}
             </p>
             <Button
               onPress={onOpen}
@@ -319,70 +402,128 @@ const CartPage = () => {
             isOpen={isOpen}
             onOpenChange={onOpenChange}
             placement="center"
-            radius="none"
+            size="2xl"
+            scrollBehavior="inside"
           >
             <ModalContent>
               {(onClose) => (
                 <>
-                  <ModalHeader className="font-primaryBold">
-                    Checkout
-                  </ModalHeader>
-                  <form onSubmit={handlePaymentSubmit}>
-                    <ModalBody>
-                      <Input
-                        isClearable
-                        className="mt-2"
-                        label="Card Number"
-                        type="text"
-                        radius="none"
-                        placeholder="0000 0000 0000 0000"
-                        value={cardNumber}
-                        onValueChange={setCardNumber}
-                        validationState={
-                          errors.cardNumber ? "invalid" : "valid"
-                        }
-                        errorMessage={errors.cardNumber}
-                      />
-                      <div className="flex flex-row mt-4">
-                        <Input
-                          isClearable
-                          className="mr-4"
-                          label="Expiry Date"
-                          placeholder="MM/YY"
-                          radius="none"
-                          type="text"
-                          value={expiryDate}
-                          onValueChange={setExpiryDate}
-                          validationState={
-                            errors.expiryDate ? "invalid" : "valid"
-                          }
-                          errorMessage={errors.expiryDate}
-                        />
-                        <Input
-                          isClearable
-                          className="ml-4"
-                          label="CVV"
-                          placeholder="123"
-                          radius="none"
-                          type="text"
-                          value={cvv}
-                          onValueChange={setCvv}
-                          validationState={errors.cvv ? "invalid" : "valid"}
-                          errorMessage={errors.cvv}
-                        />
+                  <ModalHeader className="font-primaryBold text-black">Checkout</ModalHeader>
+                  <ModalBody>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="bg-customCardDark p-4 rounded-lg">
+                        <h2 className="text-lg font-semibold mb-2 text-black"> PAYMENT METHODS</h2>
+                        <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+                          <div className="border border-gray-700 p-4 rounded mb-4">
+                            <Radio value="creditCard">
+                              <div className="flex items-center">
+                                <CreditCardIcon />
+                                <span className="text-black ml-2 mr-4">Credit Card</span>
+                                <div className="flex space-x-2">
+                                  <img src="/path-to-visa-icon.png" alt="Visa" className="h-6" />
+                                  <img src="/path-to-mastercard-icon.png" alt="Mastercard" className="h-6" />
+                                  <img src="/path-to-amex-icon.png" alt="American Express" className="h-6" />
+                                  <img src="/path-to-discover-icon.png" alt="Discover" className="h-6" />
+                                </div>
+                              </div>
+                            </Radio>
+                            {paymentMethod === 'creditCard' && (
+                              <div className="mt-4">
+                                <Input
+                                  label="Card Number"
+                                  placeholder="1111-1111-1111-1111"
+                                  value={cardNumber}
+                                  onChange={handleCardNumberChange}
+                                  className="mb-2"
+                                />
+                                <div className="flex gap-4">
+                                  <Input
+                                    label="Expiration (MM/YY)"
+                                    placeholder="MM/YY"
+                                    value={expirationDate}
+                                    onChange={handleExpirationDateChange}
+                                  />
+                                  <Input
+                                    label="CVV"
+                                    placeholder="123"
+                                    value={cvv}
+                                    onChange={handleCvvChange}
+                                  />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                          <div className="border border-gray-700 p-4 rounded">
+                            <Radio value="paypal">
+                              <div className="flex items-center">
+                                <PayPalIcon />
+                                <span className="text-black ml-2">PayPal</span>
+                              </div>
+                            </Radio>
+                            {paymentMethod === 'paypal' && (
+                              <Input
+                                label="PayPal Email"
+                                placeholder="your@email.com"
+                                value={paypalEmail}
+                                onChange={(e) => setPaypalEmail(e.target.value)}
+                                className="mt-2"
+                              />
+                            )}
+                          </div>
+                        </RadioGroup>
+                        <Checkbox
+                          isSelected={savePaymentMethod}
+                          onValueChange={setSavePaymentMethod}
+                          className="mt-4"
+                        >
+                          Save this payment method for future purchases
+                        </Checkbox>
                       </div>
-                    </ModalBody>
-                    <ModalFooter>
-                      <Button
-                        color="primary"
-                        type="submit"
-                        radius="none"
-                        className="text-white"
+                    </div>
+                    <div className="mt-4 bg-customCardDark p-4 rounded-lg">
+                      <h2 className="text-lg font-semibold mb-4 text-black">ORDER SUMMARY</h2>
+                      {cartItems.map((item) => (
+                        <div key={item._id} className="flex mb-4">
+                          <img src={item.stockid.AssignedGame.coverPhoto} alt={item.stockid.AssignedGame.title} className="w-16 h-20 object-cover mr-4" />
+                          <div>
+                            <h3 className="font-semibold text-black">{item.stockid.AssignedGame.title}</h3>
+                            <p className="text-sm text-gray-400">{item.stockid.AssignedGame.developer}</p>
+                            <p className="text-black">${item.stockid.UnitPrice.toFixed(2)}</p>
+                          </div>
+                        </div>
+                      ))}
+                      <div className="border-t border-gray-700 pt-4 mt-4">
+                        <div className="flex justify-between text-black">
+                          <span>Total</span>
+                          <span>${totalDiscountedTotal.toFixed(2)}</span>
+                        </div>
+                        <div className="bg-yellow-900 text-yellow-200 p-2 rounded mt-2 text-sm">
+                          Earn ${(totalDiscountedTotal).toFixed(2)} in Rewards with this purchase.
+                        </div>
+                      </div>
+                    {/*}  <Input
+                        label="Enter creator code"
+                        value={creatorCode}
+                        onChange={(e) => setCreatorCode(e.target.value)}
+                        className="mt-4"
+                      />*/}
+                      <Checkbox
+                        isSelected={agreeToShare}
+                        onValueChange={setAgreeToShare}
+                        className="mt-4"
                       >
-                        Pay LKR. {paymentAmount}
-                      </Button>
-                    </ModalFooter>
-                  </form>
+                        Agree to share your email for marketing purposes
+                      </Checkbox>
+                    </div>
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button color="danger" variant="light" onPress={onClose}>
+                      Cancel
+                    </Button>
+                    <Button color="primary" onPress={handlePlaceOrder}>
+                      PLACE ORDER
+                    </Button>
+                  </ModalFooter>
                 </>
               )}
             </ModalContent>
