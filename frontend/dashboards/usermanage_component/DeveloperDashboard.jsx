@@ -118,9 +118,10 @@ const DeveloperDashboard = () => {
         onClear={() => handleSearchChange({ target: { value: "" } })}
       />
       <Table
+      className="text-black"
         isHeaderSticky
         aria-label="Developer Requests Table with Pagination"
-        className="font-primaryRegular"
+        
         bottomContent={
           <div className="flex w-full justify-center font-primaryRegular">
             <Pagination
@@ -137,7 +138,9 @@ const DeveloperDashboard = () => {
         }
       >
         <TableHeader>
+          <TableColumn>FLLNAME</TableColumn>
           <TableColumn>USERNAME</TableColumn>
+          <TableColumn>PORTOFOLIO LINK</TableColumn>
           <TableColumn>EMAIL</TableColumn>
           <TableColumn>STATUS</TableColumn>
           <TableColumn>ACTIONS</TableColumn>
@@ -146,7 +149,9 @@ const DeveloperDashboard = () => {
         <TableBody>
           {paginatedItems.map((developer) => (
             <TableRow key={developer._id}>
+              <TableCell>{developer.firstname + " " + developer.lastname}</TableCell>
               <TableCell>{developer.username}</TableCell>
+              <TableCell>{developer.portfolioLink}</TableCell>
               <TableCell>{developer.email}</TableCell>
               <TableCell>
                 <Chip

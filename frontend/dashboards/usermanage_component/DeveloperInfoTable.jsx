@@ -1,5 +1,6 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 import {
   Table,
   TableHeader,
@@ -8,105 +9,90 @@ import {
   TableRow,
   TableCell,
   Pagination,
-  Chip,
-  Input,
-  Link,
   Button,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Input,
 } from "@nextui-org/react";
-import { SearchIcon } from "../../src/assets/icons/SearchIcon";
 
 const DeveloperInfoTable = () => {
-  const [developers, setDevelopers] = useState([]);
+  const [approvedDevelopers, setApprovedDevelopers] = useState([]);
   const [page, setPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [updateId, setUpdateId] = useState(null); // ID of the developer to update
-  const [updateData, setUpdateData] = useState({ firstName: "", lastName: "", username: "", email: "" });
-  const rowsPerPage = 5;
-
-  // Fetch All Developers
-  const getAllDevelopers = async () => {
-    try {
-      const response = await axios.get("http://localhost:8098/developers/all");
-      console.log("Fetched all developers:", response.data.allDevelopers);
-      setDevelopers(response.data.allDevelopers);
-    } catch (error) {
-      console.error("Error fetching all developers:", error);
-    }
-  };
+  const [rowsPerPage] = useState(4);
+  const [selectedDeveloper, setSelectedDeveloper] = useState(null);
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
 
   useEffect(() => {
-    getAllDevelopers();
+    fetchApprovedDevelopers();
   }, []);
 
-  // Search filter for developers
-  const filteredDevelopers = useMemo(() => {
-    return developers.filter((dev) =>
-      dev.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      dev.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      dev.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      dev.email.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [developers, searchQuery]);
-
-  // Pagination logic
-  const items = useMemo(() => {
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    return filteredDevelopers.slice(start, end);
-  }, [page, filteredDevelopers]);
-
-  // Handle Search Input
-  const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
-    setPage(1); // Reset page to 1 when search query changes
-  };
-
-  // Handle Update Developer
-  const handleUpdate = async (id) => {
+  const fetchApprovedDevelopers = async () => {
     try {
-      const response = await axios.put(`http://localhost:8098/developers/${id}`, updateData);
-      console.log("Updated developer:", response.data);
-      setDevelopers((prev) =>
-        prev.map((dev) => (dev._id === id ? { ...dev, ...updateData } : dev))
+      const response = await axios.get(
+        "http://localhost:8098/users/approvedDevelopers"
       );
-      setUpdateId(null); // Clear update ID after update
-      setUpdateData({ firstName: "", lastName: "", username: "", email: "" }); // Clear update form
+      setApprovedDevelopers(response.data.approvedDevelopers);
     } catch (error) {
-      console.error("Error updating developer:", error);
+      console.error("Error fetching approved developers:", error);
+      toast.error("Failed to fetch approved developers. Please try again later.");
     }
   };
 
-  // Handle Delete Developer
-  const handleDelete = async (id) => {
-    const confirmation = window.confirm("Are you sure you want to delete this developer?");
-    if (confirmation) {
-      try {
-        await axios.delete(`http://localhost:8098/developers/${id}`);
-        setDevelopers((prevDevelopers) => prevDevelopers.filter((developer) => developer._id !== id));
-        alert("Developer deleted successfully.");
-      } catch (error) {
-        console.error("Error deleting developer:", error);
-        alert("Failed to delete developer. Please try again later.");
-      }
+  const paginatedItems = approvedDevelopers.slice(
+    (page - 1) * rowsPerPage,
+    page * rowsPerPage
+  );
+
+  const openEditModal = (developer) => {
+    setSelectedDeveloper(developer);
+    setEditModalOpen(true);
+  };
+
+  const handleUpdate = async () => {
+    try {
+      await axios.put(
+        `http://localhost:8098/users/developers/update/${selectedDeveloper._id}`,
+        selectedDeveloper
+      );
+      setEditModalOpen(false);
+      fetchApprovedDevelopers(); // Refresh the list
+      toast.success("Developer updated successfully");
+    } catch (error) {
+      console.error("Error updating developer:", error);
+      toast.error("Failed to update the developer. Please try again later.");
+    }
+  };
+
+  const openDeleteModal = (developer) => {
+    setSelectedDeveloper(developer);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`http://localhost:8098/users/developers/delete/${selectedDeveloper._id}`);
+      setDeleteModalOpen(false);
+      setApprovedDevelopers((prevDevelopers) =>
+        prevDevelopers.filter((dev) => dev._id !== selectedDeveloper._id)
+      );
+      toast.success("Developer deleted successfully");
+    } catch (error) {
+      console.error("Error deleting developer:", error);
+      toast.error("Failed to delete the developer. Please try again later.");
     }
   };
 
   return (
     <div>
-      <Input
-        className="ml-2 font-primaryRegular w-48 sm:w-64"
-        placeholder="Search by Developer..."
-        startContent={<SearchIcon />}
-        value={searchQuery}
-        onChange={handleSearchChange}
-        onClear={() => handleSearchChange({ target: { value: "" } })}
-      />
       <Table
-        isHeaderSticky
-        aria-label="All Developers Information Table"
+        aria-label="Approved Developers Table"
         className="font-primaryRegular"
         bottomContent={
-          <div className="flex w-full justify-center font-primaryRegular">
+          <div className="flex w-full justify-center">
             <Pagination
               isCompact
               loop
@@ -114,98 +100,45 @@ const DeveloperInfoTable = () => {
               showShadow
               color="primary"
               page={page}
-              total={Math.ceil(filteredDevelopers.length / rowsPerPage)}
+              total={Math.ceil(approvedDevelopers.length / rowsPerPage)}
               onChange={(page) => setPage(page)}
             />
           </div>
         }
       >
         <TableHeader>
-          <TableColumn>FIRST NAME</TableColumn>
-          <TableColumn>LAST NAME</TableColumn>
+          <TableColumn>FULL NAME</TableColumn>
           <TableColumn>USERNAME</TableColumn>
+          <TableColumn>PROFILE PICTURE</TableColumn>
+          <TableColumn>BIRTHDAY</TableColumn>
           <TableColumn>EMAIL</TableColumn>
-          <TableColumn>PORTFOLIO</TableColumn>
-          <TableColumn>STATUS</TableColumn>
           <TableColumn>ACTIONS</TableColumn>
         </TableHeader>
-        <TableBody>
-          {items.map((developer) => (
-            <TableRow key={developer._id}>
+
+        <TableBody className="text-black">
+          {paginatedItems.map((developer) => (
+            <TableRow key={developer._id} className="text-black">
+              <TableCell>{`${developer.firstname || ''} ${developer.lastname || ''}`}</TableCell>
+              <TableCell>{developer.username}</TableCell>
               <TableCell>
-                {updateId === developer._id ? (
-                  <Input
-                    value={updateData.firstName}
-                    onChange={(e) => setUpdateData({ ...updateData, firstName: e.target.value })}
-                    placeholder="First Name"
-                  />
-                ) : (
-                  developer.firstName
-                )}
+                <img src={developer.profilePic} alt="Profile" width="50" height="50" />
               </TableCell>
               <TableCell>
-                {updateId === developer._id ? (
-                  <Input
-                    value={updateData.lastName}
-                    onChange={(e) => setUpdateData({ ...updateData, lastName: e.target.value })}
-                    placeholder="Last Name"
-                  />
-                ) : (
-                  developer.lastName
-                )}
+                {new Date(developer.birthday).toLocaleDateString()}
               </TableCell>
+              <TableCell>{developer.email}</TableCell>
               <TableCell>
-                {updateId === developer._id ? (
-                  <Input
-                    value={updateData.username}
-                    onChange={(e) => setUpdateData({ ...updateData, username: e.target.value })}
-                    placeholder="Username"
-                  />
-                ) : (
-                  developer.username
-                )}
-              </TableCell>
-              <TableCell>
-                {updateId === developer._id ? (
-                  <Input
-                    value={updateData.email}
-                    onChange={(e) => setUpdateData({ ...updateData, email: e.target.value })}
-                    placeholder="Email"
-                  />
-                ) : (
-                  developer.email
-                )}
-              </TableCell>
-              <TableCell>
-                {developer.portfolioLinks.length > 0 ? (
-                  developer.portfolioLinks.map((link, index) => (
-                    <Link key={index} href={link} target="_blank" className="block text-blue-500 underline">
-                      {link}
-                    </Link>
-                  ))
-                ) : (
-                  "No Portfolio"
-                )}
-              </TableCell>
-              <TableCell>
-                <Chip
-                  color={developer.status === "approved" ? "success" : developer.status === "rejected" ? "error" : "default"}
-                  variant="flat"
+                <Button
+                  onClick={() => openEditModal(developer)}
+                  color="primary"
                 >
-                  {developer.status}
-                </Chip>
-              </TableCell>
-              <TableCell>
-                {updateId === developer._id ? (
-                  <Button onClick={() => handleUpdate(developer._id)} color="success">
-                    Save
-                  </Button>
-                ) : (
-                  <Button onClick={() => { setUpdateId(developer._id); setUpdateData({ firstName: developer.firstName, lastName: developer.lastName, username: developer.username, email: developer.email }); }}>
-                    Update
-                  </Button>
-                )}
-                <Button onClick={() => handleDelete(developer._id)} color="error">
+                  Update
+                </Button>
+                <Button
+                  onClick={() => openDeleteModal(developer)}
+                  color="danger"
+                  variant="ghost"
+                >
                   Delete
                 </Button>
               </TableCell>
@@ -213,6 +146,89 @@ const DeveloperInfoTable = () => {
           ))}
         </TableBody>
       </Table>
+
+      {/* Edit Modal */}
+      <Modal isOpen={isEditModalOpen} onClose={() => setEditModalOpen(false)}>
+        <ModalContent>
+          <ModalHeader>Edit Developer</ModalHeader>
+          <ModalBody>
+            <Input
+              fullWidth
+              label="Username"
+              value={selectedDeveloper?.username || ""}
+              onChange={(e) =>
+                setSelectedDeveloper({ ...selectedDeveloper, username: e.target.value })
+              }
+            />
+            <Input
+              fullWidth
+              label="Email"
+              value={selectedDeveloper?.email || ""}
+              onChange={(e) =>
+                setSelectedDeveloper({ ...selectedDeveloper, email: e.target.value })
+              }
+            />
+            <Input
+              fullWidth
+              label="First Name"
+              value={selectedDeveloper?.firstname || ""}
+              onChange={(e) =>
+                setSelectedDeveloper({ ...selectedDeveloper, firstname: e.target.value })
+              }
+            />
+            <Input
+              fullWidth
+              label="Last Name"
+              value={selectedDeveloper?.lastname || ""}
+              onChange={(e) =>
+                setSelectedDeveloper({ ...selectedDeveloper, lastname: e.target.value })
+              }
+            />
+            <Input
+              fullWidth
+              label="Birthday"
+              type="date"
+              value={selectedDeveloper?.birthday ? new Date(selectedDeveloper.birthday).toISOString().split('T')[0] : ""}
+              onChange={(e) =>
+                setSelectedDeveloper({ ...selectedDeveloper, birthday: e.target.value })
+              }
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button color="error" flat onClick={() => setEditModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button color="primary" onClick={handleUpdate}>
+              Save
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+      >
+        <ModalContent>
+          <ModalHeader>Delete Developer</ModalHeader>
+          <ModalBody>
+            Are you sure you want to delete {selectedDeveloper?.username}?
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              color="error"
+              flat
+              onClick={() => setDeleteModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button color="primary" onClick={handleDelete}>
+              Confirm
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

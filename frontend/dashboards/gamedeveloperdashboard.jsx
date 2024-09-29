@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import axios from "axios";
 
 // Components
-import developerHeader from "../src/components/developerHeader";
+import Header from "../src/components/header";
 import Footer from "../src/components/footer";
 
 // Next UI
@@ -121,7 +121,7 @@ const GameDeveloperDashboard = () => {
   return (
     <div className="flex w-full flex-col dark text-foreground bg-background">
       <div className="relative">
-        <DeveloperHeader />
+        <Header />
       </div>
       <div className="flex items-center p-4 font-primaryRegular bg-inputColor">
         <Tabs

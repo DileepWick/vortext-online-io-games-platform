@@ -344,10 +344,7 @@ export default function Header() {
                 Login
               </Link>
 
-              {/* Developer Login Button */}
-              <Link className="text-white ml-4" href="/DeveloperLoginSignup">
-                Developer Login
-              </Link>
+              
             </>
           )}
         </NavbarContent>
