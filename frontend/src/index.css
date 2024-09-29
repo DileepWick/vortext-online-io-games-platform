@@ -31,3 +31,13 @@
   .hide-scrollbar::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Opera */
   }
+
+.printBtn{
+  position: absolute;
+  top: 60px;
+  right: 0;
+  margin: 10px;
+  padding: 10px;
+  background-color: black;
+  z-index: 1000;
+}
