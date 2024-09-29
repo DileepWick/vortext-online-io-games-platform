@@ -17,7 +17,7 @@ import { getUserRoleFromToken } from "../utils/user_role_decoder"; // Role decod
 const Login = () => {
   const [selectedTab, setSelectedTab] = useState("login");
   const [selectedRole, setSelectedRole] = useState("User"); // New state for role selection
-  const [portfolioLinks, setPortfolioLinks] = useState([""]); // Initialize with one empty input
+  const [portfolioLink, setPortfolioLinks] = useState(""); // Initialize with one empty input
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -55,16 +55,12 @@ const Login = () => {
   };
 
   // Add input fields for developer portfolio links
-  const handlePortfolioLinksChange = (e, index) => {
-    const updatedLinks = [...portfolioLinks];
-    updatedLinks[index] = e.target.value;
-    setPortfolioLinks(updatedLinks);
+  const handlePortfolioLinkChange = (e) => {
+    setPortfolioLinks(e.target.value); // Handling a single portfolio link
   };
+  
 
-  // Add a new portfolio link input field
-  const addPortfolioLink = () => {
-    setPortfolioLinks([...portfolioLinks, ""]);
-  };
+ 
 
   // Validation functions
   const validateFirstname = (firstname) => /^[a-zA-Z]+$/.test(firstname);
@@ -168,12 +164,15 @@ const Login = () => {
         age,
         playerCategory,
         role: selectedRole,
+        portfolioLink: selectedRole === 'Developer' ? portfolioLink : undefined,
       };
   
+  
       // Add developer-specific fields if selectedRole is Developer
-      if (selectedRole === "Developer") {
-        data.portfolioLinks = portfolioLinks.filter(link => link.trim() !== ""); // Filter out empty links
-      }
+if (selectedRole === "Developer") {
+  data.portfolioLink = portfolioLink; // Single portfolio link
+}
+
   
       // Make the signup API request
       const response = await axios.post("http://localhost:8098/users/register", data);
@@ -190,7 +189,7 @@ const Login = () => {
           email: "",
           birthday: "",
         });
-        setPortfolioLinks([""]); // Reset portfolio links
+        setPortfolioLinks(""); // Reset portfolio links
       } else {
         setAlertMessage(response.data.message);
       }
@@ -430,20 +429,15 @@ const Login = () => {
                       {validationErrors.password && (
                         <div className="text-red-500">{validationErrors.password}</div>
                       )}
-                      {/* Portfolio link inputs */}
-                      <Button onClick={addPortfolioLink} color="primary" size="sm">
-                        Add Portfolio Link
-                      </Button>
-                      {portfolioLinks.map((link, index) => (
-                        <Input
-                          key={index}
-                          label={`Portfolio Link ${index + 1}`}
-
-                          placeholder="Enter your portfolio link"
-                          value={link}
-                          onChange={(e) => handlePortfolioLinksChange(e, index)}
-                        />
-                      ))}
+                       <Input
+                        isRequired
+                        label="Portfolio Link"
+                        placeholder="Enter portfolio link"
+                        name="portfolioLink"
+                        type="url"
+                        value={portfolioLink}
+                        onChange={handlePortfolioLinkChange}
+                      />
                       <p className="text-center text-small">
                         Already have an account?{" "}
                         <Link size="sm" onPress={() => setSelectedTab("login")}>
