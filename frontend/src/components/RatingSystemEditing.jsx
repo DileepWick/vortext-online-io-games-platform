@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Textarea } from "@nextui-org/react";
+import { Button, Textarea ,User} from "@nextui-org/react";
 
 const RatingSystemEditing = ({
   gameId,
@@ -15,8 +15,7 @@ const RatingSystemEditing = ({
   const [userEditRating, setUserEditRating] = useState(0);
   const [EditComment, setEditComment] = useState("");
 
-  const [editedRatingId,setEditedRatingId] = useState("");
-  
+  const [editedRatingId, setEditedRatingId] = useState("");
 
   const [edit, setEdit] = useState(-1);
 
@@ -34,19 +33,16 @@ const RatingSystemEditing = ({
     setComment("");
   };
   const handleEdit = () => {
-    onUpdateRating(editedRatingId,userEditRating, EditComment);
+    onUpdateRating(editedRatingId, userEditRating, EditComment);
     setUserEditRating(0);
     setEditComment("");
     setEdit(-1);
-    console.log("Update function called")
+    console.log("Update function called");
   };
   const onCancel = () => {
     setEdit(-1);
     console.log("edit", edit);
-    
   };
-
-  
 
   return (
     <div
@@ -82,7 +78,7 @@ const RatingSystemEditing = ({
 
       {/* Rating Submission */}
       <div className="mb-6">
-        <h4 className="text-xl text-white mb-2">Rate this game:</h4>
+        <h4 className="text-xl text-white mb-2">Rate this game</h4>
         <div className="flex mb-4">
           {[1, 2, 3, 4, 5].map((star) => (
             <button
@@ -137,7 +133,7 @@ const RatingSystemEditing = ({
 
       {/* User Reviews */}
       <div className="mt-10">
-        <h4 className="text-xl font-bold text-white mb-4">User Reviews:</h4>
+        <h4 className="text-xl font-bold text-white mb-4">User Reviews</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {ratings.map((rating, index) => (
             <div
@@ -163,17 +159,17 @@ const RatingSystemEditing = ({
                     </svg>
                   ))}
                 </div>
-                <span className="ml-2 text-gray-400">
-                  by {rating.user.username}
-                </span>
+                <User
+                  className="cursor-pointer text-white"
+                  name={rating.user.username}
+                  avatarProps={{
+                    src: rating.user.profilePic,
+                  }}
+                />
               </div>
               <p className="text-white mb-4">{rating.comment}</p>
               {/* <a href="#" className="text-blue-400 hover:underline">Edit Review</a> */}
-         <div
-                className={`${
-                  edit === index ? "block" : "hidden"
-                }  `}
-              >
+              <div className={`${edit === index ? "block" : "hidden"}  `}>
                 <div className="mb-6">
                   <h4 className="text-xl text-white mb-2">Rate this game:</h4>
                   <div className="flex mb-4">
@@ -228,23 +224,23 @@ const RatingSystemEditing = ({
                       Update Review
                     </Button>
                     <Button
-                      onClick={()=>{onCancel(); console.log("isEditOpen", isEditOpen);}}
+                      onClick={() => {
+                        onCancel();
+                        console.log("isEditOpen", isEditOpen);
+                      }}
                       color="primary"
                       className="transition-colors duration-200 bg-[#f5f5f5] text-[#6b7280]"
                       css={{
-                      
                         hoverBackgroundColor: "#003399",
                         width: "100%",
                         maxWidth: "200px",
                       }}
-                      
                     >
                       Cancel
                     </Button>
                   </div>
                 </div>
-              </div> 
-              
+              </div>
 
               <button
                 onClick={() => {
