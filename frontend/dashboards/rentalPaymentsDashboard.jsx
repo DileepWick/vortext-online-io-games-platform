@@ -153,7 +153,6 @@ const RentalPaymentsDash = () => {
           <TableColumn>USER</TableColumn>
           <TableColumn>GAME</TableColumn>
           <TableColumn>STATUS</TableColumn>
-          <TableColumn>RENTAL TIME</TableColumn>
           <TableColumn>AMOUNT (LKR)</TableColumn>
           <TableColumn>DATE</TableColumn>
           <TableColumn>ACTIONS</TableColumn>
@@ -175,11 +174,6 @@ const RentalPaymentsDash = () => {
                 <Chip color={payment.rental?._id ? "success" : "warning"} variant="flat">
                   {payment.rental?._id ? 'Active' : 'Expired'}
                 </Chip>
-              </TableCell>
-              <TableCell>
-                <span className="text-secondary font-medium">
-                  {payment.rental?.time ? `${payment.rental.time} min` : 'N/A'}
-                </span>
               </TableCell>
               <TableCell>
                 <span className="text-primary font-medium">
