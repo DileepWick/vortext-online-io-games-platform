@@ -150,6 +150,7 @@ export const getSpecificGame = async (req, res) => {
   }
 };
 
+
 export const getGameNameByAssignedGameId = async (req, res) => {
   try {
     const { assignedGameId } = req.params;
@@ -186,25 +187,6 @@ export const getGameNameByAssignedGameId = async (req, res) => {
 
 
 
-
-//Get specific game details by id
-export const getSpecificGame = async (req, res) => {
-  try {
-    const gameId = req.params.id;
-
-    const PickedGame = await Game.findById(gameId)
-      .populate("Category")
-      .populate("Stock");
-    return res.status(200).json({
-      PickedGame,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      message: "Error getting the game.",
-    });
-  }
-};
-
 // Delete game
 export const deleteGame = async (req, res) => {
   try {
@@ -231,6 +213,8 @@ export const deleteGame = async (req, res) => {
     });
   }
 };
+
+
 // Update game
 export const updateGame = async (req, res) => {
   try {
