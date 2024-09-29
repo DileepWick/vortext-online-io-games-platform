@@ -2,6 +2,8 @@
 import fs from "fs";
 import { Game } from "../models/game.js";
 import cloudinary from "../utils/cloudinary.js";
+import { GameStock } from "../models/gameStock.js";
+import { User } from "../models/user.js";
 
 
 //Add new game
@@ -92,6 +94,74 @@ export const getAllGames = async (req, res) => {
   }
 };
 
+export const getGameNameById = async (req, res) => {
+  try {
+    const { gameId } = req.params;
+    const game = await Game.findById(gameId); 
+    
+    if (game) {
+      const response = {
+        _id: game._id,
+        title: game.title
+      };
+      console.log("Game Title:", game);
+      return res.status(200).json(game);
+    } else {
+      console.log("Game not found");
+      return res.status(404).json({
+        message: "Game not found."
+        
+      });
+    }
+
+  } catch (error) {
+    console.error("Error getting game name:", error);
+    return res.status(500).json({
+      message: "Error getting game name."
+    });
+  }
+};
+
+export const getGameNameByAssignedGameId = async (req, res) => {
+  try {
+    const { assignedGameId } = req.params;
+    const gameStock = await GameStock.findOne({ "AssignedGame": assignedGameId }).populate("AssignedGame");
+
+
+
+    if (gameStock) {
+      // Prepare response with relevant data from AssignedGame
+      const response = {
+        _id: gameStock.AssignedGame._id,
+        title: gameStock.AssignedGame.title,
+        genre: gameStock.AssignedGame.Genre,
+        UnitPrice: gameStock.UnitPrice,
+        discount: gameStock.discount,
+        coverPhoto: gameStock.AssignedGame.coverPhoto,
+       };
+
+      console.log("Game found:", response);
+      return res.status(200).json(response);
+    } else {
+      console.log("Game not found");
+      return res.status(404).json({
+        message: "Game not found.",
+      });
+    }
+  } catch (error) {
+    console.error("Error getting game by AssignedGameId:", error);
+    return res.status(500).json({
+      message: "Error getting game by AssignedGameId."
+    });
+  }
+};
+
+// export const getUserEmailbyId = async (req, res) => {
+//   try {
+
+
+
+
 //Get specific game details by id
 export const getSpecificGame = async (req, res) => {
   try {
@@ -106,32 +176,6 @@ export const getSpecificGame = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       message: "Error getting the game.",
-    });
-  }
-};
-
-// New fetchGameById function
-export const fetchGameById = async (req, res) => {
-  console.log("fetchGameById function called");
-  try {
-    const gameId = req.params.id;
-    console.log("Attempting to fetch game with ID:", gameId);
-    const pickedGame = await Game.findById(gameId);
-    
-    if (!pickedGame) {
-      console.log("Game not found for ID:", gameId);
-      return res.status(404).json({
-        message: "Game not found",
-      });
-    }
-    console.log("Game found:", pickedGame);
-    return res.status(200).json(pickedGame);
-  } catch (error) {
-    console.error("Error getting the game:", error);
-    return res.status(500).json({
-      message: "Error getting the game.",
-      error: error.message,
-      stack: error.stack
     });
   }
 };
