@@ -20,6 +20,7 @@ import FAQsPage from "./pages/FAQsPage";
 import HandleRentals from "./pages/HandleRentals";
 import RentalGamesEmbed from "./pages/RentalGamesEmbed";
 import TailoredGames from "./pages/tailoredGames";
+import TransactionHistory from "./pages/TransactionHistoryPage";
 
 import DeveloperLoginSignup from "./pages/DeveloperLoginSignup";
 
@@ -105,6 +106,7 @@ const App = () => {
       />
 
       <Route path="/RentedGamesSection" element={<RentedGamesSection />} />
+      <Route path="/Transaction" element={<TransactionHistory />} />
       <Route path="/Snakegame" element={<Snake />} />
       <Route path="/PuzzlePlatformGame" element={<PuzzlePlatformGame />} />
       <Route path="/RentalPayments" element={<RentalPaymentsDash />} />
