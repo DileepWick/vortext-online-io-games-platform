@@ -218,6 +218,12 @@ export default function Header() {
                   My Cart
                 </DropdownItem>
 
+
+                <DropdownItem key="cart" onClick={() => navigate("/Transaction")}>
+                  Transaction History
+                </DropdownItem>
+                
+
                 {/* Developer Filter */}
                 {user.role === "developer" && (
                   <DropdownItem
@@ -227,6 +233,7 @@ export default function Header() {
                     Developer Dashboard
                   </DropdownItem>
                 )}
+
 
                 {/* Admin Filter */}
                 {user.role === "Product Manager" && (
@@ -343,8 +350,6 @@ export default function Header() {
               <Link className="text-white" href="/login">
                 Login
               </Link>
-
-              
             </>
           )}
         </NavbarContent>

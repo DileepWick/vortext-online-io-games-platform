@@ -20,6 +20,7 @@ import FAQsPage from "./pages/FAQsPage";
 import HandleRentals from "./pages/HandleRentals";
 import RentalGamesEmbed from "./pages/RentalGamesEmbed";
 import TailoredGames from "./pages/tailoredGames";
+import TransactionHistory from "./pages/TransactionHistoryPage";
 
 import DeveloperLoginSignup from "./pages/DeveloperLoginSignup";
 
@@ -30,7 +31,6 @@ import Snake from "../Games/Snake";
 import PuzzlePlatformGame from "./components/Games/PuzzlePlatformGame";
 
 import Chat from "./pages/chat";
-
 
 //Gameplay
 import GameEmbed from "./pages/GameEmbed";
@@ -51,9 +51,8 @@ import Payment_Manager from "../dashboards/Payment_manager_dashboard";
 import DeveloperDashboard from "../dashboards/usermanage_component/DeveloperDashboard";
 import GameDeveloperDashboard from "../dashboards/gamedeveloperdashboard";
 
-
 import RentedGamesSection from "../dashboards/rentedGamesDash";
-
+import RentalPaymentsDash from "../dashboards/rentalPaymentsDashboard"
 
 const App = () => {
   return (
@@ -101,12 +100,16 @@ const App = () => {
 
       <Route path="/DeveloperLoginSignup" element={<DeveloperLoginSignup />} />
       <Route path="/DeveloperDashboard" element={<DeveloperDashboard />} />
-      <Route path="/GameDeveloperDashboard" element={<GameDeveloperDashboard />} />
+      <Route
+        path="/GameDeveloperDashboard"
+        element={<GameDeveloperDashboard />}
+      />
 
       <Route path="/RentedGamesSection" element={<RentedGamesSection />} />
+      <Route path="/Transaction" element={<TransactionHistory />} />
       <Route path="/Snakegame" element={<Snake />} />
       <Route path="/PuzzlePlatformGame" element={<PuzzlePlatformGame />} />
-
+      <Route path="/RentalPayments" element={<RentalPaymentsDash />} />
     </Routes>
   );
 };

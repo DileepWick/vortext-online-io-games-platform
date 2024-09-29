@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "../src/components/header";
 import useAuthCheck from "../src/utils/authCheck";
+import { Link } from "react-router-dom";
 import {
   Tabs,
   Tab,
@@ -21,10 +22,12 @@ import {
   ModalBody,
   ModalFooter,
   Textarea,
+  Chip,
 } from "@nextui-org/react";
 import { Flip, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Footer from "../src/components/footer";
+import ChatModal from "../src/components/ChatModal";
 import { Helmet } from "react-helmet-async";
 
 const ContactDash = () => {
@@ -33,6 +36,21 @@ const ContactDash = () => {
   const [contactMessages, setContactMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [contact, setContact] = useState([]);
+
+  //chat open
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [selectedContactId, setSelectedContactId] = useState(null);
+
+  const handleChatOpen = (contactId) => {
+    setSelectedContactId(contactId);
+    setIsChatOpen(true);
+  };
+
+  const statusColorMap = {
+    open: "success",
+    closed: "danger",
+  };
 
   // FAQ state
   const {
@@ -50,22 +68,6 @@ const ContactDash = () => {
   const [editingFAQ, setEditingFAQ] = useState(null);
   const [editFAQQuestion, setEditFAQQuestion] = useState("");
   const [editFAQAnswer, setEditFAQAnswer] = useState("");
-
-  // Contact message state
-  const {
-    isOpen: isViewMessageOpen,
-    onOpen: onViewMessageOpen,
-    onOpenChange: onViewMessageOpenChange,
-  } = useDisclosure();
-  const [viewingMessage, setViewingMessage] = useState(null);
-
-  const [replyMessage, setReplyMessage] = useState("");
-  const {
-    isOpen: isReplyModalOpen,
-    onOpen: onReplyModalOpen,
-    onOpenChange: onReplyModalOpenChange,
-  } = useDisclosure();
-  const [replyingTo, setReplyingTo] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -97,53 +99,6 @@ const ContactDash = () => {
 
     fetchData();
   }, []);
-
-  const handleReply = async () => {
-    try {
-      const response = await axios.post(
-        `http://localhost:8098/contacts/reply/${replyingTo._id}`,
-        { message: replyMessage }
-      );
-      if (response.status === 200) {
-        setContactMessages((prevMessages) =>
-          prevMessages.map((msg) =>
-            msg._id === replyingTo._id ? response.data.contact : msg
-          )
-        );
-        toast.success("Reply sent successfully", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-          transition: Flip,
-          progressBarClassName: "bg-gray-800",
-          style: { fontFamily: "Rubik" },
-        });
-        setReplyMessage("");
-        setReplyingTo(null);
-        onReplyModalOpenChange(false);
-      }
-    } catch (error) {
-      console.error("Error sending reply:", error);
-      toast.error("Failed to send reply", {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-        transition: Flip,
-        progressBarClassName: "bg-gray-800",
-        style: { fontFamily: "Rubik" },
-      });
-    }
-  };
 
   // FAQ functions
   const handleAddFAQ = async () => {
@@ -306,6 +261,67 @@ const ContactDash = () => {
         progressBarClassName: "bg-gray-800",
         style: { fontFamily: "Rubik" },
       });
+    }
+  };
+
+  const handleUpdateStatus = async (contactId) => {
+    try {
+      setLoading(true);
+
+      const response = await axios.put(
+        `http://localhost:8098/contacts/setStatus/${contactId}`,
+        {
+          status: "closed",
+        }
+      );
+
+      console.log(contactId);
+      console.log("Response Data:", response.data);
+
+      if (response.status >= 200 && response.status < 300) {
+        console.log("Status updated to closed:", response.data);
+
+        // Update the local state immediately
+        setContact((prevContact) => ({
+          ...prevContact,
+          status: "closed",
+        }));
+
+        // Show success toast after the status is updated
+        toast.success("Status updated to closed", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Flip,
+          progressBarClassName: "bg-gray-800",
+          style: { fontFamily: "Rubik" },
+        });
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
+      setError("Failed to update status");
+
+      // Show error toast in case of failure
+      toast.error("Failed to update status", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Flip,
+        progressBarClassName: "bg-gray-800",
+        style: { fontFamily: "Rubik" },
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -563,6 +579,7 @@ const ContactDash = () => {
                     <TableColumn>USERNAME</TableColumn>
                     <TableColumn>EMAIL</TableColumn>
                     <TableColumn>MESSAGE</TableColumn>
+                    <TableColumn>Status</TableColumn>
                     <TableColumn>ACTIONS</TableColumn>
                   </TableHeader>
                   <TableBody>
@@ -580,31 +597,40 @@ const ContactDash = () => {
                               "No message content"}
                         </TableCell>
                         <TableCell>
-                          <Button
-                            color="primary"
-                            className="mr-2"
-                            onPress={() => {
-                              setViewingMessage(contact);
-                              onViewMessageOpen();
-                            }}
+                          <Chip
+                            color={statusColorMap[contact.status]}
+                            className="capitalize"
+                            variant="flat"
                           >
-                            View
-                          </Button>
-                          <Button
-                            color="secondary"
-                            className="mr-2"
-                            onPress={() => {
-                              setReplyingTo(contact);
-                              onReplyModalOpen();
-                            }}
-                          >
-                            Reply
-                          </Button>
+                            {contact.status}
+                          </Chip>
+                        </TableCell>
+                        <TableCell>
                           <Button
                             color="danger"
+                            className="mr-2"
                             onPress={() => handleDeleteMessage(contact._id)}
                           >
                             Delete
+                          </Button>
+
+                          <Button
+                            color="success"
+                            className="mr-2"
+                            onPress={() => {
+                              handleChatOpen(contact._id);
+                            }}
+                          >
+                            {contact.status === "closed" ? "View" : "Reply"}
+                          </Button>
+                          <Button
+                            color="primary"
+                            className="mr-2"
+                            onClick={() => handleUpdateStatus(contact._id)}
+                            isDisabled={contact.status === "closed"}
+                          >
+                            {console.log(contact.status)}
+                            {contact.status === "closed" ? "Closed" : "Close"}
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -612,81 +638,11 @@ const ContactDash = () => {
                   </TableBody>
                 </Table>
               )}
-              <Modal
-                isOpen={isViewMessageOpen}
-                onOpenChange={onViewMessageOpenChange}
-                className="dark text-foreground bg-background"
-              >
-                <ModalContent>
-                  {(onClose) => (
-                    <>
-                      <ModalHeader className="flex flex-col gap-1">
-                        View Message
-                      </ModalHeader>
-                      <ModalBody>
-                        <p>
-                          <strong>Username:</strong> {viewingMessage?.username}
-                        </p>
-                        <p>
-                          <strong>Email:</strong> {viewingMessage?.email}
-                        </p>
-                        <p>
-                          <strong>Message:</strong>
-                        </p>
-                        <p>{viewingMessage?.message}</p>
-                      </ModalBody>
-                      <ModalFooter>
-                        <Button color="primary" onPress={onClose}>
-                          Close
-                        </Button>
-                      </ModalFooter>
-                    </>
-                  )}
-                </ModalContent>
-              </Modal>
-              <Modal
-                isOpen={isReplyModalOpen}
-                onOpenChange={onReplyModalOpenChange}
-                className="dark text-foreground bg-background"
-              >
-                <ModalContent>
-                  {(onClose) => (
-                    <>
-                      <ModalHeader className="flex flex-col gap-1">
-                        Reply to Message
-                      </ModalHeader>
-                      <ModalBody>
-                        <p>
-                          <strong>Replying to:</strong> {replyingTo?.username}
-                        </p>
-                        <p>
-                          <strong>Original Message:</strong>
-                        </p>
-                        <p>{replyingTo?.message}</p>
-                        <Textarea
-                          label="Your Reply"
-                          placeholder="Enter your reply"
-                          value={replyMessage}
-                          onChange={(e) => setReplyMessage(e.target.value)}
-                          fullWidth
-                        />
-                      </ModalBody>
-                      <ModalFooter>
-                        <Button
-                          color="danger"
-                          variant="light"
-                          onPress={onClose}
-                        >
-                          Cancel
-                        </Button>
-                        <Button color="primary" onPress={handleReply}>
-                          Send Reply
-                        </Button>
-                      </ModalFooter>
-                    </>
-                  )}
-                </ModalContent>
-              </Modal>
+              <ChatModal
+                isOpen={isChatOpen}
+                onOpenChange={() => setIsChatOpen(false)}
+                contactId={selectedContactId}
+              />
             </div>
           )}
         </div>

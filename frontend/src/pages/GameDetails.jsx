@@ -291,27 +291,39 @@ const GameDetails = () => {
 
   const handleRateUpdate = async (ratingId, rating, comment) => {
     try {
-      const response = await axios.put(`http://localhost:8098/ratings/game/${ratingId}`, {
-        rating,
-        comment
-      });
+      const response = await axios.put(
+        `http://localhost:8098/ratings/game/${ratingId}`,
+        {
+          rating,
+          comment,
+        }
+      );
       console.log("Rating update response:", response);
       if (response.status === 200) {
         toast.success("Rating updated successfully", {
           // ... (keep existing toast options)
         });
         // Refresh ratings
-        const updatedRatings = await axios.get(`http://localhost:8098/ratings/game/${id}`);
+        const updatedRatings = await axios.get(
+          `http://localhost:8098/ratings/game/${id}`
+        );
         console.log("Updated ratings:", updatedRatings.data);
         setRatings(updatedRatings.data);
-        const avg = updatedRatings.data.reduce((sum, r) => sum + r.rating, 0) / updatedRatings.data.length;
+        const avg =
+          updatedRatings.data.reduce((sum, r) => sum + r.rating, 0) /
+          updatedRatings.data.length;
         setAverageRating(avg);
       }
     } catch (error) {
       console.error("Error updating rating:", error.response || error);
-      toast.error(`Error updating rating: ${error.response?.data?.message || error.message}`, {
-        // ... (keep existing toast options)
-      });
+      toast.error(
+        `Error updating rating: ${
+          error.response?.data?.message || error.message
+        }`,
+        {
+          // ... (keep existing toast options)
+        }
+      );
     }
   };
 
@@ -329,9 +341,9 @@ const GameDetails = () => {
   return (
     <div className="bg-customDark text-black min-h-screen font-primaryRegular">
       <Header />
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-customDark rounded-lg shadow-lg ">
-          <div className="flex flex-col md:flex-row items-start justify-start gap-4 bg-customDark scale-80">
+      <div className="container">
+        <div className="bg-customDark rounded-lg shadow-lg h-[800px]">
+          <div className="flex flex-col md:flex-row items-start justify-start gap-4 bg-customDark scale-90 m-8">
             <div className="flex flex-col">
               <VideoPlayer
                 videoUrl={gameStock.AssignedGame.TrailerVideo}
@@ -343,7 +355,10 @@ const GameDetails = () => {
               <h1 className="mt-8 text-editionColor text-5xl">
                 About the game
               </h1>
-              <p className="text-lg mt-4">
+              <p
+                className="text-lg mt-4"
+                style={{ fontSize: "24px", padding: "4px" }}
+              >
                 <ScrollShadow
                   hideScrollBar
                   className="w-[1000px] h-[200px] text-white"
@@ -362,11 +377,18 @@ const GameDetails = () => {
                   src={gameStock.AssignedGame.coverPhoto}
                 />
                 <CardBody>
-                  <h2 className="text-xl font-primaryRegular text-white mb-2">
+                  <h2
+                    className="text-xl font-primaryRegular text-white mb-2"
+                    style={{ fontSize: "20px" }}
+                  >
                     {gameStock.AssignedGame.title} <br />
                     {gameStock.discount > 0 && (
                       <>
-                        <Chip color="primary" radius="none">
+                        <Chip
+                          color="primary"
+                          radius="none"
+                          style={{ fontSize: "20px" }}
+                        >
                           -{gameStock.discount}% off
                         </Chip>
                         <div className="flex items-center mt-2">
@@ -380,40 +402,23 @@ const GameDetails = () => {
                       </>
                     )}
                   </h2>
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {gameStock.AssignedGame.Genre.flatMap((genre) =>
-                      genre.includes(",") ? genre.split(",") : genre
-                    ).map((genre, index) => (
-                      <Chip
-                        key={index}
-                        color="primary"
-                        variant="flat"
-                        size="sm"
-                        radius="none"
-                        className="font-primaryRegular text-white"
-                      >
-                        {genre.trim()}
-                      </Chip>
-                    ))}
-                  </div>
                 </CardBody>
                 <CardFooter className="text-center">
                   <div className="flex flex-col items-center">
                     <Button
                       onClick={() => handleAddToCart(gameStock._id)}
                       color="primary"
-                      radius="none"
+                      style={{ height: "50px", fontSize: "20px" }}
                       className="w-[300px] mb-2"
-                      variant="shadow"
+                      variant="solid"
                     >
                       Add to Cart
                     </Button>
                     <Button
                       onClick={() => handleRent(gameStock.AssignedGame._id)}
-                      color="primary"
-                      radius="none"
-                      className="w-[300px] mt-2"
-                      variant="bordered"
+                      color="default"
+                      style={{ height: "50px", fontSize: "20px" }}
+                      className="w-[300px] mt-2 "
                     >
                       Rent Game
                     </Button>
@@ -424,8 +429,10 @@ const GameDetails = () => {
           </div>
         </div>
 
-        <div className="mt-8 scale-80">
-          <h2 className="text-3xl text-white mb-4 ">Ratings and Reviews</h2>
+        <div className="mt-4 m-8 scale-90">
+          <h2 className="mt-8 text-editionColor text-5xl">
+            Ratings and Reviews
+          </h2>
 
           {user.role === "Review Manager" ? (
             <RatingSystemEditing
