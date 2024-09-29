@@ -106,9 +106,9 @@ const AllPayments = () => {
           <TableColumn key="CUSTOMER">CUSTOMER</TableColumn>
           <TableColumn key="CUSTOMER">Actions</TableColumn>
         </TableHeader>
-        <TableBody>
+        <TableBody className="text-black">
           {items.map((item) => (
-            <TableRow key={item._id}>
+            <TableRow key={item._id} className="text-black">
               <TableCell>
                 {item.stockid?.AssignedGame?.title || "N/A"}
               </TableCell>

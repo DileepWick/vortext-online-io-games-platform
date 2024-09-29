@@ -20,6 +20,7 @@ import FAQsPage from "./pages/FAQsPage";
 import HandleRentals from "./pages/HandleRentals";
 import RentalGamesEmbed from "./pages/RentalGamesEmbed";
 import TailoredGames from "./pages/tailoredGames";
+import TransactionHistory from "./pages/TransactionHistoryPage";
 
 //Gameplay
 import GameEmbed from "./pages/GameEmbed";
@@ -78,6 +79,7 @@ const App = () => {
       />
       <Route path="/TailoredGames" element={<TailoredGames />} />
       <Route path="/RentedGamesSection" element={<RentedGamesSection />} />
+      <Route path="/Transaction" element={<TransactionHistory />} />
     </Routes>
   );
 };

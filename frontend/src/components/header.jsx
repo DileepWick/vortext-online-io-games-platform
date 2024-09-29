@@ -191,6 +191,11 @@ export default function Header() {
                   My Cart
                 </DropdownItem>
 
+                <DropdownItem key="cart" onClick={() => navigate("/Transaction")}>
+                  Transaction History
+                </DropdownItem>
+                
+
                 {/* Admin Filter */}
                 {user.role === "Product Manager" && (
                   <DropdownItem
