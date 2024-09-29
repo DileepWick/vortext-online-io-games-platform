@@ -291,27 +291,39 @@ const GameDetails = () => {
 
   const handleRateUpdate = async (ratingId, rating, comment) => {
     try {
-      const response = await axios.put(`http://localhost:8098/ratings/game/${ratingId}`, {
-        rating,
-        comment
-      });
+      const response = await axios.put(
+        `http://localhost:8098/ratings/game/${ratingId}`,
+        {
+          rating,
+          comment,
+        }
+      );
       console.log("Rating update response:", response);
       if (response.status === 200) {
         toast.success("Rating updated successfully", {
           // ... (keep existing toast options)
         });
         // Refresh ratings
-        const updatedRatings = await axios.get(`http://localhost:8098/ratings/game/${id}`);
+        const updatedRatings = await axios.get(
+          `http://localhost:8098/ratings/game/${id}`
+        );
         console.log("Updated ratings:", updatedRatings.data);
         setRatings(updatedRatings.data);
-        const avg = updatedRatings.data.reduce((sum, r) => sum + r.rating, 0) / updatedRatings.data.length;
+        const avg =
+          updatedRatings.data.reduce((sum, r) => sum + r.rating, 0) /
+          updatedRatings.data.length;
         setAverageRating(avg);
       }
     } catch (error) {
       console.error("Error updating rating:", error.response || error);
-      toast.error(`Error updating rating: ${error.response?.data?.message || error.message}`, {
-        // ... (keep existing toast options)
-      });
+      toast.error(
+        `Error updating rating: ${
+          error.response?.data?.message || error.message
+        }`,
+        {
+          // ... (keep existing toast options)
+        }
+      );
     }
   };
 
@@ -333,6 +345,7 @@ const GameDetails = () => {
         <div className="bg-customDark rounded-lg shadow-lg ">
           <div className="flex flex-col md:flex-row items-start justify-start gap-4 bg-customDark scale-80">
             <div className="flex flex-col">
+              <h1>Hello</h1>
               <VideoPlayer
                 videoUrl={gameStock.AssignedGame.TrailerVideo}
                 autoPlay
@@ -366,13 +379,7 @@ const GameDetails = () => {
                     {gameStock.AssignedGame.title} <br />
                     {gameStock.discount > 0 && (
                       <>
-                        <Chip color="primary" radius="none">
-                          -{gameStock.discount}% off
-                        </Chip>
                         <div className="flex items-center mt-2">
-                          <span className="line-through mr-4 text-editionColor">
-                            LKR .{originalPrice.toFixed(2)}
-                          </span>
                           <span className="text-lg">
                             LKR .{discountedPrice.toFixed(2)}
                           </span>
@@ -380,40 +387,22 @@ const GameDetails = () => {
                       </>
                     )}
                   </h2>
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {gameStock.AssignedGame.Genre.flatMap((genre) =>
-                      genre.includes(",") ? genre.split(",") : genre
-                    ).map((genre, index) => (
-                      <Chip
-                        key={index}
-                        color="primary"
-                        variant="flat"
-                        size="sm"
-                        radius="none"
-                        className="font-primaryRegular text-white"
-                      >
-                        {genre.trim()}
-                      </Chip>
-                    ))}
-                  </div>
                 </CardBody>
                 <CardFooter className="text-center">
                   <div className="flex flex-col items-center">
                     <Button
                       onClick={() => handleAddToCart(gameStock._id)}
                       color="primary"
-                      radius="none"
-                      className="w-[300px] mb-2"
-                      variant="shadow"
+                      className="w-[300px] mt-2 h-[70px] text-lg"
+                      
                     >
                       Add to Cart
                     </Button>
                     <Button
                       onClick={() => handleRent(gameStock.AssignedGame._id)}
-                      color="primary"
-                      radius="none"
-                      className="w-[300px] mt-2"
-                      variant="bordered"
+                      color="default"
+                      className="w-[300px] mt-2 h-[70px] text-lg"
+                      
                     >
                       Rent Game
                     </Button>
