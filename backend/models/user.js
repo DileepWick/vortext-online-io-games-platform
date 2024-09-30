@@ -19,7 +19,7 @@ const UserSchema = new mongoose.Schema({
   birthday: { type: Date, required: false },
   age: { type: Number },
   createdAt: { type: Date, default: Date.now },
-  playerType: { type: String, enum: ['Kid', 'Teenager', 'Adult'], default: 'Kid' },
+  playerType: { type: String, enum: ['Kid', 'Teenager', 'Adult'], default: 'Adult' },
   
   // Developer-specific fields, only required if role is 'Developer'
   developerAttributes: {
@@ -30,6 +30,7 @@ const UserSchema = new mongoose.Schema({
       default: 'pending', 
       required: function() { return this.role === 'Developer'; }
     },
+    
   },
   
 });
