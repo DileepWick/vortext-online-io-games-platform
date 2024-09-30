@@ -17,10 +17,12 @@ import winAudio from "../../assets/won.mp3";
 import loseAudio from "../../assets/over.mp3";
 
 // Background image
-import loadingGif from "../../assets/ghost.gif";
+import loadingGif from "../../assets/Ghost.gif";
 
 // Import add new edition
 import EditionSelector from "./Edition_selector";
+import Header from "../header";
+import Footer from "../footer";
 
 // Default Questions
 const defaultQuestions = [
@@ -54,19 +56,15 @@ const Hangman = () => {
   const [selectedEditionId, setSelectedEditionId] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
   const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
-
   const [selectedEditionName, setSelectedEditionName] = useState("");
-
   const currentQuestion = questions[currentQuestionIndex];
   const word = currentQuestion?.answer.toUpperCase() || "";
   const hint = currentQuestion?.hint || "";
-
   const isGameWon = !word
     .split("")
     .some((letter) => !correctLetters.includes(letter));
   const isGameOver = wrongGuesses >= maxWrongGuesses;
   const remainingChances = maxWrongGuesses - wrongGuesses;
-
   const winAudioRef = useRef(new Audio(winAudio));
   const loseAudioRef = useRef(new Audio(loseAudio));
 
@@ -74,13 +72,13 @@ const Hangman = () => {
   useEffect(() => {
     if (gameStarted && !isGameWon && !isGameOver) {
       const warnings = [
-        "The room is empty. The silence is deafening.",
-        "Spooky shadows flicker around. The atmosphere is tense.",
-        "The windows start shaking. Something is outside.",
-        "A larger window appears, and strange noises are coming from it.",
-        "The scared girl appears, trembling in fear.",
-        "Ghostly figures start appearing around her, intensifying the fear.",
-        "The ghosts surround the girl, making her terror palpable.",
+        "With each wrong answer, the sky darkens, and a menacing red moon rises, casting an eerie glow over the land.",
+        " A creeping shadow rolls across the ground, hinting at the witches gathering their dark powers.",
+        "The witches light a bonfire, dancing around it as they chant incantations to strengthen their magic.",
+        "The first witch steps forward, her eyes gleaming with malice as she prepares to unleash her curse.",
+        " The second witch joins, weaving spells in the air, her laughter echoing ominously in the night.",
+        "The third witch appears, and together they begin their powerful spell, the air crackling with dark energy.",
+        "As the final spell completes, a horde of bats is summoned from the shadows, signaling the end of the game and your defeat.",
       ];
       setWarning(warnings[wrongGuesses]);
     } else {
@@ -148,7 +146,7 @@ const Hangman = () => {
     word.split("").map((letter, index) => (
       <span
         key={index}
-        className={`text-4xl font-bold mx-2 ${
+        className={`text-4xl font-primaryRegular mx-2 ${
           correctLetters.includes(letter) ? "text-black" : "text-gray-600"
         }`}
       >
@@ -166,7 +164,7 @@ const Hangman = () => {
         variant="ghost"
         onClick={() => handleGuess(letter)}
         disabled={guessedLetters.includes(letter)}
-        className={`bg-white hover:bg-black-400 text-black font-scary2 text-2xl py-2 px-4 rounded m-1 transition-colors duration-300 ${
+        className={`bg-white hover:bg-black-400 text-black font-primaryRegular text-2xl py-2 px-4 rounded m-1 transition-colors duration-300 ${
           guessedLetters.includes(letter) ? "opacity-50 cursor-not-allowed" : ""
         }`}
       >
@@ -182,7 +180,7 @@ const Hangman = () => {
       <img
         src={stages[wrongGuesses]}
         alt={`Hangman Stage ${wrongGuesses}`}
-        className="w-[700px] h-[700px] mx-auto opacity-100 transition-opacity duration-500 ease-in-out border-4 border-customPink shadow-lg rounded-lg"
+        className="w-[500px] h-[500px] mx-auto opacity-100 transition-opacity duration-500 ease-in-out border-4 border-customPink shadow-lg rounded-lg"
       />
     );
   };
@@ -192,14 +190,14 @@ const Hangman = () => {
     <img
       src={happyGirlJumping}
       alt="Happy Jumping Girl"
-      className="w-[700px] h-[700px] mx-auto opacity-100 transition-opacity duration-500 ease-in-out border-4 border-customPink shadow-lg rounded-lg"
+      className="w-[500px] h-[500px] mx-auto opacity-100 transition-opacity duration-500 ease-in-out border-4 border-customPink shadow-lg rounded-lg"
     />
   );
 
   //Render Warning
   const renderWarning = () => (
     <p
-      className={`font-scary2 text-xl mb-6 text-customPink transition-opacity duration-500 ease-in-out ${
+      className={`font-primaryRegular  text-xl mb-6 text-customPink transition-opacity duration-500 ease-in-out ${
         warning ? "opacity-100" : "opacity-0"
       }`}
     >
@@ -210,8 +208,8 @@ const Hangman = () => {
   //Show correct answer if round lost
   const renderCorrectAnswer = () => (
     <>
-      <p className="font-scary2 text-customPink text-3xl mb-4">
-      The monsters got you this time, but remember: even vampires have to count their losses!
+      <p className="font-primaryRegular text-customPink text-5xl mb-4 " style={{textAlign:'center'}}>
+      Game Over... Bats Have Summoned . . .
       </p>
       <p className="text-black font-primaryRegular text-xl">
         The correct answer was: <strong>{word}</strong>
@@ -222,8 +220,8 @@ const Hangman = () => {
   //Show happy message
   const renderWinMessage = () => (
     <>
-      <p className="font-scary2  text-3xl mb-4">
-        WELL PLAYED . . . KEEP GOING
+      <p className="font-primaryRegular text-5xl mb-4 text-black" style={{textAlign:'center'}}>
+      Great job! You're one step closer to defeating the witches. Get ready for the next question!
       </p>
     </>
   );
@@ -237,7 +235,7 @@ const Hangman = () => {
 
   //Show question and hint
   const renderQuestionAndHint = () => (
-    <div className="text-xl font-bold mb-4 text-black">
+    <div className="text-xl font-primaryRegular mb-4 text-black">
       <p className="mb-2 text-4xl">{currentQuestion.question}</p>
       <p className="italic text-[15px]">Hint: {currentQuestion.hint}</p>
     </div>
@@ -311,6 +309,8 @@ const Hangman = () => {
   };
 
   return (
+    <div className="bg-customDark">
+    <Header/>
     <div
       style={{ backgroundImage: `url(${loadingGif})` }}
       className="w-[1500px] h-[800px] mx-auto mt-12 p-8 border-2 border-gray-300 shadow-lg rounded-lg flex bg-conatin bg-center"
@@ -342,14 +342,14 @@ const Hangman = () => {
             ) : (
               <>
                 {/* Display selected edition name */}
-                <p className="text-5xl font-scary2 mb-8 text-customPink">
+                <p className="text-5xl font-primaryRegular mb-8 text-customPink">
                   {selectedEditionName || "Demo Edition"}
                 </p>
                 {renderQuestionAndHint()} {/* Display the question and hint */}
                 <div className="mb-4">{renderWord()}</div>
                 {renderWarning()}
                 <div className="grid grid-cols-8 gap-2">{renderAlphabet()}</div>
-                <p className="text-2xl font-bold text-customPink mb-4">
+                <p className="text-2xl font-primaryRegular text-customPink mb-4">
                   Wrong guesses: {wrongGuesses} / {maxWrongGuesses}
                 </p>
               </>
@@ -357,25 +357,20 @@ const Hangman = () => {
           </>
         ) : (
           <>
-            <h1 className="text-customPink text-5xl font-scary2 mb-8">
-              Spookey Gusses
+            <h1 className="text-customPink text-5xl font-primaryRegular mb-8">
+            The Witch's Enigma
             </h1>
-            <p className="mb-8 font-scary2 text-2xl text-black">
-              Prepare to embark on an epic adventure where your only enemy is
-              your own inability to choose! Whether you’re a seasoned hero or a
-              curious newbie, each edition of this game promises a unique blend
-              of chaos and charm. Dive into the madness, pick your favorite, and
-              let the games begin—because in this world, the only rule is to
-              have fun and maybe, just maybe, try not to laugh too hard!
+            <p className="mb-8 text-2xl text-black">
+            Stop the witches from summoning evil bats by guessing the right answers to their tricky questions. Time is running out, and every wrong guess brings the bats closer to chaos. Can you solve the riddles and save the day?
             </p>
             <Button
-              className="bg-black text-white font-scary2 w-[400px] h-[100px] text-5xl"
+              className="bg-black text-white font-primaryRegular w-[400px] h-[100px] text-5xl mb-8"
               onClick={() => handleStartGame()}
             >
               Play Demo
             </Button>
             {/* Edition selction*/}
-            <EditionSelector onSelectEdition={handleStartGame} />
+            <EditionSelector onSelectEdition={handleStartGame}/>
           </>
         )}
         {showAlert && (
@@ -387,8 +382,8 @@ const Hangman = () => {
               className="bg-white p-8 rounded shadow-lg"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="text-xl font-scary2 mb-4">All Questions Done</h2>
-              <p className="mb-4">
+              <h2 className="text-xl font-primaryRegular mb-4 text-black">All Questions Done</h2>
+              <p className="mb-4 text-black">
                 You answered {correctAnswersCount} questions correctly.
               </p>
               <Button
@@ -402,6 +397,8 @@ const Hangman = () => {
           </div>
         )}
       </div>
+    </div>
+    <Footer/>
     </div>
   );
 };

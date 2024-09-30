@@ -48,13 +48,14 @@ import CommunityDashBoard from "../dashboards/communityDashboard";
 import UserManagementDashboard from "../dashboards/UserManagementDashboard";
 import Payment_Manager from "../dashboards/Payment_manager_dashboard";
 
-
 import DeveloperDashboard from "../dashboards/usermanage_component/DeveloperDashboard";
 import GameDeveloperDashboard from "../dashboards/gamedeveloperdashboard";
 
 import RentedGamesSection from "../dashboards/rentedGamesDash";
-import RentalPaymentsDash from "../dashboards/rentalPaymentsDashboard"
+import RentalPaymentsDash from "../dashboards/rentalPaymentsDashboard";
 import SessionAnalytics from "../dashboards/sessionAnalytics";
+
+import Hangman from "./components/Games/Hangaman";
 
 const App = () => {
   return (
@@ -113,6 +114,9 @@ const App = () => {
       <Route path="/PuzzlePlatformGame" element={<PuzzlePlatformGame />} />
       <Route path="/RentalPayments" element={<RentalPaymentsDash />} />
       <Route path="/SessionAnalytics" element={<SessionAnalytics />} />
+
+      {/*Game Routes*/}
+      <Route path="/HangmanGame" element={<Hangman />} />
     </Routes>
   );
 };
