@@ -144,14 +144,14 @@ const SessionManagerDash = () => {
 
       const dataToSend = {
         gameId: formData.gameId,
-        duration: parseInt(formData.duration, 10),
+        duration: parseInt(formData.duration, 10) * 60, // Convert minutes to seconds
         price: parseFloat(formData.price),
       };
 
       const existingRentalTime = rentalTimes.find(
         (rt) =>
           rt.game && rt.game._id === formData.gameId &&
-          rt.duration === parseInt(formData.duration, 10)
+          rt.duration === parseInt(formData.duration, 10) * 60 // Compare in seconds
       );
 
       if (existingRentalTime && !editingId) {
@@ -215,7 +215,7 @@ const SessionManagerDash = () => {
     setFormData({
       gameId: rentalTime.game._id,
       gameName: rentalTime.game.title,
-      duration: rentalTime.duration.toString(),
+      duration: (rentalTime.duration / 60).toString(), // Convert seconds to minutes for display
       price: rentalTime.price.toString(),
     });
     setEditingId(rentalTime._id);
@@ -251,11 +251,10 @@ const SessionManagerDash = () => {
 
   const filteredItems = useMemo(() => {
     return rentalTimes.filter((rentalTime) => {
-      // Check if game object and title exist before filtering
       if (rentalTime && rentalTime.game && rentalTime.game.title) {
         return rentalTime.game.title.toLowerCase().includes(searchQuery.toLowerCase());
       }
-      return false; // Exclude items with missing game or title
+      return false;
     });
   }, [rentalTimes, searchQuery]);
 
@@ -274,6 +273,7 @@ const SessionManagerDash = () => {
     setSearchQuery("");
     setPage(1);
   };
+
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -364,12 +364,12 @@ const SessionManagerDash = () => {
                     <TableRow key={rentalTime._id}>
                       <TableCell>
                         <span className="text-primary font-medium">
-                          {rentalTime.game?.title||'Unknown game'}
+                          {rentalTime.game?.title || 'Unknown game'}
                         </span>
                       </TableCell>
                       <TableCell>
                         <Chip color="default" variant="flat">
-                          {rentalTime.duration} min
+                          {rentalTime.duration / 60} min
                         </Chip>
                       </TableCell>
                       <TableCell>
@@ -420,7 +420,7 @@ const SessionManagerDash = () => {
         isOpen={isOpen}
         onClose={() => {
           onClose();
-          setPricePerMinute(5); // Reset to default value
+          setPricePerMinute(5);
         }}
       >
         <ModalContent>

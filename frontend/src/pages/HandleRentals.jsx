@@ -82,7 +82,7 @@ const HandleRentals = () => {
       );
       setRentalOptions(
         response.data.map((option) => ({
-          time: option.duration.toString(),
+          time: option.duration.toString(), // This is now in seconds
           price: option.price,
         }))
       );
@@ -91,7 +91,7 @@ const HandleRentals = () => {
       toast.error("Failed to fetch rental options. Please try again.");
       setRentalOptions([]);
     }
-  };
+  }
 
   useEffect(() => {
     const fetchGameDetails = async () => {
@@ -408,11 +408,13 @@ const HandleRentals = () => {
                               : ""
                           }`}
                         >
-                          {parseInt(option.time) >= 60
-                            ? `${parseInt(option.time) / 60} hour${
-                                parseInt(option.time) > 60 ? "s" : ""
-                              }`
-                            : `${option.time} min`}
+                         {parseInt(option.time) >= 3600
+                        ? `${Math.floor(parseInt(option.time) / 3600)} hour${
+                            Math.floor(parseInt(option.time) / 3600) > 1 ? "s" : ""
+                          }`
+                        : parseInt(option.time) >= 60
+                        ? `${Math.floor(parseInt(option.time) / 60)} min`
+                        : `${option.time} sec`}
                         </p>
                         <p
                           className={`text-sm ${
@@ -466,8 +468,13 @@ const HandleRentals = () => {
           <ModalHeader className="text-white">Confirm Rental</ModalHeader>
           <ModalBody>
             <p>
-              You are about to buy {selectedRental?.time || 10} minutes of
-              playtime for {game?.title || "League of Legends"}.
+              You are about to buy {
+                 parseInt(selectedRental?.time) >= 3600
+                 ? `${Math.floor(parseInt(selectedRental?.time) / 3600)} hour${Math.floor(parseInt(selectedRental?.time) / 3600) > 1 ? 's' : ''}`
+                 : parseInt(selectedRental?.time) >= 60
+                 ? `${Math.floor(parseInt(selectedRental?.time) / 60)} minute${Math.floor(parseInt(selectedRental?.time) / 60) > 1 ? 's' : ''}`
+                 : `${selectedRental?.time} seconds`
+              }of playtime for {game?.title || "League of Legends"}.
             </p>
             <p>Price: LKR {selectedRental?.price}</p>
             <p>Please confirm to proceed with the payment.</p>
