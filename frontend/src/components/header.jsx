@@ -114,7 +114,7 @@ export default function Header() {
                 location.pathname === "/TailoredGames" ? "underline" : ""
               } text-white hover:underline`}
             >
-              Tailored Games
+              Vortex Games
             </Link>
           </NavbarItem>
           <Dropdown placement="bottom-start">
@@ -218,6 +218,12 @@ export default function Header() {
                   My Cart
                 </DropdownItem>
 
+
+                <DropdownItem key="cart" onClick={() => navigate("/Transaction")}>
+                  Transaction History
+                </DropdownItem>
+                
+
                 {/* Developer Filter */}
                 {user.role === "developer" && (
                   <DropdownItem
@@ -227,6 +233,7 @@ export default function Header() {
                     Developer Dashboard
                   </DropdownItem>
                 )}
+
 
                 {/* Admin Filter */}
                 {user.role === "Product Manager" && (
@@ -342,11 +349,6 @@ export default function Header() {
               {/* Normal Login Button */}
               <Link className="text-white" href="/login">
                 Login
-              </Link>
-
-              {/* Developer Login Button */}
-              <Link className="text-white ml-4" href="/DeveloperLoginSignup">
-                Developer Login
               </Link>
             </>
           )}

@@ -135,7 +135,7 @@ const UserManagementTable = ({ users, setUsers }) => {
                 : selectedPlayerType}
             </Button>
           </DropdownTrigger>
-          <DropdownMenu
+          <DropdownMenu className="text-black"
             aria-label="Player Type Selection"
             onAction={(key) => handlePlayerTypeSelect(key)}
           >
@@ -175,9 +175,9 @@ const UserManagementTable = ({ users, setUsers }) => {
           <TableColumn>Player Type</TableColumn>
           <TableColumn>Actions</TableColumn>
         </TableHeader>
-        <TableBody>
+        <TableBody className="text-black">
           {items.map((user) => (
-            <TableRow key={user._id}>
+            <TableRow key={user._id} className="text-black">
               <TableCell>{user.firstname + " " + user.lastname}</TableCell>
               <TableCell>
                 <Avatar src={user.profilePic} />

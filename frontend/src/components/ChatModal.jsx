@@ -7,19 +7,27 @@ import {
   ModalFooter,
   Button,
   Input,
+  Divider,
 } from "@nextui-org/react";
 import axios from "axios";
 
 const ChatModal = ({ isOpen, onOpenChange, contactId }) => {
   const [messages, setMessages] = useState([]);
   const [userName, setUserName] = useState("");
+  const [createdAt, setCreatedAt] = useState("");
   const [replyMessage, setReplyMessage] = useState("");
   const messagesEndRef = useRef(null);
+  const [status, setStatus] = useState("open");
   const [replyingTo, setReplyingTo] = useState(null);
 
   useEffect(() => {
     if (isOpen && contactId) {
       fetchMessages(contactId);
+      const intervalId = setInterval(() => {
+        fetchMessages(contactId); // Poll every 5 seconds
+      }, 5000); // 5000 milliseconds = 5 seconds
+
+      return () => clearInterval(intervalId); // Clear the interval when the modal is closed
     }
   }, [isOpen, contactId]);
 
@@ -41,8 +49,14 @@ const ChatModal = ({ isOpen, onOpenChange, contactId }) => {
         ...msg,
         timestamp: msg.timestamp || new Date().toISOString(),
       }));
-      setMessages(formattedMessages);
+
+      // Update state only if new messages are fetched
+      if (formattedMessages.length !== messages.length) {
+        setMessages(formattedMessages);
+      }
+      setStatus(data.contact.status);
       setUserName(data.contact.username);
+      setCreatedAt(data.contact.createdAt);
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
@@ -95,8 +109,15 @@ const ChatModal = ({ isOpen, onOpenChange, contactId }) => {
         {(onClose) => (
           <>
             <ModalHeader className="flex flex-col gap-1">
-              Chat with {userName}
+              <div className="text-small mb-21">Chat with {userName}</div>
+              <div className="text-small mb-21">
+                Raised at {new Date(createdAt).toLocaleString()}
+              </div>
+              <div className="text-small mb-21">
+                Status: {status.charAt(0).toUpperCase() + status.slice(1)}
+              </div>
             </ModalHeader>
+            <Divider className="my-4" />
             <ModalBody className="flex flex-col">
               <div
                 className="flex-grow overflow-y-auto"
@@ -137,6 +158,7 @@ const ChatModal = ({ isOpen, onOpenChange, contactId }) => {
                   value={replyMessage}
                   onChange={(e) => setReplyMessage(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleReply()}
+                  isDisabled={status === "closed"}
                 />
               </div>
             </ModalBody>
@@ -144,7 +166,11 @@ const ChatModal = ({ isOpen, onOpenChange, contactId }) => {
               <Button color="danger" variant="light" onPress={onClose}>
                 Close
               </Button>
-              <Button color="primary" onPress={handleReply}>
+              <Button
+                color="primary"
+                onPress={handleReply}
+                isDisabled={status === "closed" || !replyMessage.trim()}
+              >
                 Send
               </Button>
             </ModalFooter>

@@ -15,7 +15,7 @@ const userRouter = express.Router();
 // User Registration
 userRouter.post("/register", async (request, response) => {
   try {
-    const { firstname, lastname, username, password, email, birthday, role } =
+    const { firstname, lastname, username, password, email, birthday, role , portfolioLink } =
       request.body;
 
     // Validate input
@@ -72,7 +72,18 @@ userRouter.post("/register", async (request, response) => {
       birthday,
       age, // Store the calculated age
       playerType, // Store the categorized player type
+      developerAttributes: {}
+      
     };
+
+    // Add developer-specific attributes if role is Developer
+    if (role === 'Developer') {
+      newUser.developerAttributes = {
+        portfolioLink: portfolioLink ? portfolioLink.trim() : '',  // Assign portfolioLink here
+        status: 'pending',  // Default status for developer
+      };
+    }
+    
 
     // Create a new user
     const createdUser = await User.create(newUser);
@@ -291,6 +302,64 @@ userRouter.get("/allDevelopers", async (request, response) => {
   }
 });
 
+// Get all approved developers with required fields
+userRouter.get("/approvedDevelopers", async (req, res) => {
+  try {
+    const approvedDevelopers = await User.find({
+      role: "developer",
+      "developerAttributes.status": "approved",
+    });
+
+    return res.status(200).json({
+      total_approved: approvedDevelopers.length,
+      approvedDevelopers: approvedDevelopers,
+    });
+  } catch (error) {
+    console.error("Error fetching approved developers:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
+// Update developer info
+userRouter.put("/developers/update/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedData = req.body; // Contains the updated developer info
+
+    const updatedDeveloper = await User.findByIdAndUpdate(id, updatedData, {
+      new: true,
+    });
+
+    if (!updatedDeveloper) {
+      return res.status(404).json({ message: "Developer not found" });
+    }
+
+    res.status(200).json({ message: "Developer updated successfully", developer: updatedDeveloper });
+  } catch (error) {
+    console.error("Error updating developer:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+// Delete developer info
+userRouter.delete("/developers/delete/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deletedDeveloper = await User.findByIdAndDelete(id);
+
+    if (!deletedDeveloper) {
+      return res.status(404).json({ message: "Developer not found" });
+    }
+
+    res.status(200).json({ message: "Developer deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting developer:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
 
 // Get user profile
 userRouter.get("/profile/:id", async (request, response) => {
@@ -436,5 +505,24 @@ userRouter.delete("/delete/:id", async (request, response) => {
     response.status(500).json({ message: "Internal server error" });
   }
 });
+
+// Get all users with moderator roles
+userRouter.get("/moderators", async (req, res) => {
+  try {
+    const moderatorRoles = [
+      'Product Manager', 'User Manager', 'Order Manager', 'Blogger', 
+      'Session_Manager', 'Community Manager', 'Review Manager', 
+      'Support Agent', 'Staff_Manager', 'Payment Manager'
+    ];
+    const moderators = await User.find({ role: { $in: moderatorRoles } }).select("-password");
+    res.status(200).json(moderators);
+  } catch (error) {
+    console.error("Error fetching moderators:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
+
 
 export default userRouter;

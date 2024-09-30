@@ -2,96 +2,177 @@ import React, { useState, useMemo, useEffect } from "react";
 import axios from "axios";
 
 // Components
-import developerHeader from "../src/components/developerHeader";
+import Header from "../src/components/header";
+
+
+import UploadGame from "./Games_Components/add_new_game";
+import UpdateGame from "./Games_Components/update_game";
+import AddNewStock from "./Games_Components/add_new_stock";
+
 import Footer from "../src/components/footer";
+import VideoPlayer from "../src/components/videoPlayer";
+
+//Stock Components
+import StockTable from "./Stock_Components/stock_table";
 
 // Next UI
-import { Tabs, Tab, Button, Input, Tooltip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
+import { Tabs, Tab, Button, Input, User, Chip, Image } from "@nextui-org/react";
+import { ScrollShadow } from "@nextui-org/react";
+import {
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Pagination,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+} from "@nextui-org/react";
 import { EditIcon } from "../src/assets/icons/EditIcon";
 import { EyeIcon } from "../src/assets/icons/EyeIcon";
 import { DeleteIcon } from "../src/assets/icons/DeleteIcon";
+import { Tooltip } from "@nextui-org/react";
 import { PlusIcon } from "../src/assets/icons/PlusIcon";
 import { SearchIcon } from "../src/assets/icons/SearchIcon";
 import { toast, Flip } from "react-toastify";
-import DeveloperHeader from "../src/components/developerHeader";
+import { getToken } from "../src/utils/getToken";
+import { getUserIdFromToken } from "../src/utils/user_id_decoder";
+import useAuthCheck from "../src/utils/authCheck";
 
-const GameDeveloperDashboard = () => {
-  // Modals
-  const { isOpen: isAddModalOpen, onOpen: onAddModalOpen, onClose: onAddModalClose } = useDisclosure();
-  const { isOpen: isDetailsModalOpen, onOpen: onDetailsModalOpen, onClose: onDetailsModalClose } = useDisclosure();
-  const { isOpen: isDeleteModalOpen, onOpen: onDeleteModalOpen, onClose: onDeleteModalClose } = useDisclosure();
-  const { isOpen: isUpdateModalOpen, onOpen: onUpdateModalOpen, onClose: onUpdateModalClose } = useDisclosure();
+const GameDeveloperDashboard= () => {
 
-  const [activeTab, setActiveTab] = useState("overview");
+    // Authenticate user
+    useAuthCheck();
+
+    //Get the logged in developer
+    const token = getToken();
+    const developerId = getUserIdFromToken(token);
+
+
+
+  //Add New Game Modal
+  const {
+    isOpen: isAddModalOpen,
+    onOpen: onAddModalOpen,
+    onClose: onAddModalClose,
+  } = useDisclosure();
+  //Details Modal
+  const {
+    isOpen: isDetailsModalOpen,
+    onOpen: onDetailsModalOpen,
+    onClose: onDetailsModalClose,
+  } = useDisclosure();
+
+  //Delete Game Modal
+  const {
+    isOpen: isDeleteModalOpen,
+    onOpen: onDeleteModalOpen,
+    onClose: onDeleteModalClose,
+  } = useDisclosure();
+
+  //Update Game Modal
+  const {
+    isOpen: isUpdateModalOpen,
+    onOpen: onUpdateModalOpen,
+    onClose: onUpdateModalClose,
+  } = useDisclosure();
+
+  //Add New Stock Modal
+  const {
+    isOpen: isAddStockModalOpen,
+    onOpen: onAddStockModalOpen,
+    onClose: onAddStockModalClose,
+  } = useDisclosure();
+
+  const [activeTab, setActiveTab] = useState("stats");
   const [page, setPage] = useState(1);
-  const [products, setProducts] = useState([]);
+  const [games, setGames] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedGame, setSelectedGame] = useState(null);
   const rowsPerPage = 5;
 
-  // Search filter
+  //Search filter
   const filteredItems = useMemo(() => {
-    return products.filter((product) =>
-      product.title.toLowerCase().includes(searchQuery.toLowerCase())
+    return games.filter((game) =>
+      game.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [products, searchQuery]);
+  }, [games, searchQuery]);
 
-  // Pagination
+  //Pagination Next UI
   const items = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
     return filteredItems.slice(start, end);
   }, [page, filteredItems]);
 
-  // Fetch all products
+  //Get all games for developer function
   useEffect(() => {
-    getAllProducts();
+    getAllGames();
   }, []);
 
-  const getAllProducts = async () => {
+  //Get all games for developer function
+  const getAllGames = async () => {
     try {
-      const response = await axios.get(`http://localhost:8098/products/allProducts`);
-      if (response.data.allProducts) {
-        setProducts(response.data.allProducts);
+      const response = await axios.get(`http://localhost:8098/games/getGamesByDeveloper/66f8f8ad34ff4bef025da0cd`);
+      if (response.data.allGames) {
+        setGames(response.data.allGames);
       }
     } catch (error) {
-      console.error("Error fetching products:", error);
+      console.error("Error fetching games:", error);
     }
   };
 
-  // Handle Search change
+  //Handle Search change
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
     setPage(1); // Reset page to 1 when search query changes
   };
 
-  // Clear Search
+  //Clear Search
   const handleClearSearch = () => {
     setSearchQuery("");
   };
 
-  // Handle actions
-  const handleEyeIconClick = (product) => {
-    setSelectedProduct(product);
+  //Handle View
+  const handleEyeIconClick = (game) => {
+    setSelectedGame(game);
     onDetailsModalOpen();
   };
 
-  const handleEditIconClick = (product) => {
-    setSelectedProduct(product);
-    onUpdateModalOpen();
-  };
-
-  const handleProductDeletion = (product) => {
-    setSelectedProduct(product);
+  //Set deleted game
+  const handleGameDeletion = (game) => {
+    setSelectedGame(game);
     onDeleteModalOpen();
   };
 
-  const deleteSelectedProduct = async () => {
+  //Set updating game
+  const handleEditIconClick = (game) => {
+    console.log("Edit game:", game);
+    setSelectedGame(game);
+    onUpdateModalOpen();
+  };
+
+  //Set New Stock Game
+  const handleAddNewStock = (game) => {
+    console.log("Stocking game:", game);
+    setSelectedGame(game);
+    onAddStockModalOpen();
+  };
+
+  //Handle deleting
+  const deleteSelectedGame = async () => {
     try {
-      const response = await axios.delete(`http://localhost:8098/products/deleteProduct/${selectedProduct._id}`);
+      const response = await axios.delete(
+        `http://localhost:8098/games/deleteGame/${selectedGame._id}`
+      );
       if (response.data.message) {
-        setProducts(products.filter((product) => product.id !== selectedProduct.id));
-        toast.success("Product Deleted", {
+        setGames(games.filter((game) => game.id !== selectedGame.id));
+        toast.success("Game Deleted", {
           position: "top-right",
           autoClose: 2000,
           hideProgressBar: false,
@@ -104,28 +185,31 @@ const GameDeveloperDashboard = () => {
           style: { fontFamily: "Rubik" },
         });
         onDeleteModalClose(); // Close the deletion modal after successful deletion
-        getAllProducts(); // Refetch products list
+
+        // Refetch games list
+        getAllGames();
       } else {
-        alert("Failed to delete product.");
+        alert("Failed to delete game."); // Show error message if deletion fails
       }
     } catch (error) {
-      console.error("Error deleting product:", error);
-      alert("An error occurred while deleting the product.");
+      console.error("Error deleting game:", error);
+      alert("An error occurred while deleting the game."); // Handle error
     }
   };
 
+  //Call back function
   const handleUploadComplete = () => {
-    getAllProducts();
+    getAllGames();
   };
 
   return (
-    <div className="flex w-full flex-col dark text-foreground bg-background">
+    <div className="flex w-full flex-col text-black bg-white">
       <div className="relative">
-        <DeveloperHeader />
+        <Header />
       </div>
       <div className="flex items-center p-4 font-primaryRegular bg-inputColor">
         <Tabs
-          aria-label="Game Developer Dashboard Tabs"
+          aria-label="Blogger Tabs"
           className="flex-1"
           onSelectionChange={setActiveTab}
           selectedKey={activeTab}
@@ -133,24 +217,25 @@ const GameDeveloperDashboard = () => {
           variant="bordered"
           color="primary"
         >
-          <Tab key="overview" title="Overview" />
-          <Tab key="products" title="Product List" />
-          <Tab key="sales" title="Sales Reports" />
+          <Tab key="analytics" title="Analytics" />
+          <Tab key="products" title="My Games" />
         </Tabs>
       </div>
       <div className="p-4">
-        {activeTab === "overview" && (
-          <>
-            <h1>Overview</h1>
-            {/* Add your overview content here */}
-          </>
+        {activeTab === "analytics" && (
+          <div className="bg-white flex flex-col min-h-screen">
+            <p className="text-center text-black font-primaryRegular text-5xl mt-[100px]">
+              STATS
+            </p>
+          </div>
         )}
+        {/*PRODUCTS*/}
         {activeTab === "products" && (
           <>
             <div className="flex justify-between mb-4 bg-inputColor">
               <Input
                 className="ml-2 font-primaryRegular w-[300px] bg-inputColor"
-                placeholder="SEARCH BY PRODUCT"
+                placeholder="SEARCH BY GAME"
                 startContent={<SearchIcon />}
                 value={searchQuery}
                 onChange={handleSearchChange}
@@ -167,9 +252,10 @@ const GameDeveloperDashboard = () => {
                 Add New
               </Button>
             </div>
+            {/*Product Table*/}
             <Table
               isHeaderSticky
-              aria-label="Products table with pagination"
+              aria-label="Example table with client side pagination "
               className="font-primaryRegular bg-inputColor"
               bottomContent={
                 <div className="flex w-full justify-center font-primaryRegular">
@@ -191,26 +277,32 @@ const GameDeveloperDashboard = () => {
             >
               <TableHeader className="bg-foreground">
                 <TableColumn key="name">TITLE</TableColumn>
-                <TableColumn key="price">PRICE</TableColumn>
+                <TableColumn key="date">RELEASE DATE</TableColumn>
                 <TableColumn key="actions">ACTIONS</TableColumn>
               </TableHeader>
               <TableBody className="bg-inputColor">
-                {items.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell>{product.title}</TableCell>
-                    <TableCell>{product.price}</TableCell>
+                {items.map((game) => (
+                  <TableRow key={game.id}>
+                    <TableCell>{game.title}</TableCell>
+                    <TableCell>
+                      {new Date(game.insertDate).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </TableCell>
                     <TableCell>
                       <div className="relative flex items-center gap-2 space-x-4">
                         <Tooltip
                           content="Show details"
                           showArrow
-                          className="font-primaryRegular"
+                          className="font-primaryRegular text-black"
                           color="default"
                           placement="top-end"
                         >
                           <span
                             className="text-lg text-default-400 cursor-pointer active:opacity-20"
-                            onClick={() => handleEyeIconClick(product)}
+                            onClick={() => handleEyeIconClick(game)}
                           >
                             <EyeIcon />
                           </span>
@@ -223,13 +315,13 @@ const GameDeveloperDashboard = () => {
                         >
                           <span
                             className="text-lg text-default-400 cursor-pointer active:opacity-20"
-                            onClick={() => handleEditIconClick(product)}
+                            onClick={() => handleEditIconClick(game)}
                           >
                             <EditIcon />
                           </span>
                         </Tooltip>
                         <Tooltip
-                          content="Delete product"
+                          content="Delete game"
                           showArrow
                           color="danger"
                           className="font-primaryRegular"
@@ -237,7 +329,7 @@ const GameDeveloperDashboard = () => {
                         >
                           <span
                             className="text-lg text-default-400 cursor-pointer active:opacity-20"
-                            onClick={() => handleProductDeletion(product)}
+                            onClick={() => handleGameDeletion(game)}
                           >
                             <DeleteIcon />
                           </span>
@@ -249,122 +341,185 @@ const GameDeveloperDashboard = () => {
               </TableBody>
             </Table>
 
-            {/* Show Product Details */}
+            {/* Show Game Details */}
             <Modal
               isOpen={isDetailsModalOpen}
               size="2xl"
               onOpenChange={onDetailsModalClose}
               classNames={{
-                backdrop: "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20",
+                backdrop:
+                  "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20",
               }}
-              className="p-4"
+              className="p-4 text-black"
             >
-              <ModalContent className="font-primaryRegular bg-black">
-                <ModalHeader>
-                  <h2>Product Details</h2>
-                </ModalHeader>
+              <ModalContent className="font-primaryRegular bg-white">
+                <ModalHeader>Game Information</ModalHeader>
                 <ModalBody>
-                  {selectedProduct && (
-                    <div>
-                      <h3>{selectedProduct.title}</h3>
-                      <p>
-                        <strong>Price:</strong> ${selectedProduct.price}
+                  {selectedGame && (
+                    <div className="flex flex-col gap-4">
+                      <Chip color="primary">{selectedGame.title}</Chip>
+
+                      <div className="flex gap-4 items-start">
+                        <div>
+                          <Image
+                            isZoomed
+                            width={300}
+                            alt="Game Cover Photo"
+                            src={selectedGame.coverPhoto}
+                            className="rounded-lg shadow-md"
+                          />
+                        </div>
+                        {selectedGame.TrailerVideo && (
+                          <div className="w-[700px] h-[100px] mb-8">
+                            <VideoPlayer
+                              videoUrl={selectedGame.TrailerVideo}
+                              autoPlay
+                              controls
+                              className="w-[400px] h-[300px]"
+                              muted
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      <p className="text-black text-[16px] mt-8">
+                        {selectedGame.Description}
                       </p>
-                      {/* Add more product details here */}
+
+                      <p className="text-gray-600">
+                        Release Date <br />
+                        <Chip radius="none" color="default">
+                          {new Date(selectedGame.insertDate).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            }
+                          )}
+                        </Chip>
+                      </p>
                     </div>
                   )}
                 </ModalBody>
+
                 <ModalFooter>
-                  <Button color="primary" onPress={onDetailsModalClose}>
+                  <Button
+                    color="danger"
+                    variant="ghost"
+                    size="sm"
+                    onPress={onDetailsModalClose}
+                  >
                     Close
                   </Button>
                 </ModalFooter>
               </ModalContent>
             </Modal>
 
-            {/* Add New Product */}
+            {/* Add New Game  */}
             <Modal
               isOpen={isAddModalOpen}
-              size="2xl"
+              size="lg"
               onOpenChange={onAddModalClose}
               classNames={{
-                backdrop: "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20",
+                backdrop:
+                  "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20",
               }}
-              className="p-4"
             >
-              <ModalContent className="font-primaryRegular bg-black">
-                <ModalHeader>
-                  <h2>Add New Product</h2>
-                </ModalHeader>
+              <ModalContent className="font-primaryRegular text-black">
+                <ModalHeader>Add New Game</ModalHeader>
                 <ModalBody>
-                  {/* Add product form here */}
+                  <UploadGame
+                    FunctionToCallAfterUpload={handleUploadComplete}
+                  />
                 </ModalBody>
-                <ModalFooter>
-                  <Button color="primary" onPress={onAddModalClose}>
-                    Close
-                  </Button>
-                </ModalFooter>
+                <ModalFooter></ModalFooter>
               </ModalContent>
             </Modal>
 
-            {/* Update Product */}
-            <Modal
-              isOpen={isUpdateModalOpen}
-              size="2xl"
-              onOpenChange={onUpdateModalClose}
-              classNames={{
-                backdrop: "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20",
-              }}
-              className="p-4"
-            >
-              <ModalContent className="font-primaryRegular bg-black">
-                <ModalHeader>
-                  <h2>Update Product</h2>
-                </ModalHeader>
-                <ModalBody>
-                  {/* Update product form here */}
-                </ModalBody>
-                <ModalFooter>
-                  <Button color="primary" onPress={onUpdateModalClose}>
-                    Close
-                  </Button>
-                </ModalFooter>
-              </ModalContent>
-            </Modal>
-
-            {/* Delete Product */}
+            {/* Delete Game  */}
             <Modal
               isOpen={isDeleteModalOpen}
-              size="sm"
               onOpenChange={onDeleteModalClose}
               classNames={{
-                backdrop: "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20",
+                backdrop:
+                  "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20",
               }}
-              className="p-4"
             >
-              <ModalContent className="font-primaryRegular bg-black">
-                <ModalHeader>
-                  <h2>Confirm Deletion</h2>
-                </ModalHeader>
+              <ModalContent className="font-primaryRegular text-black">
+                <ModalHeader>Confirm Game Deletion</ModalHeader>
                 <ModalBody>
-                  <p>Are you sure you want to delete this product?</p>
+                  <p>
+                    Deleting Game : {selectedGame ? selectedGame.title : ""}
+                  </p>
                 </ModalBody>
                 <ModalFooter>
-                  <Button color="danger" onPress={deleteSelectedProduct}>
-                    Delete
-                  </Button>
-                  <Button color="primary" onPress={onDeleteModalClose}>
+                  <Button
+                    color="danger"
+                    variant="light"
+                    onPress={onDeleteModalClose}
+                  >
                     Cancel
+                  </Button>
+                  <Button color="primary" onClick={deleteSelectedGame}>
+                    Confirm
                   </Button>
                 </ModalFooter>
               </ModalContent>
             </Modal>
-          </>
-        )}
-        {activeTab === "sales" && (
-          <>
-            <h1>Sales Reports</h1>
-            {/* Add sales reports content here */}
+
+            {/* Update Game Details */}
+            <Modal
+              isOpen={isUpdateModalOpen}
+              size="3xl"
+              onOpenChange={onUpdateModalClose}
+              classNames={{
+                backdrop:
+                  "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20",
+              }}
+            >
+              <ModalContent className="font-primaryRegular">
+                <ModalBody className="bg-white text-black">
+                  <ModalHeader>Update Game</ModalHeader>
+
+                  <UpdateGame
+                    updatingGame={selectedGame}
+                    callBackFunction1={onUpdateModalClose}
+                    callBackFunction2={handleUploadComplete}
+                  />
+                </ModalBody>
+                <ModalFooter className="bg-white ">
+                  <Button
+                    color="danger"
+                    variant="ghost"
+                    onPress={onUpdateModalClose}
+                  >
+                    Close
+                  </Button>
+                </ModalFooter>
+              </ModalContent>
+            </Modal>
+
+            {/*Publish Game*/}
+            <Modal
+              isOpen={isAddStockModalOpen}
+              size="lg"
+              onOpenChange={onAddStockModalClose}
+              classNames={{
+                backdrop:
+                  "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20",
+              }}
+            >
+              <ModalContent className="font-primaryRegular text-black">
+                <ModalHeader>Publish Game</ModalHeader>
+                <ModalBody>
+                  <AddNewStock
+                    gameForTheStock={selectedGame}
+                    callBackFunction={onAddStockModalClose}
+                  />
+                </ModalBody>
+              </ModalContent>
+            </Modal>
           </>
         )}
       </div>

@@ -37,24 +37,16 @@ export const deleteRentalPayment = async (req, res) => {
 
 export const getAllRentalPayments = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-
     const rentalPayments = await RentalPayment.find()
       .populate('user', 'username email')
       .populate('game', 'title')
       .populate('rental', 'time status')
-      .skip(skip)
-      .limit(limit)
       .sort({ date: -1 });
 
-    const total = await RentalPayment.countDocuments();
+    const total = rentalPayments.length;
 
     res.status(200).json({
       rentalPayments,
-      currentPage: page,
-      totalPages: Math.ceil(total / limit),
       totalPayments: total
     });
   } catch (error) {

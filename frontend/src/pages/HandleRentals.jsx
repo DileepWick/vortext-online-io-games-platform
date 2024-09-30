@@ -82,7 +82,7 @@ const HandleRentals = () => {
       );
       setRentalOptions(
         response.data.map((option) => ({
-          time: option.duration.toString(),
+          time: option.duration.toString(), // This is now in seconds
           price: option.price,
         }))
       );
@@ -91,7 +91,7 @@ const HandleRentals = () => {
       toast.error("Failed to fetch rental options. Please try again.");
       setRentalOptions([]);
     }
-  };
+  }
 
   useEffect(() => {
     const fetchGameDetails = async () => {
@@ -118,9 +118,47 @@ const HandleRentals = () => {
     );
   }, []);
 
-  const handleRentClick = useCallback(() => {
+  const handleRentClick = useCallback(async () => {
     if (selectedRental) {
-      onOpen();
+      try {
+        const token = getToken();
+        const userId = getUserIdFromToken(token);
+
+        if (!userId) {
+          throw new Error("User ID not found. Please log in again.");
+        }
+
+        // Check for existing rental
+        const checkResponse = await axios.get(
+          `http://localhost:8098/Rentals/checkExistingRental/${userId}/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (checkResponse.data.hasExistingRental) {
+          toast.warning(`You already have an existing rental for ${game.title}.`, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+            transition: Flip,
+            style: { fontFamily: "Rubik" },
+          });
+        } else {
+          // If no existing rental, proceed to open the confirmation modal
+          onOpen();
+        }
+      } catch (error) {
+        console.error("Error checking existing rental:", error);
+        toast.error("Failed to check existing rentals. Please try again.");
+      }
     } else {
       toast.warning("Please select a rental duration.", {
         position: "top-right",
@@ -135,7 +173,7 @@ const HandleRentals = () => {
         style: { fontFamily: "Rubik" },
       });
     }
-  }, [selectedRental, onOpen]);
+  }, [selectedRental, onOpen, id, game]);
 
 
 
@@ -370,11 +408,13 @@ const HandleRentals = () => {
                               : ""
                           }`}
                         >
-                          {parseInt(option.time) >= 60
-                            ? `${parseInt(option.time) / 60} hour${
-                                parseInt(option.time) > 60 ? "s" : ""
-                              }`
-                            : `${option.time} min`}
+                         {parseInt(option.time) >= 3600
+                        ? `${Math.floor(parseInt(option.time) / 3600)} hour${
+                            Math.floor(parseInt(option.time) / 3600) > 1 ? "s" : ""
+                          }`
+                        : parseInt(option.time) >= 60
+                        ? `${Math.floor(parseInt(option.time) / 60)} min`
+                        : `${option.time} sec`}
                         </p>
                         <p
                           className={`text-sm ${
@@ -428,8 +468,13 @@ const HandleRentals = () => {
           <ModalHeader className="text-white">Confirm Rental</ModalHeader>
           <ModalBody>
             <p>
-              You are about to buy {selectedRental?.time || 10} minutes of
-              playtime for {game?.title || "League of Legends"}.
+              You are about to buy {
+                 parseInt(selectedRental?.time) >= 3600
+                 ? `${Math.floor(parseInt(selectedRental?.time) / 3600)} hour${Math.floor(parseInt(selectedRental?.time) / 3600) > 1 ? 's' : ''}`
+                 : parseInt(selectedRental?.time) >= 60
+                 ? `${Math.floor(parseInt(selectedRental?.time) / 60)} minute${Math.floor(parseInt(selectedRental?.time) / 60) > 1 ? 's' : ''}`
+                 : `${selectedRental?.time} seconds`
+              }of playtime for {game?.title || "League of Legends"}.
             </p>
             <p>Price: LKR {selectedRental?.price}</p>
             <p>Please confirm to proceed with the payment.</p>

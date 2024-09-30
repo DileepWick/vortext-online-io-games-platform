@@ -2,6 +2,8 @@
 import fs from "fs";
 import { Game } from "../models/game.js";
 import cloudinary from "../utils/cloudinary.js";
+import { GameStock } from "../models/gameStock.js";
+import { User } from "../models/user.js";
 
 
 //Add new game
@@ -33,7 +35,7 @@ export const uploadGame = async (req, res) => {
     );
 
     // Check required fields
-    if (!req.body.title || !req.body.Description || !req.body.Genre || !req.body.PlayLink || !req.body.AgeGroup) {
+    if (!req.body.title || !req.body.Description || !req.body.Genre || !req.body.PlayLink || !req.body.AgeGroup ||!req.body.developer) {
       // Clean up uploaded files before returning error response
       fs.unlinkSync(req.files.image[0].path);
       fs.unlinkSync(req.files.video[0].path);
@@ -53,6 +55,7 @@ export const uploadGame = async (req, res) => {
       Genre: req.body.Genre,
       PlayLink: req.body.PlayLink,
       AgeGroup: req.body.AgeGroup,
+      developer:req.body.developer,
     });
 
     // Save the new game to the database
@@ -80,7 +83,7 @@ export const uploadGame = async (req, res) => {
 //Get all games
 export const getAllGames = async (req, res) => {
   try {
-    const allGames = await Game.find();
+    const allGames = await Game.find().populate("developer");
     return res.status(200).json({
       total_games: allGames.length,
       allGames,
@@ -92,20 +95,27 @@ export const getAllGames = async (req, res) => {
   }
 };
 
-//Get specific game details by id
-export const getSpecificGame = async (req, res) => {
-  try {
-    const gameId = req.params.id;
 
-    const PickedGame = await Game.findById(gameId)
-      .populate("Category")
-      .populate("Stock");
+// Get games by developer
+export const getGamesByDeveloper = async (req, res) => {
+  try {
+    const { developerId } = req.params; // Get developer ID from route params
+
+    const allGames = await Game.find({ developer: developerId }).populate("developer");
+
+    if (!allGames.length) {
+      return res.status(404).json({
+        message: "No games found for this developer.",
+      });
+    }
+
     return res.status(200).json({
-      PickedGame,
+      total_games: allGames.length,
+      allGames,
     });
   } catch (error) {
     return res.status(500).json({
-      message: "Error getting the game.",
+      message: "Error getting games for this developer.",
     });
   }
 };
@@ -132,6 +142,70 @@ export const fetchGameById = async (req, res) => {
       message: "Error getting the game.",
       error: error.message,
       stack: error.stack
+    });
+  }
+};
+
+
+//Get specific game details by id
+export const getSpecificGame = async (req, res) => {
+  try {
+    const { gameId } = req.params;
+    const game = await Game.findById(gameId); 
+    
+    if (game) {
+      const response = {
+        _id: game._id,
+        title: game.title
+      };
+      console.log("Game Title:", game);
+      return res.status(200).json(game);
+    } else {
+      console.log("Game not found");
+      return res.status(404).json({
+        message: "Game not found."
+        
+      });
+    }
+
+  } catch (error) {
+    console.error("Error getting game name:", error);
+    return res.status(500).json({
+      message: "Error getting game name."
+    });
+  }
+};
+
+export const getGameNameByAssignedGameId = async (req, res) => {
+  try {
+    const { assignedGameId } = req.params;
+    const gameStock = await GameStock.findOne({ "AssignedGame": assignedGameId }).populate("AssignedGame");
+
+
+
+    if (gameStock) {
+      // Prepare response with relevant data from AssignedGame
+      const response = {
+        _id: gameStock.AssignedGame._id,
+        title: gameStock.AssignedGame.title,
+        genre: gameStock.AssignedGame.Genre,
+        UnitPrice: gameStock.UnitPrice,
+        discount: gameStock.discount,
+        coverPhoto: gameStock.AssignedGame.coverPhoto,
+       };
+
+      console.log("Game found:", response);
+      return res.status(200).json(response);
+    } else {
+      console.log("Game not found");
+      return res.status(404).json({
+        message: "Game not found.",
+      });
+    }
+  } catch (error) {
+    console.error("Error getting game by AssignedGameId:", error);
+    return res.status(500).json({
+      message: "Error getting game by AssignedGameId."
     });
   }
 };

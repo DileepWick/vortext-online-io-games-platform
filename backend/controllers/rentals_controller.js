@@ -174,3 +174,77 @@ export const getLatestRental = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+export const checkExistingRental = async (req, res) => {
+  try {
+    const { userId, gameId } = req.params;
+    console.log(`Checking existing rental for user ${userId} and game ${gameId}`);
+
+    // Find any rental for this user and game, regardless of its status
+    const existingRental = await Rental.findOne({
+      user: userId,
+      game: gameId
+    });
+
+    const hasExistingRental = !!existingRental;
+    console.log(`Existing rental ${hasExistingRental ? 'found' : 'not found'}`);
+
+    res.json({ hasExistingRental });
+  } catch (error) {
+    console.error("Error in checkExistingRental:", error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+export const extendRentalTime = async (req, res) => {
+  try {
+    const { userId, gameId } = req.params;
+    const { additionalTime, additionalPrice } = req.body;
+    console.log(`Extending rental time for user ${userId} and game ${gameId}`);
+
+    // Find the most recent rental for this user and game
+    const rental = await Rental.findOne({ 
+      user: userId, 
+      game: gameId 
+    }).sort({ insertDate: -1 });
+
+    if (!rental) {
+      return res.status(404).json({ message: "No rental found for this user and game" });
+    }
+
+    // Parse the current time and additional time as integers
+    const currentTime = parseInt(rental.time);
+    const timeToAdd = parseInt(additionalTime);
+
+    // Calculate the new total time
+    const newTotalTime = currentTime + timeToAdd;
+
+    // Calculate the new total price
+    const newTotalPrice = rental.price + parseFloat(additionalPrice);
+
+    // Update the rental with the new total time and price
+    const updatedRental = await Rental.findByIdAndUpdate(
+      rental._id,
+      { 
+        time: newTotalTime.toString(),
+        price: newTotalPrice
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedRental) {
+      return res.status(404).json({ message: "Failed to update rental" });
+    }
+
+    console.log("Rental time and price extended successfully");
+    res.json({
+      message: "Rental time and price extended successfully",
+      rental: updatedRental
+    });
+  } catch (error) {
+    console.error("Error in extendRentalTime:", error);
+    res.status(500).json({ 
+      message: "Error extending rental time and price", 
+      error: error.message 
+    });
+  }
+};
