@@ -83,6 +83,23 @@ const RentedGamesSection = () => {
     }
   };
 
+  const formatTime = (seconds) => {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    
+    let timeString = "";
+    if (hrs > 0) {
+      timeString += `${hrs}h `;
+    }
+    if (mins > 0 || hrs > 0) {
+      timeString += `${mins}m `;
+    }
+    timeString += `${secs}s`;
+    
+    return timeString.trim();
+  };
+
   const uniqueUsers = useMemo(() => {
     const users = new Set(rentedGames.map((game) => game.user?.username));
     return ["all", ...Array.from(users)];
@@ -180,7 +197,7 @@ const RentedGamesSection = () => {
         <TableHeader>
           <TableColumn>GAME</TableColumn>
           <TableColumn>USER</TableColumn>
-          <TableColumn>TIME (MINUTES)</TableColumn>
+          <TableColumn>TIME</TableColumn>
           <TableColumn>PRICE</TableColumn>
           <TableColumn>RENTAL DATE</TableColumn>
           <TableColumn>ACTIONS</TableColumn>
@@ -205,7 +222,7 @@ const RentedGamesSection = () => {
                   {rentedGame.user?.username || "N/A"}
                 </TableCell>
                 <TableCell style={{ color: "black" }}>
-                  {rentedGame.time || "N/A"} min
+                  {formatTime(rentedGame.time) || "N/A"}
                 </TableCell>
                 <TableCell style={{ color: "black" }}>
                   LKR {rentedGame.price || "N/A"}.00

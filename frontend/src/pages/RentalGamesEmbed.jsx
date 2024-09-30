@@ -36,10 +36,10 @@ const RentalGamesEmbed = () => {
   const navigate = useNavigate();
   const decodedSrc = decodeURIComponent(src);
   const decodedTitle = decodeURIComponent(title);
-  const rentalTimeMinutes = parseInt(decodeURIComponent(rentalTime), 10);
-  const initialTimeSeconds = !isNaN(rentalTimeMinutes) && rentalTimeMinutes > 0 
-    ? rentalTimeMinutes * 60  // Convert minutes to seconds
-    : 14400;  // Default to 4 hours (240 minutes) if invalid
+  const rentalTimeSeconds = parseInt(decodeURIComponent(rentalTime), 10);
+  const initialTimeSeconds = !isNaN(rentalTimeSeconds) && rentalTimeSeconds > 0 
+    ? rentalTimeSeconds
+    : 14400;  // Default to 4 hours (14400 seconds) if invalid
   const iframeRef = useRef(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [timeLeft, setTimeLeft] = useState(initialTimeSeconds);
@@ -56,9 +56,8 @@ const RentalGamesEmbed = () => {
 
   const updateRentalTime = async (remainingTimeInSeconds) => {
     try {
-      const remainingTimeInMinutes = Math.ceil(remainingTimeInSeconds / 60);
       await axios.put(`http://localhost:8098/Rentals/updateRentalTime/${rentalId}`, {
-        remainingTime: remainingTimeInMinutes
+        remainingTime: remainingTimeInSeconds
       });
       console.log("Rental time updated successfully");
     } catch (error) {
@@ -67,7 +66,6 @@ const RentalGamesEmbed = () => {
   };
 
   useEffect(() => {
-    console.log("Initial rental time (minutes):", rentalTimeMinutes);
     console.log("Initial rental time (seconds):", initialTimeSeconds);
     
     // Countdown timer
@@ -85,7 +83,7 @@ const RentalGamesEmbed = () => {
     }, 1000);
 
     return () => clearInterval(timer); // Clean up the timer on component unmount
-  }, [navigate, initialTimeSeconds, rentalTimeMinutes, rentalId]);
+  }, [navigate, initialTimeSeconds, rentalId]);
 
   useEffect(() => {
     const handleFullScreenChange = () => {

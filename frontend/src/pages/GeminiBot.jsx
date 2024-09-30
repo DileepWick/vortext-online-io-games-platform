@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
-import { Avatar, Button, Textarea } from "@nextui-org/react";
+import { Avatar, Button, Textarea, Tooltip } from "@nextui-org/react";
 import { MessageCircle, X } from "lucide-react";
 
 // Utils
@@ -24,8 +24,7 @@ const ChatComponent = ({ game }) => {
         `http://localhost:8098/users/profile/${userId}`
       );
       const { username, age } = userResponse.data.profile;
-
-      const promptWithGame = `Greet "${username}" and say something cool about user's age. User's age is "${age}". Behave according to that age and your responses should align with that age. You are an expert on the game "${game}". Introduce yourself shortly and ask if the user has any questions about the game. You only talk about "${game}" nothing more. If the user asks about other stuff, be funny and mock them politely. Act like Ezreal from league of legends. Your name is Ezreal. Give short and simple answers and use emojis`;
+      const promptWithGame = `Greet "${username}". You are an expert on the game "${game}". Introduce yourself shortly and ask if the user has any questions about the game. You only talk about "${game}" nothing more. If the user asks about other stuff, be funny and mock them politely. Act Like a cute gamer girl. Your name is Gwen. Give very short and simple answers and use emojis`;
 
       const chatResponse = await axios.post("http://localhost:8098/api/chat", {
         sessionId,
@@ -101,18 +100,25 @@ const ChatComponent = ({ game }) => {
   return (
     <>
       {!isChatOpen && (
-        <Button
-          onClick={toggleChat}
-          className="fixed bottom-4 right-4 w-16 h-16 rounded-full bg-blue-500 text-white shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-300 ease-in-out z-50"
-        >
-          <MessageCircle size={32} />
-        </Button>
+        <Tooltip showArrow={true} content="Wanna Help With The Game ? Just Ask Me " className="text-black"
+        placement="top-start">
+          <button
+            onClick={toggleChat}
+            className="fixed bottom-4 right-4 w-[240px] h-[240px] rounded-full p-0    z-50 "
+          >
+            <img
+              src="https://res.cloudinary.com/dhcawltsr/image/upload/v1727709362/smart-girl-animation-download--unscreen_icm1qe.gif" // Replace with your image path or URL
+              alt="Chat Icon"
+              className="w-full h-full rounded-full object-cover"
+            />
+          </button>
+        </Tooltip>
       )}
       {isChatOpen && (
         <div className="fixed bottom-4 right-4 w-full max-w-lg mx-auto p-6 bg-customDark text-white rounded-lg shadow-xl z-50">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-2xl font-primaryRegular text-white">
-              Get Help From Ezreal
+              Get Help From Gwen
             </h1>
             <Button
               onClick={toggleChat}
@@ -121,7 +127,7 @@ const ChatComponent = ({ game }) => {
               <X size={24} />
             </Button>
           </div>
-          <p className="mb-4 text-gray-400">He is an expert in {game}</p>
+          <p className="mb-4 text-gray-400">She is an expert in {game}</p>
           <div className="h-96 overflow-y-auto rounded-lg p-4 bg-customDark mb-4">
             {messages.map((msg, index) => (
               <div
@@ -134,24 +140,21 @@ const ChatComponent = ({ game }) => {
               >
                 {msg.role === "ai" && (
                   <div
-                    className="flex flex-col items-start bg-customDark p-3 rounded-lg"
+                    className="flex flex-col items-start bg-customDark p-3 rounded-lg comic-speech-bubble-left"
                     style={{ fontSize: "20px" }}
                   >
                     <Avatar
-                      src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjAo0CvRISfNjyX_y1ZxGf59zAOnw0fmLfoQ&s"
+                      src="https://res.cloudinary.com/dhcawltsr/image/upload/v1727709362/smart-girl-animation-download--unscreen_icm1qe.gif"
                       alt="AI Avatar"
                       size="lg"
                     />
-                    <span className="mt-2 font-primaryRegular text-customPink">
-                      Ezreal
-                    </span>
-                    <div className="mt-1 p-2 bg-customDark rounded-lg text-white font-primaryRegular">
+                    <div className="mt-1 p-2 bg-customDark text-white font-primaryRegular comic-speech-text">
                       {msg.text}
                     </div>
                   </div>
                 )}
                 {msg.role === "user" && (
-                  <div className="flex flex-row bg-customDark p-3 rounded-lg">
+                  <div className="flex flex-row p-3 rounded-lg comic-speech-bubble-right">
                     <div
                       className="p-2 bg-blue-500 rounded-lg text-white font-primaryRegular text-right"
                       style={{ fontSize: "20px" }}
@@ -162,7 +165,7 @@ const ChatComponent = ({ game }) => {
                 )}
               </div>
             ))}
-            {loading && <div className="text-gray-300">Ezreal is typing...</div>}
+            {loading && <div className="text-gray-300">Gwen is typing...</div>}
             {error && <div className="text-red-400">{error}</div>}
             <div ref={chatEndRef} />
           </div>
@@ -180,7 +183,7 @@ const ChatComponent = ({ game }) => {
               className="bg-blue-500 text-white p-2 mt-4 rounded-r-lg hover:bg-blue-600 h-[70px] font-primaryRegular"
               disabled={loading}
             >
-              {loading ? "Asking Ezreal..." : "Ask"}
+              {loading ? "Asking Gwen..." : "Ask"}
             </Button>
           </form>
         </div>
