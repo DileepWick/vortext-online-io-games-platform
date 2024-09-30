@@ -7,8 +7,17 @@ import UserManagementTable from "./usermanage_component/UserManagementTable";
 import UserStats from "./usermanage_component/Userstats";
 import DeveloperDashboard from "./usermanage_component/DeveloperDashboard";
 import DeveloperInfoTable from "./usermanage_component/DeveloperInfoTable";
+import useAuthCheck from "../src/utils/authCheck";
+import ModeratorsTable from "./usermanage_component/ModeratorsTable";
+
+
+
 
 const UserManagementDashboard = () => {
+
+// Authenticate user
+useAuthCheck();
+
   const [activeTab, setActiveTab] = useState("tab1");
   const [users, setUsers] = useState([]);
   const [moderators, setModerators] = useState([]);
@@ -87,16 +96,7 @@ const UserManagementDashboard = () => {
           </div>
         )}
 
-        {activeTab === "tab5" && (
-          <div>
-            <h2>Moderators</h2>
-            <UserManagementTable
-              users={moderators}
-              setUsers={setModerators}
-              userType="moderator"
-            />
-          </div>
-        )}
+        
 
         {activeTab === "tab3" && (
           <div>
@@ -110,6 +110,13 @@ const UserManagementDashboard = () => {
             <DeveloperInfoTable developers={developers} />
           </div>
         )}
+        {activeTab === "tab5" && (
+            <div>
+              <h2>Manage Moderators</h2>
+              <ModeratorsTable moderators={moderators} />
+            </div>
+          )}
+        
       </div>
       <footer/>
     </div>

@@ -135,7 +135,7 @@ const UserManagementTable = ({ users, setUsers }) => {
                 : selectedPlayerType}
             </Button>
           </DropdownTrigger>
-          <DropdownMenu
+          <DropdownMenu className="text-black"
             aria-label="Player Type Selection"
             onAction={(key) => handlePlayerTypeSelect(key)}
           >

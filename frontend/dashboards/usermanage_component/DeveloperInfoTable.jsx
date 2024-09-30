@@ -17,6 +17,7 @@ import {
   ModalFooter,
   Input,
 } from "@nextui-org/react";
+import { SearchIcon } from "../../src/assets/icons/SearchIcon"; // Assuming you have the icon
 
 const DeveloperInfoTable = () => {
   const [approvedDevelopers, setApprovedDevelopers] = useState([]);
@@ -25,6 +26,7 @@ const DeveloperInfoTable = () => {
   const [selectedDeveloper, setSelectedDeveloper] = useState(null);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(""); // Add search query state
 
   useEffect(() => {
     fetchApprovedDevelopers();
@@ -38,11 +40,20 @@ const DeveloperInfoTable = () => {
       setApprovedDevelopers(response.data.approvedDevelopers);
     } catch (error) {
       console.error("Error fetching approved developers:", error);
-      toast.error("Failed to fetch approved developers. Please try again later.");
+      toast.error(
+        "Failed to fetch approved developers. Please try again later."
+      );
     }
   };
 
-  const paginatedItems = approvedDevelopers.slice(
+  // Filter developers by search query (username, firstname, or lastname)
+  const filteredDevelopers = approvedDevelopers.filter((developer) =>
+    developer.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    developer.firstname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    developer.lastname.toLowerCase().includes(searchQuery.toLowerCase()) // Filter by lastname as well
+  );
+
+  const paginatedItems = filteredDevelopers.slice(
     (page - 1) * rowsPerPage,
     page * rowsPerPage
   );
@@ -74,7 +85,9 @@ const DeveloperInfoTable = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:8098/users/developers/delete/${selectedDeveloper._id}`);
+      await axios.delete(
+        `http://localhost:8098/users/developers/delete/${selectedDeveloper._id}`
+      );
       setDeleteModalOpen(false);
       setApprovedDevelopers((prevDevelopers) =>
         prevDevelopers.filter((dev) => dev._id !== selectedDeveloper._id)
@@ -86,8 +99,26 @@ const DeveloperInfoTable = () => {
     }
   };
 
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+    setPage(1); // Reset to the first page when searching
+  };
+
   return (
     <div>
+      {/* Search Bar */}
+      <div className="flex items-center mb-4">
+  <Input
+    className="ml-2 font-primaryRegular w-full" // Use w-full to make it full width
+    placeholder="Search by Developer (username, firstname, or lastname)..."
+    startContent={<SearchIcon />}
+    value={searchQuery}
+    onChange={handleSearchChange}
+    onClear={() => handleSearchChange({ target: { value: "" } })}
+    style={{ maxWidth: "600px" }} // Optional: Set a maximum width
+  />
+</div>
+
       <Table
         aria-label="Approved Developers Table"
         className="font-primaryRegular"
@@ -100,7 +131,7 @@ const DeveloperInfoTable = () => {
               showShadow
               color="primary"
               page={page}
-              total={Math.ceil(approvedDevelopers.length / rowsPerPage)}
+              total={Math.ceil(filteredDevelopers.length / rowsPerPage)}
               onChange={(page) => setPage(page)}
             />
           </div>
@@ -157,7 +188,10 @@ const DeveloperInfoTable = () => {
               label="Username"
               value={selectedDeveloper?.username || ""}
               onChange={(e) =>
-                setSelectedDeveloper({ ...selectedDeveloper, username: e.target.value })
+                setSelectedDeveloper({
+                  ...selectedDeveloper,
+                  username: e.target.value,
+                })
               }
             />
             <Input
@@ -165,7 +199,10 @@ const DeveloperInfoTable = () => {
               label="Email"
               value={selectedDeveloper?.email || ""}
               onChange={(e) =>
-                setSelectedDeveloper({ ...selectedDeveloper, email: e.target.value })
+                setSelectedDeveloper({
+                  ...selectedDeveloper,
+                  email: e.target.value,
+                })
               }
             />
             <Input
@@ -173,7 +210,10 @@ const DeveloperInfoTable = () => {
               label="First Name"
               value={selectedDeveloper?.firstname || ""}
               onChange={(e) =>
-                setSelectedDeveloper({ ...selectedDeveloper, firstname: e.target.value })
+                setSelectedDeveloper({
+                  ...selectedDeveloper,
+                  firstname: e.target.value,
+                })
               }
             />
             <Input
@@ -181,16 +221,28 @@ const DeveloperInfoTable = () => {
               label="Last Name"
               value={selectedDeveloper?.lastname || ""}
               onChange={(e) =>
-                setSelectedDeveloper({ ...selectedDeveloper, lastname: e.target.value })
+                setSelectedDeveloper({
+                  ...selectedDeveloper,
+                  lastname: e.target.value,
+                })
               }
             />
             <Input
               fullWidth
               label="Birthday"
               type="date"
-              value={selectedDeveloper?.birthday ? new Date(selectedDeveloper.birthday).toISOString().split('T')[0] : ""}
+              value={
+                selectedDeveloper?.birthday
+                  ? new Date(selectedDeveloper.birthday)
+                      .toISOString()
+                      .split("T")[0]
+                  : ""
+              }
               onChange={(e) =>
-                setSelectedDeveloper({ ...selectedDeveloper, birthday: e.target.value })
+                setSelectedDeveloper({
+                  ...selectedDeveloper,
+                  birthday: e.target.value,
+                })
               }
             />
           </ModalBody>
@@ -210,7 +262,7 @@ const DeveloperInfoTable = () => {
         isOpen={isDeleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
       >
-        <ModalContent>
+        <ModalContent className="text-black">
           <ModalHeader>Delete Developer</ModalHeader>
           <ModalBody>
             Are you sure you want to delete {selectedDeveloper?.username}?
