@@ -32,6 +32,7 @@ import { DeleteIcon } from "../src/assets/icons/DeleteIcon";
 import { EditIcon } from "../src/assets/icons/EditIcon";
 import { PlusIcon } from "../src/assets/icons/PlusIcon";
 import RentedGamesSection from "./rentedGamesDash";
+import SessionAnalytics from "./sessionAnalytics";
 
 const SessionManagerDash = () => {
   const [rentalTimes, setRentalTimes] = useState([]);
@@ -291,6 +292,7 @@ const SessionManagerDash = () => {
             >
               <Tab key="rentalTimes" title="Rental Times" />
               <Tab key="rentedGames" title="Rented Games" />
+              <Tab key="analytics" title="Analytics" />
             </Tabs>
           </div>
           {activeTab === "rentalTimes" && (
@@ -412,6 +414,8 @@ const SessionManagerDash = () => {
             </>
           )}
           {activeTab === "rentedGames" && <RentedGamesSection />}
+          {activeTab === "analytics" && <SessionAnalytics />}
+          
         </div>
       </main>
       <Footer />
