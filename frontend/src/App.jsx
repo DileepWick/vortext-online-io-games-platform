@@ -48,11 +48,13 @@ import CommunityDashBoard from "../dashboards/communityDashboard";
 import UserManagementDashboard from "../dashboards/UserManagementDashboard";
 import Payment_Manager from "../dashboards/Payment_manager_dashboard";
 
+
 import DeveloperDashboard from "../dashboards/usermanage_component/DeveloperDashboard";
 import GameDeveloperDashboard from "../dashboards/gamedeveloperdashboard";
 
 import RentedGamesSection from "../dashboards/rentedGamesDash";
 import RentalPaymentsDash from "../dashboards/rentalPaymentsDashboard"
+import SessionAnalytics from "../dashboards/sessionAnalytics";
 
 const App = () => {
   return (
@@ -110,6 +112,7 @@ const App = () => {
       <Route path="/Snakegame" element={<Snake />} />
       <Route path="/PuzzlePlatformGame" element={<PuzzlePlatformGame />} />
       <Route path="/RentalPayments" element={<RentalPaymentsDash />} />
+      <Route path="/SessionAnalytics" element={<SessionAnalytics />} />
     </Routes>
   );
 };

@@ -69,6 +69,23 @@ const GamingSessions = () => {
     closeModal();
   }, [currentGame, navigate, closeModal]);
 
+  const formatTime = (seconds) => {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    
+    let timeString = "";
+    if (hrs > 0) {
+      timeString += `${hrs} hour${hrs > 1 ? 's' : ''} `;
+    }
+    if (mins > 0 || hrs > 0) {
+      timeString += `${mins} minute${mins !== 1 ? 's' : ''} `;
+    }
+    timeString += `${secs} second${secs !== 1 ? 's' : ''}`;
+    
+    return timeString.trim();
+  };
+
   const convertTimeToSeconds = (timeString) => {
     if (!timeString) return 14400;
     
@@ -218,7 +235,7 @@ const GamingSessions = () => {
         const extendResponse = await axios.put(
           `http://localhost:8098/Rentals/extendRentalTime/${userId}/${currentGame.game._id}`,
           { 
-            additionalTime: selectedExtension.time,
+            additionalTime: parseInt(selectedExtension.time, 10),
             additionalPrice: selectedExtension.price
           },
           {
@@ -309,7 +326,7 @@ const GamingSessions = () => {
                     </p>
                     
                     <p className="mb-2 text-sm text-gray-300">
-                      Rental Time: {rental.time}
+                    Rental Time: {formatTime(rental.time)}
                     </p>
                     
                     <div className="flex flex-wrap gap-2 mb-4 font-primaryRegular">
@@ -357,7 +374,7 @@ const GamingSessions = () => {
               ))}
             </div>
           ) : (
-            <p>No Games in the library</p>
+            <p>No Rentals found</p>
           )}
         </div>
         
@@ -414,7 +431,7 @@ const GamingSessions = () => {
                     }`}
                   >
                     <CardBody className="text-center">
-                      <p className="font-bold">{option.time} minutes</p>
+                    <p className="font-bold">{formatTime(parseInt(option.time, 10))}</p>
                       <p>LKR {option.price}</p>
                     </CardBody>
                   </Card>
