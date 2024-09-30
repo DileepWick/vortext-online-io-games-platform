@@ -2,22 +2,26 @@ import React, { useMemo } from "react";
 import { Card } from "@nextui-org/react";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import Footer from "../../src/components/footer";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const UserStats = ({ users }) => {
-  // Memoized calculation of the number of users by playerType
+  // Memoized calculation of the number of users by playerType and role
   const playerTypeCounts = useMemo(() => {
     const counts = {
       Kid: 0,
       Teenager: 0,
       Adult: 0,
+      totalUsers: users.length,
+      totalDevelopers: 0,
     };
 
     users.forEach((user) => {
       if (user.playerType === "Kid") counts.Kid += 1;
       if (user.playerType === "Teenager") counts.Teenager += 1;
       if (user.playerType === "Adult") counts.Adult += 1;
+      if (user.role === "Developer") counts.totalDevelopers += 1;
     });
 
     return counts;
@@ -38,7 +42,25 @@ const UserStats = ({ users }) => {
   return (
     <div>
       {/* Container for the cards */}
-      <div style={{ display: "flex", justifyContent: "center", gap: "30px" }}>
+      <div style={{ display: "flex", justifyContent: "center", gap: "30px", flexWrap: "wrap" }}>
+        <Card style={{ flex: "1 1 300px", maxWidth: "300px" }}>
+          <div style={{ padding: "16px" }}>
+            <h4 style={{ textAlign: "center" }}>Total Users</h4>
+            <p style={{ fontSize: "24px", textAlign: "center" }}>
+              {playerTypeCounts.totalUsers}
+            </p>
+          </div>
+        </Card>
+
+        <Card style={{ flex: "1 1 300px", maxWidth: "300px" }}>
+          <div style={{ padding: "16px" }}>
+            <h4 style={{ textAlign: "center" }}>Total Developers</h4>
+            <p style={{ fontSize: "24px", textAlign: "center" }}>
+              {playerTypeCounts.totalDevelopers}
+            </p>
+          </div>
+        </Card>
+
         <Card style={{ flex: "1 1 300px", maxWidth: "300px" }}>
           <div style={{ padding: "16px" }}>
             <h4 style={{ textAlign: "center" }}>Number of Kids</h4>
@@ -68,7 +90,7 @@ const UserStats = ({ users }) => {
       </div>
 
       {/* Container for the pie chart */}
-      <div style={{ marginTop: "40px", display: "flex", justifyContent: "center" }}>
+      <div style={{ marginTop: "40px", display: "flex", justifyContent: "center", marginBottom: "60px" }}>
         <Card style={{ flex: "1", maxWidth: "600px" }}>
           <div style={{ padding: "16px", textAlign: "center" }}>
             <h4>Player Types Distribution</h4>
@@ -78,6 +100,9 @@ const UserStats = ({ users }) => {
           </div>
         </Card>
       </div>
+
+      {/* Add margin below the pie chart */}
+      <Footer />
     </div>
   );
 };

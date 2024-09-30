@@ -15,7 +15,7 @@ const userRouter = express.Router();
 // User Registration
 userRouter.post("/register", async (request, response) => {
   try {
-    const { firstname, lastname, username, password, email, birthday, role , portfolioLink} =
+    const { firstname, lastname, username, password, email, birthday, role , portfolioLink } =
       request.body;
 
     // Validate input
@@ -505,5 +505,24 @@ userRouter.delete("/delete/:id", async (request, response) => {
     response.status(500).json({ message: "Internal server error" });
   }
 });
+
+// Get all users with moderator roles
+userRouter.get("/moderators", async (req, res) => {
+  try {
+    const moderatorRoles = [
+      'Product Manager', 'User Manager', 'Order Manager', 'Blogger', 
+      'Session_Manager', 'Community Manager', 'Review Manager', 
+      'Support Agent', 'Staff_Manager', 'Payment Manager'
+    ];
+    const moderators = await User.find({ role: { $in: moderatorRoles } }).select("-password");
+    res.status(200).json(moderators);
+  } catch (error) {
+    console.error("Error fetching moderators:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
+
 
 export default userRouter;

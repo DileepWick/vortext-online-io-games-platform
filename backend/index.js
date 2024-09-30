@@ -24,7 +24,7 @@ import RentalRouter from "./routes/rental_routes.js";
 import chatRouter from "./routes/chat_bot_route.js";
 import rentalPaymentsRouter from "./routes/rentalPaymentRoutes.js";
 
-import developerRouter from "./routes/developer_routes.js";
+
 
 import CommunityPost from "./routes/communityPost_routes.js";
 import contactRouter from "./routes/contact_us_route.js";
@@ -102,7 +102,7 @@ app.use("/rentalDurations", RentalDurationRouter);
 app.use("/rentalPayments", rentalPaymentsRouter); //payments for the rentals
 
 app.use("/api", GPTRouter);
-app.use("/developers", developerRouter); // Developer route
+
 
 app.use("/api", GPTRouter);
 app.use("/contacts", contactRouter);
