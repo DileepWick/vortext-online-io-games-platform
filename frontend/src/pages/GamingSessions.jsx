@@ -374,7 +374,7 @@ const GamingSessions = () => {
               ))}
             </div>
           ) : (
-            <p>No Games in the library</p>
+            <p>No Rentals found</p>
           )}
         </div>
         
