@@ -17,7 +17,7 @@ import winAudio from "../../assets/won.mp3";
 import loseAudio from "../../assets/over.mp3";
 
 // Background image
-import loadingGif from "../../assets/Ghost.gif";
+import loadingGif from "../../assets/ghost.gif";
 
 // Import add new edition
 import EditionSelector from "./Edition_selector";
