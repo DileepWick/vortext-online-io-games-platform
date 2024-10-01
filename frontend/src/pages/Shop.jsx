@@ -14,6 +14,7 @@ import {
 } from "@nextui-org/react";
 import Loader from "../components/Loader/loader";
 
+
 const Shop = () => {
   const [gameStocks, setGameStocks] = useState([]);
   const [filteredStocks, setFilteredStocks] = useState([]);
