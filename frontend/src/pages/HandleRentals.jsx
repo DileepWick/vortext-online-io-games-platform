@@ -51,29 +51,73 @@ const HandleRentals = () => {
     cvv: "",
     expiryDate: "",
   });
+
   const [cardErrors, setCardErrors] = useState({});
+
+  const handleCardNumberChange = (e) => {
+    const value = e.target.value.replace(/\D/g, '');
+    const formattedValue = value.replace(/(\d{4})(?=\d)/g, '$1-');
+    setCardDetails(prev => ({ ...prev, cardNumber: formattedValue.slice(0, 19) }));
+  };
+
+  const handleExpiryDateChange = (e) => {
+    const value = e.target.value.replace(/\D/g, '');
+    if (value.length <= 2) {
+      setCardDetails(prev => ({ ...prev, expiryDate: value }));
+    } else {
+      const month = value.slice(0, 2);
+      const year = value.slice(2, 4);
+      if (parseInt(month) > 12) {
+        setCardDetails(prev => ({ ...prev, expiryDate: `12/${year}` }));
+      } else {
+        setCardDetails(prev => ({ ...prev, expiryDate: `${month}/${year}` }));
+      }
+    }
+  };
+
+  const handleCvvChange = (e) => {
+    const value = e.target.value.replace(/\D/g, '');
+    setCardDetails(prev => ({ ...prev, cvv: value.slice(0, 3) }));
+  };
+
+  const validateCardDetails = () => {
+    const errors = {};
+    if (cardDetails.cardNumber.replace(/-/g, '').length !== 16) {
+      toast.error("Invalid card number");
+      return false;
+    }
+    if (cardDetails.expiryDate.length !== 5) {
+      toast.error("Invalid expiration date");
+      return false;
+    }
+    const [month, year] = cardDetails.expiryDate.split('/');
+    if (parseInt(month) < 1 || parseInt(month) > 12) {
+      toast.error("Invalid month in expiration date");
+      return false;
+    }
+    // Check if the card is not expired
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear() % 100;
+    const currentMonth = currentDate.getMonth() + 1;
+    if (parseInt(year) < currentYear || (parseInt(year) === currentYear && parseInt(month) < currentMonth)) {
+      toast.error("Card has expired");
+      return false;
+    }
+    if (cardDetails.cvv.length !== 3) {
+      toast.error("Invalid CVV");
+      return false;
+    }
+    return true;
+  };
+
+
 
   const handleCardInputChange = (e) => {
     const { name, value } = e.target;
     setCardDetails(prev => ({ ...prev, [name]: value }));
   };
 
-  const validateCardDetails = () => {
-    const errors = {};
-    if (!/^\d{16}$/.test(cardDetails.cardNumber)) {
-      errors.cardNumber = "Card number must be 16 digits";
-    }
-    if (!/^\d{3}$/.test(cardDetails.cvv)) {
-      errors.cvv = "CVV must be 3 digits";
-    }
-    if (!/^\d{2}\/\d{2}$/.test(cardDetails.expiryDate)) {
-      errors.expiryDate = "Expiry date must be in MM/YY format";
-    }
-    setCardErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-
+  
 
   const fetchRentalTimes = async (gameId) => {
     try {
@@ -183,24 +227,24 @@ const HandleRentals = () => {
     if (!validateCardDetails()) {
       return;
     }
-  
+
     try {
       const token = getToken();
       const userId = getUserIdFromToken(token);
-  
+
       if (!userId) {
         throw new Error("User ID not found. Please log in again.");
       }
-  
+
       const rentalData = {
         user: userId,
         game: id,
         time: parseInt(selectedRental.time),
         price: parseFloat(selectedRental.price)
       };
-  
+
       console.log("Sending rental data:", rentalData);
-  
+
       // Create the rental
       const rentalResponse = await axios.post(
         "http://localhost:8098/Rentals/createRental",
@@ -211,13 +255,13 @@ const HandleRentals = () => {
           },
         }
       );
-  
+
       console.log("Rental response:", rentalResponse);
-  
+
       if (rentalResponse.status !== 201) {
         throw new Error("Failed to create rental");
       }
-  
+
       // Fetch the latest rental to get the rental ID
       const latestRentalResponse = await axios.get(
         `http://localhost:8098/Rentals/getLatestRental/${userId}/${id}`,
@@ -227,15 +271,15 @@ const HandleRentals = () => {
           },
         }
       );
-  
+
       console.log("Latest rental response:", latestRentalResponse);
-  
+
       if (latestRentalResponse.status !== 200 || !latestRentalResponse.data._id) {
         throw new Error("Failed to fetch the latest rental ID");
       }
-  
+
       const rentalId = latestRentalResponse.data._id;
-  
+
       // Create the payment
       const paymentData = {
         user: userId,
@@ -243,9 +287,9 @@ const HandleRentals = () => {
         rental: rentalId,
         amount: parseFloat(selectedRental.price)
       };
-  
+
       console.log("Sending payment data:", paymentData);
-  
+
       const paymentResponse = await axios.post(
         "http://localhost:8098/rentalPayments/create",
         paymentData,
@@ -255,9 +299,9 @@ const HandleRentals = () => {
           },
         }
       );
-  
+
       console.log("Payment response:", paymentResponse);
-  
+
       if (paymentResponse.status === 201) {
         toast.success("Payment successful! Game added to your rentals.");
         setIsPaymentModalOpen(false);
@@ -495,53 +539,54 @@ const HandleRentals = () => {
   
       {/* Payment Modal */}
       <Modal
-        isOpen={isPaymentModalOpen}
-        onClose={() => setIsPaymentModalOpen(false)}
-        classNames={{
-          body: "text-white",
-          header: "text-white",
-          footer: "text-white",
-          base: "bg-gray-800",
-        }}
-      >
-        <ModalContent>
-          <ModalHeader className="text-white">Enter Payment Details</ModalHeader>
-          <ModalBody>
-            <Input
-              name="cardNumber"
-              label="Card Number"
-              placeholder="1234 5678 9012 3456"
-              value={cardDetails.cardNumber}
-              onChange={handleCardInputChange}
-              error={cardErrors.cardNumber}
-            />
-            <Input
-              name="cvv"
-              label="CVV"
-              placeholder="123"
-              value={cardDetails.cvv}
-              onChange={handleCardInputChange}
-              error={cardErrors.cvv}
-            />
-            <Input
-              name="expiryDate"
-              label="Expiry Date"
-              placeholder="MM/YY"
-              value={cardDetails.expiryDate}
-              onChange={handleCardInputChange}
-              error={cardErrors.expiryDate}
-            />
-          </ModalBody>
-          <ModalFooter>
-            <Button color="danger" variant="light" onPress={() => setIsPaymentModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button color="primary" onPress={handlePayment}>
-              Confirm and Pay
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      isOpen={isPaymentModalOpen}
+      onClose={() => setIsPaymentModalOpen(false)}
+      classNames={{
+        body: "text-white",
+        header: "text-white",
+        footer: "text-white",
+        base: "bg-gray-800",
+      }}
+    >
+      <ModalContent>
+        <ModalHeader className="text-white">Enter Payment Details</ModalHeader>
+        <ModalBody>
+          <Input
+            name="cardNumber"
+            label="Card Number"
+            placeholder="1234-5678-9012-3456"
+            value={cardDetails.cardNumber}
+            onChange={handleCardNumberChange}
+            maxLength={19}
+          />
+          <Input
+            name="expiryDate"
+            label="Expiry Date"
+            placeholder="MM/YY"
+            value={cardDetails.expiryDate}
+            onChange={handleExpiryDateChange}
+            maxLength={5}
+          />
+          <Input
+            name="cvv"
+            label="CVV"
+            placeholder="123"
+            value={cardDetails.cvv}
+            onChange={handleCvvChange}
+            maxLength={3}
+          />
+        </ModalBody>
+        <ModalFooter>
+          <Button color="danger" variant="light" onPress={() => setIsPaymentModalOpen(false)}>
+            Cancel
+          </Button>
+          <Button color="primary" onPress={handlePayment}>
+            Confirm and Pay
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+
   
       <Footer />
     </div>
