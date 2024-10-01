@@ -28,35 +28,13 @@ export const submitContactForm = async (req, res) => {
       });
     }
 
-    // Check if user has submitted a message in the last 24 hours
-    const lastDaySubmission = await ContactUsSchema.findOne({
-      userId,
-      createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
-    });
-
-    if (lastDaySubmission) {
-      const timeSinceLastSubmission =
-        Date.now() - lastDaySubmission.createdAt.getTime();
-      const timeRemaining = 24 * 60 * 60 * 1000 - timeSinceLastSubmission;
-      const hoursRemaining = Math.floor(timeRemaining / (60 * 60 * 1000));
-      const minutesRemaining = Math.floor(
-        (timeRemaining % (60 * 60 * 1000)) / (60 * 1000)
-      );
-
-      return res.status(429).json({
-        message: "You can only submit one message per day.",
-        timeRemaining: {
-          hours: hoursRemaining,
-          minutes: minutesRemaining,
-        },
-      });
-    }
-
+    // Create a new contact entry for each submission
     const newContact = new ContactUsSchema({
       userId,
       username,
       email,
       messages: [{ sender: "user", content: message }],
+      status: "open",
     });
 
     const createdContact = await newContact.save();
@@ -182,7 +160,7 @@ export const fetchContactByUserId = async (req, res) => {
     }
 
     // Correct usage of ObjectId with 'new'
-    const contact = await ContactUsSchema.findOne({
+    const contact = await ContactUsSchema.find({
       userId: new mongoose.Types.ObjectId(userId),
     });
 

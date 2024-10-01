@@ -90,8 +90,8 @@ const TransactionHistory = () => {
           className="mb-6"
         >
           <Tab key="purchase" title="Purchase" />
-          <Tab key="rentals" title="Rentals" />
-          <Tab key="subscription" title="Refunds" />
+         {/*} <Tab key="rentals" title="Rentals" />
+          <Tab key="subscription" title="Refunds" />*/}
         </Tabs>
         <Input
           className="mb-4 w-full max-w-xs"

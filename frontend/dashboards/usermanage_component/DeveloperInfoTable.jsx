@@ -22,7 +22,7 @@ import { SearchIcon } from "../../src/assets/icons/SearchIcon"; // Assuming you 
 const DeveloperInfoTable = () => {
   const [approvedDevelopers, setApprovedDevelopers] = useState([]);
   const [page, setPage] = useState(1);
-  const [rowsPerPage] = useState(4);
+  const [rowsPerPage] = useState(6);
   const [selectedDeveloper, setSelectedDeveloper] = useState(null);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -180,7 +180,7 @@ const DeveloperInfoTable = () => {
 
       {/* Edit Modal */}
       <Modal isOpen={isEditModalOpen} onClose={() => setEditModalOpen(false)}>
-        <ModalContent>
+        <ModalContent className="text-black">
           <ModalHeader>Edit Developer</ModalHeader>
           <ModalBody>
             <Input

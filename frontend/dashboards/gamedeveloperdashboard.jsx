@@ -43,6 +43,7 @@ import { toast, Flip } from "react-toastify";
 import { getToken } from "../src/utils/getToken";
 import { getUserIdFromToken } from "../src/utils/user_id_decoder";
 import useAuthCheck from "../src/utils/authCheck";
+import DeveloperIncomeTable from "../src/pages/DeveloperEarningTable";
 
 const GameDeveloperDashboard= () => {
 
@@ -118,7 +119,7 @@ const GameDeveloperDashboard= () => {
   //Get all games for developer function
   const getAllGames = async () => {
     try {
-      const response = await axios.get(`http://localhost:8098/games/getGamesByDeveloper/66f8f8ad34ff4bef025da0cd`);
+      const response = await axios.get(`http://localhost:8098/games/getGamesByDeveloper/${developerId}`);
       if (response.data.allGames) {
         setGames(response.data.allGames);
       }
@@ -202,6 +203,8 @@ const GameDeveloperDashboard= () => {
     getAllGames();
   };
 
+  
+
   return (
     <div className="flex w-full flex-col text-black bg-white">
       <div className="relative">
@@ -219,13 +222,14 @@ const GameDeveloperDashboard= () => {
         >
           <Tab key="analytics" title="Analytics" />
           <Tab key="products" title="My Games" />
+          <Tab key="payments" title="Earnings" />
         </Tabs>
       </div>
       <div className="p-4">
         {activeTab === "analytics" && (
           <div className="bg-white flex flex-col min-h-screen">
             <p className="text-center text-black font-primaryRegular text-5xl mt-[100px]">
-              STATS
+              <DeveloperIncomeTable/>
             </p>
           </div>
         )}

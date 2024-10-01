@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "../src/components/header";
+import Footer from "../src/components/footer";
 import useAuthCheck from "../src/utils/authCheck";
 import { Tabs, Tab } from "@nextui-org/react";
-import AllPayments from "./Payment_Management/all_payments";
+import AllPayments from "../dashboards/Payment_Management/all_payments";
 import Chart from "./Payment_Management/chart";
 import GamesSortChart from "./Payment_Management/Games_Sort";
+import RentalPaymentsDash from "./rentalPaymentsDashboard";;
+
 //import DevFunds from "./Payment_Management/DevFunds"; 
 
 const API_BASE_URL = "http://localhost:8098";
@@ -53,7 +56,7 @@ const Payment_Manager = () => {
             <Tab key="tab1" title="All Order Items" />
             <Tab key="tab2" title="Price Comparison Chart" />
             <Tab key="tab3" title="Most Sold Games" />
-            <Tab key="tab4" title="DevFunds " />
+            <Tab key="tab4" title="Rentals " />
           </Tabs>
         </div>
         <div className="p-4">
@@ -80,7 +83,7 @@ const Payment_Manager = () => {
               )}
             </div>
           )}
-          
+          {activeTab === "tab4" && <RentalPaymentsDash />}
         </div>
       </div>
     </div>
