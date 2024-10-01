@@ -17,7 +17,12 @@ const RentalTimeSchema = new Schema({
     type: Number,
     required: true,
     min: [0, 'Price must be a positive number']
+  },
+  notes:{
+    type:String,
+    required: true
   }
+
 });
 
 export const RentalTime = mongoose.model("RentalDuration", RentalTimeSchema);

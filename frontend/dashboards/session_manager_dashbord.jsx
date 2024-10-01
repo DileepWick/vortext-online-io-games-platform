@@ -43,6 +43,7 @@ const SessionManagerDash = () => {
     gameName: "",
     duration: "",
     price: "",
+    notes: ""
   });
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState("");
@@ -147,6 +148,7 @@ const SessionManagerDash = () => {
         gameId: formData.gameId,
         duration: parseInt(formData.duration, 10) * 60, // Convert minutes to seconds
         price: parseFloat(formData.price),
+        notes: formData.notes 
       };
 
       const existingRentalTime = rentalTimes.find(
@@ -195,7 +197,7 @@ const SessionManagerDash = () => {
       }
 
       await fetchRentalTimes();
-      setFormData({ gameId: "", gameName: "", duration: "", price: "" });
+      setFormData({ gameId: "", gameName: "", duration: "", price: "",notes:"" });
       setEditingId(null);
       setError("");
       onClose();
@@ -326,6 +328,7 @@ const SessionManagerDash = () => {
                       gameName: "",
                       duration: "",
                       price: "",
+                      notes:""
                     });
                     setEditingId(null);
                     setError("");
@@ -359,6 +362,8 @@ const SessionManagerDash = () => {
                   <TableColumn>GAME</TableColumn>
                   <TableColumn>DURATION (MINUTES)</TableColumn>
                   <TableColumn>PRICE (LKR)</TableColumn>
+                  <TableColumn>Notes (LKR)</TableColumn>
+
                   <TableColumn>ACTIONS</TableColumn>
                 </TableHeader>
                 <TableBody>
@@ -378,6 +383,13 @@ const SessionManagerDash = () => {
                         <span className="text-primary font-medium">
                           LKR {rentalTime.price.toFixed(2)}
                         </span>
+                      </TableCell>
+                      <TableCell>
+
+                      <span className="text-primary font-medium">
+                          {rentalTime.notes}
+                        </span>
+
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-4">
@@ -491,6 +503,16 @@ const SessionManagerDash = () => {
                   value={formData.price}
                   readOnly
                 />
+              </div>
+              <div className="mb-4">
+                <Input 
+                label="Notes"
+                  name="notes"
+                  type="text"
+                  value={formData.notes}
+                  onChange={handleInputChange} 
+                />
+
               </div>
             </ModalBody>
             <ModalFooter>
