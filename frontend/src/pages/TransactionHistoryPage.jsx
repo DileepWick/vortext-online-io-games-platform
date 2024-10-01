@@ -81,7 +81,7 @@ const TransactionHistory = () => {
         <p className="mb-4">Your account payment details, transactions, and earned Vortex Rewards.</p>
         <div className="mb-4">
           <Link href="#" className="text-blue-500 mr-4">Vortex Games Refund Policy</Link>
-          <Link href="#" className="text-blue-500">Vortex Rewards FAQ</Link>
+          <Link href="#" className="text-blue-500">Vortex FAQ</Link>
         </div>
         <Tabs
           aria-label="Transaction Tabs"
@@ -132,9 +132,9 @@ const TransactionHistory = () => {
               <TableRow key={transaction.id} className="text-black">
                 <TableCell>{new Date(transaction.date).toLocaleDateString()}</TableCell>
                 <TableCell>{transaction.stockid.AssignedGame.title}</TableCell>
-                <TableCell>${transaction.price}</TableCell>
+                <TableCell>Rs.{transaction.price}</TableCell>
                 <TableCell>{transaction.stockid.discount}%</TableCell>
-                <TableCell>${transaction.order.paymentAmount}</TableCell>
+                <TableCell>Rs.{transaction.order.paymentAmount}</TableCell>
               </TableRow>
             ))}
           </TableBody>

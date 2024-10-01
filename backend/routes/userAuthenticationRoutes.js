@@ -131,6 +131,7 @@ userRouter.get("/developers/requests", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
 // Approve Developer
 userRouter.put("/developers/approve/:id", async (req, res) => {
   try {
@@ -190,6 +191,7 @@ function calculateAge(birthday) {
 
   return age;
 }
+
 // Login route
 userRouter.post("/login", async (req, res) => {
   const { username, password } = req.body;
@@ -506,6 +508,46 @@ userRouter.delete("/delete/:id", async (request, response) => {
   }
 });
 
+// Update developer income route
+userRouter.put('/update-income/:id', async (req, res) => {
+  const { id } = req.params; // Developer ID
+  const { saleAmount } = req.body; // Sale amount from the body
+
+  // Validate saleAmount
+  if (typeof saleAmount !== 'number' || isNaN(saleAmount)) {
+    return res.status(400).json({ error: 'Invalid sale amount' });
+  }
+
+  try {
+    // Find the developer by ID and ensure the user is a developer
+    const developer = await User.findOne({ _id: id, role: 'developer' });
+
+    if (!developer) {
+      return res.status(404).json({ error: 'Developer not found or not a developer' });
+    }
+
+    // Calculate 70% of the sale amount (DevFunds)
+    const devFunds = saleAmount * 0.7;
+
+    // Ensure current income is a number before adding
+    const currentIncome = developer.developerAttributes.income || 0;
+    const newIncome = currentIncome + devFunds;
+
+    // Update the developer's income
+    developer.developerAttributes.income = newIncome;
+    await developer.save();
+
+    res.status(200).json({
+      message: 'Income updated successfully',
+      updatedIncome: newIncome,
+      developer: developer,
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update income', details: error.message });
+  }
+});
+
+
 // Get all users with moderator roles
 userRouter.get("/moderators", async (req, res) => {
   try {
@@ -521,8 +563,5 @@ userRouter.get("/moderators", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
-
-
 
 export default userRouter;

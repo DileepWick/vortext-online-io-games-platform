@@ -23,16 +23,14 @@ const UserSchema = new mongoose.Schema({
   
   // Developer-specific fields, only required if role is 'Developer'
   developerAttributes: {
-    
-    status: { 
-      type: String, 
-      enum: ['pending', 'approved', 'rejected'], 
-      default: 'pending', 
-      required: function() { return this.role === 'Developer'; }
+    portfolioLinks: [{ type: String, required: function() { return this.role === 'Developer'; } }], // Required if role is Developer
+    status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending', required: function() { return this.role === 'Developer'; } }, // Required if role is Developer
+    income: { 
+      type: Number, 
+      default: 0,
+      required: function() { return this.role === 'Developer'; } // Ensure this is only for developers
     },
-    
   },
-  
 });
 
 // No need for a pre-save hook, Mongoose will enforce condition
