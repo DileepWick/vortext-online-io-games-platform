@@ -264,6 +264,7 @@ const Login = () => {
   };
 
   return (
+    <div><Header/>
     <div className="min-h-screen flex">
       {/* Left side - Image */}
       <div
@@ -503,6 +504,8 @@ const Login = () => {
           </CardBody>
         </Card>
       </div>
+    </div>
+    <Footer/>
     </div>
   );
 };
