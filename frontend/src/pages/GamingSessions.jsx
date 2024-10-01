@@ -24,9 +24,64 @@ const GamingSessions = () => {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [cardDetails, setCardDetails] = useState({
     cardNumber: "",
+    expirationDate: "",
     cvv: "",
-    expiryDate: "",
   });
+
+  const handleCardNumberChange = (e) => {
+    const value = e.target.value.replace(/\D/g, '');
+    const formattedValue = value.replace(/(\d{4})(?=\d)/g, '$1-');
+    setCardDetails(prev => ({ ...prev, cardNumber: formattedValue.slice(0, 19) }));
+  };
+
+  const handleExpirationDateChange = (e) => {
+    const value = e.target.value.replace(/\D/g, '');
+    if (value.length <= 2) {
+      setCardDetails(prev => ({ ...prev, expirationDate: value }));
+    } else {
+      const month = value.slice(0, 2);
+      const year = value.slice(2, 4);
+      if (parseInt(month) > 12) {
+        setCardDetails(prev => ({ ...prev, expirationDate: `12/${year}` }));
+      } else {
+        setCardDetails(prev => ({ ...prev, expirationDate: `${month}/${year}` }));
+      }
+    }
+  };
+
+  const handleCvvChange = (e) => {
+    const value = e.target.value.replace(/\D/g, '');
+    setCardDetails(prev => ({ ...prev, cvv: value.slice(0, 3) }));
+  };
+
+  const validateForm = () => {
+    if (cardDetails.cardNumber.replace(/-/g, '').length !== 16) {
+      toast.error("Invalid card number");
+      return false;
+    }
+    if (cardDetails.expirationDate.length !== 5) {
+      toast.error("Invalid expiration date");
+      return false;
+    }
+    const [month, year] = cardDetails.expirationDate.split('/');
+    if (parseInt(month) < 1 || parseInt(month) > 12) {
+      toast.error("Invalid month in expiration date");
+      return false;
+    }
+    // Check if the card is not expired
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear() % 100;
+    const currentMonth = currentDate.getMonth() + 1;
+    if (parseInt(year) < currentYear || (parseInt(year) === currentYear && parseInt(month) < currentMonth)) {
+      toast.error("Card has expired");
+      return false;
+    }
+    if (cardDetails.cvv.length !== 3) {
+      toast.error("Invalid CVV");
+      return false;
+    }
+    return true;
+  };
   const [cardErrors, setCardErrors] = useState({});
 
   const fetchRentals = useCallback(async () => {
@@ -196,18 +251,18 @@ const GamingSessions = () => {
   };
 
   const handlePayment = async () => {
-    if (!validateCardDetails()) {
+    if (!validateForm()) {
       return;
     }
-  
+
     try {
       const token = getToken();
       const userId = getUserIdFromToken(token);
-  
+
       if (!userId) {
         throw new Error("User ID not found. Please log in again.");
       }
-  
+
       // Create the payment
       const paymentData = {
         user: userId,
@@ -215,9 +270,9 @@ const GamingSessions = () => {
         rental: currentGame._id,
         amount: parseFloat(selectedExtension.price)
       };
-  
+
       console.log("Sending payment data:", paymentData);
-  
+
       const paymentResponse = await axios.post(
         "http://localhost:8098/rentalPayments/create",
         paymentData,
@@ -227,9 +282,9 @@ const GamingSessions = () => {
           },
         }
       );
-  
+
       console.log("Payment response:", paymentResponse);
-  
+
       if (paymentResponse.status === 201) {
         // Extend rental time
         const extendResponse = await axios.put(
@@ -267,28 +322,7 @@ const GamingSessions = () => {
       }
     } catch (error) {
       console.error("Error processing payment:", error);
-      console.error("Error details:", error.response?.data);
-      
-      if (error.response) {
-        if (error.response.status === 400) {
-          toast.error("Invalid data submitted. Please check your inputs and try again.");
-        } else if (error.response.status === 401) {
-          toast.error("Authentication failed. Please log in again.");
-        } else if (error.response.status === 404) {
-          toast.error("Rental not found. Please try again.");
-        } else if (error.response.status === 500) {
-          toast.error("Server error. Please try again later or contact support.");
-        } else {
-          toast.error(`Operation failed: ${error.response.data.message || 'Unknown error'}`);
-        }
-      } else if (error.request) {
-        toast.error("No response from server. Please check your internet connection.");
-      } else {
-        toast.error(error.message || "Operation failed. Please try again.");
-      }
-      
-      setIsPaymentModalOpen(false);
-      closeExtendModal();
+      toast.error(error.message || "Payment failed. Please try again.");
     }
   };
 
@@ -450,53 +484,53 @@ const GamingSessions = () => {
         </Modal>
   
         <Modal
-          isOpen={isPaymentModalOpen}
-          onClose={closePaymentModal}
-          classNames={{
-            body: "text-white",
-            header: "text-white",
-            footer: "text-white",
-            base: "bg-gray-800",
-          }}
-        >
-          <ModalContent>
-            <ModalHeader className="text-white">Enter Payment Details</ModalHeader>
-            <ModalBody>
-              <Input
-                name="cardNumber"
-                label="Card Number"
-                placeholder="1234 5678 9012 3456"
-                value={cardDetails.cardNumber}
-                onChange={handleCardInputChange}
-                error={cardErrors.cardNumber}
-              />
-              <Input
-                name="cvv"
-                label="CVV"
-                placeholder="123"
-                value={cardDetails.cvv}
-                onChange={handleCardInputChange}
-                error={cardErrors.cvv}
-              />
-              <Input
-                name="expiryDate"
-                label="Expiry Date"
-                placeholder="MM/YY"
-                value={cardDetails.expiryDate}
-                onChange={handleCardInputChange}
-                error={cardErrors.expiryDate}
-              />
-            </ModalBody>
-            <ModalFooter>
-              <Button color="danger" variant="light" onPress={closePaymentModal}>
-                Cancel
-              </Button>
-              <Button color="primary" onPress={handlePayment}>
-                Confirm and Pay
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+      isOpen={isPaymentModalOpen}
+      onClose={closePaymentModal}
+      classNames={{
+        body: "text-white",
+        header: "text-white",
+        footer: "text-white",
+        base: "bg-gray-800",
+      }}
+    >
+      <ModalContent>
+        <ModalHeader className="text-white">Enter Payment Details</ModalHeader>
+        <ModalBody>
+          <Input
+            name="cardNumber"
+            label="Card Number"
+            placeholder="1234-5678-9012-3456"
+            value={cardDetails.cardNumber}
+            onChange={handleCardNumberChange}
+            maxLength={19}
+          />
+          <Input
+            name="expirationDate"
+            label="Expiration Date"
+            placeholder="MM/YY"
+            value={cardDetails.expirationDate}
+            onChange={handleExpirationDateChange}
+            maxLength={5}
+          />
+          <Input
+            name="cvv"
+            label="CVV"
+            placeholder="123"
+            value={cardDetails.cvv}
+            onChange={handleCvvChange}
+            maxLength={3}
+          />
+        </ModalBody>
+        <ModalFooter>
+          <Button color="danger" variant="light" onPress={closePaymentModal}>
+            Cancel
+          </Button>
+          <Button color="primary" onPress={handlePayment}>
+            Confirm and Pay
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
       </div>
       <Footer />
     </div>
