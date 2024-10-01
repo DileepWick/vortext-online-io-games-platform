@@ -19,6 +19,7 @@ const Contact = () => {
     email: "",
   });
   const [message, setMessage] = useState("");
+  const [hasOpenTicket, setHasOpenTicket] = useState(false);
 
   const token = getToken();
   const userId = getUserIdFromToken(token);
@@ -38,9 +39,28 @@ const Contact = () => {
           username: response.data.profile.username,
           email: response.data.profile.email,
         });
+
+        // Check if user has an open ticket
+        const ticketResponse = await axios.get(
+          `http://localhost:8098/contacts/fetchContactByUserId/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (
+          ticketResponse.data.contact &&
+          ticketResponse.data.contact.status !== "closed"
+        ) {
+          setHasOpenTicket(true);
+        } else {
+          setHasOpenTicket(false);
+        }
       } catch (error) {
         console.error("Error fetching user data:", error);
-        toast.error("Failed to fetch user data");
+        // toast.error("Failed to fetch user data");
       }
     };
 
@@ -51,6 +71,26 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (hasOpenTicket) {
+      toast.error(
+        "You already have an open ticket. Please wait for a response or check your existing ticket.",
+        {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Flip,
+          progressBarClassName: "bg-gray-800",
+          style: { fontFamily: "Rubik" },
+        }
+      );
+      return;
+    }
 
     if (message.trim() === "") {
       toast.error("Message cannot be empty", {
@@ -100,14 +140,16 @@ const Contact = () => {
       });
 
       setMessage("");
+      setHasOpenTicket(true);
     } catch (error) {
       console.error("Error sending message:", error);
-      if (error.response?.status === 429) {
-        const { hours, minutes } = error.response.data.timeRemaining;
-        const timeMessage = `You can send another message in ${hours} hours and ${minutes} minutes.`;
-        toast.error(`${error.response.data.message} ${timeMessage}`, {
+      toast.error(
+        `Failed to send message: ${
+          error.response?.data?.message || error.message
+        }`,
+        {
           position: "top-right",
-          autoClose: 5000,
+          autoClose: 2000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
@@ -117,27 +159,8 @@ const Contact = () => {
           transition: Flip,
           progressBarClassName: "bg-gray-800",
           style: { fontFamily: "Rubik" },
-        });
-      } else {
-        toast.error(
-          `Failed to send message: ${
-            error.response?.data?.message || error.message
-          }`,
-          {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "dark",
-            transition: Flip,
-            progressBarClassName: "bg-gray-800",
-            style: { fontFamily: "Rubik" },
-          }
-        );
-      }
+        }
+      );
     }
   };
 
@@ -154,41 +177,48 @@ const Contact = () => {
         <div className="contact_us_container">
           <div className="w-full flex flex-col gap-8">
             <h1 className="text-3xl">Contact Us:</h1>
-            <form className="w-full" onSubmit={handleSubmit}>
-              <Input
-                label="Name"
-                size="lg"
-                type="text"
-                labelPlacement="inside"
-                value={userData.username}
-                readOnly
-              />
-              <Input
-                label="Email"
-                className="mt-5"
-                size="lg"
-                type="email"
-                labelPlacement="inside"
-                value={userData.email}
-                readOnly
-              />
-              <Textarea
-                label="Message"
-                labelPlacement="inside"
-                className="mt-5"
-                size="lg"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-              />
-              <Button
-                type="submit"
-                radius="sm"
-                size="md"
-                className="bg-black text-white font-bold mt-14"
-              >
-                Submit
-              </Button>
-            </form>
+            {hasOpenTicket ? (
+              <p className="text-red-500">
+                You already have an open ticket. Please wait for a response or
+                check your existing ticket.
+              </p>
+            ) : (
+              <form className="w-full" onSubmit={handleSubmit}>
+                <Input
+                  label="Name"
+                  size="lg"
+                  type="text"
+                  labelPlacement="inside"
+                  value={userData.username}
+                  readOnly
+                />
+                <Input
+                  label="Email"
+                  className="mt-5"
+                  size="lg"
+                  type="email"
+                  labelPlacement="inside"
+                  value={userData.email}
+                  readOnly
+                />
+                <Textarea
+                  label="Message"
+                  labelPlacement="inside"
+                  className="mt-5"
+                  size="lg"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                />
+                <Button
+                  type="submit"
+                  radius="sm"
+                  size="md"
+                  className="bg-black text-white font-bold mt-14"
+                >
+                  Submit
+                </Button>
+              </form>
+            )}
           </div>
         </div>
       </div>

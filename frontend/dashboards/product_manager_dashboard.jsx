@@ -367,7 +367,8 @@ const Blogger = () => {
                         <div>
                           <Image
                             isZoomed
-                            width={300}
+                            width={1000}
+                            height={200}
                             alt="Game Cover Photo"
                             src={selectedGame.coverPhoto}
                             className="rounded-lg shadow-md"
@@ -379,7 +380,7 @@ const Blogger = () => {
                               videoUrl={selectedGame.TrailerVideo}
                               autoPlay
                               controls
-                              className="w-[400px] h-[300px]"
+                              className="w-[100px] h-[100px]"
                               muted
                             />
                           </div>

@@ -93,7 +93,7 @@ userRouter.post("/register", async (request, response) => {
     const cartCreation = await Cart.create(newCart);
 
     if (createdUser && cartCreation) {
-      if (role === "Developer") {
+      if (role === "developer") {
         return response
           .status(201)
           .json({
