@@ -209,7 +209,7 @@ const Blogger = () => {
         {activeTab === "analytics" && (
           <div className="bg-white flex flex-col min-h-screen">
             <p className="text-center text-black font-primaryRegular text-5xl mt-[100px]">
-              STATS
+            Analytics on development
             </p>
           </div>
         )}

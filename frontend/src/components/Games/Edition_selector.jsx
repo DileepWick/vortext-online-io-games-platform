@@ -40,7 +40,7 @@ const EditionSelector = ({ onSelectEdition }) => {
 
   return (
     <div className="edition-selector">
-      <h2 className="text-xl mb-4 mt-4">Available Editions</h2>
+      <h2 className="text-xl mb-4 mt-4 text-black">Available Editions</h2>
       <AddNewEdition/>
       <div className="edition-buttons-container grid grid-cols-4 gap-4 mt-4">
         {editions.map((edition) => (
@@ -49,7 +49,7 @@ const EditionSelector = ({ onSelectEdition }) => {
             key={edition._id}
             onClick={() => handlePlayButtonClick(edition._id)} // Pass the ID of the selected edition
             variant="shadow"
-            color="default"
+            color="danger"
             className="font-primaryRegular text-md"
           >
             {edition.title} <PlayIcon />

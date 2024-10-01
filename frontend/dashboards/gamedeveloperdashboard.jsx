@@ -3,9 +3,12 @@ import axios from "axios";
 
 // Components
 import Header from "../src/components/header";
+
+
 import UploadGame from "./Games_Components/add_new_game";
 import UpdateGame from "./Games_Components/update_game";
 import AddNewStock from "./Games_Components/add_new_stock";
+
 import Footer from "../src/components/footer";
 import VideoPlayer from "../src/components/videoPlayer";
 

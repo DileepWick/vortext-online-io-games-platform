@@ -19,6 +19,7 @@ const UserSchema = new mongoose.Schema({
   birthday: { type: Date, required: false },
   age: { type: Number },
   createdAt: { type: Date, default: Date.now },
+  playerType: { type: String, enum: ['Kid', 'Teenager', 'Adult'], default: 'Adult' },
   
   // Developer-specific fields, only required if role is 'Developer'
   developerAttributes: {
@@ -30,9 +31,7 @@ const UserSchema = new mongoose.Schema({
       required: function() { return this.role === 'Developer'; } // Ensure this is only for developers
     },
   },
-
-  
 });
 
-// No need for a pre-save hook, Mongoose will enforce conditions
+// No need for a pre-save hook, Mongoose will enforce condition
 export const User = mongoose.model('User', UserSchema);

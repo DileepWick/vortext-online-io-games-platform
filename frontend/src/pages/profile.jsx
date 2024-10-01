@@ -14,8 +14,11 @@ import Header from "../components/header";
 // Utils
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { getToken } from "../utils/getToken";
+import useAuthCheck from "../utils/authCheck";
 
 const Profile = () => {
+
+  useAuthCheck();
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -121,7 +124,7 @@ const Profile = () => {
       <Header />
       <div className="min-h-screen bg-gray-100 flex justify-center items-center font-primaryRegular">
         <div className="bg-white p-8 shadow-md rounded-md w-96">
-          <h2 className="text-2xl font-semibold mb-6 text-center">Profile</h2>
+          <h2 className="text-2xl font-semibold mb-6 text-center text-black" >Profile</h2>
           <Avatar
             isBordered
             color="default"

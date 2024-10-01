@@ -42,7 +42,6 @@ const GameEmbed = () => {
   const iframeRef = useRef(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [timeLeft, setTimeLeft] = useState(1000); // 4 hours in seconds
-  
 
   useEffect(() => {
     // Countdown timer
@@ -118,7 +117,9 @@ const GameEmbed = () => {
   return (
     <>
       <Header />
-      <div className="relative flex min-h-screen bg-customDark ">
+      <div className="relative flex min-h-screen bg-white ">
+        {/* Ai assistance */}
+        <ChatComponent game={decodedTitle} />
         {/* Game iframe on the left */}
         <div className="flex-1 relative">
           <iframe
@@ -169,10 +170,6 @@ const GameEmbed = () => {
             </div>
           </div>
         </div>
-
-        {/* Ai assistance */}
-        <ChatComponent game={decodedTitle}/>
-
       </div>
       <Footer />
     </>

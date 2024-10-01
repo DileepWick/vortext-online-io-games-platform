@@ -97,7 +97,8 @@ export const AddNewEdition = ({ callBackFunction }) => {
         variant="bordered"
         onClick={handleEditionButton}
         size="lg"
-        className="bg-customPink text-white"
+        className="text-black"
+        color="danger"
       >
         Custom Edition +
       </Button>

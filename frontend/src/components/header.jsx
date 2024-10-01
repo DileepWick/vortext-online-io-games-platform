@@ -114,7 +114,7 @@ export default function Header() {
                 location.pathname === "/TailoredGames" ? "underline" : ""
               } text-white hover:underline`}
             >
-              Tailored Games
+              Vortex Games
             </Link>
           </NavbarItem>
           <Dropdown placement="bottom-start">
