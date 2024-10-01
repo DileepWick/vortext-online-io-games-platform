@@ -21,7 +21,9 @@ import HandleRentals from "./pages/HandleRentals";
 import RentalGamesEmbed from "./pages/RentalGamesEmbed";
 import TailoredGames from "./pages/tailoredGames";
 import TransactionHistory from "./pages/TransactionHistoryPage";
+import DeveloperIncomeTable from "./pages/DeveloperEarningTable";
 import ChatHistory from "./pages/ChatHistory";
+
 
 import DeveloperLoginSignup from "./pages/DeveloperLoginSignup";
 
@@ -120,6 +122,7 @@ const App = () => {
       <Route path="/RentalPayments" element={<RentalPaymentsDash />} />
       <Route path="/SessionAnalytics" element={<SessionAnalytics />} />
 
+      <Route path="DeveloperEarningTable" element={<DeveloperIncomeTable/>} />
       {/*Game Routes*/}
       <Route path="/HangmanGame" element={<Hangman />} />
     </Routes>

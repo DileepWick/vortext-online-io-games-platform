@@ -414,17 +414,12 @@ const CartPage = () => {
                       <div className="bg-customCardDark p-4 rounded-lg">
                         <h2 className="text-lg font-semibold mb-2 text-black"> PAYMENT METHODS</h2>
                         <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                          <div className="border border-gray-700 p-4 rounded mb-4">
+                          <div className="border border-gray-900 p-5 rounded mb-4 w-[550px]">
                             <Radio value="creditCard">
                               <div className="flex items-center">
                                 <CreditCardIcon />
                                 <span className="text-black ml-2 mr-4">Credit Card</span>
-                                <div className="flex space-x-2">
-                                  <img src="/path-to-visa-icon.png" alt="Visa" className="h-6" />
-                                  <img src="/path-to-mastercard-icon.png" alt="Mastercard" className="h-6" />
-                                  <img src="/path-to-amex-icon.png" alt="American Express" className="h-6" />
-                                  <img src="/path-to-discover-icon.png" alt="Discover" className="h-6" />
-                                </div>
+                              
                               </div>
                             </Radio>
                             {paymentMethod === 'creditCard' && (
@@ -434,7 +429,7 @@ const CartPage = () => {
                                   placeholder="1111-1111-1111-1111"
                                   value={cardNumber}
                                   onChange={handleCardNumberChange}
-                                  className="mb-2"
+                                  className="mb-5"
                                 />
                                 <div className="flex gap-4">
                                   <Input
@@ -442,6 +437,7 @@ const CartPage = () => {
                                     placeholder="MM/YY"
                                     value={expirationDate}
                                     onChange={handleExpirationDateChange}
+                                    className="mb-5"
                                   />
                                   <Input
                                     label="CVV"
@@ -471,13 +467,13 @@ const CartPage = () => {
                             )}
                           </div>
                         </RadioGroup>
-                        <Checkbox
+                        {/*<Checkbox
                           isSelected={savePaymentMethod}
                           onValueChange={setSavePaymentMethod}
                           className="mt-4"
                         >
-                          Save this payment method for future purchases
-                        </Checkbox>
+                        Save this payment method for future purchases
+                        </Checkbox>*/}
                       </div>
                     </div>
                     <div className="mt-4 bg-customCardDark p-4 rounded-lg">

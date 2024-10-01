@@ -547,6 +547,31 @@ userRouter.put('/update-income/:id', async (req, res) => {
   }
 });
 
+// Get developer income route
+userRouter.get('/get-income/:id', async (req, res) => {
+  const { id } = req.params; // Developer ID
+
+  try {
+    // Find the developer by ID and ensure the user is a developer
+    const developer = await User.findOne({ _id: id, role: 'developer' });
+
+    if (!developer) {
+      return res.status(404).json({ error: 'Developer not found or not a developer' });
+    }
+
+    // Get the developer's income
+    const currentIncome = developer.developerAttributes.income || 0;
+
+    res.status(200).json({
+      message: 'Income retrieved successfully',
+      income: currentIncome,
+      developer: developer,
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to retrieve income', details: error.message });
+  }
+});
+
 
 // Get all users with moderator roles
 userRouter.get("/moderators", async (req, res) => {
