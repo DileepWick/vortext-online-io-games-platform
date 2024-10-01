@@ -21,6 +21,7 @@ import HandleRentals from "./pages/HandleRentals";
 import RentalGamesEmbed from "./pages/RentalGamesEmbed";
 import TailoredGames from "./pages/tailoredGames";
 import TransactionHistory from "./pages/TransactionHistoryPage";
+import ChatHistory from "./pages/ChatHistory";
 
 import DeveloperLoginSignup from "./pages/DeveloperLoginSignup";
 
@@ -29,7 +30,7 @@ import UserMessages from "./pages/UserMessage";
 //Games
 import Snake from "../Games/Snake";
 import PuzzlePlatformGame from "./components/Games/PuzzlePlatformGame";
-
+import ColorGuessingGame from "../Games/ColorGuessingGame";
 import Chat from "./pages/chat";
 
 //Gameplay
@@ -85,6 +86,7 @@ const App = () => {
       <Route path="/faq" element={<FAQsPage />} />
       <Route path="/community" element={<Community />} />
       <Route path="/UserMessage" element={<UserMessages />} />
+      <Route path="//chat-history" element={<ChatHistory />} />
 
       <Route path="/chat" element={<Chat />} />
 
@@ -112,6 +114,9 @@ const App = () => {
       <Route path="/Transaction" element={<TransactionHistory />} />
       <Route path="/Snakegame" element={<Snake />} />
       <Route path="/PuzzlePlatformGame" element={<PuzzlePlatformGame />} />
+
+      <Route path="/ColorGuessingGame" element={<ColorGuessingGame />} />
+
       <Route path="/RentalPayments" element={<RentalPaymentsDash />} />
       <Route path="/SessionAnalytics" element={<SessionAnalytics />} />
 

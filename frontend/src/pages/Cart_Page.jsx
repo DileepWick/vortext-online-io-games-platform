@@ -487,18 +487,18 @@ const CartPage = () => {
                           <img src={item.stockid.AssignedGame.coverPhoto} alt={item.stockid.AssignedGame.title} className="w-16 h-20 object-cover mr-4" />
                           <div>
                             <h3 className="font-semibold text-black">{item.stockid.AssignedGame.title}</h3>
-                            <p className="text-sm text-gray-400">{item.stockid.AssignedGame.developer}</p>
-                            <p className="text-black">${item.stockid.UnitPrice.toFixed(2)}</p>
+                            <p className="text-sm text-gray-400">Id:{item.stockid.AssignedGame.developer}</p>
+                            <p className="text-black">Rs.{item.stockid.UnitPrice.toFixed(2)}</p>
                           </div>
                         </div>
                       ))}
                       <div className="border-t border-gray-700 pt-4 mt-4">
                         <div className="flex justify-between text-black">
                           <span>Total</span>
-                          <span>${totalDiscountedTotal.toFixed(2)}</span>
+                          <span>Rs.{totalDiscountedTotal.toFixed(2)}</span>
                         </div>
                         <div className="bg-yellow-900 text-yellow-200 p-2 rounded mt-2 text-sm">
-                          Earn ${(totalDiscountedTotal).toFixed(2)} in Rewards with this purchase.
+                          Get Rs.{(totalDiscountedTotal).toFixed(2)} in Rewards with this purchase.
                         </div>
                       </div>
                     {/*}  <Input

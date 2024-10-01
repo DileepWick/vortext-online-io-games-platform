@@ -101,10 +101,10 @@ const ChatComponent = ({ game }) => {
     <>
       {!isChatOpen && (
         <Tooltip showArrow={true} content="Wanna Help With The Game ? Just Ask Me " className="text-black"
-        placement="top-start">
+        placement="top">
           <button
             onClick={toggleChat}
-            className="fixed bottom-4 right-4 w-[240px] h-[240px] rounded-full p-0    z-50 "
+            className="fixed bottom-4 right-4 w-[120px] h-[120px] rounded-full p-0    z-50 "
           >
             <img
               src="https://res.cloudinary.com/dhcawltsr/image/upload/v1727709362/smart-girl-animation-download--unscreen_icm1qe.gif" // Replace with your image path or URL
