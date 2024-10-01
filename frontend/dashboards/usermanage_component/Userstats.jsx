@@ -102,7 +102,7 @@ const UserStats = ({ users }) => {
       </div>
 
       {/* Add margin below the pie chart */}
-      <Footer />
+      
     </div>
   );
 };

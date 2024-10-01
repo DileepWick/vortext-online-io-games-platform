@@ -36,11 +36,13 @@ const UserManagementTable = ({ users, setUsers }) => {
   const rowsPerPage = 8;
 
   const filteredUsers = useMemo(() => {
-    return users.filter(
-      (user) =>
-        user.username.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        (selectedPlayerType === "All" || user.playerType === selectedPlayerType)
-    );
+    return users
+      .filter(
+        (user) =>
+          user.username.toLowerCase().includes(searchQuery.toLowerCase()) &&
+          (selectedPlayerType === "All" || user.playerType === selectedPlayerType)
+      )
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sorting by latest created date
   }, [users, searchQuery, selectedPlayerType]);
 
   const items = useMemo(() => {
@@ -58,6 +60,7 @@ const UserManagementTable = ({ users, setUsers }) => {
     setSearchQuery("");
     setPage(1);
   };
+
   const handlePlayerTypeSelect = (playerType) => {
     setSelectedPlayerType(playerType);
     setPage(1);
@@ -212,10 +215,26 @@ const UserManagementTable = ({ users, setUsers }) => {
       </Table>
 
       {/* Edit Modal */}
-      <Modal isOpen={isEditModalOpen} onClose={() => setEditModalOpen(false)}>
+      <Modal isOpen={isEditModalOpen} onClose={() => setEditModalOpen(false)} className="text-black">
         <ModalContent>
           <ModalHeader>Edit User</ModalHeader>
           <ModalBody>
+            <Input
+              fullWidth
+              label="First Name"
+              value={selectedUser?.firstname || ""}
+              onChange={(e) =>
+                setSelectedUser({ ...selectedUser, firstname: e.target.value })
+              }
+            />
+            <Input
+              fullWidth
+              label="Last Name"
+              value={selectedUser?.lastname || ""}
+              onChange={(e) =>
+                setSelectedUser({ ...selectedUser, lastname: e.target.value })
+              }
+            />
             <Input
               fullWidth
               label="Username"
@@ -230,23 +249,6 @@ const UserManagementTable = ({ users, setUsers }) => {
               value={selectedUser?.email || ""}
               onChange={(e) =>
                 setSelectedUser({ ...selectedUser, email: e.target.value })
-              }
-            />
-            <Input
-              fullWidth
-              label="Age"
-              type="number"
-              value={selectedUser?.age || ""}
-              onChange={(e) =>
-                setSelectedUser({ ...selectedUser, age: e.target.value })
-              }
-            />
-            <Input
-              fullWidth
-              label="Player Type"
-              value={selectedUser?.playerType || ""}
-              onChange={(e) =>
-                setSelectedUser({ ...selectedUser, playerType: e.target.value })
               }
             />
           </ModalBody>
@@ -265,8 +267,9 @@ const UserManagementTable = ({ users, setUsers }) => {
       <Modal
         isOpen={isDeleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
+        className="text-black"	
       >
-        <ModalContent>
+        <ModalContent >
           <ModalHeader>Delete User</ModalHeader>
           <ModalBody>
             Are you sure you want to delete {selectedUser?.username}?
