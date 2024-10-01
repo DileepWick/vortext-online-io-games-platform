@@ -25,6 +25,7 @@ const UserMessages = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [replyMessage, setReplyMessage] = useState("");
+  const [scrollBehavior, setScrollBehavior] = React.useState("inside");
 
   const token = getToken();
   const userId = getUserIdFromToken(token);
@@ -200,7 +201,9 @@ const UserMessages = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)} // Use onClose to handle modal close event
-        className="bg-customDark"
+        className="dark text-foreground bg-background"
+        scrollBehavior={scrollBehavior}
+        size="2xl"
       >
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">
@@ -233,15 +236,15 @@ const UserMessages = () => {
                       <div
                         className={`max-w-xs sm:max-w-md rounded-lg p-3 ${
                           message.sender === "user"
-                            ? "bg-blue-600 text-white"
-                            : "bg-gray-700 text-white"
+                            ? "bg-green-600 text-white max-w-[70%] text-left"
+                            : "bg-blue-500 text-white max-w-[70%] text-left"
                         }`}
                       >
-                        <p className="font-semibold text-sm">
+                        {/* <p className="font-semibold text-sm">
                           {message.sender === "user"
                             ? selectedTicket.username
                             : "Agent"}
-                        </p>
+                        </p> */}
                         <p className="mt-1">{message.content}</p>
                         <p className="text-xs mt-1 opacity-75">
                           {formatTime(message.timestamp)}
@@ -257,40 +260,49 @@ const UserMessages = () => {
               </div>
             )}
 
-            {/* Reply input field and button, only if the ticket is open */}
-            {selectedTicket && selectedTicket.status === "open" && (
-              <div className="mt-4">
-                <Input
-                  aria-label="Reply to Agent"
-                  value={replyMessage}
-                  onChange={(e) => setReplyMessage(e.target.value)}
-                  placeholder="Type your message..."
-                  fullWidth
-                  clearable
-                  className="bg-gray-800 text-white"
-                />
-                <Button
-                  color="primary"
-                  onPress={handleReplyToAgent}
-                  disabled={!replyMessage.trim()}
-                  className="mt-2"
-                >
-                  Send Reply
-                </Button>
-              </div>
-            )}
-
             {/* Show a message if the ticket is closed */}
             {selectedTicket && selectedTicket.status === "closed" && (
-              <div className="text-red-500 mt-4">
+              <div className="text-red-500 mt-4 text-sm text-center">
                 This ticket is closed. You cannot reply to it.
               </div>
             )}
           </ModalBody>
-          <ModalFooter>
-            <Button color="primary" onPress={() => setIsModalOpen(false)}>
-              Close
-            </Button>
+          {/* Modal Footer */}
+          <ModalFooter className="flex flex-col gap-2 w-full">
+            {/* Reply input field, only if the ticket is open */}
+            {selectedTicket && selectedTicket.status === "open" && (
+              <Input
+                aria-label="Reply to Agent"
+                value={replyMessage}
+                onChange={(e) => setReplyMessage(e.target.value)}
+                placeholder="Type your message..."
+                fullWidth
+                clearable
+                className="bg-gray-800 text-white"
+              />
+            )}
+
+            {/* Button container for right-aligned buttons */}
+            <div className="flex justify-end gap-2 mt-2">
+              {/* Close Button */}
+              <Button
+                color="danger"
+                variant="light"
+                onPress={() => setIsModalOpen(false)}
+              >
+                Close
+              </Button>
+
+              {/* Send Button */}
+              <Button
+                onPress={handleReplyToAgent}
+                color="primary"
+                disabled={!replyMessage.trim()}
+                className="cursor-pointer"
+              >
+                Send
+              </Button>
+            </div>
           </ModalFooter>
         </ModalContent>
       </Modal>
