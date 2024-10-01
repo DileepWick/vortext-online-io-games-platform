@@ -1,5 +1,6 @@
 import { OrderItems } from "../models/orderItems.js";
 import { Order } from "../models/order.js";
+import { populate } from "dotenv";
 
 // Create a new order item
 export const createOrderItem = async (req, res) => {
@@ -28,7 +29,6 @@ export const createOrderItem = async (req, res) => {
   }
 };
 
-
 // Get all order items
 export const getAllOrderItems = async (req, res) => {
   try {
@@ -37,13 +37,22 @@ export const getAllOrderItems = async (req, res) => {
         path: "stockid",
         populate: {
           path: "AssignedGame", // Populate all fields of AssignedGame
-        }
+        },
       })
       .populate({
         path: "order",
         populate: {
           path: "user", // Populate all fields of user
-        }
+        },
+      })
+      .populate({
+        path: "stockid",
+        populate: {
+          path: "AssignedGame",
+          populate: {
+            path: "developer",
+          }, // Populate all fields of AssignedGame
+        },
       });
 
     res.status(200).json({
@@ -54,7 +63,6 @@ export const getAllOrderItems = async (req, res) => {
     res.status(500).json({ message: "Error fetching order items" });
   }
 };
-
 
 // Get order items by order ID
 export const getOrderItemsByOrderId = async (req, res) => {
@@ -91,7 +99,7 @@ export const getOrderItemsByOrderId = async (req, res) => {
 export const checkLibraryItem = async (req, res) => {
   try {
     const { stockid } = req.params;
-    const {userId} = req.params; 
+    const { userId } = req.params;
 
     // Validate stock ID
     if (!stockid) {
@@ -233,3 +241,5 @@ export const getOrderItemsByUserId = async (req, res) => {
     res.status(500).json({ message: "Error fetching order items" });
   }
 };
+
+

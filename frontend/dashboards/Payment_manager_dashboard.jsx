@@ -80,7 +80,7 @@ const Payment_Manager = () => {
               )}
             </div>
           )}
-          {activeTab === "tab4" && <DevFunds />} {/* Display DevFunds component here */}
+          
         </div>
       </div>
     </div>
