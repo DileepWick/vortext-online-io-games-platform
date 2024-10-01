@@ -12,7 +12,6 @@ import {
   ModalBody,
   ModalFooter,
 } from "@nextui-org/react";
-import { Helmet } from "react-helmet-async";
 import { getToken } from "../utils/getToken";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 
@@ -123,17 +122,37 @@ const UserMessages = () => {
     }
   };
 
+  const formatTime = (timestamp) => {
+    return new Intl.DateTimeFormat("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(new Date(timestamp));
+  };
+
+  const formatDate = (timestamp) => {
+    return new Intl.DateTimeFormat("en-GB", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date(timestamp));
+  };
+
+  const isSameDay = (d1, d2) => {
+    const date1 = new Date(d1);
+    const date2 = new Date(d2);
+    return (
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate()
+    );
+  };
+
   if (loading) {
     return <Spinner />;
   }
 
-  console.log("Is modal open?", isModalOpen); // Debug: Check if modal state changes
-
   return (
     <div className="bg-gray-900 min-h-screen">
-      <Helmet>
-        <title>My Tickets | Vortex </title>
-      </Helmet>
       <Header />
       <div className="max-w-4xl mx-auto p-4">
         {error ? (
@@ -191,32 +210,47 @@ const UserMessages = () => {
             {selectedTicket &&
             selectedTicket.messages &&
             selectedTicket.messages.length > 0 ? (
-              selectedTicket.messages.map((message, index) => (
-                <div
-                  key={`${selectedTicket._id}-message-${index}`}
-                  className={`mb-4 flex ${
-                    message.sender === "user" ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  <div
-                    className={`max-w-xs sm:max-w-md rounded-lg p-3 ${
-                      message.sender === "user"
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-700 text-white"
-                    }`}
-                  >
-                    <p className="font-semibold text-sm">
-                      {message.sender === "user"
-                        ? selectedTicket.username
-                        : "Agent"}
-                    </p>
-                    <p className="mt-1">{message.content}</p>
-                    <p className="text-xs mt-1 opacity-75">
-                      {new Date(message.timestamp).toLocaleString()}
-                    </p>
+              selectedTicket.messages.map((message, index) => {
+                const previousMessage = selectedTicket.messages[index - 1];
+                const showDate =
+                  !previousMessage ||
+                  !isSameDay(message.timestamp, previousMessage.timestamp);
+
+                return (
+                  <div key={`${selectedTicket._id}-message-${index}`}>
+                    {showDate && (
+                      <div className="text-gray-500 text-center my-2">
+                        {formatDate(message.timestamp)}
+                      </div>
+                    )}
+                    <div
+                      className={`mb-4 flex ${
+                        message.sender === "user"
+                          ? "justify-end"
+                          : "justify-start"
+                      }`}
+                    >
+                      <div
+                        className={`max-w-xs sm:max-w-md rounded-lg p-3 ${
+                          message.sender === "user"
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-700 text-white"
+                        }`}
+                      >
+                        <p className="font-semibold text-sm">
+                          {message.sender === "user"
+                            ? selectedTicket.username
+                            : "Agent"}
+                        </p>
+                        <p className="mt-1">{message.content}</p>
+                        <p className="text-xs mt-1 opacity-75">
+                          {formatTime(message.timestamp)}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <div className="text-white text-center">
                 No messages in this ticket yet

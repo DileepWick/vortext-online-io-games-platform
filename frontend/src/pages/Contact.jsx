@@ -6,6 +6,7 @@ import { Button } from "@nextui-org/button";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { getToken } from "../utils/getToken";
@@ -13,7 +14,7 @@ import useAuthCheck from "../utils/authCheck";
 
 const Contact = () => {
   useAuthCheck();
-
+  const navigate = useNavigate();
   const [userData, setUserData] = useState({
     username: "",
     email: "",
@@ -40,7 +41,7 @@ const Contact = () => {
           email: response.data.profile.email,
         });
 
-        // Check if user has an open ticket
+        // Check if user has any tickets and if there is an open ticket
         const ticketResponse = await axios.get(
           `http://localhost:8098/contacts/fetchContactByUserId/${userId}`,
           {
@@ -50,14 +51,12 @@ const Contact = () => {
           }
         );
 
-        if (
-          ticketResponse.data.contact &&
-          ticketResponse.data.contact.status !== "closed"
-        ) {
-          setHasOpenTicket(true);
-        } else {
-          setHasOpenTicket(false);
-        }
+        const tickets = ticketResponse.data.contact || [];
+
+        // Check if any ticket exists and is not closed
+        const hasOpen = tickets.some((ticket) => ticket.status !== "closed");
+
+        setHasOpenTicket(hasOpen);
       } catch (error) {
         console.error("Error fetching user data:", error);
         // toast.error("Failed to fetch user data");
@@ -176,12 +175,21 @@ const Contact = () => {
         </div>
         <div className="contact_us_container">
           <div className="w-full flex flex-col gap-8">
-            <h1 className="text-3xl">Contact Us:</h1>
+            <h1 className="text-3xl text-black">Contact Us:</h1>
             {hasOpenTicket ? (
-              <p className="text-red-500">
-                You already have an open ticket. Please wait for a response or
-                check your existing ticket.
-              </p>
+              <div className="text-center">
+                <p className="text-red-500 text-lg">
+                  You already have an open ticket. Please wait for a response or
+                  check your existing ticket.
+                </p>
+                <Button
+                  className="mx-auto block"
+                  onClick={() => navigate("/UserMessage")}
+                  color="primary"
+                >
+                  Show me
+                </Button>
+              </div>
             ) : (
               <form className="w-full" onSubmit={handleSubmit}>
                 <Input
