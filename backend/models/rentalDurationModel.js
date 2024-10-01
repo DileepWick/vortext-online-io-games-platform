@@ -17,6 +17,11 @@ const RentalTimeSchema = new Schema({
     type: Number,
     required: true,
     min: [0, 'Price must be a positive number']
+  },
+  notes: {
+    type: String,
+    required: true,
+    
   }
 });
 

@@ -4,16 +4,17 @@ export const RentalTimeController = {
   // Add a new rental time for a game
   addRentalTime: async (req, res) => {
     try {
-      const { gameId, duration, price } = req.body;
+      const { gameId, duration, price, notes } = req.body;
 
-      if (!gameId || !duration || !price) {
+      if (!gameId || !duration || !price || !notes) {
         return res.status(400).json({ message: "Game ID, duration, and price are required" });
       }
 
       const newRentalTime = new RentalTime({
         game: gameId,
         duration,
-        price
+        price,
+        notes
       });
 
       const savedRentalTime = await newRentalTime.save();

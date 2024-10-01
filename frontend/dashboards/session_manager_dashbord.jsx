@@ -43,6 +43,7 @@ const SessionManagerDash = () => {
     gameName: "",
     duration: "",
     price: "",
+    notes: "",
   });
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState("");
@@ -147,6 +148,7 @@ const SessionManagerDash = () => {
         gameId: formData.gameId,
         duration: parseInt(formData.duration, 10) * 60, // Convert minutes to seconds
         price: parseFloat(formData.price),
+        notes: formData.notes
       };
 
       const existingRentalTime = rentalTimes.find(
@@ -326,6 +328,7 @@ const SessionManagerDash = () => {
                       gameName: "",
                       duration: "",
                       price: "",
+                      notes:"",
                     });
                     setEditingId(null);
                     setError("");
@@ -490,6 +493,15 @@ const SessionManagerDash = () => {
                   type="number"
                   value={formData.price}
                   readOnly
+                />
+              </div>
+              <div className="mb-4">
+                <Input
+                  label="notes"
+                  name="notes"
+                  type="text"
+                  onChange={handleInputChange}
+                  
                 />
               </div>
             </ModalBody>
