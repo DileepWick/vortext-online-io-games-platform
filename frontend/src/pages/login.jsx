@@ -3,9 +3,18 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast, Flip } from "react-toastify";
+import { Eye, EyeOff } from "lucide-react";
 
 // Next UI
-import { Input, Button, Tabs, Tab, Link, Card, CardBody } from "@nextui-org/react";
+import {
+  Input,
+  Button,
+  Tabs,
+  Tab,
+  Link,
+  Card,
+  CardBody,
+} from "@nextui-org/react";
 
 // Components
 import Header from "../components/header";
@@ -18,13 +27,13 @@ const Login = () => {
   const [selectedTab, setSelectedTab] = useState("login");
   const [selectedRole, setSelectedRole] = useState("User"); // New state for role selection
   const [portfolioLink, setPortfolioLinks] = useState(""); // Initialize with one empty input
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
 
-
   //Check the user is developer or not
-  //if user is a developer check account status 
+  //if user is a developer check account status
   //if account status is approved then navigate to developer dashboard
   //if account status is pending then navigate to developer login page
 
@@ -48,9 +57,10 @@ const Login = () => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
       ...prevFormData,
-      [name]: name === "firstname" || name === "lastname"
-        ? filterLettersOnly(value)
-        : value,
+      [name]:
+        name === "firstname" || name === "lastname"
+          ? filterLettersOnly(value)
+          : value,
     }));
   };
 
@@ -58,16 +68,19 @@ const Login = () => {
   const handlePortfolioLinkChange = (e) => {
     setPortfolioLinks(e.target.value); // Handling a single portfolio link
   };
-  
-
- 
 
   // Validation functions
   const validateFirstname = (firstname) => /^[a-zA-Z]+$/.test(firstname);
   const validateLastname = (lastname) => /^[a-zA-Z]+$/.test(lastname);
-  const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.com$/i;
+    return emailRegex.test(email);
+  };
   const validatePassword = (password) =>
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password);
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+      password
+    );
 
   const validateForm = () => {
     const errors = {};
@@ -80,6 +93,10 @@ const Login = () => {
     }
     if (!validateEmail(formData.email)) {
       errors.email = "Invalid email format.";
+    }
+    if (!validateEmail(formData.email)) {
+      errors.email =
+        "Invalid email format. Email must contain '@' and end with '.com'.";
     }
     if (!validatePassword(formData.password)) {
       errors.password =
@@ -109,7 +126,13 @@ const Login = () => {
 
         const userRole = getUserRoleFromToken(token);
 
-        navigate(userRole === "admin" ? "/" : redirectTo ? decodeURIComponent(redirectTo) : "/");
+        navigate(
+          userRole === "admin"
+            ? "/"
+            : redirectTo
+            ? decodeURIComponent(redirectTo)
+            : "/"
+        );
       } else {
         setAlertMessage(response.data.message);
       }
@@ -138,22 +161,27 @@ const Login = () => {
     if (!validateForm()) {
       return; // Prevent signup if validation fails
     }
-  
+
     try {
-      const { firstname, lastname, username, email, password, birthday } = formData;
-  
+      const { firstname, lastname, username, email, password, birthday } =
+        formData;
+
       // Calculate age
       const today = new Date();
       const birthDate = new Date(birthday);
       let age = today.getFullYear() - birthDate.getFullYear();
       const monthDiff = today.getMonth() - birthDate.getMonth();
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      if (
+        monthDiff < 0 ||
+        (monthDiff === 0 && today.getDate() < birthDate.getDate())
+      ) {
         age--;
       }
-  
+
       // Determine player category
-      const playerCategory = age <= 12 ? "Kid" : age <= 18 ? "Teenager" : "Adult";
-  
+      const playerCategory =
+        age <= 12 ? "Kid" : age <= 18 ? "Teenager" : "Adult";
+
       const data = {
         firstname,
         lastname,
@@ -164,20 +192,21 @@ const Login = () => {
         age,
         playerCategory,
         role: selectedRole,
-        portfolioLink: selectedRole === 'Developer' ? portfolioLink : undefined,
+        portfolioLink: selectedRole === "Developer" ? portfolioLink : undefined,
       };
-  
-  
-      // Add developer-specific fields if selectedRole is Developer
-if (selectedRole === "Developer") {
-  data.portfolioLink = portfolioLink; // Single portfolio link
-}
 
-  
+      // Add developer-specific fields if selectedRole is Developer
+      if (selectedRole === "Developer") {
+        data.portfolioLink = portfolioLink; // Single portfolio link
+      }
+
       // Make the signup API request
-      const response = await axios.post("http://localhost:8098/users/register", data);
-  
-      if (response.data.success) {
+      const response = await axios.post(
+        "http://localhost:8098/users/register",
+        data
+      );
+
+      if (response.data.message) {
         setAlertMessage("Registration successful! Please log in.");
         setSelectedTab("login"); // Switch to login tab
         // Optionally, clear the form data
@@ -190,43 +219,88 @@ if (selectedRole === "Developer") {
           birthday: "",
         });
         setPortfolioLinks(""); // Reset portfolio links
+
+        toast.success(response.data.message, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Flip,
+          style: { fontFamily: "Rubik" },
+        });
       } else {
-        setAlertMessage(response.data.message);
+        
+        toast.success("User Account created successfully !", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Flip,
+          style: { fontFamily: "Rubik" },
+        });
       }
     } catch (error) {
       console.error("Registration error:", error);
       setAlertMessage("Registration failed. Please try again.");
     }
   };
-  
 
   // Get today's date and calculate the max date for the birthday input
   const today = new Date();
-  const maxDate = new Date(today.setFullYear(today.getFullYear() - 5)).toISOString().split('T')[0];
+  const maxDate = new Date(today.setFullYear(today.getFullYear() - 5))
+    .toISOString()
+    .split("T")[0];
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   return (
-    <div>
-      <Header />
-      <div className="flex items-center justify-center min-h-screen bg-gray-20">
-        <Card className="w-[340px] h-[750px]">
+    <div className="min-h-screen flex">
+      {/* Left side - Image */}
+      <div
+        className="hidden lg:block w-1/2 bg-cover bg-center"
+        style={{
+          backgroundImage:
+            "url(https://cdn.dribbble.com/users/1646023/screenshots/6625629/gamer_800x600.gif)",
+        }}
+      >
+        {/* Replace the placeholder URL with your actual image URL */}
+      </div>
+
+      {/* Right side - Login/Signup form */}
+      <div className="w-full lg:w-1/2 bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
           <CardBody className="overflow-hidden">
+            <h1 className="text-2xl font-bold text-center mb-6">
+              Welcome to Vortex Gaming
+            </h1>
             <Tabs
               fullWidth
               size="lg"
-              aria-label="Tabs form"
+              aria-label="Login/Signup Tabs"
               selectedKey={selectedTab}
               onSelectionChange={setSelectedTab}
+              className="mb-4"
             >
               <Tab key="login" title="Login">
-                <form className="flex flex-col gap-4">
+                <form className="space-y-4">
                   <Input
                     isRequired
                     label="Username"
                     placeholder="Enter your username"
                     name="username"
-                    type="text"
                     value={formData.username}
                     onChange={handleInputChange}
+                    className="max-w-full"
                   />
                   <Input
                     isRequired
@@ -236,70 +310,63 @@ if (selectedRole === "Developer") {
                     type="password"
                     value={formData.password}
                     onChange={handleInputChange}
+                    className="max-w-full"
                   />
-                  <p className="text-center text-small">
+                  <p className="text-center text-sm">
                     Need to create an account?{" "}
                     <Link size="sm" onPress={() => setSelectedTab("sign-up")}>
                       Sign up
                     </Link>
                   </p>
-                  {alertMessage && (
-                    <div className="mt-4 text-center text-red-500">
-                      {alertMessage}
-                    </div>
-                  )}
-                  <div className="flex gap-2 justify-end">
-                    <Button fullWidth color="primary" onClick={handleLogin}>
-                      Login
-                    </Button>
-                  </div>
+                  <Button
+                    fullWidth
+                    color="primary"
+                    onClick={handleLogin}
+                    className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                  >
+                    Login
+                  </Button>
                 </form>
               </Tab>
-
               <Tab key="sign-up" title="Sign up">
                 <Tabs
                   fullWidth
-                  size="lg"
+                  size="md"
                   aria-label="Signup Tabs"
                   selectedKey={selectedRole}
                   onSelectionChange={setSelectedRole}
+                  className="mb-4"
                 >
                   <Tab key="user" title="User">
-                    <form className="flex flex-col gap-4 h-[500px]">
+                    <form className="space-y-3">
                       <Input
                         isRequired
-                        label="Firstname"
+                        label="First Name"
                         placeholder="Enter your first name"
                         name="firstname"
-                        type="text"
                         value={formData.firstname}
                         onChange={handleInputChange}
                         color={validationErrors.firstname ? "error" : "default"}
+                        className="max-w-full"
                       />
-                      {validationErrors.firstname && (
-                        <div className="text-red-500">{validationErrors.firstname}</div>
-                      )}
                       <Input
                         isRequired
-                        label="Lastname"
-                        placeholder="Enter your lastname"
+                        label="Last Name"
+                        placeholder="Enter your last name"
                         name="lastname"
-                        type="text"
                         value={formData.lastname}
                         onChange={handleInputChange}
                         color={validationErrors.lastname ? "error" : "default"}
+                        className="max-w-full"
                       />
-                      {validationErrors.lastname && (
-                        <div className="text-red-500">{validationErrors.lastname}</div>
-                      )}
                       <Input
                         isRequired
                         label="Username"
-                        placeholder="Enter your username"
+                        placeholder="Choose a username"
                         name="username"
-                        type="text"
                         value={formData.username}
                         onChange={handleInputChange}
+                        className="max-w-full"
                       />
                       <Input
                         isRequired
@@ -310,10 +377,8 @@ if (selectedRole === "Developer") {
                         value={formData.email}
                         onChange={handleInputChange}
                         color={validationErrors.email ? "error" : "default"}
+                        className="max-w-full"
                       />
-                      {validationErrors.email && (
-                        <div className="text-red-500">{validationErrors.email}</div>
-                      )}
                       <Input
                         isRequired
                         label="Birthday"
@@ -322,76 +387,60 @@ if (selectedRole === "Developer") {
                         type="date"
                         value={formData.birthday}
                         onChange={handleInputChange}
-                        max={maxDate} // Set max date to 5 years before today
+                        max={maxDate}
+                        className="max-w-full"
                       />
                       <Input
                         isRequired
                         label="Password"
-                        placeholder="Enter your password"
+                        placeholder="Create a password"
                         name="password"
                         type="password"
                         value={formData.password}
                         onChange={handleInputChange}
                         color={validationErrors.password ? "error" : "default"}
+                        className="max-w-full"
                       />
-                      {validationErrors.password && (
-                        <div className="text-red-500">{validationErrors.password}</div>
-                      )}
-                      <p className="text-center text-small">
-                        Already have an account?{" "}
-                        <Link size="sm" onPress={() => setSelectedTab("login")}>
-                          Login
-                        </Link>
-                      </p>
-                      {alertMessage && (
-                        <div className="mt-4 text-center text-red-500">
-                          {alertMessage}
-                        </div>
-                      )}
-                      <div className="flex gap-2 justify-end">
-                        <Button fullWidth color="primary" onClick={handleSignUp}>
-                          Sign up
-                        </Button>
-                      </div>
+                      <Button
+                        fullWidth
+                        color="primary"
+                        onClick={handleSignUp}
+                        className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600"
+                      >
+                        Sign up as User
+                      </Button>
                     </form>
                   </Tab>
-
                   <Tab key="developer" title="Developer">
-                    <form className="flex flex-col gap-4 h-[500px]">
+                    <form className="space-y-3">
                       <Input
                         isRequired
-                        label="Firstname"
+                        label="First Name"
                         placeholder="Enter your first name"
                         name="firstname"
-                        type="text"
                         value={formData.firstname}
                         onChange={handleInputChange}
                         color={validationErrors.firstname ? "error" : "default"}
+                        className="max-w-full"
                       />
-                      {validationErrors.firstname && (
-                        <div className="text-red-500">{validationErrors.firstname}</div>
-                      )}
                       <Input
                         isRequired
-                        label="Lastname"
-                        placeholder="Enter your lastname"
+                        label="Last Name"
+                        placeholder="Enter your last name"
                         name="lastname"
-                        type="text"
                         value={formData.lastname}
                         onChange={handleInputChange}
                         color={validationErrors.lastname ? "error" : "default"}
+                        className="max-w-full"
                       />
-                      {validationErrors.lastname && (
-                        <div className="text-red-500">{validationErrors.lastname}</div>
-                      )}
                       <Input
                         isRequired
                         label="Username"
-                        placeholder="Enter your username"
+                        placeholder="Choose a username"
                         name="username"
-                        type="text"
                         value={formData.username}
                         onChange={handleInputChange}
+                        className="max-w-full"
                       />
                       <Input
                         isRequired
@@ -402,10 +451,8 @@ if (selectedRole === "Developer") {
                         value={formData.email}
                         onChange={handleInputChange}
                         color={validationErrors.email ? "error" : "default"}
+                        className="max-w-full"
                       />
-                      {validationErrors.email && (
-                        <div className="text-red-500">{validationErrors.email}</div>
-                      )}
                       <Input
                         isRequired
                         label="Birthday"
@@ -414,47 +461,48 @@ if (selectedRole === "Developer") {
                         type="date"
                         value={formData.birthday}
                         onChange={handleInputChange}
-                        max={maxDate} // Set max date to 5 years before today
+                        max={maxDate}
+                        className="max-w-full"
                       />
                       <Input
                         isRequired
                         label="Password"
-                        placeholder="Enter your password"
+                        placeholder="Create a password"
                         name="password"
                         type="password"
                         value={formData.password}
                         onChange={handleInputChange}
                         color={validationErrors.password ? "error" : "default"}
+                        className="max-w-full"
                       />
-                      {validationErrors.password && (
-                        <div className="text-red-500">{validationErrors.password}</div>
-                      )}
-                       
-                      <p className="text-center text-small">
-                        Already have an account?{" "}
-                        <Link size="sm" onPress={() => setSelectedTab("login")}>
-                          Login
-                        </Link>
-                      </p>
-                      {alertMessage && (
-                        <div className="mt-4 text-center text-red-500">
-                          {alertMessage}
-                        </div>
-                      )}
-                      <div className="flex gap-2 justify-end">
-                        <Button fullWidth color="primary" onClick={handleSignUp}>
-                          Sign up
-                        </Button>
-                      </div>
+                      <Input
+                        label="Portfolio Link"
+                        placeholder="Enter your portfolio URL"
+                        value={portfolioLink}
+                        onChange={handlePortfolioLinkChange}
+                        className="max-w-full"
+                      />
+                      <Button
+                        fullWidth
+                        color="secondary"
+                        onClick={handleSignUp}
+                        className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                      >
+                        Sign up as Developer
+                      </Button>
                     </form>
                   </Tab>
                 </Tabs>
               </Tab>
             </Tabs>
+            {alertMessage && (
+              <div className="mt-4 text-center text-red-500">
+                {alertMessage}
+              </div>
+            )}
           </CardBody>
         </Card>
       </div>
-      <Footer />
     </div>
   );
 };

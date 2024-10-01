@@ -27,7 +27,7 @@ const DeveloperDashboard = () => {
   const [selectedDeveloper, setSelectedDeveloper] = useState(null);
   const [isApproveModalOpen, setApproveModalOpen] = useState(false);
   const [isRejectModalOpen, setRejectModalOpen] = useState(false);
-  const rowsPerPage = 4;
+  const rowsPerPage = 6;
 
   useEffect(() => {
     const fetchDevelopers = async () => {
@@ -162,7 +162,15 @@ const DeveloperDashboard = () => {
             <TableRow key={developer._id}>
               <TableCell>{developer.firstname + " " + developer.lastname}</TableCell>
               <TableCell>{developer.username}</TableCell>
-              <TableCell>{developer.portfolioLink}</TableCell>
+              <TableCell>
+                <a
+                  href={developer.portfolioLink || `https://github.com/${developer.username}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {developer.portfolioLink || `https://github.com/${developer.username}`}
+                </a>
+              </TableCell>
               <TableCell>{developer.email}</TableCell>
               <TableCell>
                 <Chip
@@ -189,8 +197,8 @@ const DeveloperDashboard = () => {
                     </Button>
                   </>
                 )}
-              </TableCell>
-            </TableRow>
+                 </TableCell>
+              </TableRow>
           ))}
         </TableBody>
       </Table>
