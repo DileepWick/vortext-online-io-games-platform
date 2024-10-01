@@ -29,7 +29,7 @@ import UserMessages from "./pages/UserMessage";
 //Games
 import Snake from "../Games/Snake";
 import PuzzlePlatformGame from "./components/Games/PuzzlePlatformGame";
-
+import ColorGuessingGame from "../Games/ColorGuessingGame";
 import Chat from "./pages/chat";
 
 //Gameplay
@@ -112,8 +112,12 @@ const App = () => {
       <Route path="/Transaction" element={<TransactionHistory />} />
       <Route path="/Snakegame" element={<Snake />} />
       <Route path="/PuzzlePlatformGame" element={<PuzzlePlatformGame />} />
+
+      <Route path="/ColorGuessingGame" element={<ColorGuessingGame />} />
+
       <Route path="/RentalPayments" element={<RentalPaymentsDash />} />
       <Route path="/SessionAnalytics" element={<SessionAnalytics />} />
+
 
       {/*Game Routes*/}
       <Route path="/HangmanGame" element={<Hangman />} />
