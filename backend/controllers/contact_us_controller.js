@@ -232,36 +232,36 @@ export const setStatus = async (req, res) => {
   }
 };
 
-export const updateContact = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { status } = req.body;
+// export const updateContact = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const { status } = req.body;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Invalid Contact ID" });
-    }
+//     if (!mongoose.Types.ObjectId.isValid(id)) {
+//       return res.status(400).json({ message: "Invalid Contact ID" });
+//     }
 
-    const updatedContact = await ContactUsSchema.findByIdAndUpdate(
-      id,
-      { status, updatedAt: new Date() },
-      { new: true }
-    );
+//     const updatedContact = await ContactUsSchema.findByIdAndUpdate(
+//       id,
+//       { status, updatedAt: new Date() },
+//       { new: true }
+//     );
 
-    if (!updatedContact) {
-      return res.status(404).json({ message: "Contact not found" });
-    }
+//     if (!updatedContact) {
+//       return res.status(404).json({ message: "Contact not found" });
+//     }
 
-    res.status(200).json({
-      message: "Contact updated successfully",
-      contact: updatedContact,
-    });
-  } catch (error) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ message: "An error occurred", error: error.message });
-  }
-};
+//     res.status(200).json({
+//       message: "Contact updated successfully",
+//       contact: updatedContact,
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res
+//       .status(500)
+//       .json({ message: "An error occurred", error: error.message });
+//   }
+// };
 
 export const deleteContact = async (req, res) => {
   try {
