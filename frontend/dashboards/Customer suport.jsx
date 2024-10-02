@@ -200,6 +200,22 @@ const ContactDash = () => {
       return; // Stop submission if no changes are made
     }
 
+    if (editFAQQuestion.trim() === "" || editFAQAnswer.trim() === "") {
+      toast.error("Question and answer cannot be empty!", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Flip,
+        progressBarClassName: "bg-gray-800",
+        style: { fontFamily: "Rubik" },
+      });
+      return;
+    }
     try {
       const response = await axios.put(
         `http://localhost:8098/faq/updateFAQ/${editingFAQ._id}`,
