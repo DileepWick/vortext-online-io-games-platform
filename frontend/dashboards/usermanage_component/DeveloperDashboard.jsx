@@ -151,7 +151,7 @@ const DeveloperDashboard = () => {
         <TableHeader>
           <TableColumn>FULL NAME</TableColumn>
           <TableColumn>USERNAME</TableColumn>
-          <TableColumn>PORTFOLIO LINK</TableColumn>
+          <TableColumn>LINKEDIN LINK</TableColumn>
           <TableColumn>EMAIL</TableColumn>
           <TableColumn>STATUS</TableColumn>
           <TableColumn>ACTIONS</TableColumn>
@@ -164,11 +164,11 @@ const DeveloperDashboard = () => {
               <TableCell>{developer.username}</TableCell>
               <TableCell>
                 <a
-                  href={developer.portfolioLink || `https://github.com/${developer.username}`}
+                  href={developer.portfolioLink || `www.linkedin.com/${developer.username}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {developer.portfolioLink || `https://github.com/${developer.username}`}
+                  {developer.portfolioLink || `www.linkedin.com/${developer.username}`}
                 </a>
               </TableCell>
               <TableCell>{developer.email}</TableCell>

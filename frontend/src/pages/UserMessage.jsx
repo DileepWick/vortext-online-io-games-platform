@@ -20,8 +20,8 @@ import Footer from "../components/footer";
 
 const UserMessages = () => {
   const [userTickets, setUserTickets] = useState([]);
-  const [selectedTicket, setSelectedTicket] = useState(null); // For storing the selected ticket
-  const [isModalOpen, setIsModalOpen] = useState(false); // Control modal visibility
+  const [selectedTicket, setSelectedTicket] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [replyMessage, setReplyMessage] = useState("");
@@ -67,9 +67,8 @@ const UserMessages = () => {
   }, [userId, token]);
 
   const handleSelectTicket = (ticket) => {
-    console.log("Ticket clicked:", ticket); // Debug: Check if the function triggers
-    setSelectedTicket(ticket); // Set the selected ticket
-    setIsModalOpen(true); // Open the modal
+    setSelectedTicket(ticket);
+    setIsModalOpen(true);
   };
 
   const handleReplyToAgent = async () => {
@@ -152,9 +151,9 @@ const UserMessages = () => {
   }
 
   return (
-    <div className="bg-gray-900 min-h-screen">
+    <div className="bg-gray-900 min-h-screen flex flex-col">
       <Header />
-      <div className="max-w-4xl mx-auto p-4">
+      <div className="max-w-4xl mx-auto p-4 flex-grow">
         {error ? (
           <Card className="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
             <CardBody className="p-4 bg-gray-700 text-red-500 text-center">
@@ -162,36 +161,34 @@ const UserMessages = () => {
             </CardBody>
           </Card>
         ) : userTickets.length === 0 ? (
-          <Card className="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+          <Card className="bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-10">
             <CardBody className="p-4 bg-gray-700 text-white text-center">
-              <div>You have no raised tickets</div>
+              <div className="text-lg">You have no raised tickets</div>
             </CardBody>
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Ticket list */}
-            <div className="space-y-4">
-              {userTickets.map((ticket) => (
-                <Card
-                  key={ticket._id}
-                  className="bg-gray-800 rounded-lg shadow-lg overflow-hidden cursor-pointer"
-                  isPressable
-                  onPress={() => handleSelectTicket(ticket)} // Open modal on click
-                >
-                  <CardBody className="p-4">
-                    <h2 className="text-lg font-semibold text-white">
-                      Ticket: {ticket._id}
-                    </h2>
-                    <p className="text-sm text-gray-400">
-                      Status: {ticket.status}
-                    </p>
-                    <p className="text-sm text-gray-400">
-                      Created: {new Date(ticket.createdAt).toLocaleString()}
-                    </p>
-                  </CardBody>
-                </Card>
-              ))}
-            </div>
+            {userTickets.map((ticket) => (
+              <Card
+                key={ticket._id}
+                className="bg-gray-800 rounded-lg shadow-lg overflow-hidden cursor-pointer mt-8"
+                isPressable
+                onPress={() => handleSelectTicket(ticket)}
+              >
+                <CardBody className="p-4">
+                  <h2 className="text-lg font-semibold text-white">
+                    Ticket: {ticket._id}
+                  </h2>
+                  <p className="text-sm text-gray-400">
+                    Status: {ticket.status}
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    Created: {new Date(ticket.createdAt).toLocaleString()}
+                  </p>
+                </CardBody>
+              </Card>
+            ))}
           </div>
         )}
       </div>
@@ -199,8 +196,9 @@ const UserMessages = () => {
       {/* Modal for Chat History */}
       <Modal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)} // Use onClose to handle modal close event
-        className="bg-customDark"
+        onClose={() => setIsModalOpen(false)}
+        className="dark text-foreground bg-background"
+        size="2xl"
       >
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">
@@ -233,15 +231,10 @@ const UserMessages = () => {
                       <div
                         className={`max-w-xs sm:max-w-md rounded-lg p-3 ${
                           message.sender === "user"
-                            ? "bg-blue-600 text-white"
-                            : "bg-gray-700 text-white"
+                            ? "bg-green-600 text-white max-w-[70%] text-left"
+                            : "bg-blue-500 text-white max-w-[70%] text-left"
                         }`}
                       >
-                        <p className="font-semibold text-sm">
-                          {message.sender === "user"
-                            ? selectedTicket.username
-                            : "Agent"}
-                        </p>
                         <p className="mt-1">{message.content}</p>
                         <p className="text-xs mt-1 opacity-75">
                           {formatTime(message.timestamp)}
@@ -256,41 +249,43 @@ const UserMessages = () => {
                 No messages in this ticket yet
               </div>
             )}
-
-            {/* Reply input field and button, only if the ticket is open */}
-            {selectedTicket && selectedTicket.status === "open" && (
-              <div className="mt-4">
-                <Input
-                  aria-label="Reply to Agent"
-                  value={replyMessage}
-                  onChange={(e) => setReplyMessage(e.target.value)}
-                  placeholder="Type your message..."
-                  fullWidth
-                  clearable
-                  className="bg-gray-800 text-white"
-                />
-                <Button
-                  color="primary"
-                  onPress={handleReplyToAgent}
-                  disabled={!replyMessage.trim()}
-                  className="mt-2"
-                >
-                  Send Reply
-                </Button>
-              </div>
-            )}
-
-            {/* Show a message if the ticket is closed */}
+          </ModalBody>
+          <ModalFooter className="flex flex-col gap-2 w-full">
             {selectedTicket && selectedTicket.status === "closed" && (
-              <div className="text-red-500 mt-4">
+              <div className="text-red-500 mt-4 text-sm text-center">
                 This ticket is closed. You cannot reply to it.
               </div>
             )}
-          </ModalBody>
-          <ModalFooter>
-            <Button color="primary" onPress={() => setIsModalOpen(false)}>
-              Close
-            </Button>
+            {selectedTicket && selectedTicket.status === "open" && (
+              <Input
+                aria-label="Reply to Agent"
+                value={replyMessage}
+                onChange={(e) => setReplyMessage(e.target.value)}
+                placeholder="Type your message..."
+                fullWidth
+                clearable
+                className="bg-gray-800 text-white"
+              />
+            )}
+
+            <div className="flex justify-end gap-2 mt-2">
+              <Button
+                color="danger"
+                variant="light"
+                onPress={() => setIsModalOpen(false)}
+              >
+                Close
+              </Button>
+
+              <Button
+                onPress={handleReplyToAgent}
+                color="primary"
+                disabled={!replyMessage.trim()}
+                className="cursor-pointer"
+              >
+                Send
+              </Button>
+            </div>
           </ModalFooter>
         </ModalContent>
       </Modal>

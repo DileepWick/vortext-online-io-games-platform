@@ -137,7 +137,7 @@ const CartPage = () => {
       const month = value.slice(0, 2);
       const year = value.slice(2, 4);
       if (parseInt(month) > 12) {
-        setExpirationDate('12/' + year);
+        setExpirationDate('12/${year}' + year);
       } else {
         setExpirationDate(`${month}/${year}`);
       }
@@ -164,13 +164,24 @@ const CartPage = () => {
         toast.error("Invalid month in expiration date");
         return false;
       }
+
+      // Check if the card is not expired
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear() % 100;
+    const currentMonth = currentDate.getMonth() + 1;
+    if (parseInt(year) < currentYear || (parseInt(year) === currentYear && parseInt(month) < currentMonth)) {
+      toast.error("Card has expired");
+      return false;
+    }
+
       if (cvv.length !== 3) {
         toast.error("Invalid CVV");
         return false;
       }
-    } else if (paymentMethod === 'paypal') {
-      if (!paypalEmail || !paypalEmail.includes('@')) {
-        toast.error("Invalid PayPal email");
+    }  else if (paymentMethod === "paypal") {
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[com]+$/;
+      if (!paypalEmail || !emailPattern.test(paypalEmail)) {
+        toast.error("Invalid PayPal email.");
         return false;
       }
     }
@@ -483,7 +494,7 @@ const CartPage = () => {
                           <img src={item.stockid.AssignedGame.coverPhoto} alt={item.stockid.AssignedGame.title} className="w-16 h-20 object-cover mr-4" />
                           <div>
                             <h3 className="font-semibold text-black">{item.stockid.AssignedGame.title}</h3>
-                            <p className="text-sm text-gray-400">Id:{item.stockid.AssignedGame.developer}</p>
+                          {/*  <p className="text-sm text-gray-400">Id:{item.stockid.AssignedGame.developer}</p>*/}
                             <p className="text-black">Rs.{item.stockid.UnitPrice.toFixed(2)}</p>
                           </div>
                         </div>
@@ -494,7 +505,7 @@ const CartPage = () => {
                           <span>Rs.{totalDiscountedTotal.toFixed(2)}</span>
                         </div>
                         <div className="bg-yellow-900 text-yellow-200 p-2 rounded mt-2 text-sm">
-                          Get Rs.{(totalDiscountedTotal).toFixed(2)} in Rewards with this purchase.
+                          Get some rewards with this purchase.
                         </div>
                       </div>
                     {/*}  <Input

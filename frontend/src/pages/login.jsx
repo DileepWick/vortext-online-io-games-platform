@@ -65,10 +65,17 @@ const Login = () => {
   };
 
   // Add input fields for developer portfolio links
-  const handlePortfolioLinkChange = (e) => {
-    setPortfolioLinks(e.target.value); // Handling a single portfolio link
-  };
+  // Handle portfolio link input change and enforce www.linkedin.com/ format
+const handlePortfolioLinkChange = (e) => {
+  let value = e.target.value;
 
+  // Automatically add "www.linkedin.com/" if it doesn't start with it
+  if (!value.startsWith("www.linkedin.com/")) {
+    value = "www.linkedin.com/";
+  }
+
+  setPortfolioLinks(value); // Set the modified value
+};
   // Validation functions
   const validateFirstname = (firstname) => /^[a-zA-Z]+$/.test(firstname);
   const validateLastname = (lastname) => /^[a-zA-Z]+$/.test(lastname);
@@ -264,6 +271,7 @@ const Login = () => {
   };
 
   return (
+    <div><Header/>
     <div className="min-h-screen flex">
       {/* Left side - Image */}
       <div
@@ -476,12 +484,12 @@ const Login = () => {
                         className="max-w-full"
                       />
                       <Input
-                        label="Portfolio Link"
-                        placeholder="Enter your portfolio URL"
-                        value={portfolioLink}
-                        onChange={handlePortfolioLinkChange}
-                        className="max-w-full"
-                      />
+  label="LinkedIn Link"
+  placeholder="Enter your LinkedIn URL (www.linkedin.com/)"
+  value={portfolioLink}
+  onChange={handlePortfolioLinkChange}
+  className="max-w-full"
+/>
                       <Button
                         fullWidth
                         color="secondary"
@@ -503,6 +511,8 @@ const Login = () => {
           </CardBody>
         </Card>
       </div>
+    </div>
+    <Footer/>
     </div>
   );
 };

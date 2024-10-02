@@ -178,10 +178,13 @@ const Contact = () => {
             <h1 className="text-3xl text-black">Contact Us:</h1>
             {hasOpenTicket ? (
               <div className="text-center">
-                <p className="text-red-500 text-lg">
-                  You already have an open ticket. Please wait for a response or
-                  check your existing ticket.
-                </p>
+                <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 rounded">
+                  <p className="font-medium text-lg">
+                    You have an open ticket. Please wait for a response or check
+                    your existing ticket.
+                  </p>
+                </div>
+
                 <Button
                   className="mx-auto block"
                   onClick={() => navigate("/UserMessage")}

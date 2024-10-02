@@ -363,6 +363,34 @@ const ContactDash = () => {
   // Contact message functions
   const handleDeleteMessage = async (messageId) => {
     try {
+      // First, find the contact in the contactMessages array
+      const contactToDelete = contactMessages.find(
+        (contact) => contact._id === messageId
+      );
+
+      // Check if the contact exists and its status
+      if (!contactToDelete) {
+        throw new Error("Contact not found");
+      }
+
+      if (contactToDelete.status === "open") {
+        toast.error("Cannot delete contact with open status", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Flip,
+          progressBarClassName: "bg-gray-800",
+          style: { fontFamily: "Rubik" },
+        });
+        return;
+      }
+
+      // If status is not "open", proceed with deletion
       await axios.delete(
         `http://localhost:8098/contacts/deleteContact/${messageId}`
       );
@@ -382,9 +410,9 @@ const ContactDash = () => {
         progressBarClassName: "bg-gray-800",
         style: { fontFamily: "Rubik" },
       });
-    } catch {
+    } catch (error) {
       setError("Failed to delete message.");
-      toast.error("Failed to delete Message", {
+      toast.error(error.message || "Failed to delete Message", {
         position: "top-right",
         autoClose: 2000,
         hideProgressBar: false,
@@ -399,7 +427,6 @@ const ContactDash = () => {
       });
     }
   };
-
   return (
     <div>
       <Header />
