@@ -247,7 +247,7 @@ const AllPayments = () => {
         isDismissable={false}
         isKeyboardDismissDisabled={true}
       >
-        <ModalContent>
+        <ModalContent className="text-black">
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">

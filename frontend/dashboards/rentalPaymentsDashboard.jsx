@@ -119,7 +119,7 @@ const RentalPaymentsDash = () => {
 
   return (
     <div className="flex flex-col p-4">
-      <h1 className="text-2xl font-bold mb-4">Rental Payments Dashboard</h1>
+      
       <div className="flex justify-between items-center mb-4">
         <Input
           className="w-64"
