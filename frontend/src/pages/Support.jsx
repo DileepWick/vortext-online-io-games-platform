@@ -10,6 +10,8 @@ import {
   AccordionItem,
 } from "@nextui-org/react";
 import Chatbot from "../components/Chatbot";
+import DoubleArrowDown from "../assets/icons/DoubleArrowDown";
+import DoubleArrowUp from "../assets/icons/DoubleArrowUp";
 import { Helmet } from "react-helmet-async";
 
 const Support = () => {
@@ -48,7 +50,7 @@ const Support = () => {
         <h1 className="text-5xl text-white mb-8 font-primaryRegular">
           Welcome to Our Support Center
         </h1>
-        <p className="text-4xs text-white mb-2 font-primaryRegular">
+        <p className="text-lg text-white mb-2 font-primaryRegular">
           Find answers to your questions, chat with support, or browse our
           resources.
         </p>
@@ -71,12 +73,12 @@ const Support = () => {
 
       <Chatbot className="absolute bottom-4 right-4 z-50" />
       <div className="container mx-auto px-4 py-16">
-        <h2 className="text-4xl text-center text-white mb-8 font-primaryRegular">
+        <h2 className="text-5xl text-center text-white mb-8 font-primaryRegular">
           Frequently Asked Questions
         </h2>
 
         {displayedFAQs.length === 0 ? (
-          <p className="text-center text-gray-400">No FAQs available</p>
+          <p className="text-center text-gray-400 text-lg">No FAQs available</p>
         ) : (
           <Accordion>
             {displayedFAQs.map((faq) => (
@@ -85,8 +87,8 @@ const Support = () => {
                 aria-label={faq.question}
                 title={faq.question}
                 classNames={{
-                  title: "text-white text-xl font-primaryRegular",
-                  content: "text-white",
+                  title: "text-white text-2xl font-primaryRegular",
+                  content: "text-white text-xl font-primaryRegular",
                 }}
               >
                 {faq.answer || "No answer available"}
@@ -100,7 +102,9 @@ const Support = () => {
             <Button
               color="primary"
               onClick={() => setShowAllFAQs(!showAllFAQs)}
+              variant="light"
             >
+              {showAllFAQs ? <DoubleArrowUp /> : <DoubleArrowDown />}
               {showAllFAQs ? "Show Less" : "Show More"}
             </Button>
           </div>
