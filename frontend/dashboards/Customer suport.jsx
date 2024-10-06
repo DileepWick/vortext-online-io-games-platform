@@ -23,6 +23,10 @@ import {
   ModalFooter,
   Textarea,
   Chip,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
 } from "@nextui-org/react";
 import { Flip, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -38,9 +42,30 @@ const ContactDash = () => {
   const [error, setError] = useState(null);
   const [contact, setContact] = useState([]);
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
   //chat open
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [selectedContactId, setSelectedContactId] = useState(null);
+
+  // Filter function for FAQs
+  const filteredFAQs = faqs.filter(
+    (faq) =>
+      faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Filter function for Contact Messages
+  const filteredContactMessages = contactMessages.filter(
+    (message) =>
+      (message.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        message.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        message.messages[0]?.content
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase())) &&
+      (statusFilter === "all" || message.status === statusFilter)
+  );
 
   const handleChatOpen = (contactId) => {
     setSelectedContactId(contactId);
@@ -459,6 +484,14 @@ const ContactDash = () => {
             <Tab key="FAQ" title="FAQ" />
             <Tab key="ContactUs" title="Contact Messages" />
           </Tabs>
+          <div className="p-4">
+            <Input
+              className="mb-4"
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
         </div>
         <div className="p-4">
           {activeTab === "FAQ" && (
@@ -563,7 +596,11 @@ const ContactDash = () => {
               ) : error ? (
                 <p className="text-red-500 text-center">Error: {error}</p>
               ) : faqs.length === 0 ? (
-                <p className="text-center text-gray-400">No FAQs available</p>
+                <p className="text-center text-gray-400">
+                  {searchQuery
+                    ? "No FAQs match your search"
+                    : "No FAQs available"}
+                </p>
               ) : (
                 <Table aria-label="FAQ Table" className="mt-4">
                   <TableHeader className="bg-foreground">
@@ -572,7 +609,7 @@ const ContactDash = () => {
                     <TableColumn>ACTIONS</TableColumn>
                   </TableHeader>
                   <TableBody>
-                    {faqs.map((faq) => (
+                    {filteredFAQs.map((faq) => (
                       <TableRow key={faq._id}>
                         <TableCell width={350}>{faq.question}</TableCell>
                         <TableCell>{faq.answer}</TableCell>
@@ -608,13 +645,31 @@ const ContactDash = () => {
               <Helmet>
                 <title>Contact | Support Dashboard</title>
               </Helmet>
+              <Dropdown className="bg-foreground">
+                <DropdownTrigger>
+                  <Button className="mb-4">
+                    Filter by Status:{" "}
+                    {statusFilter === "all" ? "All" : statusFilter}
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu
+                  aria-label="Status filter"
+                  onAction={(key) => setStatusFilter(key)}
+                >
+                  <DropdownItem key="all">All</DropdownItem>
+                  <DropdownItem key="open">Open</DropdownItem>
+                  <DropdownItem key="closed">Closed</DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
               {loading ? (
                 <Spinner />
               ) : error ? (
                 <p className="text-red-500 text-center">Error: {error}</p>
               ) : contactMessages.length === 0 ? (
                 <p className="text-center text-gray-400">
-                  No messages available
+                  {searchQuery || statusFilter !== "all"
+                    ? "No messages match your search or filter criteria"
+                    : "No messages available"}
                 </p>
               ) : (
                 <Table aria-label="Contact Messages Table" className="mt-4">
@@ -626,7 +681,7 @@ const ContactDash = () => {
                     <TableColumn>ACTIONS</TableColumn>
                   </TableHeader>
                   <TableBody>
-                    {contactMessages.map((contact) => (
+                    {filteredContactMessages.map((contact) => (
                       <TableRow key={contact._id}>
                         <TableCell>{contact.username}</TableCell>
                         <TableCell>{contact.email}</TableCell>
@@ -656,7 +711,6 @@ const ContactDash = () => {
                           >
                             Delete
                           </Button>
-
                           <Button
                             color="success"
                             className="mr-2"
@@ -672,7 +726,6 @@ const ContactDash = () => {
                             onClick={() => handleUpdateStatus(contact._id)}
                             isDisabled={contact.status === "closed"}
                           >
-                            {console.log(contact.status)}
                             {contact.status === "closed" ? "Closed" : "Close"}
                           </Button>
                         </TableCell>
