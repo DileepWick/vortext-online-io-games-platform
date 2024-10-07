@@ -3,6 +3,12 @@ import { Notification } from "../models/notification_model.js";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config.js";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+import PDFDocument from "pdfkit";
 
 export const submitContactForm = async (req, res) => {
   try {
@@ -283,5 +289,233 @@ export const deleteContact = async (req, res) => {
     res
       .status(500)
       .json({ message: "An error occurred", error: error.message });
+  }
+};
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export const generateReport = async (req, res) => {
+  try {
+    res.setHeader(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, private"
+    );
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+    // Fetch report data by grouping by userId and calculating the unique ticket count
+    const report = await ContactUsSchema.aggregate([
+      {
+        $group: {
+          _id: "$userId",
+          username: { $first: "$username" },
+          email: { $first: "$email" },
+          ticketCount: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { ticketCount: -1 },
+      },
+    ]);
+
+    if (!report || report.length === 0) {
+      return res.status(404).json({ message: "No data found for report" });
+    }
+
+    // Create a new PDF document
+    const doc = new PDFDocument();
+
+    // Define file name and path
+    const reportsDir = path.resolve(__dirname, "../reports");
+
+    // Check if directory exists
+    if (!fs.existsSync(reportsDir)) {
+      fs.mkdirSync(reportsDir);
+    }
+
+    const pageWidth = doc.page.width;
+    const pageCenter = pageWidth / 2;
+    const now = new Date();
+    const timestamp = new Date().getTime();
+    const fileName = `support_report_${timestamp}.pdf`;
+    const filePath = path.join(reportsDir, fileName);
+    const formattedDate = now.toLocaleString();
+
+    // Pipe the PDF to a write stream
+    const stream = fs.createWriteStream(filePath);
+    doc.pipe(stream);
+
+    doc.fontSize(24).text("Vortex Gaming", { align: "center" });
+    doc.moveDown(0.5);
+    doc.fontSize(18).text("Support Ticket Report", { align: "center" });
+    doc.moveDown(0.5);
+
+    // Add the generated date and time to the PDF
+    doc
+      .fontSize(12)
+      .text(`Generated on: ${formattedDate}`, { align: "center" });
+    doc.moveDown(1);
+
+    // Adjusted table columns
+    const tableWidth = 500; // Adjust as needed
+    const tableLeft = (pageWidth - tableWidth) / 2;
+    const tableTop = 200; // Increased to give more space for titles
+    const idColumnWidth = 150;
+    const usernameColumnWidth = 100;
+    const emailColumnWidth = 150;
+    const ticketCountColumnWidth = 100;
+    const rowHeight = 30;
+
+    const drawLine = (x1, y1, x2, y2) => {
+      doc.moveTo(x1, y1).lineTo(x2, y2).stroke();
+    };
+
+    doc.fontSize(10);
+    doc.rect(tableLeft, tableTop, tableWidth, rowHeight).stroke();
+    doc.text("User ID", tableLeft + 5, tableTop + 5);
+    doc.text("Username", tableLeft + idColumnWidth + 5, tableTop + 5);
+    doc.text(
+      "Email",
+      tableLeft + idColumnWidth + usernameColumnWidth + 5,
+      tableTop + 5
+    );
+    doc.text(
+      "Ticket Count",
+      tableLeft + idColumnWidth + usernameColumnWidth + emailColumnWidth + 5,
+      tableTop + 5
+    );
+
+    // Draw vertical lines for header
+    drawLine(
+      tableLeft + idColumnWidth,
+      tableTop,
+      tableLeft + idColumnWidth,
+      tableTop + rowHeight
+    );
+    drawLine(
+      tableLeft + idColumnWidth + usernameColumnWidth,
+      tableTop,
+      tableLeft + idColumnWidth + usernameColumnWidth,
+      tableTop + rowHeight
+    );
+    drawLine(
+      tableLeft + idColumnWidth + usernameColumnWidth + emailColumnWidth,
+      tableTop,
+      tableLeft + idColumnWidth + usernameColumnWidth + emailColumnWidth,
+      tableTop + rowHeight
+    );
+
+    // Add table rows
+    let yPosition = tableTop + rowHeight;
+    report.forEach((row, index) => {
+      // Draw row
+      doc.rect(tableLeft, yPosition, tableWidth, rowHeight).stroke();
+
+      // Add text
+      doc.text(
+        row._id.toString().substring(0, 24),
+        tableLeft + 5,
+        yPosition + 5
+      );
+      doc.text(row.username, tableLeft + idColumnWidth + 5, yPosition + 5);
+      doc.text(
+        row.email,
+        tableLeft + idColumnWidth + usernameColumnWidth + 5,
+        yPosition + 5
+      );
+      doc.text(
+        row.ticketCount.toString(),
+        tableLeft + idColumnWidth + usernameColumnWidth + emailColumnWidth + 5,
+        yPosition + 5
+      );
+
+      // Draw vertical lines for row
+      drawLine(
+        tableLeft + idColumnWidth,
+        yPosition,
+        tableLeft + idColumnWidth,
+        yPosition + rowHeight
+      );
+      drawLine(
+        tableLeft + idColumnWidth + usernameColumnWidth,
+        yPosition,
+        tableLeft + idColumnWidth + usernameColumnWidth,
+        yPosition + rowHeight
+      );
+      drawLine(
+        tableLeft + idColumnWidth + usernameColumnWidth + emailColumnWidth,
+        yPosition,
+        tableLeft + idColumnWidth + usernameColumnWidth + emailColumnWidth,
+        yPosition + rowHeight
+      );
+
+      yPosition += rowHeight;
+
+      if (yPosition > 700) {
+        doc.addPage();
+        yPosition = 50;
+
+        // Redraw header on new page
+        doc.rect(tableLeft, yPosition, tableWidth, rowHeight).stroke();
+        doc.text("User ID", tableLeft + 5, yPosition + 5);
+        doc.text("Username", tableLeft + idColumnWidth + 5, yPosition + 5);
+        doc.text(
+          "Email",
+          tableLeft + idColumnWidth + usernameColumnWidth + 5,
+          yPosition + 5
+        );
+        doc.text(
+          "Ticket Count",
+          tableLeft +
+            idColumnWidth +
+            usernameColumnWidth +
+            emailColumnWidth +
+            5,
+          yPosition + 5
+        );
+
+        drawLine(
+          tableLeft + idColumnWidth,
+          yPosition,
+          tableLeft + idColumnWidth,
+          yPosition + rowHeight
+        );
+        drawLine(
+          tableLeft + idColumnWidth + usernameColumnWidth,
+          yPosition,
+          tableLeft + idColumnWidth + usernameColumnWidth,
+          yPosition + rowHeight
+        );
+        drawLine(
+          tableLeft + idColumnWidth + usernameColumnWidth + emailColumnWidth,
+          yPosition,
+          tableLeft + idColumnWidth + usernameColumnWidth + emailColumnWidth,
+          yPosition + rowHeight
+        );
+
+        yPosition += rowHeight;
+      }
+    });
+
+    // Finalize the PDF and end the stream
+    doc.end();
+
+    // Wait for the stream to finish before sending the response
+    stream.on("finish", () => {
+      // Send the PDF file as a downloadable response
+      res.download(filePath, fileName, (err) => {
+        if (err) {
+          console.error("Error during file download:", err);
+          return res
+            .status(500)
+            .json({ message: "Error downloading the file" });
+        } else {
+          fs.unlinkSync(filePath); // Clean up after sending
+        }
+      });
+    });
+  } catch (error) {
+    console.error("Error generating report:", error);
+    res.status(500).json({ message: "Error generating report", error });
   }
 };
