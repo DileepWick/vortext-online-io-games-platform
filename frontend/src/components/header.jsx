@@ -117,14 +117,14 @@ export default function Header() {
               Vortex Games
             </Link>
           </NavbarItem>
-          <Dropdown placement="bottom-start">
+          <Dropdown placement="bottom-start" className="bg-foreground">
             <DropdownTrigger>
               <NavbarItem className="cursor-pointer">Help</NavbarItem>
             </DropdownTrigger>
             <DropdownMenu
               aria-label="Profile Actions"
               variant="flat"
-              className="font-primaryRegular text-black "
+              className="font-primaryRegular "
             >
               <DropdownItem key="support" onClick={() => navigate("/support")}>
                 Vortex Support
@@ -146,7 +146,7 @@ export default function Header() {
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
-          <Dropdown placement="bottom-start">
+          <Dropdown placement="bottom-start" className="bg-foreground">
             <DropdownTrigger>
               <NavbarItem className="cursor-pointer flex items-center">
                 <NotificationIcon style={{ marginRight: "8px" }} />
@@ -162,7 +162,7 @@ export default function Header() {
             <DropdownMenu
               aria-label="Notification Actions"
               variant="flat"
-              className="font-primaryRegular text-black"
+              className="font-primaryRegular"
             >
               <DropdownItem onClick={() => navigate("/Notification")}>
                 View All Notifications
@@ -176,7 +176,7 @@ export default function Header() {
 
         <NavbarContent as="div" justify="end">
           {token && user ? (
-            <Dropdown placement="bottom-end">
+            <Dropdown placement="bottom-end" className="bg-foreground">
               <DropdownTrigger>
                 <User
                   className="cursor-pointer text-white"
@@ -190,7 +190,7 @@ export default function Header() {
               <DropdownMenu
                 aria-label="Profile Actions"
                 variant="flat"
-                className="font-primaryRegular text-black"
+                className="font-primaryRegular"
               >
                 <DropdownItem key="profile" className="h-14 gap-2">
                   <p className="font-semibold">Signed in as</p>
@@ -218,11 +218,12 @@ export default function Header() {
                   My Cart
                 </DropdownItem>
 
-
-                <DropdownItem key="cart" onClick={() => navigate("/Transaction")}>
+                <DropdownItem
+                  key="cart"
+                  onClick={() => navigate("/Transaction")}
+                >
                   Transaction History
                 </DropdownItem>
-                
 
                 {/* Developer Filter */}
                 {user.role === "developer" && (
@@ -233,7 +234,6 @@ export default function Header() {
                     Developer Dashboard
                   </DropdownItem>
                 )}
-
 
                 {/* Admin Filter */}
                 {user.role === "Product Manager" && (
