@@ -38,7 +38,7 @@
     "dayjs": "^1.11.11",
     "embla-carousel-react": "^8.1.5",
     "formik": "^2.4.6",
-    "framer-motion": "^11.2.11",
+    "framer-motion": "^11.11.1",
     "helmet": "^7.1.0",
     "i": "^0.3.7",
     "js-cookie": "^3.0.5",
