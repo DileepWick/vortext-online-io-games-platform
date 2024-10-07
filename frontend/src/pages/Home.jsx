@@ -1,13 +1,15 @@
-import  { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { toast, Flip } from "react-toastify";
 import axios from "axios";
-import { Link } from "react-router-dom"
-import '../style/Slider.css'
+import { Link } from "react-router-dom";
+import "../style/Slider.css";
 import Hangman from "../components/Games/Hangaman";
 import Chatbot from "../components/chatbox";
 import { Helmet } from "react-helmet-async";
+import { motion } from "framer-motion";
+import { LampContainer } from "../components/ui/lamp";
 
 const Home = () => {
   const [gameStocks, setGameStocks] = useState([]);
@@ -15,9 +17,6 @@ const Home = () => {
   const [ratingsData, setRatingsData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
-
-  
 
   const notify = () => {
     toast.success("🦄 Wow so easy!", {
@@ -127,7 +126,6 @@ const Home = () => {
   }, [ratingsData, gameStocks]);
 
   const [activeIndex, setActiveIndex] = useState(0);
- 
 
   const carouselRef = useRef(null);
   const listRef = useRef(null);
@@ -175,38 +173,68 @@ const Home = () => {
     }, timeRunning);
   };
 
-  
-
   return (
     <div className="font-primaryRegular bg-customDark flex flex-col min-h-screen">
       <Helmet>
         <title>Welcome to Vortex</title>
       </Helmet>
       <Header />
-      <h1 className="text-5xl text-white mt-[40px]">Vortex Gaming Home</h1>
+      <LampContainer>
+        <motion.h1
+          initial={{ opacity: 0.5, y: 100 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{
+            delay: 0.3,
+            duration: 0.8,
+            ease: "easeInOut",
+          }}
+          className="mt-8 bg-gradient-to-br from-slate-300 to-slate-500 py-4 bg-clip-text text-center text-4xl font-primaryRegular  tracking-tight text-transparent md:text-7xl"
+        >
+          Vortex Gaming
+        </motion.h1>
+      </LampContainer>
       <div className="m-auto  mt-[80px] mb-[40px]">
         <div className="carousel" ref={carouselRef}>
           <div className="list" ref={listRef}>
             {filteredStocks[0] && (
               <div className="item">
                 <img src={filteredStocks[0].AssignedGame.coverPhoto} />
-                <div className="darklayer absolute -z-0 top-0 w-[100%] h-[100%] " ref={timeRef} ></div>
+                <div
+                  className="darklayer absolute -z-0 top-0 w-[100%] h-[100%] "
+                  ref={timeRef}
+                ></div>
                 <div className="content">
-                  <div className="title">{filteredStocks[0].AssignedGame.title}</div>
-                  <div className="topic">-{filteredStocks[0].discount}% off</div>
-                  <div className="des">{filteredStocks[0].AssignedGame.Description}</div>
+                  <div className="title">
+                    {filteredStocks[0].AssignedGame.title}
+                  </div>
+                  <div className="topic">
+                    -{filteredStocks[0].discount}% off
+                  </div>
+                  <div className="des">
+                    {filteredStocks[0].AssignedGame.Description}
+                  </div>
 
                   <div className="author">
-                  <span className="line-through mr-1 text-editionColor">
-                                LKR.{filteredStocks[0].UnitPrice}
-                              </span> 
-                              <span className="discprice">LKR.{filteredStocks[0].discount > 0
-                    ? filteredStocks[0].UnitPrice - (filteredStocks[0].UnitPrice * filteredStocks[0].discount) / 100
-                    : filteredStocks[0].UnitPrice}</span>
+                    <span className="line-through mr-1 text-editionColor">
+                      LKR.{filteredStocks[0].UnitPrice}
+                    </span>
+                    <span className="discprice">
+                      LKR.
+                      {filteredStocks[0].discount > 0
+                        ? filteredStocks[0].UnitPrice -
+                          (filteredStocks[0].UnitPrice *
+                            filteredStocks[0].discount) /
+                            100
+                        : filteredStocks[0].UnitPrice}
+                    </span>
                   </div>
                   <div className="buttons">
-                  <Link to={`/game/${filteredStocks[0]._id}` } > <button className="border-none bg-[#f1683a] tracking-widest font-poppins font-medium p-[10px] rounded-[5px]">SEE MORE </button></Link>
-                    
+                    <Link to={`/game/${filteredStocks[0]._id}`}>
+                      {" "}
+                      <button className="border-none bg-[#f1683a] tracking-widest font-poppins font-medium p-[10px] rounded-[5px]">
+                        SEE MORE{" "}
+                      </button>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -215,24 +243,42 @@ const Home = () => {
             {filteredStocks[1] && (
               <div className="item">
                 <img src={filteredStocks[1].AssignedGame.coverPhoto} />
-                <div className="darklayer absolute -z-0 top-0 w-[100%] h-[100%] " ref={timeRef} ></div>
+                <div
+                  className="darklayer absolute -z-0 top-0 w-[100%] h-[100%] "
+                  ref={timeRef}
+                ></div>
                 <div className="content">
-                  
-                <div className="title">{filteredStocks[1].AssignedGame.title}</div>
-                  <div className="topic">-{filteredStocks[1].discount}% off</div>
-                  <div className="des">{filteredStocks[1].AssignedGame.Description}</div>
+                  <div className="title">
+                    {filteredStocks[1].AssignedGame.title}
+                  </div>
+                  <div className="topic">
+                    -{filteredStocks[1].discount}% off
+                  </div>
+                  <div className="des">
+                    {filteredStocks[1].AssignedGame.Description}
+                  </div>
 
                   <div className="author">
-                  <span className="line-through mr-1 text-editionColor">
-                                LKR.{filteredStocks[1].UnitPrice}
-                              </span> 
-                              <span className="discprice">LKR.{filteredStocks[1].discount > 0
-                    ? filteredStocks[1].UnitPrice - (filteredStocks[1].UnitPrice * filteredStocks[1].discount) / 100
-                    : filteredStocks[1].UnitPrice}</span>
+                    <span className="line-through mr-1 text-editionColor">
+                      LKR.{filteredStocks[1].UnitPrice}
+                    </span>
+                    <span className="discprice">
+                      LKR.
+                      {filteredStocks[1].discount > 0
+                        ? filteredStocks[1].UnitPrice -
+                          (filteredStocks[1].UnitPrice *
+                            filteredStocks[1].discount) /
+                            100
+                        : filteredStocks[1].UnitPrice}
+                    </span>
                   </div>
                   <div className="buttons">
-                  <Link to={`/game/${filteredStocks[1]._id}` } > <button className="border-none bg-[#f1683a] tracking-widest font-poppins font-medium p-[10px] rounded-[5px]">SEE MORE </button></Link>
-                    
+                    <Link to={`/game/${filteredStocks[1]._id}`}>
+                      {" "}
+                      <button className="border-none bg-[#f1683a] tracking-widest font-poppins font-medium p-[10px] rounded-[5px]">
+                        SEE MORE{" "}
+                      </button>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -240,24 +286,42 @@ const Home = () => {
             {filteredStocks[2] && (
               <div className="item">
                 <img src={filteredStocks[2].AssignedGame.coverPhoto} />
-                <div className="darklayer absolute -z-0 top-0 w-[100%] h-[100%] " ref={timeRef} ></div>
+                <div
+                  className="darklayer absolute -z-0 top-0 w-[100%] h-[100%] "
+                  ref={timeRef}
+                ></div>
                 <div className="content">
-                  
-                <div className="title">{filteredStocks[2].AssignedGame.title}</div>
-                  <div className="topic">-{filteredStocks[2].discount}% off</div>
-                  <div className="des">{filteredStocks[2].AssignedGame.Description}</div>
+                  <div className="title">
+                    {filteredStocks[2].AssignedGame.title}
+                  </div>
+                  <div className="topic">
+                    -{filteredStocks[2].discount}% off
+                  </div>
+                  <div className="des">
+                    {filteredStocks[2].AssignedGame.Description}
+                  </div>
 
                   <div className="author">
-                  <span className="line-through mr-1 text-editionColor">
-                                LKR.{filteredStocks[2].UnitPrice}
-                              </span> 
-                              <span className="discprice">LKR.{filteredStocks[2].discount > 0
-                    ? filteredStocks[2].UnitPrice - (filteredStocks[2].UnitPrice * filteredStocks[2].discount) / 100
-                    : filteredStocks[2].UnitPrice}</span>
+                    <span className="line-through mr-1 text-editionColor">
+                      LKR.{filteredStocks[2].UnitPrice}
+                    </span>
+                    <span className="discprice">
+                      LKR.
+                      {filteredStocks[2].discount > 0
+                        ? filteredStocks[2].UnitPrice -
+                          (filteredStocks[2].UnitPrice *
+                            filteredStocks[2].discount) /
+                            100
+                        : filteredStocks[2].UnitPrice}
+                    </span>
                   </div>
                   <div className="buttons">
-                   <Link to={`/game/${filteredStocks[2]._id}` } > <button className="border-none bg-[#f1683a] tracking-widest font-poppins font-medium p-[10px] rounded-[5px]">SEE MORE </button></Link>
-                    
+                    <Link to={`/game/${filteredStocks[2]._id}`}>
+                      {" "}
+                      <button className="border-none bg-[#f1683a] tracking-widest font-poppins font-medium p-[10px] rounded-[5px]">
+                        SEE MORE{" "}
+                      </button>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -265,40 +329,33 @@ const Home = () => {
           </div>
 
           <div className="thumbnail " ref={thumbnailRef}>
-          {filteredStocks[0] && (
-              <div  className="item">
-                <img
-                  src={filteredStocks[0].AssignedGame.coverPhoto}
-                  
-                />
+            {filteredStocks[0] && (
+              <div className="item">
+                <img src={filteredStocks[0].AssignedGame.coverPhoto} />
                 <div className="content">
                   {/* <div className="title">{image.title}</div> */}
                   {/* <div className="description">{image.description}</div> */}
                 </div>
-              </div>)}
-              {filteredStocks[1] && (
-              <div  className="item">
-                <img
-                  src={filteredStocks[1].AssignedGame.coverPhoto}
-                  
-                />
+              </div>
+            )}
+            {filteredStocks[1] && (
+              <div className="item">
+                <img src={filteredStocks[1].AssignedGame.coverPhoto} />
                 <div className="content">
                   {/* <div className="title">{image.title}</div> */}
                   {/* <div className="description">{image.description}</div> */}
                 </div>
-              </div>)}
-              {filteredStocks[2] && (
-              <div  className="item">
-                 <img
-                  src={filteredStocks[2].AssignedGame.coverPhoto}
-                  
-                />
+              </div>
+            )}
+            {filteredStocks[2] && (
+              <div className="item">
+                <img src={filteredStocks[2].AssignedGame.coverPhoto} />
                 <div className="content">
                   {/* <div className="title">{image.title}</div> */}
                   {/* <div className="description">{image.description}</div> */}
                 </div>
-              </div>)}
-            
+              </div>
+            )}
           </div>
           <div className="arrows hidden">
             <button id="prev" ref={prevRef} onClick={handlePrev}>
@@ -311,8 +368,6 @@ const Home = () => {
           <div className="time" ref={timeRef}></div>
         </div>
       </div>
-
-      <h1 className="text-5xl text-white mt-[100px]">Vortex Gaming Home</h1>
       <Footer />
       <script src="../components/Slider.jsx"></script>
     </div>
