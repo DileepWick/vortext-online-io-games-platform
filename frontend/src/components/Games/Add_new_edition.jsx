@@ -113,7 +113,7 @@ export const AddNewEdition = ({ callBackFunction }) => {
         }}
       >
         <ModalContent className="font-primaryRegular p-4">
-          <ModalHeader className="text-3xl font-scary2">Custom Edition</ModalHeader>
+          <ModalHeader className="text-3xl font-primaryRegular text-black">Custom Edition</ModalHeader>
           <ModalBody>
             <form onSubmit={saveNewEdition}>
               <Input
@@ -125,7 +125,7 @@ export const AddNewEdition = ({ callBackFunction }) => {
               <ScrollShadow className="w-[450px] h-[400px]">
                 {questions.map((question, index) => (
                   <div key={index} className="mt-8">
-                    <h3 className="text-lg font-semibold">Question {index + 1}</h3>
+                    <h3 className="text-lg font-primaryRegular text-black">Question {index + 1}</h3>
                     <Input
                       label="Question"
                       type="text"
