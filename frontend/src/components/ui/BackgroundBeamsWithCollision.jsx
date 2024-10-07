@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, color } from "framer-motion";
 import { cn } from "../../libs/util";
-import { Plus, Minus, Divide, X } from "lucide-react";
+import { Plus, Minus, Divide, X, Icon, Equal, Pi, Percent } from "lucide-react";
 import { Background } from "@cloudinary/url-gen/qualifiers";
 
 const MathIcon = ({ icon: Icon, ...props }) => <Icon {...props} />;
@@ -15,12 +15,22 @@ export const BackgroundBeamsWithCollision = ({ children, className }) => {
     { Icon: Minus, color: "#7C3AED" },
     { Icon: Divide, color: "#EC4899" },
     { Icon: X, color: "#06B6D4" },
+    { Icon: Equal, color: "#F59E0B" },
+    { Icon: Pi, color: "#8B5CF6" },
+    { Icon: Percent, color: "#EF4444" },
   ];
 
   const iconInstances = [
-    { initialX: 600, translateX: 600, duration: 30, repeatDelay: 3, delay: 4 },
     { initialX: 400, translateX: 400, duration: 25, repeatDelay: 14, delay: 4 },
+    { initialX: 600, translateX: 600, duration: 30, repeatDelay: 3, delay: 4 },
     { initialX: 800, translateX: 800, duration: 20, repeatDelay: 2 },
+    {
+      initialX: 1000,
+      translateX: 1000,
+      duration: 18,
+      repeatDelay: 4,
+      delay: 2,
+    },
     {
       initialX: 1200,
       translateX: 1200,
@@ -30,13 +40,7 @@ export const BackgroundBeamsWithCollision = ({ children, className }) => {
     },
 
     { initialX: -10, translateX: -10, duration: 30, repeatDelay: 3, delay: 2 },
-    {
-      initialX: -600,
-      translateX: -600,
-      duration: 25,
-      repeatDelay: 3,
-      delay: 4,
-    },
+
     { initialX: -100, translateX: -100, duration: 20, repeatDelay: 7 },
     {
       initialX: -400,
@@ -45,7 +49,15 @@ export const BackgroundBeamsWithCollision = ({ children, className }) => {
       repeatDelay: 14,
       delay: 4,
     },
+    {
+      initialX: -600,
+      translateX: -600,
+      duration: 25,
+      repeatDelay: 3,
+      delay: 4,
+    },
     { initialX: -800, translateX: -800, duration: 25, repeatDelay: 2 },
+    { initialX: -900, translateX: -900, duration: 25, repeatDelay: 2 },
     { initialX: -1000, translateX: -1000, duration: 20, repeatDelay: 2 },
     {
       initialX: -1200,
