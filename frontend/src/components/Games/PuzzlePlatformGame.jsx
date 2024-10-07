@@ -161,10 +161,25 @@ const PuzzlePlatformGame = () => {
   }, [difficulty, gameOver, generateQuestion]);
 
   useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (!paused && !gameOver) {
+        e.preventDefault(); // Prevent default action
+        e.returnValue = ""; // Required for Chrome to show the dialog
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [paused, gameOver]);
+
+  useEffect(() => {
     if (gameOver) return;
 
     let animationFrameId;
-
     const gameLoop = () => {
       if (paused) {
         animationFrameId = requestAnimationFrame(gameLoop); // Keep the loop running while paused
