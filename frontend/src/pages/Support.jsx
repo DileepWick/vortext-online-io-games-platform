@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Header from "../components/header";
 import Footer from "../components/footer";
@@ -12,6 +12,8 @@ import {
 import Chatbot from "../components/Chatbot";
 import DoubleArrowDown from "../assets/icons/DoubleArrowDown";
 import DoubleArrowUp from "../assets/icons/DoubleArrowUp";
+import { motion } from "framer-motion";
+import { LampContainer } from "../components/ui/Lamp";
 import { Helmet } from "react-helmet-async";
 
 const Support = () => {
@@ -19,6 +21,9 @@ const Support = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAllFAQs, setShowAllFAQs] = useState(false);
+
+  // Step 1: Create a ref for the Welcome section
+  const welcomeRef = useRef(null);
 
   useEffect(() => {
     const fetchFAQs = async () => {
@@ -35,6 +40,13 @@ const Support = () => {
     fetchFAQs();
   }, []);
 
+  const scrollToWelcomeSection = () => {
+    // Step 2: Scroll to the section when the button is clicked
+    if (welcomeRef.current) {
+      welcomeRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   if (loading) return <Spinner size="large" />;
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
@@ -46,7 +58,30 @@ const Support = () => {
         <title>Support | Vortex</title>
       </Helmet>
       <Header />
-      <section className="pt-10 text-center">
+      <LampContainer>
+        <motion.h1
+          initial={{ opacity: 0.5, y: 100 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{
+            delay: 0.3,
+            duration: 0.8,
+            ease: "easeInOut",
+          }}
+          className="mt-8 bg-gradient-to-br from-slate-300 to-slate-500 py-4 bg-clip-text text-center text-4xl font-medium tracking-tight text-transparent md:text-7xl"
+        >
+          Spark your gameplay
+          <br /> with our support!
+        </motion.h1>
+      </LampContainer>
+
+      {/* Step 3: Add the button here */}
+      <div className="text-center mb-8">
+        <Button color="primary" onClick={scrollToWelcomeSection}>
+          Go to Welcome Section
+        </Button>
+      </div>
+
+      <section ref={welcomeRef} className="pt-10 text-center">
         <h1 className="text-5xl text-white mb-8 font-primaryRegular">
           Welcome to Our Support Center
         </h1>
