@@ -1,11 +1,16 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Target } from "lucide-react";
+import { BackgroundBeamsWithCollision } from "../ui/BackgroundBeamsWithCollision";
+import Header from "../header";
+import Footer from "../footer";
+import { TextGenerateEffect } from "../ui/TextGenerateEffect";
 
 const DIFFICULTY_LEVELS = {
   EASY: "easy",
   MEDIUM: "medium",
   HARD: "hard",
 };
+const words = `How High Can You Aim for the Equation?`;
 
 const PuzzlePlatformGame = () => {
   const [score, setScore] = useState(0);
@@ -19,6 +24,11 @@ const PuzzlePlatformGame = () => {
   const [enemySpeed, setEnemySpeed] = useState(1);
   const [level, setLevel] = useState(1);
   const [difficulty, setDifficulty] = useState(null);
+  const [paused, setPaused] = useState(false);
+
+  const togglePause = useCallback(() => {
+    setPaused((prev) => !prev);
+  }, []);
 
   const isOverlapping = useMemo(
     () => (enemy1, enemy2) => {
@@ -156,6 +166,10 @@ const PuzzlePlatformGame = () => {
     let animationFrameId;
 
     const gameLoop = () => {
+      if (paused) {
+        animationFrameId = requestAnimationFrame(gameLoop); // Keep the loop running while paused
+        return; // Exit the loop early if paused
+      }
       setEnemies((prevEnemies) =>
         prevEnemies.map((enemy) => ({
           ...enemy,
@@ -229,6 +243,7 @@ const PuzzlePlatformGame = () => {
     generateQuestion,
     playerPosition,
     enemySpeed,
+    paused,
   ]);
 
   const handleMouseMove = useCallback(
@@ -242,14 +257,23 @@ const PuzzlePlatformGame = () => {
     },
     [gameOver]
   );
+  const handleClick = useCallback(
+    (e) => {
+      // Prevent firing bullets if the game is over or paused
+      if (gameOver || paused) return;
 
-  const handleClick = useCallback(() => {
-    if (gameOver) return;
-    setBullets((prevBullets) => [
-      ...prevBullets,
-      { id: Date.now(), x: playerPosition.x + 25, y: playerPosition.y },
-    ]);
-  }, [gameOver, playerPosition]);
+      // If the game is not paused, fire a bullet
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+
+      // Fire a bullet at the clicked position
+      setBullets((prevBullets) => [
+        ...prevBullets,
+        { id: Date.now(), x: clickX, y: playerPosition.y },
+      ]);
+    },
+    [gameOver, paused, playerPosition]
+  );
 
   const startGame = useCallback((selectedDifficulty) => {
     setDifficulty(selectedDifficulty);
@@ -262,21 +286,48 @@ const PuzzlePlatformGame = () => {
     setLevel(1);
   }, []);
 
+  const handlePauseClick = useCallback(() => {
+    // Toggle pause state
+    togglePause();
+  }, [togglePause]);
+
   if (!difficulty) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-gray-800">
-        <h1 className="text-4xl font-bold text-white mb-8">Math Blaster</h1>
-        <div className="space-y-4">
-          {Object.values(DIFFICULTY_LEVELS).map((level) => (
-            <button
-              key={level}
-              className="px-6 py-3 bg-blue-500 text-white rounded-lg text-xl font-semibold hover:bg-blue-600 transition duration-200"
-              onClick={() => startGame(level)}
-            >
-              {level.charAt(0).toUpperCase() + level.slice(1)}
-            </button>
-          ))}
-        </div>
+      <div className="bg-foreground ">
+        <Header />
+        <BackgroundBeamsWithCollision>
+          <div className="flex flex-col items-center justify-center min-h-screen">
+            <div className="mb-8 text-center">
+              <h1 className="text-7xl font-bold text-black bg-clip-text bg-no-repeat text-transparent bg-gradient-to-r py-4 from-purple-500 via-violet-500 to-pink-500 [text-shadow:0_0_rgba(0,0,0,0.1)]">
+                Mathz Blaster
+              </h1>
+            </div>
+            <div className="flex items-center justify-center mb-4">
+              <div className="relative">
+                <div className="bg-gradient-to-r from-indigo-500 to-purple-500 text-transparent bg-clip-text text-4xl font-bold text-center">
+                  <TextGenerateEffect words={words} />
+                </div>
+              </div>
+            </div>
+
+            <div className="items-center space-y-4">
+              {Object.values(DIFFICULTY_LEVELS).map((level) => (
+                <button
+                  key={level}
+                  className="p-[3px] relative m-2"
+                  onClick={() => startGame(level)} // Outer button styling
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg" />
+                  <div className="px-6 py-3 bg-black rounded-[6px] relative group transition duration-200 text-white text-xl hover:bg-transparent">
+                    {level.charAt(0).toUpperCase() + level.slice(1)}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </BackgroundBeamsWithCollision>
+
+        <Footer />
       </div>
     );
   }
@@ -284,10 +335,20 @@ const PuzzlePlatformGame = () => {
   return (
     <div
       className="relative w-full h-full bg-gray-800 overflow-hidden"
-      onMouseMove={handleMouseMove}
+      onMouseMove={!paused ? handleMouseMove : undefined}
       onClick={handleClick}
       style={{ width: "100vw", height: "100vh" }}
     >
+      {/* Add the GameHeader component here */}
+      <GameHeader
+        question={question}
+        score={score}
+        health={health}
+        level={level}
+        paused={paused}
+        onTogglePause={handlePauseClick}
+      />
+
       {/* Player Character */}
       <div
         className="absolute w-[50px] h-[50px] bg-blue-500"
@@ -316,30 +377,13 @@ const PuzzlePlatformGame = () => {
         />
       ))}
 
-      {/* Display Question */}
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-white px-4 py-2 rounded">
-        <span className="text-2xl font-bold text-black">{question} = ?</span>
-      </div>
-
-      {/* Display Score */}
-      <div className="absolute top-4 right-4 bg-white px-4 py-2 rounded">
-        <span className="text-xl font-bold text-black">Score: {score}</span>
-      </div>
-
-      {/* Display Health */}
-      <div className="absolute top-4 left-4 bg-white px-4 py-2 rounded">
-        <span className="text-xl font-bold text-black">Health: {health}</span>
-      </div>
-
-      {/* Display Level */}
-      <div className="absolute top-16 left-4 bg-white px-4 py-2 rounded">
-        <span className="text-xl font-bold">Level: {level}</span>
-      </div>
-
-      {/* Display Difficulty */}
-      <div className="absolute top-28 left-4 bg-white px-4 py-2 rounded">
-        <span className="text-xl font-bold">Difficulty: {difficulty}</span>
-      </div>
+      {/* Display Pause Screen */}
+      {paused && (
+        <PauseScreen
+          onResume={togglePause}
+          onRestart={() => startGame(difficulty)}
+        />
+      )}
 
       {/* Game Over Screen */}
       {gameOver && (
@@ -360,6 +404,56 @@ const PuzzlePlatformGame = () => {
           </button>
         </div>
       )}
+    </div>
+  );
+};
+
+const PauseScreen = ({ onResume, onRestart }) => {
+  return (
+    <div className="absolute inset-0 bg-black bg-opacity-75 flex flex-col items-center justify-center">
+      <h2 className="text-4xl font-bold text-white mb-4">Paused</h2>
+      <button
+        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mb-4"
+        onClick={onResume}
+      >
+        Resume
+      </button>
+      <button
+        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+        onClick={onRestart}
+      >
+        Restart
+      </button>
+    </div>
+  );
+};
+
+const GameHeader = ({
+  question,
+  score,
+  health,
+  level,
+  paused,
+  onTogglePause,
+}) => {
+  const handlePauseClick = (e) => {
+    e.stopPropagation(); // Prevent click event from bubbling up
+    onTogglePause(); // Call the toggle pause function
+  };
+  return (
+    <div className="absolute top-0 left-0 w-full flex justify-between items-center bg-gray-800 text-white p-4">
+      <div className="flex items-center space-x-4">
+        <span className="text-lg font-bold">Health: {health}</span>
+        <span className="text-lg font-bold">Level: {level}</span>
+        <button
+          onClick={handlePauseClick}
+          className="px-4 py-2 bg-blue-500 rounded hover:bg-blue-600 transition"
+        >
+          {paused ? "Resume" : "Pause"}
+        </button>
+      </div>
+      <div className="text-xl font-bold">{question} = ?</div>
+      <div className="text-lg font-bold">Score: {score}</div>
     </div>
   );
 };

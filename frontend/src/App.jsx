@@ -24,7 +24,6 @@ import TransactionHistory from "./pages/TransactionHistoryPage";
 import DeveloperIncomeTable from "./pages/DeveloperEarningTable";
 import ChatHistory from "./pages/ChatHistory";
 
-
 import DeveloperLoginSignup from "./pages/DeveloperLoginSignup";
 
 import UserMessages from "./pages/UserMessage";
@@ -59,6 +58,8 @@ import RentalPaymentsDash from "../dashboards/rentalPaymentsDashboard";
 import SessionAnalytics from "../dashboards/sessionAnalytics";
 
 import Hangman from "./components/Games/Hangaman";
+
+import { BackgroundBeamsWithCollision } from "./components/ui/BackgroundBeamsWithCollision";
 
 const App = () => {
   return (
@@ -122,7 +123,12 @@ const App = () => {
       <Route path="/RentalPayments" element={<RentalPaymentsDash />} />
       <Route path="/SessionAnalytics" element={<SessionAnalytics />} />
 
-      <Route path="DeveloperEarningTable" element={<DeveloperIncomeTable/>} />
+      <Route
+        path="/BackgroundBeamsWithCollision"
+        element={<BackgroundBeamsWithCollision />}
+      />
+
+      <Route path="DeveloperEarningTable" element={<DeveloperIncomeTable />} />
       {/*Game Routes*/}
       <Route path="/HangmanGame" element={<Hangman />} />
     </Routes>

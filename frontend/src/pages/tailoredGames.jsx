@@ -107,9 +107,9 @@ const TailoredGames = () => {
           />
           {/* Game 7 */}
           <GameCard
-            title="Member 7 Game"
-            imageUrl="https://images5.alphacoders.com/127/1274050.jpg"
-            link="/games/tictactoe"
+            title="Mathz Blaster"
+            imageUrl="https://res.cloudinary.com/dhcawltsr/image/upload/v1728299817/DALLE2024-10-0716.45.01-AsimpleandfunlogoforagamecalledMathBlaster.Thelogoshouldhaveplayfulandbright_myurlb.jpg"
+            link="/PuzzlePlatformGame"
             devName={"Dissanayake K.M.S.N.B"}
             devId={"IT22231246"}
           />
