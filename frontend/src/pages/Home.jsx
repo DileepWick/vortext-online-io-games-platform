@@ -10,6 +10,7 @@ import Chatbot from "../components/chatbox";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { LampContainer } from "../components/ui/lamp";
+import { SparklesCore } from "../components/ui/sparkles";
 
 const Home = () => {
   const [gameStocks, setGameStocks] = useState([]);
@@ -126,7 +127,6 @@ const Home = () => {
   }, [ratingsData, gameStocks]);
 
   const [activeIndex, setActiveIndex] = useState(0);
-
   const carouselRef = useRef(null);
   const listRef = useRef(null);
   const thumbnailRef = useRef(null);
@@ -179,21 +179,57 @@ const Home = () => {
         <title>Welcome to Vortex</title>
       </Helmet>
       <Header />
-      <LampContainer>
-        <motion.h1
-          initial={{ opacity: 0.5, y: 100 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          style={{fontSize:'200px'}}
-          transition={{
-            delay: 0.3,
-            duration: 0.8,
-            ease: "easeInOut",
-          }}
-          className="mt-8 bg-gradient-to-br from-slate-300 to-slate-500 py-4 bg-clip-text text-center text-4xl font-primaryRegular  tracking-tight text-transparent md:text-7xl"
-        >
-          Vortex Gaming
-        </motion.h1>
-      </LampContainer>
+
+      <div className="h-[40rem] w-full bg-black flex flex-col items-center justify-center overflow-hidden rounded-md">
+      <h1 className="md:text-7xl text-3xl lg:text-9xl  text-center text-white relative z-20">
+        Vortex
+      </h1>
+      <div className="w-[40rem] h-40 relative">
+        {/* Gradients */}
+        <div className="absolute inset-x-20 top-0 bg-gradient-to-r from-transparent via-indigo-500 to-transparent h-[2px] w-3/4 blur-sm" />
+        <div className="absolute inset-x-20 top-0 bg-gradient-to-r from-transparent via-indigo-500 to-transparent h-px w-3/4" />
+        <div className="absolute inset-x-60 top-0 bg-gradient-to-r from-transparent via-sky-500 to-transparent h-[5px] w-1/4 blur-sm" />
+        <div className="absolute inset-x-60 top-0 bg-gradient-to-r from-transparent via-sky-500 to-transparent h-px w-1/4" />
+ 
+        {/* Core component */}
+        <SparklesCore
+          background="transparent"
+          minSize={0.4}
+          maxSize={1}
+          particleDensity={1200}
+          className="w-full h-full"
+          particleColor="#FFFFFF"
+        />
+ 
+        {/* Radial Gradient to prevent sharp edges */}
+        <div className="absolute inset-0 w-full h-full bg-black [mask-image:radial-gradient(350px_200px_at_top,transparent_20%,white)]"></div>
+      </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
       <div className="m-auto  mt-[80px] mb-[40px]">
         <div className="carousel" ref={carouselRef}>
           <div className="list" ref={listRef}>
