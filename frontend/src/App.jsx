@@ -57,6 +57,7 @@ import RentedGamesSection from "../dashboards/rentedGamesDash";
 import RentalPaymentsDash from "../dashboards/rentalPaymentsDashboard";
 import SessionAnalytics from "../dashboards/sessionAnalytics";
 
+//Games
 import Hangman from "./components/Games/Hangaman";
 
 import { BackgroundBeamsWithCollision } from "./components/ui/BackgroundBeamsWithCollision";
