@@ -68,12 +68,13 @@ useAuthCheck();
           selectedKey={activeTab}
           size="lg"
           color="primary"
+          style={{ fontSize: '1.1rem', padding: '20px 30px' }}
         >
-          <Tab key="tab1" title="User Statistics" />
-          <Tab key="tab2" title="Manage Users" />
-          <Tab key="tab3" title="pending Developers" />
-          <Tab key="tab4" title="Manage Developers" />
-          <Tab key="tab5" title="Manage Moderators" />
+          <Tab key="tab1" title="User Statistics"style={{ padding: '20px 30px', fontSize: '1.1rem' }}/>
+          <Tab key="tab2" title="Manage Users" style={{ padding: '20px 30px', fontSize: '1.1rem' }}/>
+          <Tab key="tab3" title="pending Developers" style={{ padding: '20px 30px', fontSize: '1.1rem' }}/>
+          <Tab key="tab4" title="Manage Developers" style={{ padding: '20px 30px', fontSize: '1.1rem' }}/>
+          <Tab key="tab5" title="Manage Moderators" style={{ padding: '20px 30px', fontSize: '1.1rem' }} />
           
           
         </Tabs>
