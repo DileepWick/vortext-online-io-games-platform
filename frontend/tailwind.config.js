@@ -14,10 +14,10 @@ export default {
         scary2:['scary2'],
       },
       colors: {
-        customDark: '#131213',
-        headerDark:'#18191d',
+        customDark: '#030616',
+        headerDark:'#030616',
         editionColor:'#787979',
-        customPink: '#f10b63',
+        customPink: '#8668cf',
         customGreen: '#00FF00',
         inputColor:"#202125"
       },
