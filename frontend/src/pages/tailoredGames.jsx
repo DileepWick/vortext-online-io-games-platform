@@ -99,9 +99,9 @@ const TailoredGames = () => {
           />
           {/* Game 6 */}
           <GameCard
-            title="Member 6 Game"
+            title="Color Guessing"
             imageUrl="https://images5.alphacoders.com/127/1274050.jpg"
-            link="/games/tictactoe"
+            link="/ColorGuessingGame"
             devName={"Dissanayaka D.M.K.L.K"}
             devId={"IT22120748"}
           />
