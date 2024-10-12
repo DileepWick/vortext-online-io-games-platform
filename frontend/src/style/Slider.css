@@ -25,9 +25,9 @@ header a{
 }
 /* carousel */
 .carousel{
-    height: 70vh;
+    height: 80vh;
     margin-top: -50px;
-    width: 70vw;
+    width: 100vw;
     overflow: hidden;
     position: relative;
 }

@@ -183,7 +183,7 @@ const Home = () => {
         <title>Welcome to Vortex</title>
       </Helmet>
       <Header />
-      <h1 className="text-5xl text-white mt-[40px]">Vortex Gaming Home</h1>
+     
       <div className="m-auto  mt-[80px] mb-[40px]">
         <div className="carousel" ref={carouselRef}>
           <div className="list" ref={listRef}>
