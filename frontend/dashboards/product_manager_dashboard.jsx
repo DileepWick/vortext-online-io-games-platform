@@ -12,6 +12,9 @@ import VideoPlayer from "../src/components/videoPlayer";
 //Stock Components
 import StockTable from "./Stock_Components/stock_table";
 
+//Analytics
+import Analytics from "./Stock_Components/analytics";
+
 // Next UI
 import { Tabs, Tab, Button, Input, User, Chip, Image } from "@nextui-org/react";
 import { ScrollShadow } from "@nextui-org/react";
@@ -193,7 +196,7 @@ const Blogger = () => {
       <div className="flex items-center p-4 font-primaryRegular bg-inputColor">
         <Tabs
           aria-label="Blogger Tabs"
-          className="flex-1"
+          className="flex-1 mt-8"
           onSelectionChange={setActiveTab}
           selectedKey={activeTab}
           size="lg"
@@ -208,9 +211,7 @@ const Blogger = () => {
       <div className="p-4">
         {activeTab === "analytics" && (
           <div className="bg-white flex flex-col min-h-screen">
-            <p className="text-center text-black font-primaryRegular text-5xl mt-[100px]">
-            Analytics on development
-            </p>
+            <Analytics/>
           </div>
         )}
         {/*PRODUCTS*/}

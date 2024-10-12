@@ -23,7 +23,7 @@ import TailoredGames from "./pages/tailoredGames";
 import TransactionHistory from "./pages/TransactionHistoryPage";
 import DeveloperIncomeTable from "./pages/DeveloperEarningTable";
 import ChatHistory from "./pages/ChatHistory";
-
+import Leaderboard from "./pages/MathzLeaderboard";
 
 import DeveloperLoginSignup from "./pages/DeveloperLoginSignup";
 
@@ -57,8 +57,12 @@ import GameDeveloperDashboard from "../dashboards/gamedeveloperdashboard";
 import RentedGamesSection from "../dashboards/rentedGamesDash";
 import RentalPaymentsDash from "../dashboards/rentalPaymentsDashboard";
 import SessionAnalytics from "../dashboards/sessionAnalytics";
+import Unauthorized from "./pages/Unauthorized";
 
+//Games
 import Hangman from "./components/Games/Hangaman";
+
+import { BackgroundBeamsWithCollision } from "./components/ui/BackgroundBeamsWithCollision";
 
 const App = () => {
   return (
@@ -89,6 +93,9 @@ const App = () => {
       <Route path="/community" element={<Community />} />
       <Route path="/UserMessage" element={<UserMessages />} />
       <Route path="//chat-history" element={<ChatHistory />} />
+      <Route path="/unauthorized" element={<Unauthorized />} />
+
+      <Route path="/Leaderboard" element={<Leaderboard />} />
 
       <Route path="/chat" element={<Chat />} />
 
@@ -122,7 +129,12 @@ const App = () => {
       <Route path="/RentalPayments" element={<RentalPaymentsDash />} />
       <Route path="/SessionAnalytics" element={<SessionAnalytics />} />
 
-      <Route path="DeveloperEarningTable" element={<DeveloperIncomeTable/>} />
+      <Route
+        path="/BackgroundBeamsWithCollision"
+        element={<BackgroundBeamsWithCollision />}
+      />
+
+      <Route path="DeveloperEarningTable" element={<DeveloperIncomeTable />} />
       {/*Game Routes*/}
       <Route path="/HangmanGame" element={<Hangman />} />
     </Routes>
