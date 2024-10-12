@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, forwardRef } from "react";
 import {
   Navbar,
   NavbarBrand,
@@ -20,7 +20,7 @@ import { NotificationIcon } from "../assets/icons/NotificationIcon.jsx";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { getToken } from "../utils/getToken";
 
-export default function Header() {
+const Header = forwardRef((props, ref) => {
   const [user, setUser] = useState(null);
   const token = getToken();
   const userId = getUserIdFromToken(token);
@@ -131,7 +131,7 @@ export default function Header() {
               </DropdownItem>
               <DropdownItem
                 Key="contactus"
-                onClick={() => navigate("/contact")}
+                onClick={() => navigate("/support#contactForm")}
               >
                 Contact Us
               </DropdownItem>
@@ -356,4 +356,5 @@ export default function Header() {
       </Navbar>
     </div>
   );
-}
+});
+export default Header;

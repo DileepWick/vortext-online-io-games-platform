@@ -28,6 +28,7 @@ import MathzBlasterScore from "./routes/math_blaster_routes.js";
 import CommunityPost from "./routes/communityPost_routes.js";
 import contactRouter from "./routes/contact_us_route.js";
 import messageRoutes from "./routes/messageRoutes.js";
+import DirectContactUsRoute from "./routes/direct_contact_us_route.js";
 
 import { RentalDurationRouter } from "./routes/rentalDurationRoutes.js";
 
@@ -100,6 +101,7 @@ app.use("/api", chatRouter); // Use chatbot routes
 app.use("/rentalDurations", RentalDurationRouter);
 app.use("/rentalPayments", rentalPaymentsRouter); //payments for the rentals
 app.use("/mathzblaster", MathzBlasterScore);
+app.use("/directContactUs", DirectContactUsRoute);
 
 app.use("/api", GPTRouter);
 app.use("/api", GPTRouter);
