@@ -49,8 +49,10 @@ import "react-toastify/dist/ReactToastify.css";
 
 // Document Head Management
 import { Helmet } from "react-helmet-async";
+import ScrollToTop from "../src/components/ScrollToTop";
 
 const ContactDash = () => {
+  useAuthCheck("Support Agent");
   // State for active tab
   const [activeTab, setActiveTab] = useState("tab1");
 
@@ -439,6 +441,7 @@ const ContactDash = () => {
   return (
     <div>
       <Header />
+      <ScrollToTop />
       <div className="flex w-full flex-col dark text-foreground bg-background">
         <div className="flex items-center p-4 font-primaryRegular">
           <Tabs
