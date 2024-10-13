@@ -21,6 +21,8 @@ import useAuthCheck from "../utils/authCheck";
 import {cn} from "../libs/util";
 import  {Input}  from "../components/ui/Input";
 import  {Label}  from "../components/ui/Lable";
+import { TracingBeam } from "../components/ui/TracingBeam";
+import { BackgroundBeams } from "../components/ui/BackgroundBeams";
 
 const LabelInputContainer = ({
   children,
@@ -46,7 +48,7 @@ const CreatePost = ({ user, onSubmit }) => {
   };
 
   return (
-    <div className="max-w-lg mx-auto bg-gray-500 dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+    <div className="max-w-lg mx-auto bg-gray-400 dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
       <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Create Post</h2>
       <form onSubmit={handleSubmit}>
         <div className="flex items-center mb-4">
@@ -427,6 +429,7 @@ const Articles = () => {
 
   return (
     <div className="bg-customDark min-h-screen text-white font-sans">
+      <TracingBeam>
       <Header />
 
       <div className="container mx-auto p-4">
@@ -644,6 +647,7 @@ const Articles = () => {
           </div>
         )}
       </div>
+      </TracingBeam>
       <Footer />
     </div>
   );
