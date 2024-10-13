@@ -117,7 +117,10 @@ const Header = forwardRef((props, ref) => {
               Vortex Games
             </Link>
           </NavbarItem>
-          <Dropdown placement="bottom-start" className="bg-foreground">
+          <Dropdown
+            placement="bottom-start"
+            className="bg-foreground text-white"
+          >
             <DropdownTrigger>
               <NavbarItem className="cursor-pointer">Help</NavbarItem>
             </DropdownTrigger>
@@ -146,7 +149,10 @@ const Header = forwardRef((props, ref) => {
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
-          <Dropdown placement="bottom-start" className="bg-foreground">
+          <Dropdown
+            placement="bottom-start"
+            className="bg-foreground text-white"
+          >
             <DropdownTrigger>
               <NavbarItem className="cursor-pointer flex items-center">
                 <NotificationIcon style={{ marginRight: "8px" }} />
@@ -176,7 +182,10 @@ const Header = forwardRef((props, ref) => {
 
         <NavbarContent as="div" justify="end">
           {token && user ? (
-            <Dropdown placement="bottom-end" className="bg-foreground">
+            <Dropdown
+              placement="bottom-end"
+              className="bg-foreground text-white"
+            >
               <DropdownTrigger>
                 <User
                   className="cursor-pointer text-white"
