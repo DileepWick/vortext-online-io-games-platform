@@ -54,9 +54,6 @@ const Header = forwardRef((props, ref) => {
   return (
     <div className="bg-headerDark h-[50px]">
       <Navbar className="font-primaryRegular bg-headerDark text-white">
-        <NavbarBrand>
-          <p className="font-bold text-white">VORTEX GAMING</p>
-        </NavbarBrand>
 
         <NavbarContent className="hidden sm:flex gap-4" justify="center">
           <NavbarItem>
@@ -67,7 +64,7 @@ const Header = forwardRef((props, ref) => {
                 location.pathname === "/" ? "underline" : ""
               } text-white hover:underline`}
             >
-              Home
+              HOME
             </Link>
           </NavbarItem>
           <NavbarItem>
@@ -78,7 +75,7 @@ const Header = forwardRef((props, ref) => {
                 location.pathname === "/shop" ? "underline" : ""
               } text-white hover:underline`}
             >
-              Shop
+              SHOP
             </Link>
           </NavbarItem>
           <NavbarItem>
@@ -89,7 +86,7 @@ const Header = forwardRef((props, ref) => {
                 location.pathname === "/articles" ? "underline" : ""
               } text-white hover:underline`}
             >
-              Article
+             COMMUNITY
             </Link>
           </NavbarItem>
           <NavbarItem>
@@ -100,7 +97,7 @@ const Header = forwardRef((props, ref) => {
                 location.pathname === "/chat" ? "underline" : ""
               } text-white hover:underline`}
             >
-              Chat
+              CHAT
             </Link>
           </NavbarItem>
 
@@ -114,12 +111,15 @@ const Header = forwardRef((props, ref) => {
                 location.pathname === "/TailoredGames" ? "underline" : ""
               } text-white hover:underline`}
             >
-              Vortex Games
+              OUR GAMES
             </Link>
           </NavbarItem>
-          <Dropdown placement="bottom-start" className="bg-foreground">
+          <Dropdown
+            placement="bottom-start"
+            className="bg-foreground text-white"
+          >
             <DropdownTrigger>
-              <NavbarItem className="cursor-pointer">Help</NavbarItem>
+              <NavbarItem className="cursor-pointer">SUPPORT</NavbarItem>
             </DropdownTrigger>
             <DropdownMenu
               aria-label="Profile Actions"
@@ -146,7 +146,10 @@ const Header = forwardRef((props, ref) => {
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
-          <Dropdown placement="bottom-start" className="bg-foreground">
+          <Dropdown
+            placement="bottom-start"
+            className="bg-foreground text-white"
+          >
             <DropdownTrigger>
               <NavbarItem className="cursor-pointer flex items-center">
                 <NotificationIcon style={{ marginRight: "8px" }} />
@@ -176,7 +179,10 @@ const Header = forwardRef((props, ref) => {
 
         <NavbarContent as="div" justify="end">
           {token && user ? (
-            <Dropdown placement="bottom-end" className="bg-foreground">
+            <Dropdown
+              placement="bottom-end"
+              className="bg-foreground text-white"
+            >
               <DropdownTrigger>
                 <User
                   className="cursor-pointer text-white"
@@ -190,7 +196,7 @@ const Header = forwardRef((props, ref) => {
               <DropdownMenu
                 aria-label="Profile Actions"
                 variant="flat"
-                className="font-primaryRegular"
+                className="font-primaryRegular text-white"
               >
                 <DropdownItem key="profile" className="h-14 gap-2">
                   <p className="font-semibold">Signed in as</p>

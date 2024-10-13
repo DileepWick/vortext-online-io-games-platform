@@ -4,21 +4,22 @@ import { Link } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import GameIcon from "../assets/icons/detailsIcon";
-import {
-  Card,
-  CardBody,
-  Chip,
-  ScrollShadow,
-  Input,
-} from "@nextui-org/react";
+import { TracingBeam } from "../components/ui/TracingBeam";
+import { Card, CardBody, Chip, ScrollShadow, Input } from "@nextui-org/react";
 import Loader from "../components/Loader/loader";
-import { IoIosArrowForward } from "react-icons/io";  
-import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/css';
-import 'swiper/css/effect-coverflow';
-import 'swiper/css/pagination';
-import { EffectCoverflow, Pagination, Navigation, Autoplay } from 'swiper/modules';
-import '../style/Shop.css';
+import { IoIosArrowForward } from "react-icons/io";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/effect-coverflow";
+import "swiper/css/pagination";
+import {
+  EffectCoverflow,
+  Pagination,
+  Navigation,
+  Autoplay,
+} from "swiper/modules";
+import "../style/Shop.css";
+import { BackgroundLines } from "../components/ui/background-lines";
 
 const Shop = () => {
   const [gameStocks, setGameStocks] = useState([]);
@@ -41,11 +42,10 @@ const Shop = () => {
       } catch (err) {
         setError(err.message);
       } finally {
-        setLoading(false); 
+        setLoading(false);
       }
     };
 
-    
     fetchGameStocks();
   }, [showtoprated]);
 
@@ -137,6 +137,7 @@ const Shop = () => {
 
   return (
     <div className="min-h-screen bg-customDark text-white dark">
+      <TracingBeam>
       <Header />
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
@@ -156,20 +157,19 @@ const Shop = () => {
         </div>
 
         <button
-  className="text-[white] font-bold px-16 pb-8 flex flex-row gap-2 items-center  text-left text-[22px]"
-  onClick={() => {
-    setSwiperLoading(true); // Start loading state immediately when clicked
-    setShowTopRated(true); // Set the showtoprated state to true
+          className="text-[white] font-bold px-16 pb-8 flex flex-row gap-2 items-center  text-left text-[22px]"
+          onClick={() => {
+            setSwiperLoading(true); // Start loading state immediately when clicked
+            setShowTopRated(true); // Set the showtoprated state to true
 
-    // Set timeout to simulate delay (if you still need it), but move state management into useEffect
-    setTimeout(() => {
-      setSwiperLoading(false); // After 500ms, stop loading
-    }, 1500);
-  }}
->
-  Show Top Rated This week <IoIosArrowForward />
-</button>
-
+            // Set timeout to simulate delay (if you still need it), but move state management into useEffect
+            setTimeout(() => {
+              setSwiperLoading(false); // After 500ms, stop loading
+            }, 1500);
+          }}
+        >
+          Show Top Rated This week <IoIosArrowForward />
+        </button>
 
         {filteredStocks.length === 0 ? (
           <p className="text-gray-400 text-center">No Games Found</p>
@@ -178,11 +178,11 @@ const Shop = () => {
             {showtoprated ? (
               swiperLoading ? (
                 <div className="flex justify-center items-center h-64">
-                <div className="w-10 h-10 border-4 border-t-customPink border-transparent border-solid rounded-full animate-spin"></div>
+                  <div className="w-10 h-10 border-4 border-t-customPink border-transparent border-solid rounded-full animate-spin"></div>
                 </div>
               ) : (
                 <Swiper
-                  effect={'coverflow'}
+                  effect={"coverflow"}
                   grabCursor={true}
                   centeredSlides={true}
                   loop={true}
@@ -190,7 +190,7 @@ const Shop = () => {
                     delay: 2500,
                     disableOnInteraction: false,
                   }}
-                  slidesPerView={'auto'}
+                  slidesPerView={"auto"}
                   spaceBetween={100}
                   coverflowEffect={{
                     rotate: 30,
@@ -199,16 +199,16 @@ const Shop = () => {
                     modifier: 1,
                     slideShadows: true,
                   }}
-                  pagination={{ el: '.swiper-pagination', clickable: true }}
+                  pagination={{ el: ".swiper-pagination", clickable: true }}
                   navigation={{
-                    nextEl: '.swiper-button-next',
-                    prevEl: '.swiper-button-prev',
+                    nextEl: ".swiper-button-next",
+                    prevEl: ".swiper-button-prev",
                     clickable: true,
                   }}
                   modules={[EffectCoverflow, Pagination, Navigation, Autoplay]}
                   className="swiper_container overflow-hidden w-[850px] "
                 >
-                  {filteredStocks.map((stock,index) => {
+                  {filteredStocks.map((stock, index) => {
                     const originalPrice = stock.UnitPrice;
                     const discount = stock.discount;
                     const discountedPrice =
@@ -217,15 +217,13 @@ const Shop = () => {
                         : originalPrice;
 
                     return (
-                      <SwiperSlide key={stock._id} className='slide w-fit '>
-                        <Card
-                          className="relative bg-opacity-20 z-40 rounded-lg shadow-lg text-white transform transition-transform duration-300  hover:z-10 hover:shadow-2xl hover:bg-opacity-80 w-[250px] h-[500px] hover:scale-1"
-                        > 
-                          
-                          
+                      <SwiperSlide key={stock._id} className="slide w-fit ">
+                        <Card className="relative bg-opacity-20 z-40 rounded-lg shadow-lg text-white transform transition-transform duration-300  hover:z-10 hover:shadow-2xl hover:bg-opacity-80 w-[250px] h-[500px] hover:scale-1">
                           <Link to={`/game/${stock._id}`}>
-                          <div className="rank absolute z-49 top-[34%] text-center justify-center items-center text-white "></div>
-                          <p className="rankNum absolute top-[30%] z-50  left-[28%] text-[35px]  gaming-animation">Top : {index + 1} </p>
+                            <div className="rank absolute z-49 top-[34%] text-center justify-center items-center text-white "></div>
+                            <p className="rankNum absolute top-[30%] z-50  left-[28%] text-[35px]  gaming-animation">
+                              Top : {index + 1}{" "}
+                            </p>
                             <div className="relative">
                               <img
                                 alt={stock.AssignedGame.title}
@@ -236,7 +234,6 @@ const Shop = () => {
                                 }}
                                 src={stock.AssignedGame.coverPhoto}
                               />
-                              
 
                               <div className="absolute  inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity duration-300  hover:opacity-100">
                                 <GameIcon />
@@ -334,7 +331,7 @@ const Shop = () => {
                   return (
                     <Card
                       key={stock._id}
-                      className="relative bg-opacity-20 rounded-lg shadow-lg text-white transform transition-transform duration-300 hover:scale-105 hover:z-10 hover:shadow-2xl hover:bg-opacity-80 w-[250px] h-[500px]"
+                      className="relative bg-customDark bg-opacity-20 rounded-lg shadow-lg text-white transform transition-transform duration-300 hover:scale-105 hover:z-10 hover:shadow-2xl hover:bg-opacity-80 w-[250px] h-[500px]"
                     >
                       <Link to={`/game/${stock._id}`}>
                         <div className="relative">
@@ -360,7 +357,7 @@ const Shop = () => {
                             {discount > 0 && (
                               <>
                                 <Chip
-                                  color="danger"
+                                  color="primary"
                                   radius="none"
                                   className="font-primaryRegular mr-1"
                                   size="sm"
@@ -388,27 +385,23 @@ const Shop = () => {
                                 size="sm"
                                 radius="none"
                                 className="font-primaryRegular"
-                                color="danger"
+                                color="primary"
                                 key={index}
                               >
                                 {(() => {
                                   const genreName =
                                     genre.trim().charAt(0).toUpperCase() +
                                     genre.trim().slice(1);
-                                  if (genreName === "Action")
-                                    return `Action ⚔️`;
+                                  if (genreName === "Action") return `ACTION`;
                                   if (genreName === "Adventure")
-                                    return `Adventure 🐾`;
-                                  if (genreName === "Racing")
-                                    return `Racing 🏎️`;
-                                  if (genreName === "Puzzle")
-                                    return `Puzzle 🧩`;
+                                    return `ADVENTURE`;
+                                  if (genreName === "Racing") return `RACING`;
+                                  if (genreName === "Puzzle") return `PUZZLE`;
                                   if (genreName === "Fighting")
-                                    return `Fighting 🥷🏻`;
+                                    return `FIGHTING `;
                                   if (genreName === "Strategy")
-                                    return `Strategy 🙄`;
-                                  if (genreName === "Sport")
-                                    return `Sport 🏅`;
+                                    return `STRATEGY`;
+                                  if (genreName === "Sport") return `SPORT`;
                                   return genreName; // Fallback in case no match is found
                                 })()}
                               </Chip>
@@ -425,6 +418,7 @@ const Shop = () => {
         )}
       </div>
       <Footer />
+      </TracingBeam>
     </div>
   );
 };
