@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import Header from "../src/components/header";
 import Footer from "../src/components/footer";
 
+
 const GRID_SIZE = 30;
 const CELL_SIZE = 20;
 const INITIAL_SNAKE = [

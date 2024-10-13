@@ -7,6 +7,7 @@ import { Eye, EyeOff } from "lucide-react";
 
 // Next UI
 import {
+  Tooltip,
   Input,
   Button,
   Tabs,
@@ -28,7 +29,7 @@ const Login = () => {
   const [selectedRole, setSelectedRole] = useState("User"); // New state for role selection
   const [portfolioLink, setPortfolioLinks] = useState(""); // Initialize with one empty input
   const [showPassword, setShowPassword] = useState(false);
-  const [confirmPassword, setConfirmPassword] = useState(""); // New state for confirm password
+ 
 
 
   const navigate = useNavigate();
@@ -92,9 +93,7 @@ const handlePortfolioLinkChange = (e) => {
     );
 
 
-    const handleConfirmPasswordChange = (e) => {
-      setConfirmPassword(e.target.value);
-    };
+  
     
 
   const validateForm = () => {
@@ -117,9 +116,7 @@ const handlePortfolioLinkChange = (e) => {
       errors.password =
         "Password must be at least 8 characters long and include uppercase, lowercase, number, and symbol.";
     }
-    if (formData.password !== confirmPassword) {
-      errors.confirmPassword = "Passwords do not match.";
-    }
+    
 
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
@@ -297,18 +294,18 @@ const handlePortfolioLinkChange = (e) => {
 
       {/* Right side - Login/Signup form */}
       <div className="w-full lg:w-1/2 bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
+        <Card className="w-full max-w-sm">
           <CardBody className="overflow-hidden">
-            <h1 className="text-2xl font-bold text-center mb-6">
+            <h1 className="text-l font-bold text-center mb-3">
               Welcome to Vortex Gaming
             </h1>
             <Tabs
               fullWidth
-              size="lg"
+              size="sm"
               aria-label="Login/Signup Tabs"
               selectedKey={selectedTab}
               onSelectionChange={setSelectedTab}
-              className="mb-4"
+              className="mb-2"
             >
               <Tab key="login" title="Login">
                 <form className="space-y-4">
@@ -350,14 +347,18 @@ const handlePortfolioLinkChange = (e) => {
               <Tab key="sign-up" title="Sign up">
                 <Tabs
                   fullWidth
-                  size="md"
+                  size="sm"
                   aria-label="Signup Tabs"
                   selectedKey={selectedRole}
                   onSelectionChange={setSelectedRole}
-                  className="mb-4"
+                  className="mb-2"
                 >
                   <Tab key="user" title="User">
                     <form className="space-y-3">
+                    <Tooltip
+                      content={<span style={{ color: 'black' }}>Firstname must contain only letters</span>}
+                      placement="bottom"
+                    >
                       <Input
                         isRequired
                         label="First Name"
@@ -368,6 +369,11 @@ const handlePortfolioLinkChange = (e) => {
                         color={validationErrors.firstname ? "error" : "default"}
                         className="max-w-full"
                       />
+                      </Tooltip>
+                      <Tooltip
+                      content={<span style={{ color: 'black' }}>Lastname must contain only letters</span>}
+                      placement="bottom"
+                    >
                       <Input
                         isRequired
                         label="Last Name"
@@ -378,6 +384,7 @@ const handlePortfolioLinkChange = (e) => {
                         color={validationErrors.lastname ? "error" : "default"}
                         className="max-w-full"
                       />
+                      </Tooltip>
                       <Input
                         isRequired
                         label="Username"
@@ -387,6 +394,10 @@ const handlePortfolioLinkChange = (e) => {
                         onChange={handleInputChange}
                         className="max-w-full"
                       />
+                      <Tooltip
+                      content={<span style={{ color: 'black' }}>Invalid email format. Email must contain '@' and end with '.com'</span>}
+                      placement="bottom"
+                    >
                       <Input
                         isRequired
                         label="Email"
@@ -398,6 +409,7 @@ const handlePortfolioLinkChange = (e) => {
                         color={validationErrors.email ? "error" : "default"}
                         className="max-w-full"
                       />
+                      </Tooltip>
                       <Input
                         isRequired
                         label="Birthday"
@@ -409,6 +421,10 @@ const handlePortfolioLinkChange = (e) => {
                         max={maxDate}
                         className="max-w-full"
                       />
+                       <Tooltip
+                      content={<span style={{ color: 'black' }}>Password must be at least 8 characters long and include uppercase, lowercase, number, and symbol.</span>}
+                      placement="bottom"
+                    >
                       <Input
                         isRequired
                         label="Password"
@@ -420,6 +436,7 @@ const handlePortfolioLinkChange = (e) => {
                         color={validationErrors.password ? "error" : "default"}
                         className="max-w-full"
                       />
+                      </Tooltip>
                       <Button
                         fullWidth
                         color="primary"
@@ -432,6 +449,10 @@ const handlePortfolioLinkChange = (e) => {
                   </Tab>
                   <Tab key="developer" title="Developer">
                     <form className="space-y-3">
+                    <Tooltip
+                      content={<span style={{ color: 'black' }}>Firstname must contain only letters</span>}
+                      placement="bottom"
+                    >
                       <Input
                         isRequired
                         label="First Name"
@@ -442,6 +463,11 @@ const handlePortfolioLinkChange = (e) => {
                         color={validationErrors.firstname ? "error" : "default"}
                         className="max-w-full"
                       />
+                      </Tooltip>
+                      <Tooltip
+                      content={<span style={{ color: 'black' }}>Lastname must contain only letters</span>}
+                      placement="bottom"
+                    >
                       <Input
                         isRequired
                         label="Last Name"
@@ -452,6 +478,7 @@ const handlePortfolioLinkChange = (e) => {
                         color={validationErrors.lastname ? "error" : "default"}
                         className="max-w-full"
                       />
+                      </Tooltip>
                       <Input
                         isRequired
                         label="Username"
@@ -461,6 +488,10 @@ const handlePortfolioLinkChange = (e) => {
                         onChange={handleInputChange}
                         className="max-w-full"
                       />
+                      <Tooltip
+                      content={<span style={{ color: 'black' }}>Invalid email format. Email must contain '@' and end with '.com'</span>}
+                      placement="bottom"
+                    >
                       <Input
                         isRequired
                         label="Email"
@@ -472,6 +503,7 @@ const handlePortfolioLinkChange = (e) => {
                         color={validationErrors.email ? "error" : "default"}
                         className="max-w-full"
                       />
+                      </Tooltip>
                       <Input
                         isRequired
                         label="Birthday"
@@ -483,6 +515,10 @@ const handlePortfolioLinkChange = (e) => {
                         max={maxDate}
                         className="max-w-full"
                       />
+                      <Tooltip
+                      content={<span style={{ color: 'black' }}>Password must be at least 8 characters long and include uppercase, lowercase, number, and symbol.</span>}
+                      placement="bottom"
+                    >
                       <Input
                         isRequired
                         label="Password"
@@ -494,7 +530,11 @@ const handlePortfolioLinkChange = (e) => {
                         color={validationErrors.password ? "error" : "default"}
                         className="max-w-full"
                       />
-                      
+                      </Tooltip>
+                      <Tooltip
+                          content={<span style={{ color: 'black' }}>LinkedIn link should start with www.linkedin.com/</span>}
+                          placement="bottom"
+                        >
                       <Input
                       
   label="LinkedIn Link"
@@ -503,6 +543,7 @@ const handlePortfolioLinkChange = (e) => {
   onChange={handlePortfolioLinkChange}
   className="max-w-full"
 />
+</Tooltip>
                       <Button
                         fullWidth
                         color="secondary"
@@ -517,7 +558,7 @@ const handlePortfolioLinkChange = (e) => {
               </Tab>
             </Tabs>
             {alertMessage && (
-              <div className="mt-4 text-center text-red-500">
+              <div className="mt-3 text-center text-red-500 text-sm">
                 {alertMessage}
               </div>
             )}

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import Header from "../header";
 import Footer from "../footer";
 import { Terminal, Zap, Shield, Award, Code, Database, Server } from 'lucide-react';
+import useAuthCheck from "../../utils/authCheck";
 
 const GAME_STAGES = {
   INTRO: 'intro',
@@ -363,10 +364,115 @@ void mergeSort(std::vector<int>& arr, int left, int right) {
     points: 250,
     difficulty: DIFFICULTY_LEVELS.HARD,
     language: "C++"
+  },
+  {
+    id: 19,
+    title: "Basic Data Types",
+    description: "Test your knowledge of basic data types in programming.",
+    task: "Which of the following is NOT a primitive data type in most programming languages?",
+    options: ["Integer", "Boolean", "Float", "Array"],
+    correctAnswer: "Array",
+    explanation: "Arrays are composite data types that can hold multiple values, while Integer, Boolean, and Float are primitive data types that hold single values.",
+    points: 50,
+    difficulty: DIFFICULTY_LEVELS.EASY,
+    language: "Theory"
+  },
+  {
+    id: 20,
+    title: "Control Structures",
+    description: "Understand the basic control structures in programming.",
+    task: "What is the purpose of a 'switch' statement in programming?",
+    options: [
+      "To create a loop",
+      "To handle exceptions",
+      "To execute different code blocks based on different conditions",
+      "To define a function"
+    ],
+    correctAnswer: "To execute different code blocks based on different conditions",
+    explanation: "A switch statement allows a program to execute different code blocks based on the value of a variable or expression, providing an efficient way to handle multiple conditions.",
+    points: 75,
+    difficulty: DIFFICULTY_LEVELS.EASY,
+    language: "Theory"
+  },
+  {
+    id: 21,
+    title: "Object-Oriented Programming",
+    description: "Test your understanding of OOP concepts.",
+    task: "What is encapsulation in object-oriented programming?",
+    options: [
+      "The ability of a class to inherit properties and methods from another class",
+      "The process of creating an instance of a class",
+      "The principle of bundling data and methods that operate on that data within a single unit",
+      "The ability of objects to respond differently to the same method call"
+    ],
+    correctAnswer: "The principle of bundling data and methods that operate on that data within a single unit",
+    explanation: "Encapsulation is a fundamental principle of OOP that involves bundling the data (attributes) and the methods that operate on the data within a single unit or object. This helps in data hiding and reducing complexity.",
+    points: 100,
+    difficulty: DIFFICULTY_LEVELS.MEDIUM,
+    language: "Theory"
+  },
+  {
+    id: 22,
+    title: "Database Concepts",
+    description: "Understand basic database concepts.",
+    task: "What is a primary key in a relational database?",
+    options: [
+      "A key used to encrypt the database",
+      "The first column in any database table",
+      "A unique identifier for each record in a table",
+      "A foreign key that references another table"
+    ],
+    correctAnswer: "A unique identifier for each record in a table",
+    explanation: "A primary key is a column or set of columns in a table that uniquely identifies each row in that table. It ensures that each record can be uniquely identified and helps in maintaining data integrity.",
+    points: 125,
+    difficulty: DIFFICULTY_LEVELS.MEDIUM,
+    language: "Theory"
+  },
+  {
+    id: 23,
+    title: "Networking Fundamentals",
+    description: "Test your knowledge of basic networking concepts.",
+    task: "What is the purpose of the DNS (Domain Name System) in computer networking?",
+    options: [
+      "To encrypt network traffic",
+      "To assign IP addresses to devices",
+      "To translate domain names to IP addresses",
+      "To route packets between networks"
+    ],
+    correctAnswer: "To translate domain names to IP addresses",
+    explanation: "The Domain Name System (DNS) is responsible for translating human-readable domain names (like www.example.com) into IP addresses that computers use to identify each other on the network. This makes it easier for users to access websites and other network resources.",
+    points: 150,
+    difficulty: DIFFICULTY_LEVELS.MEDIUM,
+    language: "Theory"
+  },
+  {
+    id: 24,
+    title: "Algorithms and Data Structures",
+    description: "Analyze the time complexity of common algorithms.",
+    task: "What is the average-case time complexity of quicksort?",
+    options: ["O(n)", "O(n log n)", "O(n^2)", "O(log n)"],
+    correctAnswer: "O(n log n)",
+    explanation: "The average-case time complexity of quicksort is O(n log n). This is because, on average, the algorithm divides the array into two roughly equal parts in each recursive step, leading to a depth of log n recursions, each taking n time to process.",
+    points: 200,
+    difficulty: DIFFICULTY_LEVELS.HARD,
+    language: "Theory"
+  },
+  {
+    id: 25,
+    title: "Software Design Patterns",
+    description: "Understand advanced software design concepts.",
+    task: "Which design pattern is best suited for creating objects in a superclass, but allowing subclasses to alter the type of objects that will be created?",
+    options: ["Singleton", "Factory Method", "Observer", "Decorator"],
+    correctAnswer: "Factory Method",
+    explanation: "The Factory Method pattern is a creational pattern that provides an interface for creating objects in a superclass, but allows subclasses to alter the type of objects that will be created. This pattern is useful when a class can't anticipate the type of objects it needs to create beforehand.",
+    points: 250,
+    difficulty: DIFFICULTY_LEVELS.HARD,
+    language: "Theory"
   }
 ];
 
 const CodeBreaker = () => {
+  useAuthCheck();
   const [gameStage, setGameStage] = useState(GAME_STAGES.INTRO);
   const [currentChallenge, setCurrentChallenge] = useState(null);
   const [userSolution, setUserSolution] = useState('');
@@ -402,18 +508,30 @@ const CodeBreaker = () => {
   };
 
   const handleSubmit = () => {
-    if (userSolution.trim() === currentChallenge.correctAnswer.trim()) {
-      setScore(prevScore => prevScore + currentChallenge.points);
-      setMessage('Great job! You solved the challenge.');
-      const filteredChallenges = challenges.filter(challenge => challenge.difficulty === difficulty);
-      const currentIndex = filteredChallenges.findIndex(challenge => challenge.id === currentChallenge.id);
-      if (currentIndex === filteredChallenges.length - 1) {
-        setGameStage(GAME_STAGES.GAME_OVER);
+    if (currentChallenge.options) {
+      // For theory questions
+      if (userSolution === currentChallenge.correctAnswer) {
+        setScore(prevScore => prevScore + currentChallenge.points);
+        setMessage(`Correct! ${currentChallenge.explanation}`);
       } else {
-        setCurrentChallenge(filteredChallenges[currentIndex + 1]);
+        setMessage(`Incorrect. ${currentChallenge.explanation}`);
       }
     } else {
-      setMessage('Oops! That\'s not quite right. Try again!');
+      // For coding challenges
+      if (userSolution.trim() === currentChallenge.correctAnswer.trim()) {
+        setScore(prevScore => prevScore + currentChallenge.points);
+        setMessage('Great job! You solved the challenge.');
+      } else {
+        setMessage('Oops! That\'s not quite right. Try again!');
+      }
+    }
+    
+    const filteredChallenges = challenges.filter(challenge => challenge.difficulty === difficulty);
+    const currentIndex = filteredChallenges.findIndex(challenge => challenge.id === currentChallenge.id);
+    if (currentIndex === filteredChallenges.length - 1) {
+      setGameStage(GAME_STAGES.GAME_OVER);
+    } else {
+      setCurrentChallenge(filteredChallenges[currentIndex + 1]);
     }
     setUserSolution('');
   };
@@ -430,8 +548,6 @@ const CodeBreaker = () => {
     }
   };
 
-
-  
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -499,23 +615,37 @@ const CodeBreaker = () => {
                 {getIcon(currentChallenge.difficulty)}
                 {currentChallenge.title}
               </h2>
-              <p className="mb-2 text-yellow-300 text-xl">Language: {currentChallenge.language}</p>
+              <p className="mb-2 text-yellow-300 text-xl">Type: {currentChallenge.language}</p>
               <p className="mb-4 text-lg">{currentChallenge.description}</p>
-              {currentChallenge.encryptedMessage && (
-                <p className="mb-4 text-lg">Encrypted message: <code className="text-xl">{currentChallenge.encryptedMessage}</code></p>
-              )}
-              {currentChallenge.code && (
-                <pre className="bg-gray-700 p-4 rounded-lg mb-4 overflow-x-auto text-lg">
-                  <code>{currentChallenge.code}</code>
-                </pre>
-              )}
               <p className="mb-4 text-xl font-semibold">{currentChallenge.task}</p>
-              <textarea
-                className="w-full p-4 mb-4 bg-gray-700 text-white rounded h-64 text-lg"
-                value={userSolution}
-                onChange={(e) => setUserSolution(e.target.value)}
-                placeholder="Enter your solution here..."
-              />
+
+              {currentChallenge.options ? (
+                // Render multiple choice options for theory questions
+                <div className="mt-4">
+                  {currentChallenge.options.map((option, index) => (
+                    <button
+                      key={index}
+                      className={`w-full text-left p-3 mb-2 rounded transition duration-300 ${
+                        userSolution === option
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-700 text-white hover:bg-gray-600'
+                      }`}
+                      onClick={() => setUserSolution(option)}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                // Render code input for coding challenges
+                <textarea
+                  className="w-full p-4 mb-4 bg-gray-700 text-white rounded h-64 text-lg"
+                  value={userSolution}
+                  onChange={(e) => setUserSolution(e.target.value)}
+                  placeholder="Enter your solution here..."
+                />
+              )}
+
               <div className="flex justify-between items-center">
                 <div className="flex gap-4">
                   <button
@@ -524,12 +654,14 @@ const CodeBreaker = () => {
                   >
                     Submit Solution
                   </button>
-                  <button
-                    className="px-6 py-3 bg-yellow-500 text-white rounded-lg shadow-md hover:bg-yellow-600 transition duration-300 text-lg"
-                    onClick={() => setMessage(currentChallenge.hint)}
-                  >
-                    Get Hint
-                  </button>
+                  {!currentChallenge.options && (
+                    <button
+                      className="px-6 py-3 bg-yellow-500 text-white rounded-lg shadow-md hover:bg-yellow-600 transition duration-300 text-lg"
+                      onClick={() => setMessage(currentChallenge.hint)}
+                    >
+                      Get Hint
+                    </button>
+                  )}
                 </div>
                 <button
                   className="px-6 py-3 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 transition duration-300 text-lg"
@@ -568,7 +700,7 @@ const CodeBreaker = () => {
 
       {gameStage === GAME_STAGES.INTRO && <Footer />}
     </div>
-  );;
+  );
 };
 
 export default CodeBreaker;
