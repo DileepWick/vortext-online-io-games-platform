@@ -9,19 +9,34 @@ const AddNewStock = ({ gameForTheStock, callBackFunction }) => {
   const [game] = useState(gameForTheStock);
   const [title] = useState(gameForTheStock.title);
   const [cover] = useState(gameForTheStock.coverPhoto);
-  const [price, setPrice] = useState(0);
-  const [discount, setDiscount] = useState("");
+  const [price, setPrice] = useState(0.1); // Initial price set to 0.1
+  const [discount, setDiscount] = useState(0); // Initial discount set to 0
+  
+  // Ensure the price is always >= 0.1
+  const handlePriceInput = (e) => {
+    const inputValue = Number(e.target.value);
+    if (inputValue >= 0.1 || e.target.value === "") {
+      setPrice(inputValue);
+    }
+  };
+
+  // Ensure the discount is always between 0 and 100
+  const handleDiscountInput = (e) => {
+    const inputValue = Number(e.target.value);
+    if (inputValue >= 0 && inputValue <= 100 || e.target.value === "") {
+      setDiscount(inputValue);
+    }
+  };
 
   const handleAddNewStock = async (e) => {
     e.preventDefault();
+
     try {
       const newStock = {
         UnitPrice: price,
         discount: discount,
         AssignedGame: game._id,
       };
-
-      console.log("New Stock Data:", newStock); // Log new stock data for debugging
 
       const response = await axios.post(
         `http://localhost:8098/gameStocks/createGameStock`,
@@ -37,7 +52,7 @@ const AddNewStock = ({ gameForTheStock, callBackFunction }) => {
         if (callBackFunction) {
           callBackFunction();
         }
-      } else if (response.status === 400 || response.status === 405) {
+      } else {
         toast.error(response.data.message, {
           theme: "dark",
           transition: Flip,
@@ -46,18 +61,14 @@ const AddNewStock = ({ gameForTheStock, callBackFunction }) => {
       }
     } catch (error) {
       if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
         toast.warning(error.response.data.message, {
           theme: "dark",
           transition: Flip,
           style: { fontFamily: "Rubik" },
         });
       } else if (error.request) {
-        // The request was made but no response was received
         toast.error("No response received from server.");
       } else {
-        // Something happened in setting up the request that triggered an Error
         toast.error("Error adding new stock.");
         console.error("Error:", error.message);
       }
@@ -87,9 +98,11 @@ const AddNewStock = ({ gameForTheStock, callBackFunction }) => {
             type="number"
             label="SET PRICE FOR THE GAME"
             value={price}
-            onChange={(e) => setPrice(Number(e.target.value))}
+            onInput={handlePriceInput} // Restricts price entry
             className="w-full"
-            placeholder="0.00"
+            placeholder="0.1"
+            min={0.1}
+            step={0.01}
             startContent={
               <div className="pointer-events-none flex items-center">
                 <span className="text-default-400 text-small">$</span>
@@ -100,8 +113,11 @@ const AddNewStock = ({ gameForTheStock, callBackFunction }) => {
             type="number"
             label="ADD DISCOUNT"
             value={discount}
-            onChange={(e) => setDiscount(Number(e.target.value))}
+            onInput={handleDiscountInput} // Restricts discount entry
             className="w-full"
+            min={0}
+            max={100}
+            step={1}
           />
           <Button
             type="submit"
