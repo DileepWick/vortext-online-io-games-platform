@@ -190,7 +190,7 @@ const Header = forwardRef((props, ref) => {
               <DropdownMenu
                 aria-label="Profile Actions"
                 variant="flat"
-                className="font-primaryRegular"
+                className="font-primaryRegular text-white"
               >
                 <DropdownItem key="profile" className="h-14 gap-2">
                   <p className="font-semibold">Signed in as</p>

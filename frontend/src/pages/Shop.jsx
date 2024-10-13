@@ -19,6 +19,7 @@ import 'swiper/css/effect-coverflow';
 import 'swiper/css/pagination';
 import { EffectCoverflow, Pagination, Navigation, Autoplay } from 'swiper/modules';
 import '../style/Shop.css';
+import { BackgroundLines } from "../components/ui/background-lines";
 
 const Shop = () => {
   const [gameStocks, setGameStocks] = useState([]);
@@ -323,6 +324,7 @@ const Shop = () => {
               )
             ) : (
               <div className="flex flex-wrap justify-center gap-8">
+                
                 {filteredStocks.map((stock) => {
                   const originalPrice = stock.UnitPrice;
                   const discount = stock.discount;
@@ -332,9 +334,10 @@ const Shop = () => {
                       : originalPrice;
 
                   return (
+                    
                     <Card
                       key={stock._id}
-                      className="relative bg-opacity-20 rounded-lg shadow-lg text-white transform transition-transform duration-300 hover:scale-105 hover:z-10 hover:shadow-2xl hover:bg-opacity-80 w-[250px] h-[500px]"
+                      className="relative bg-customDark bg-opacity-20 rounded-lg shadow-lg text-white transform transition-transform duration-300 hover:scale-105 hover:z-10 hover:shadow-2xl hover:bg-opacity-80 w-[250px] h-[500px]"
                     >
                       <Link to={`/game/${stock._id}`}>
                         <div className="relative">
@@ -360,7 +363,7 @@ const Shop = () => {
                             {discount > 0 && (
                               <>
                                 <Chip
-                                  color="danger"
+                                  color="primary"
                                   radius="none"
                                   className="font-primaryRegular mr-1"
                                   size="sm"
@@ -388,7 +391,7 @@ const Shop = () => {
                                 size="sm"
                                 radius="none"
                                 className="font-primaryRegular"
-                                color="danger"
+                                color="primary"
                                 key={index}
                               >
                                 {(() => {
@@ -396,19 +399,19 @@ const Shop = () => {
                                     genre.trim().charAt(0).toUpperCase() +
                                     genre.trim().slice(1);
                                   if (genreName === "Action")
-                                    return `Action ⚔️`;
+                                    return `ACTION`;
                                   if (genreName === "Adventure")
-                                    return `Adventure 🐾`;
+                                    return `ADVENTURE`;
                                   if (genreName === "Racing")
-                                    return `Racing 🏎️`;
+                                    return `RACING`;
                                   if (genreName === "Puzzle")
-                                    return `Puzzle 🧩`;
+                                    return `PUZZLE`;
                                   if (genreName === "Fighting")
-                                    return `Fighting 🥷🏻`;
+                                    return `FIGHTING `;
                                   if (genreName === "Strategy")
-                                    return `Strategy 🙄`;
+                                    return `STRATEGY`;
                                   if (genreName === "Sport")
-                                    return `Sport 🏅`;
+                                    return `SPORT`;
                                   return genreName; // Fallback in case no match is found
                                 })()}
                               </Chip>
