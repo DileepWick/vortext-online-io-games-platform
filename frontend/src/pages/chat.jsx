@@ -160,7 +160,7 @@ const Chat = () => {
       <Header />
       <BackgroundBeams />
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-7xl font-bold text-black bg-clip-text bg-no-repeat text-transparent bg-gradient-to-r py-4 from-blue-500 via-orange-500 to-orange-500 [text-shadow:0_0_rgba(0,0,0,0.1)]">Messaging Center</h1>
+        <h1 className="text-5xl font-bold text-black bg-clip-text bg-no-repeat text-transparent bg-gradient-to-r py-4 from-blue-500 via-orange-500 to-orange-500 [text-shadow:0_0_rgba(0,0,0,0.1)]">Messaging Center</h1>
         <div className="flex flex-col md:flex-row gap-6">
           <Card className="p-6 w-full md:w-1/3 shadow-md ">
             <div className="flex justify-between items-center mb-4 ">
