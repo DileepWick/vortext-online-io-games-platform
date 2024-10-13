@@ -100,7 +100,7 @@ const TailoredGames = () => {
           {/* Game 6 */}
           <GameCard
             title="Color Guessing"
-            imageUrl="https://images5.alphacoders.com/127/1274050.jpg"
+            imageUrl="https://res.cloudinary.com/dhcawltsr/image/upload/v1728821392/99044073-3297-4294-ab60-58fdf017b121_o80kq4.jpg"
             link="/ColorGuessingGame"
             devName={"Dissanayaka D.M.K.L.K"}
             devId={"IT22120748"}
