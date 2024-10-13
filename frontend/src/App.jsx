@@ -1,5 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
+import NotFoundPage from "./pages/NotFoundPage";
 import { Helmet } from "react-helmet-async";
 //Pages
 import Home from "./pages/Home";
@@ -137,6 +138,7 @@ const App = () => {
       <Route path="DeveloperEarningTable" element={<DeveloperIncomeTable />} />
       {/*Game Routes*/}
       <Route path="/HangmanGame" element={<Hangman />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 };
