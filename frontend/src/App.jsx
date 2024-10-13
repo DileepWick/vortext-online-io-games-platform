@@ -33,7 +33,7 @@ import UserMessages from "./pages/UserMessage";
 //Games
 import Snake from "../Games/Snake";
 import PuzzlePlatformGame from "./components/Games/PuzzlePlatformGame";
-import ColorGuessingGame from "../Games/ColorGuessingGame";
+import ColorGuessingGame from "./components/Games/ColorGuessingGame";
 import Chat from "./pages/chat";
 
 import CodeBreaker from "./components/Games/CodeBreaker";
