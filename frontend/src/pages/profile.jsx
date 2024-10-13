@@ -4,16 +4,22 @@ import { useNavigate } from "react-router-dom";
 import { Input, Avatar } from "@nextui-org/react";
 import { toast, Flip } from 'react-toastify';
 import Header from "../components/header";
+import Footer from "../components/footer";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { getToken } from "../utils/getToken";
 import { FaGamepad, FaTrophy, FaUserNinja } from 'react-icons/fa';
 
 const Profile = () => {
   const [user, setUser] = useState(null);
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [profilePic, setProfilePic] = useState(null);
   const [existingProfilePic, setExistingProfilePic] = useState("");
+  const [currentPassword, setCurrentPassword] = useState(""); // New state for current password
+  const [newPassword, setNewPassword] = useState("");         // New state for new password
+  const [showChangePassword, setShowChangePassword] = useState(false); // Show change password section
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,13 +37,14 @@ const Profile = () => {
         );
         const { profile } = response.data;
         setUser(profile);
+        setFirstname(profile.firstname);
+        setLastname(profile.lastname);
         setUsername(profile.username);
         setEmail(profile.email);
         setExistingProfilePic(profile.profilePic);
       } catch (error) {
         console.error("Error fetching user:", error);
       }
-
     };
 
     fetchUser();
@@ -53,6 +60,8 @@ const Profile = () => {
       }
       const userId = getUserIdFromToken(token);
       const formData = new FormData();
+      formData.append("firstname", firstname);
+      formData.append("lastname", lastname);
       formData.append("username", username);
       formData.append("email", email);
       if (profilePic) {
@@ -67,10 +76,7 @@ const Profile = () => {
           },
         }
       );
-      setUser(response.data);
-      if (!profilePic) {
-        setExistingProfilePic(response.data.profilePic);
-      }
+
       toast.success('Profile Leveled Up!', {
         position: "top-right",
         autoClose: 1000,
@@ -78,11 +84,13 @@ const Profile = () => {
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
-        progress: undefined,
         theme: "dark",
         transition: Flip,
         style: { fontFamily: 'Rubik' }
       });
+
+      window.location.reload();
+
     } catch (error) {
       console.error("Error updating profile:", error);
       toast.error("Failed to update profile");
@@ -91,6 +99,58 @@ const Profile = () => {
 
   const handleFileChange = (e) => {
     setProfilePic(e.target.files[0]);
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    // Validate new password
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+    if (!passwordRegex.test(newPassword)) {
+      toast.error("New password must be at least 8 characters long and include uppercase, lowercase, number, and symbol.");
+      return;
+    }
+
+    try {
+      const token = getToken();
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+      const userId = getUserIdFromToken(token);
+
+      const response = await axios.put(
+        `http://localhost:8098/users/profile/change-password/${userId}`,
+        { currentPassword, newPassword },
+        {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      toast.success("Password changed successfully!", {
+        position: "top-right",
+        autoClose: 1000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "dark",
+        transition: Flip,
+        style: { fontFamily: 'Rubik' }
+      });
+
+      // Clear the fields
+      setCurrentPassword("");
+      setNewPassword("");
+      setShowChangePassword(false);
+
+    } catch (error) {
+      console.error("Error changing password:", error);
+      toast.error("Failed to change password. Please check your current password.");
+    }
   };
 
   return (
@@ -125,7 +185,25 @@ const Profile = () => {
                 <form onSubmit={handleUpdate} encType="multipart/form-data">
                   <div className="space-y-4">
                     <Input
-                      label="User name"
+                      label="First Name"
+                      value={firstname}
+                      onChange={(e) => setFirstname(e.target.value)}
+                      fullWidth
+                      size="lg"
+                      bordered
+                      color="secondary"
+                    />
+                    <Input
+                      label="Last Name"
+                      value={lastname}
+                      onChange={(e) => setLastname(e.target.value)}
+                      fullWidth
+                      size="lg"
+                      bordered
+                      color="secondary"
+                    />
+                    <Input
+                      label="Username"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       fullWidth
@@ -143,6 +221,49 @@ const Profile = () => {
                       bordered
                       color="secondary"
                     />
+                    
+                    {/* Change Password Button */}
+                    <button
+                      type="button"
+                      onClick={() => setShowChangePassword(!showChangePassword)}
+                      className="w-full bg-purple-600 text-white py-3 rounded-md hover:bg-purple-700 transition duration-300"
+                    >
+                      {showChangePassword ? "Cancel Change Password" : "Change Password"}
+                    </button>
+
+                    {/* Change Password Form */}
+                    {showChangePassword && (
+                      <div className="space-y-4 mt-4">
+                        <Input
+                          label="Current Password"
+                          type="password"
+                          value={currentPassword}
+                          onChange={(e) => setCurrentPassword(e.target.value)}
+                          fullWidth
+                          size="lg"
+                          bordered
+                          color="secondary"
+                        />
+                        <Input
+                          label="New Password"
+                          type="password"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          fullWidth
+                          size="lg"
+                          bordered
+                          color="secondary"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleChangePassword}
+                          className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-4 rounded-md hover:from-blue-600 hover:to-purple-700 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+                        >
+                          Update Password
+                        </button>
+                      </div>
+                    )}
+                    
                     <div className="flex items-center justify-center w-full">
                       <label
                         htmlFor="dropzone-file"
@@ -214,6 +335,7 @@ const Profile = () => {
           animation: gridMove 5s linear infinite;
         }
       `}</style>
+      <Footer />
     </div>
   );
 };

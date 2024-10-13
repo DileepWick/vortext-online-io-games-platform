@@ -1,6 +1,5 @@
 import { Chip, Tooltip } from "@nextui-org/react";
 import { toast, Flip } from "react-toastify";
-import { EditIcon } from "../../src/assets/icons/EditIcon";
 import {
   Modal,
   ModalContent,
@@ -16,8 +15,8 @@ import axios from "axios";
 
 export const update_stock = ({ updatingStock, callBackFunction }) => {
   // State variables
-  const [newPrice, setNewPrice] = useState();
-  const [newDiscount, setNewDiscount] = useState();
+  const [newPrice, setNewPrice] = useState(updatingStock.UnitPrice); // Set default value to the current price
+  const [newDiscount, setNewDiscount] = useState(updatingStock.discount); // Set default value to the current discount
 
   // Modal
   const {
@@ -25,6 +24,21 @@ export const update_stock = ({ updatingStock, callBackFunction }) => {
     onOpen: onPricingModalOpen,
     onClose: onPricingModalClose,
   } = useDisclosure();
+
+  // Input Restrictions
+  const handlePriceInput = (e) => {
+    const inputValue = Number(e.target.value);
+    if (inputValue >= 0.1 || e.target.value === "") {
+      setNewPrice(inputValue);
+    }
+  };
+
+  const handleDiscountInput = (e) => {
+    const inputValue = Number(e.target.value);
+    if ((inputValue >= 0 && inputValue <= 100) || e.target.value === "") {
+      setNewDiscount(inputValue);
+    }
+  };
 
   // Update Stock Function
   const updateStock = async (e) => {
@@ -58,26 +72,22 @@ export const update_stock = ({ updatingStock, callBackFunction }) => {
       }
     } catch (error) {
       if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
         toast.warning(error.response.data.message, {
           theme: "dark",
           transition: Flip,
           style: { fontFamily: "Rubik" },
         });
       } else if (error.request) {
-        // The request was made but no response was received
         toast.error("No response received from server.");
       } else {
-        // Something happened in setting up the request that triggered an Error
         toast.error("Error adding new stock.");
         console.error("Error:", error.message);
       }
     }
 
     // Set values to null after
-    setNewDiscount();
-    setNewPrice();
+    setNewDiscount(updatingStock.discount);
+    setNewPrice(updatingStock.UnitPrice);
   };
 
   // Handle Pricing Button
@@ -113,30 +123,39 @@ export const update_stock = ({ updatingStock, callBackFunction }) => {
         }}
       >
         <ModalContent className="font-primaryRegular text-black">
-          <ModalHeader>Edit Pricings For <span className="text-customPink ml-2">{updatingStock.AssignedGame.title}</span></ModalHeader>
+          <ModalHeader>
+            Edit Pricings For{" "}
+            <span className="text-customPink ml-2">
+              {updatingStock.AssignedGame.title}
+            </span>
+          </ModalHeader>
           <ModalBody className="p-4">
-            
             <form onSubmit={updateStock}>
               <p>Current Price {updatingStock.UnitPrice}$</p>
               <Input
                 label="New Price"
-                type="Number"
+                type="number"
                 value={newPrice}
-                onChange={(e) => setNewPrice(e.target.value)}
-              ></Input>
-              <br></br>
+                onInput={handlePriceInput} // Restrict input for price
+                min={0.1}
+                step={0.01}
+              />
+              <br />
               <p>Current Discount {updatingStock.discount}%</p>
               <Input
                 label="New Discount"
-                type="Number"
+                type="number"
                 value={newDiscount}
-                onChange={(e) => setNewDiscount(e.target.value)}
-              ></Input>
-              <br></br>
+                onInput={handleDiscountInput} // Restrict input for discount
+                min={0}
+                max={100}
+                step={1}
+              />
+              <br />
               <Button type="submit" color="primary">
                 Save Changes
               </Button>
-              <br></br>
+              <br />
             </form>
           </ModalBody>
         </ModalContent>

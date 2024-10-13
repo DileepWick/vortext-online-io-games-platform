@@ -83,9 +83,9 @@ const TailoredGames = () => {
 
           {/* Game 4 */}
           <GameCard
-            title="Member 4 Game"
-            imageUrl="https://images5.alphacoders.com/127/1274050.jpg"
-            link="/games/tictactoe"
+            title="CodeBreaker"
+            imageUrl="https://res.cloudinary.com/dhcawltsr/image/upload/v1728753124/e495c55e-881b-49ff-a31a-07f7e62fe589_fqjcdp.jpg"
+            link="/CodeBreaker"
             devName={"Athauda A.A.D.D "}
             devId={"IT22105820"}
           />
