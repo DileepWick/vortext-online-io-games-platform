@@ -5,7 +5,7 @@ import axios from "axios";
 import Header from "../src/components/header";
 import Footer from "../src/components/footer";
 import ChatModal from "../src/components/ChatModal";
-
+import Loader from "../src/components/Loader/loader";
 // Utilities
 import useAuthCheck from "../src/utils/authCheck";
 import { Link } from "react-router-dom";
@@ -21,7 +21,6 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Spinner,
   Button,
   Input,
   useDisclosure,
@@ -36,6 +35,7 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
+  Pagination,
 } from "@nextui-org/react";
 
 // Icons
@@ -73,6 +73,15 @@ const ContactDash = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [selectedContactId, setSelectedContactId] = useState(null);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const messagesPerPage = 5; // Define how many messages per page
+
+  const [showAllMessages, setShowAllMessages] = useState(false);
+
+  const [currentFAQPage, setCurrentFAQPage] = useState(1);
+  const [showAllFAQs, setShowAllFAQs] = useState(false);
+  const faqsPerPage = 5; // Define how many FAQs per page
+
   // Filter function for FAQs
   const filteredFAQs = faqs.filter(
     (faq) =>
@@ -91,6 +100,28 @@ const ContactDash = () => {
       (statusFilter === "all" || message.status === statusFilter)
   );
 
+  const totalPages = Math.ceil(
+    filteredContactMessages.length / messagesPerPage
+  );
+  // Get the messages for the current page, or show all if showAllMessages is true
+  const currentMessages = showAllMessages
+    ? filteredContactMessages
+    : filteredContactMessages.slice(
+        (currentPage - 1) * messagesPerPage,
+        currentPage * messagesPerPage
+      );
+
+  // Get the FAQs for the current page, or show all if showAllFAQs is true
+  const currentFAQs = showAllFAQs
+    ? filteredFAQs
+    : filteredFAQs.slice(
+        (currentFAQPage - 1) * faqsPerPage,
+        currentFAQPage * faqsPerPage
+      );
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
   // Function to handle chat opening
   const handleChatOpen = (contactId) => {
     setSelectedContactId(contactId);
@@ -477,10 +508,10 @@ const ContactDash = () => {
                 <title>FAQ | Support Dashboard</title>
               </Helmet>
               <Button
-                className="bg-primary text-foreground mb-4"
+                className="bg-primary text-foreground "
                 onPress={onAddFAQOpen}
               >
-                <PlusIcon />
+                {/* <PlusIcon /> */}
                 Add FAQ
               </Button>
               <Modal
@@ -618,7 +649,7 @@ const ContactDash = () => {
                 </ModalContent>
               </Modal>
               {loading ? (
-                <Spinner />
+                <Loader />
               ) : error ? (
                 <p className="text-red-500 text-center">Error: {error}</p>
               ) : faqs.length === 0 ? (
@@ -628,41 +659,71 @@ const ContactDash = () => {
                     : "No FAQs available"}
                 </p>
               ) : (
-                <Table aria-label="FAQ Table" className="mt-4">
-                  <TableHeader className="bg-foreground">
-                    <TableColumn>QUESTION</TableColumn>
-                    <TableColumn>ANSWER</TableColumn>
-                    <TableColumn>ACTIONS</TableColumn>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredFAQs.map((faq) => (
-                      <TableRow key={faq._id}>
-                        <TableCell width={350}>{faq.question}</TableCell>
-                        <TableCell>{faq.answer}</TableCell>
-                        <TableCell width={220}>
-                          <Button
-                            color="primary"
-                            className="mr-2"
-                            onPress={() => {
-                              setEditingFAQ(faq);
-                              setEditFAQQuestion(faq.question);
-                              setEditFAQAnswer(faq.answer);
-                              onEditFAQOpen();
-                            }}
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            color="danger"
-                            onPress={() => handleDeleteFAQ(faq._id)}
-                          >
-                            Delete
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                <>
+                  {/* Button to toggle between showing paginated and all FAQs */}
+                  <Button
+                    onClick={() => setShowAllFAQs(!showAllFAQs)}
+                    className="m-1"
+                  >
+                    {showAllFAQs ? "Show Paginated FAQs" : "View All FAQs"}
+                  </Button>
+
+                  {/* Fixed size for the table with overflow handling */}
+                  <div style={{ height: "400px", overflowY: "auto" }}>
+                    <Table aria-label="FAQ Table" className="mt-4">
+                      <TableHeader className="bg-foreground">
+                        <TableColumn>QUESTION</TableColumn>
+                        <TableColumn>ANSWER</TableColumn>
+                        <TableColumn>ACTIONS</TableColumn>
+                      </TableHeader>
+                      <TableBody>
+                        {currentFAQs.map((faq) => (
+                          <TableRow key={faq._id}>
+                            <TableCell width={350}>{faq.question}</TableCell>
+                            <TableCell>{faq.answer}</TableCell>
+                            <TableCell width={220}>
+                              <Button
+                                color="primary"
+                                className="mr-2"
+                                onPress={() => {
+                                  setEditingFAQ(faq);
+                                  setEditFAQQuestion(faq.question);
+                                  setEditFAQAnswer(faq.answer);
+                                  onEditFAQOpen();
+                                }}
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                color="danger"
+                                onPress={() => handleDeleteFAQ(faq._id)}
+                              >
+                                Delete
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+
+                  {/* Conditionally show pagination when not viewing all FAQs */}
+                  {!showAllFAQs && (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        marginTop: "20px",
+                      }}
+                    >
+                      <Pagination
+                        total={Math.ceil(filteredFAQs.length / faqsPerPage)}
+                        initialPage={currentFAQPage}
+                        onChange={(page) => setCurrentFAQPage(page)}
+                      />
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )}
@@ -688,7 +749,7 @@ const ContactDash = () => {
                 </DropdownMenu>
               </Dropdown>
               {loading ? (
-                <Spinner />
+                <Loader />
               ) : error ? (
                 <p className="text-red-500 text-center">Error: {error}</p>
               ) : contactMessages.length === 0 ? (
@@ -698,68 +759,104 @@ const ContactDash = () => {
                     : "No messages available"}
                 </p>
               ) : (
-                <Table aria-label="Contact Messages Table" className="mt-4">
-                  <TableHeader className="bg-foreground">
-                    <TableColumn>USERNAME</TableColumn>
-                    <TableColumn>EMAIL</TableColumn>
-                    <TableColumn>MESSAGE</TableColumn>
-                    <TableColumn>Status</TableColumn>
-                    <TableColumn>ACTIONS</TableColumn>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredContactMessages.map((contact) => (
-                      <TableRow key={contact._id}>
-                        <TableCell>{contact.username}</TableCell>
-                        <TableCell>{contact.email}</TableCell>
-                        <TableCell>
-                          {contact.messages[0]?.content.length > 50
-                            ? `${contact.messages[0].content.substring(
-                                0,
-                                50
-                              )}...`
-                            : contact.messages[0]?.content ||
-                              "No message content"}
-                        </TableCell>
-                        <TableCell>
-                          <Chip
-                            color={statusColorMap[contact.status]}
-                            className="capitalize"
-                            variant="flat"
-                          >
-                            {contact.status}
-                          </Chip>
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            color="danger"
-                            className="mr-2"
-                            onPress={() => handleDeleteMessage(contact._id)}
-                          >
-                            Delete
-                          </Button>
-                          <Button
-                            color="success"
-                            className="mr-2"
-                            onPress={() => {
-                              handleChatOpen(contact._id);
-                            }}
-                          >
-                            {contact.status === "closed" ? "View" : "Reply"}
-                          </Button>
-                          <Button
-                            color="primary"
-                            className="mr-2"
-                            onClick={() => handleUpdateStatus(contact._id)}
-                            isDisabled={contact.status === "closed"}
-                          >
-                            {contact.status === "closed" ? "Closed" : "Close"}
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                <>
+                  <Button
+                    onClick={() => setShowAllMessages(!showAllMessages)}
+                    style={{ marginBottom: "20px" }}
+                    className="m-1"
+                  >
+                    {showAllMessages
+                      ? "Show Paginated Messages"
+                      : "View All Messages"}
+                  </Button>
+
+                  {/* Fixed size for the table with overflow handling */}
+                  <div style={{ height: "400px", overflowY: "auto" }}>
+                    <Table aria-label="Contact Messages Table" className="mt-4">
+                      <TableHeader className="bg-foreground">
+                        <TableColumn>USERNAME</TableColumn>
+                        <TableColumn>EMAIL</TableColumn>
+                        <TableColumn>MESSAGE</TableColumn>
+                        <TableColumn>Status</TableColumn>
+                        <TableColumn>ACTIONS</TableColumn>
+                      </TableHeader>
+                      <TableBody>
+                        {currentMessages.map((contact) => (
+                          <TableRow key={contact._id}>
+                            <TableCell>{contact.username}</TableCell>
+                            <TableCell>{contact.email}</TableCell>
+                            <TableCell>
+                              {contact.messages[0]?.content.length > 50
+                                ? `${contact.messages[0].content.substring(
+                                    0,
+                                    50
+                                  )}...`
+                                : contact.messages[0]?.content ||
+                                  "No message content"}
+                            </TableCell>
+                            <TableCell>
+                              <Chip
+                                color={statusColorMap[contact.status]}
+                                className="capitalize"
+                                variant="flat"
+                              >
+                                {contact.status}
+                              </Chip>
+                            </TableCell>
+                            <TableCell>
+                              <Button
+                                color="danger"
+                                className="mr-2"
+                                onPress={() => handleDeleteMessage(contact._id)}
+                              >
+                                Delete
+                              </Button>
+                              <Button
+                                color="success"
+                                className="mr-2"
+                                onPress={() => {
+                                  handleChatOpen(contact._id);
+                                }}
+                              >
+                                {contact.status === "closed" ? "View" : "Reply"}
+                              </Button>
+                              <Button
+                                color="primary"
+                                className="mr-2"
+                                onClick={() => handleUpdateStatus(contact._id)}
+                                isDisabled={contact.status === "closed"}
+                              >
+                                {contact.status === "closed"
+                                  ? "Closed"
+                                  : "Close"}
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+
+                  {/* Centered Pagination */}
+                  {/* Conditionally show pagination when not viewing all messages */}
+                  {!showAllMessages && (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        marginTop: "20px",
+                      }}
+                    >
+                      <Pagination
+                        total={totalPages}
+                        initialPage={currentPage}
+                        onChange={handlePageChange}
+                      />
+                    </div>
+                  )}
+                </>
               )}
+
               <ChatModal
                 isOpen={isChatOpen}
                 onOpenChange={() => setIsChatOpen(false)}
