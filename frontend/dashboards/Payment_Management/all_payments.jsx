@@ -35,6 +35,22 @@ const AllPayments = () => {
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
+  // Fetch distributed payments from the server
+  const fetchDistributedPayments = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/distributed-payments/all`);
+      const distributedPayments = response.data.reduce((acc, payment) => {
+        acc[payment.paymentId] = payment.amount;
+        return acc;
+      }, {});
+      setDistributedPayments(distributedPayments);
+    } catch (error) {
+      console.error("Error fetching distributed payments:", error);
+      toast.error("Failed to fetch distributed payments");
+    }
+  };
+
+  // Fetch table data
   const fetchTableData = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/orderItems`);
@@ -49,12 +65,7 @@ const AllPayments = () => {
 
   useEffect(() => {
     fetchTableData();
-
-    // Load distributed payments from local storage
-    const storedPayments = localStorage.getItem("distributedPayments");
-    if (storedPayments) {
-      setDistributedPayments(JSON.parse(storedPayments));
-    }
+    fetchDistributedPayments();
   }, []);
 
   const filteredItems = useMemo(() => {
@@ -88,21 +99,27 @@ const AllPayments = () => {
 
   const updateDeveloperIncome = async (developerId, amount) => {
     try {
-      const getDeveloperResponse = await axios.get(
-        `${API_BASE_URL}/users/profile/${developerId}`
-      );
-      const developer = getDeveloperResponse.data;
-  
       const updateResponse = await axios.put(
         `${API_BASE_URL}/users/update-income/${developerId}`,
-        {
-          saleAmount: amount,
-        }
+        { saleAmount: amount }
       );
-  
       return updateResponse.data;
     } catch (error) {
       console.error("Error updating developer income:", error);
+      throw error;
+    }
+  };
+
+  const saveDistributedPayment = async (paymentId, developerId, amount) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/distributed-payments/save`, {
+        paymentId,
+        developerId,
+        amount,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error saving distributed payment:", error);
       throw error;
     }
   };
@@ -120,13 +137,14 @@ const AllPayments = () => {
 
         await updateDeveloperIncome(developerId, saleAmount);
 
+        // Save distributed payment to the database
+        await saveDistributedPayment(selectedItem._id, developerId, saleAmount);
+
         // Update distributed payments state
-        setDistributedPayments((prev) => {
-          const updatedPayments = { ...prev, [selectedItem._id]: saleAmount };
-          // Save updated payments to local storage
-          localStorage.setItem("distributedPayments", JSON.stringify(updatedPayments));
-          return updatedPayments;
-        });
+        setDistributedPayments((prev) => ({
+          ...prev,
+          [selectedItem._id]: saleAmount,
+        }));
 
         toast.success("Payment distributed successfully");
         onOpenChange(false);
@@ -223,7 +241,7 @@ const AllPayments = () => {
               <TableCell>{item.paymentCompletion || "NA"}</TableCell>
               <TableCell>
                 {distributedPayments[item._id] ? (
-                  <Tooltip content="Payment already distributed">
+                  <Tooltip content="Payment already distributed"className="text-yellow-500">
                     <span className="text-green-500">Done</span>
                   </Tooltip>
                 ) : (
@@ -265,15 +283,15 @@ const AllPayments = () => {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button color="secondary" onPress={onClose}>
+                <Button color="primary" variant="flat" onPress={onClose}>
                   Cancel
                 </Button>
                 <Button
-                  color="primary"
-                  onPress={handleReducePrice}
+                  color="danger"
                   isLoading={isLoading}
+                  onPress={handleReducePrice}
                 >
-                  Confirm
+                  Distribute Payment
                 </Button>
               </ModalFooter>
             </>

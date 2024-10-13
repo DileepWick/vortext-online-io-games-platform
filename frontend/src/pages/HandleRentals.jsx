@@ -21,8 +21,12 @@ import {
   ModalFooter,
   useDisclosure,
   ScrollShadow,
-  Input, // Add this line
+  Input,
+  RadioGroup,
+  Radio,
+  Checkbox,
 } from "@nextui-org/react";
+import { CreditCardIcon } from "lucide-react";
 
 const HandleRentals = () => {
   useAuthCheck();
@@ -35,6 +39,12 @@ const HandleRentals = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [rentalOptions, setRentalOptions] = useState([]);
 
+  const [paymentMethod, setPaymentMethod] = useState('creditCard');
+  const [cardNumber, setCardNumber] = useState('');
+  const [expirationDate, setExpirationDate] = useState('');
+  const [cvv, setCvv] = useState('');
+  const [agreeToShare, setAgreeToShare] = useState(false);
+
   const termsAndConditions = [
     "Rental period starts immediately after payment.",
     "No refunds for unused time.",
@@ -45,57 +55,47 @@ const HandleRentals = () => {
     "Rented games cannot be transferred to other accounts.",
   ];
 
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [cardDetails, setCardDetails] = useState({
-    cardNumber: "",
-    cvv: "",
-    expiryDate: "",
-  });
-
-  const [cardErrors, setCardErrors] = useState({});
-
   const handleCardNumberChange = (e) => {
     const value = e.target.value.replace(/\D/g, '');
     const formattedValue = value.replace(/(\d{4})(?=\d)/g, '$1-');
-    setCardDetails(prev => ({ ...prev, cardNumber: formattedValue.slice(0, 19) }));
+    setCardNumber(formattedValue.slice(0, 19));
   };
 
-  const handleExpiryDateChange = (e) => {
+  const handleExpirationDateChange = (e) => {
     const value = e.target.value.replace(/\D/g, '');
     if (value.length <= 2) {
-      setCardDetails(prev => ({ ...prev, expiryDate: value }));
+      setExpirationDate(value);
     } else {
       const month = value.slice(0, 2);
       const year = value.slice(2, 4);
       if (parseInt(month) > 12) {
-        setCardDetails(prev => ({ ...prev, expiryDate: `12/${year}` }));
+        setExpirationDate('12/${year}' + year);
       } else {
-        setCardDetails(prev => ({ ...prev, expiryDate: `${month}/${year}` }));
+        setExpirationDate(`${month}/${year}`);
       }
     }
   };
 
   const handleCvvChange = (e) => {
     const value = e.target.value.replace(/\D/g, '');
-    setCardDetails(prev => ({ ...prev, cvv: value.slice(0, 3) }));
+    setCvv(value.slice(0, 3));
   };
 
   const validateCardDetails = () => {
-    const errors = {};
-    if (cardDetails.cardNumber.replace(/-/g, '').length !== 16) {
+    if (cardNumber.replace(/-/g, '').length !== 16) {
       toast.error("Invalid card number");
       return false;
     }
-    if (cardDetails.expiryDate.length !== 5) {
+    if (expirationDate.length !== 5) {
       toast.error("Invalid expiration date");
       return false;
     }
-    const [month, year] = cardDetails.expiryDate.split('/');
+    const [month, year] = expirationDate.split('/');
     if (parseInt(month) < 1 || parseInt(month) > 12) {
       toast.error("Invalid month in expiration date");
       return false;
     }
-    // Check if the card is not expired
+     // Check if the card is not expired
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear() % 100;
     const currentMonth = currentDate.getMonth() + 1;
@@ -103,21 +103,12 @@ const HandleRentals = () => {
       toast.error("Card has expired");
       return false;
     }
-    if (cardDetails.cvv.length !== 3) {
+    if (cvv.length !== 3) {
       toast.error("Invalid CVV");
       return false;
     }
     return true;
   };
-
-
-
-  const handleCardInputChange = (e) => {
-    const { name, value } = e.target;
-    setCardDetails(prev => ({ ...prev, [name]: value }));
-  };
-
-  
 
   const fetchRentalTimes = async (gameId) => {
     try {
@@ -126,7 +117,7 @@ const HandleRentals = () => {
       );
       setRentalOptions(
         response.data.map((option) => ({
-          time: option.duration.toString(), // This is now in seconds
+          time: option.duration.toString(),
           price: option.price,
         }))
       );
@@ -140,7 +131,6 @@ const HandleRentals = () => {
   useEffect(() => {
     const fetchGameDetails = async () => {
       try {
-        // Updated API endpoint
         const response = await axios.get(
           `http://localhost:8098/games/fetchGame/${id}`
         );
@@ -172,7 +162,6 @@ const HandleRentals = () => {
           throw new Error("User ID not found. Please log in again.");
         }
 
-        // Check for existing rental
         const checkResponse = await axios.get(
           `http://localhost:8098/Rentals/checkExistingRental/${userId}/${id}`,
           {
@@ -196,7 +185,6 @@ const HandleRentals = () => {
             style: { fontFamily: "Rubik" },
           });
         } else {
-          // If no existing rental, proceed to open the confirmation modal
           onOpen();
         }
       } catch (error) {
@@ -219,11 +207,7 @@ const HandleRentals = () => {
     }
   }, [selectedRental, onOpen, id, game]);
 
-
-
-
-
-  const handlePayment = async () => {
+  const handlePlaceOrder = async () => {
     if (!validateCardDetails()) {
       return;
     }
@@ -243,9 +227,6 @@ const HandleRentals = () => {
         price: parseFloat(selectedRental.price)
       };
 
-      console.log("Sending rental data:", rentalData);
-
-      // Create the rental
       const rentalResponse = await axios.post(
         "http://localhost:8098/Rentals/createRental",
         rentalData,
@@ -256,13 +237,10 @@ const HandleRentals = () => {
         }
       );
 
-      console.log("Rental response:", rentalResponse);
-
       if (rentalResponse.status !== 201) {
         throw new Error("Failed to create rental");
       }
 
-      // Fetch the latest rental to get the rental ID
       const latestRentalResponse = await axios.get(
         `http://localhost:8098/Rentals/getLatestRental/${userId}/${id}`,
         {
@@ -272,23 +250,18 @@ const HandleRentals = () => {
         }
       );
 
-      console.log("Latest rental response:", latestRentalResponse);
-
       if (latestRentalResponse.status !== 200 || !latestRentalResponse.data._id) {
         throw new Error("Failed to fetch the latest rental ID");
       }
 
       const rentalId = latestRentalResponse.data._id;
 
-      // Create the payment
       const paymentData = {
         user: userId,
         game: id,
         rental: rentalId,
         amount: parseFloat(selectedRental.price)
       };
-
-      console.log("Sending payment data:", paymentData);
 
       const paymentResponse = await axios.post(
         "http://localhost:8098/rentalPayments/create",
@@ -300,11 +273,8 @@ const HandleRentals = () => {
         }
       );
 
-      console.log("Payment response:", paymentResponse);
-
       if (paymentResponse.status === 201) {
         toast.success("Payment successful! Game added to your rentals.");
-        setIsPaymentModalOpen(false);
         onClose();
         navigate("/GamingSessions");
       } else {
@@ -312,37 +282,10 @@ const HandleRentals = () => {
       }
     } catch (error) {
       console.error("Error processing payment:", error);
-      console.error("Error details:", error.response?.data);
-      
-      // More specific error messages
-      if (error.response) {
-        if (error.response.status === 400) {
-          toast.error("Invalid data submitted. Please check your inputs and try again.");
-        } else if (error.response.status === 401) {
-          toast.error("Authentication failed. Please log in again.");
-        } else if (error.response.status === 404) {
-          toast.error("Rental not found. Please try again.");
-        } else if (error.response.status === 500) {
-          toast.error("Server error. Please try again later or contact support.");
-        } else {
-          toast.error(`Operation failed: ${error.response.data.message || 'Unknown error'}`);
-        }
-      } else if (error.request) {
-        toast.error("No response from server. Please check your internet connection.");
-      } else {
-        toast.error(error.message || "Operation failed. Please try again.");
-      }
-      
-      setIsPaymentModalOpen(false);
+      toast.error(error.response?.data?.message || "Payment failed. Please try again.");
       onClose();
     }
   };
-
-
-
-
-
-
 
   if (loading) return <div className="text-center py-8">Loading...</div>;
   if (error)
@@ -452,13 +395,13 @@ const HandleRentals = () => {
                               : ""
                           }`}
                         >
-                         {parseInt(option.time) >= 3600
-                        ? `${Math.floor(parseInt(option.time) / 3600)} hour${
-                            Math.floor(parseInt(option.time) / 3600) > 1 ? "s" : ""
-                          }`
-                        : parseInt(option.time) >= 60
-                        ? `${Math.floor(parseInt(option.time) / 60)} min`
-                        : `${option.time} sec`}
+                          {parseInt(option.time) >= 3600
+                            ? `${Math.floor(parseInt(option.time) / 3600)} hour${
+                                Math.floor(parseInt(option.time) / 3600) > 1 ? "s" : ""
+                              }`
+                            : parseInt(option.time) >= 60
+                            ? `${Math.floor(parseInt(option.time) / 60)} min`
+                            : `${option.time} sec`}
                         </p>
                         <p
                           className={`text-sm ${
@@ -491,103 +434,106 @@ const HandleRentals = () => {
                   Please check back later or contact support for more
                   information.
                 </p>
-              </div>
+                </div>
             )}
           </div>
         </div>
       </div>
       
-      {/* Rental Confirmation Modal */}
+      {/* New Checkout Modal */}
       <Modal
         isOpen={isOpen}
-        onClose={onClose}
-        classNames={{
-          body: "text-white",
-          header: "text-white",
-          footer: "text-white",
-          base: "bg-gray-800",
-        }}
+        onOpenChange={onClose}
+        placement="center"
+        size="2xl"
+        scrollBehavior="inside"
       >
         <ModalContent>
-          <ModalHeader className="text-white">Confirm Rental</ModalHeader>
-          <ModalBody>
-            <p>
-              You are about to buy {
-                 parseInt(selectedRental?.time) >= 3600
-                 ? `${Math.floor(parseInt(selectedRental?.time) / 3600)} hour${Math.floor(parseInt(selectedRental?.time) / 3600) > 1 ? 's' : ''}`
-                 : parseInt(selectedRental?.time) >= 60
-                 ? `${Math.floor(parseInt(selectedRental?.time) / 60)} minute${Math.floor(parseInt(selectedRental?.time) / 60) > 1 ? 's' : ''}`
-                 : `${selectedRental?.time} seconds`
-              }of playtime for {game?.title || "League of Legends"}.
-            </p>
-            <p>Price: LKR {selectedRental?.price}</p>
-            <p>Please confirm to proceed with the payment.</p>
-          </ModalBody>
-          <ModalFooter>
-            <Button color="danger" variant="light" onPress={onClose}>
-              Cancel
-            </Button>
-            <Button color="primary" onPress={() => {
-              onClose();
-              setIsPaymentModalOpen(true);
-            }}>
-              Proceed to Payment
-            </Button>
-          </ModalFooter>
+          {(onClose) => (
+            <>
+              <ModalHeader className="font-primaryBold text-black">Checkout</ModalHeader>
+              <ModalBody>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-customCardDark p-4 rounded-lg">
+                    <h2 className="text-lg font-semibold mb-2 text-black">PAYMENT METHOD</h2>
+                    <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+                      <div className="border border-gray-900 p-5 rounded mb-4 w-[550px]">
+                        <Radio value="creditCard">
+                          <div className="flex items-center">
+                            <CreditCardIcon />
+                            <span className="text-black ml-2 mr-4">Credit Card</span>
+                          </div>
+                        </Radio>
+                        {paymentMethod === 'creditCard' && (
+                          <div className="mt-4">
+                            <Input
+                              label="Card Number"
+                              placeholder="1111-1111-1111-1111"
+                              value={cardNumber}
+                              onChange={handleCardNumberChange}
+                              className="mb-5"
+                            />
+                            <div className="flex gap-4">
+                              <Input
+                                label="Expiration (MM/YY)"
+                                placeholder="MM/YY"
+                                value={expirationDate}
+                                onChange={handleExpirationDateChange}
+                                className="mb-5"
+                              />
+                              <Input
+                                label="CVV"
+                                placeholder="123"
+                                value={cvv}
+                                onChange={handleCvvChange}
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </RadioGroup>
+                  </div>
+                </div>
+                <div className="mt-0 bg-customCardDark p-0 rounded-lg">
+                  <h2 className="text-lg font-semibold mb-4 text-black">ORDER SUMMARY</h2>
+                  <div className="flex mb-4">
+                    <img src={game?.coverPhoto} alt={game?.title} className="w-16 h-20 object-cover mr-4" />
+                    <div>
+                      <h3 className="font-semibold text-black">{game?.title}</h3>
+                      <p className="text-black">Rs.{selectedRental?.price.toFixed(2)}</p>
+                    </div>
+                  </div>
+                  <div className="border-t border-gray-700 pt-4 mt-4">
+                    <div className="flex justify-between text-black">
+                      <span>Total</span>
+                      <span>Rs.{selectedRental?.price.toFixed(2)}</span>
+                    </div>
+                    <div className="bg-yellow-900 text-yellow-200 p-2 rounded mt-2 text-sm">
+                      Get some rewards with this purchase.
+                    </div>
+                  </div>
+                  <Checkbox
+                    isSelected={agreeToShare}
+                    onValueChange={setAgreeToShare}
+                    className="mt-4"
+                  >
+                    Agree to share your email for marketing purposes
+                  </Checkbox>
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Cancel
+                </Button>
+                <Button color="primary" onPress={handlePlaceOrder}>
+                  CONFIRM
+                </Button>
+              </ModalFooter>
+            </>
+          )}
         </ModalContent>
       </Modal>
-  
-      {/* Payment Modal */}
-      <Modal
-      isOpen={isPaymentModalOpen}
-      onClose={() => setIsPaymentModalOpen(false)}
-      classNames={{
-        body: "text-white",
-        header: "text-white",
-        footer: "text-white",
-        base: "bg-gray-800",
-      }}
-    >
-      <ModalContent>
-        <ModalHeader className="text-white">Enter Payment Details</ModalHeader>
-        <ModalBody>
-          <Input
-            name="cardNumber"
-            label="Card Number"
-            placeholder="1234-5678-9012-3456"
-            value={cardDetails.cardNumber}
-            onChange={handleCardNumberChange}
-            maxLength={19}
-          />
-          <Input
-            name="expiryDate"
-            label="Expiry Date"
-            placeholder="MM/YY"
-            value={cardDetails.expiryDate}
-            onChange={handleExpiryDateChange}
-            maxLength={5}
-          />
-          <Input
-            name="cvv"
-            label="CVV"
-            placeholder="123"
-            value={cardDetails.cvv}
-            onChange={handleCvvChange}
-            maxLength={3}
-          />
-        </ModalBody>
-        <ModalFooter>
-          <Button color="danger" variant="light" onPress={() => setIsPaymentModalOpen(false)}>
-            Cancel
-          </Button>
-          <Button color="primary" onPress={handlePayment}>
-            Confirm and Pay
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
 
-  
       <Footer />
     </div>
   );

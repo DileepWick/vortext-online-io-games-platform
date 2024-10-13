@@ -281,7 +281,36 @@ const Home = () => {
             </div>
           </div>
         </motion.section>
+        </section>
+        {/* AI Assistant Feature */}
+        <section className="py-16 relative overflow-hidden">
+          <BackgroundBeams />
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="flex flex-col md:flex-row items-center justify-between">
+              <div className="md:w-1/2 mb-8 md:mb-0">
+                <h2 className="text-[50px] font-primaryRegular text-white mb-4">
+                  Meet Gwen <br></br>Your AI Gaming Assistant
+                </h2>
+                <p className="text-[30px] text-gray-300 mb-6">
+                  Get personalized game recommendations, strategy tips, and
+                  instant answers to your gaming questions.
+                </p>
+              </div>
+              <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-1 rounded-[200px]">
+                <div className="bg-white rounded-[200px] p-6 shadow-xl">
 
+                  <div className="flex justify-center">
+                    <img
+                      src="https://res.cloudinary.com/dhcawltsr/image/upload/v1727709362/smart-girl-animation-download--unscreen_icm1qe.gif"
+                      alt="AI Assistant Gwen"
+                      className="rounded-lg w-[300px]"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
         <AIAssistantSection />
         <IndieDeveloperSection />
 

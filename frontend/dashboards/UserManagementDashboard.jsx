@@ -57,7 +57,7 @@ useAuthCheck();
   }, []);
 
   return (
-    <div className="flex w-full flex-col">
+    <div className="flex w-full flex-col" style={{ backgroundColor: '#d4ebf2' }}>
       <Header />
       
       <div className="flex items-center p-4 font-primaryRegular">
