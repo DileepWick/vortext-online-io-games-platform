@@ -1,443 +1,411 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { motion } from "framer-motion";
+import { Helmet } from "react-helmet-async";
+import { Link } from "react-router-dom";
+import axios from "axios";
 import Header from "../components/header";
 import Footer from "../components/footer";
-import { toast, Flip } from "react-toastify";
-import axios from "axios";
-import { Link } from "react-router-dom";
-import "../style/Slider.css";
-import Hangman from "../components/Games/Hangaman";
-import Chatbot from "../components/chatbox";
-import { Helmet } from "react-helmet-async";
-import { motion } from "framer-motion";
-import { LampContainer } from "../components/ui/lamp";
-import { SparklesCore } from "../components/ui/sparkles";
-import GameSiteFeatures from "../components/ui/GameSiteFeatures";
-import InfiniteMovingCards from "../components/ui/InfiniteMovingCards";
+import { LampContainer } from "../components/ui/Lamp";
+import { FlipWords } from "../components/ui/FlipWords";
+import { TypewriterEffectSmooth } from "../components/ui/Typewriter";
+import { TracingBeam } from "../components/ui/TracingBeam";
+import { BackgroundGradient } from "../components/ui/BackgroundGradient";
+import { BackgroundBeams } from "../components/ui/BackgroundBeams";
+import { Button } from "@nextui-org/react";
 
 const Home = () => {
-  const [gameStocks, setGameStocks] = useState([]);
-  const [filteredStocks, setFilteredStocks] = useState([]);
-  const [ratingsData, setRatingsData] = useState([]);
+  const [featuredGames, setFeaturedGames] = useState([]);
+  const [latestRatings, setLatestRatings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [ratings, setRatings] = useState([]);
-
-  const notify = () => {
-    toast.success("🦄 Wow so easy!", {
-      position: "top-right",
-      autoClose: 2000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
-      transition: Flip,
-      progressBarClassName: "bg-gray-800",
-      style: { fontFamily: "Rubik" },
-    });
-  };
-
-  const propFunction = () => {
-    alert("Hello");
-  };
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const sliderRef = useRef(null);
 
   useEffect(() => {
-    const fetchLatestRatings = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8098/ratings/getnewratings"
-        );
-        if (response.data && Array.isArray(response.data)) {
-          setRatings(response.data);
-        } else {
-          setError("Received unexpected data format from the server.");
-        }
-      } catch (err) {
-        console.error("Error fetching latest ratings:", err);
-        setError(
-          err.response?.data?.message ||
-            err.message ||
-            "Failed to fetch latest ratings."
-        );
+        const [gamesResponse, ratingsResponse] = await Promise.all([
+          axios.get("http://localhost:8098/gameStocks/allGameStock"),
+          axios.get("http://localhost:8098/ratings/getnewratings"),
+        ]);
+        setFeaturedGames(gamesResponse.data.allGameStocks.slice(0, 5));
+        setLatestRatings(ratingsResponse.data.slice(0, 3));
+      } catch (error) {
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchLatestRatings();
+    fetchData();
   }, []);
 
   useEffect(() => {
-    const fetchGameStocks = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:8098/gameStocks/allGameStock"
-        );
-        setGameStocks(response.data.allGameStocks);
-        setFilteredStocks(response.data.allGameStocks);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        // Delay the end of loading to ensure the Loader is visible for at least 2 seconds
-        const minLoadingTime = 1000; // 2 seconds
-        const actualLoadingTime = Date.now() - startLoadingTime;
-        const delay = Math.max(minLoadingTime - actualLoadingTime, 0);
+    const intervalId = setInterval(() => {
+      nextSlide();
+    }, 5000);
 
-        setTimeout(() => {
-          setLoading(false);
-        }, delay);
-      }
-    };
+    return () => clearInterval(intervalId);
+  }, [currentSlide, featuredGames.length]);
 
-    const startLoadingTime = Date.now();
-    fetchGameStocks();
-  }, []);
-
-  const fetchRatings = async (id) => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8098/ratings/game/${id}`
-      );
-      const ratings = response.data;
-
-      // Calculate average rating
-      const avg =
-        ratings.length > 0
-          ? ratings.reduce((sum, rating) => sum + rating.rating, 0) /
-            ratings.length
-          : undefined;
-
-      // Check if avg is defined
-      if (avg !== undefined) {
-        // Create a new entry with gameId and averageRating
-        const newRatingData = { gameId: id, averageRating: avg };
-
-        // Update the state with the new entry
-        setRatingsData((prevData) => {
-          const updatedData = [...prevData, newRatingData];
-
-          // Filter out entries where averageRating is undefined
-          const filteredData = updatedData.filter(
-            (data) => data.averageRating !== undefined
-          );
-
-          // Sort by averageRating in descending order
-          const sortedData = filteredData.sort(
-            (a, b) => b.averageRating - a.averageRating
-          );
-
-          return sortedData;
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching ratings:", error);
-    }
+  const nextSlide = () => {
+    setCurrentSlide((prevSlide) => (prevSlide + 1) % featuredGames.length);
   };
 
-  useEffect(() => {
-    gameStocks.forEach((game) => {
-      console.log(game._id);
-      fetchRatings(game._id);
-    });
-  }, [gameStocks, setGameStocks]);
-
-  useEffect(() => {
-    const top5Ratings = ratingsData.slice(0, 3); // Get top 5 based on averageRating
-    const orderedFilteredStocks = top5Ratings
-      .map((rating) => gameStocks.find((stock) => stock._id === rating.gameId))
-      .filter((stock) => stock !== undefined);
-
-    setFilteredStocks(orderedFilteredStocks);
-    console.log("Filtered Stocks: ");
-    filteredStocks.map((stock) => {
-      console.log(stock);
-    });
-  }, [ratingsData, gameStocks]);
-
-  const [activeIndex, setActiveIndex] = useState(0);
-  const carouselRef = useRef(null);
-  const listRef = useRef(null);
-  const thumbnailRef = useRef(null);
-  const timeRef = useRef(null);
-  const nextRef = useRef(null);
-  const prevRef = useRef(null);
-
-  const timeRunning = 3000; // Time for animation
-  const timeAutoNext = 4000; // Time between slides
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      handleNext();
-    }, timeAutoNext);
-
-    return () => clearInterval(interval); // Cleanup on unmount
-  }, [activeIndex]);
-
-  const handleNext = () => {
-    showSlider("next");
+  const prevSlide = () => {
+    setCurrentSlide(
+      (prevSlide) =>
+        (prevSlide - 1 + featuredGames.length) % featuredGames.length
+    );
   };
 
-  const handlePrev = () => {
-    showSlider("prev");
-  };
-
-  const showSlider = (type) => {
-    const sliderItems = listRef.current.children;
-    const thumbnailItems = thumbnailRef.current.children;
-
-    if (type === "next") {
-      listRef.current.appendChild(sliderItems[0]);
-      thumbnailRef.current.appendChild(thumbnailItems[0]);
-      carouselRef.current.classList.add("next");
-    } else {
-      listRef.current.prepend(sliderItems[sliderItems.length - 1]);
-      thumbnailRef.current.prepend(thumbnailItems[thumbnailItems.length - 1]);
-      carouselRef.current.classList.add("prev");
-    }
-
-    setTimeout(() => {
-      carouselRef.current.classList.remove("next");
-      carouselRef.current.classList.remove("prev");
-    }, timeRunning);
-  };
-  const formattedRatings = ratings.map((rating) => {
-    return {
-      quote: rating.comment || "No comment provided",
-      name: rating.user?.username || "Anonymous",
-      title: `${rating.game?.AssignedGame?.title || "Unknown Game"} - Rating: ${
-        rating.rating
-      }/5`, // Access game title via 'AssignedGame'
-      date: rating.createdAt
-        ? new Date(rating.createdAt).toLocaleDateString()
-        : "Date unknown",
-    };
-  });
   return (
-    <div className="font-primaryRegular bg-black flex flex-col min-h-screen">
-      <Helmet>
-        <title>Welcome to Vortex</title>
-      </Helmet>
-      <Header />
+    <div className="font-primaryRegular bg-customDark flex flex-col min-h-screen">
+      {" "}
+      <TracingBeam>
+        <Helmet>
+          <title>Welcome to Vortex Gaming</title>
+        </Helmet>
+        <Header />
 
-      {/* Hero Section */}
-      <div className="h-[40rem] w-full bg-black flex flex-col items-center justify-center overflow-hidden rounded-md">
-        <h1 className="md:text-7xl text-3xl lg:text-9xl text-center text-white relative z-20">
-          Vortex
-        </h1>
-        <div className="w-[40rem] h-40 relative">
-          {/* Gradients */}
-          <div className="absolute inset-x-20 top-0 bg-gradient-to-r from-transparent via-indigo-500 to-transparent h-[2px] w-3/4 blur-sm" />
-          <div className="absolute inset-x-20 top-0 bg-gradient-to-r from-transparent via-indigo-500 to-transparent h-px w-3/4" />
-          <div className="absolute inset-x-60 top-0 bg-gradient-to-r from-transparent via-sky-500 to-transparent h-[5px] w-1/4 blur-sm" />
-          <div className="absolute inset-x-60 top-0 bg-gradient-to-r from-transparent via-sky-500 to-transparent h-px w-1/4" />
+        {/* Hero Section */}
 
-          {/* Sparkles Core Component */}
-          <SparklesCore
-            background="transparent"
-            minSize={0.4}
-            maxSize={1}
-            particleDensity={1200}
-            className="w-full h-full"
-            particleColor="#FFFFFF"
-          />
+        <LampContainer>
+          <motion.h1
+            initial={{ opacity: 0.5, y: 100 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.8, ease: "easeInOut" }}
+            className="mt-8 bg-gradient-to-br from-slate-300 to-slate-500 py-4 bg-clip-text text-center text-4xl font-medium tracking-tight text-transparent md:text-7xl"
+          >
+            <FlipWords words={["Discover", "Play", "Connect", "Shop"]} />
+          </motion.h1>
+          <p className="text-white text-xl mt-4 text-center">
+            Your one-stop destination for all things gaming
+          </p>
+          <Button color="primary" variant="shadow" size="lg" className="mt-8">
+            Explore Our Shop
+          </Button>
+        </LampContainer>
 
-          {/* Radial Gradient */}
-          <div className="absolute inset-0 w-full h-full bg-black [mask-image:radial-gradient(350px_200px_at_top,transparent_20%,white)]"></div>
-        </div>
-      </div>
-
-      <div className="m-auto  mt-[80px] mb-[40px]">
-        <div className="carousel" ref={carouselRef}>
-          <div className="list" ref={listRef}>
-            {filteredStocks[0] && (
-              <div className="item">
-                <img src={filteredStocks[0].AssignedGame.coverPhoto} />
-                <div
-                  className="darklayer absolute -z-0 top-0 w-[100%] h-[100%] "
-                  ref={timeRef}
-                ></div>
-                <div className="content">
-                  <div className="title">
-                    {filteredStocks[0].AssignedGame.title}
+        {/* Game Shop Highlight */}
+        <section className="py-16 relative overflow-hidden">
+          <BackgroundBeams />
+          <div className="container mx-auto px-4 relative z-10">
+            <h2 className="text-4xl font-bold text-white mb-8 text-center">
+              Vortex Game Shop
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {[
+                "Latest Releases",
+                "Top Sellers",
+                "Indie Gems",
+                "Special Offers",
+              ].map((category, index) => (
+                <BackgroundGradient key={index} className="rounded-xl p-1">
+                  <div className="bg-gray-800 rounded-lg p-6 h-full flex flex-col justify-between">
+                    <h3 className="text-2xl font-bold text-white mb-4">
+                      {category}
+                    </h3>
+                    <p className="text-gray-300 mb-4">
+                      Discover amazing games in our {category.toLowerCase()}{" "}
+                      collection.
+                    </p>
+                    <Button color="primary" size="sm">
+                      Browse {category}
+                    </Button>
                   </div>
-                  <div className="topic">
-                    -{filteredStocks[0].discount}% off
-                  </div>
-                  <div className="des">
-                    {filteredStocks[0].AssignedGame.Description}
-                  </div>
-
-                  <div className="author">
-                    <span className="line-through mr-1 text-editionColor">
-                      LKR.{filteredStocks[0].UnitPrice}
-                    </span>
-                    <span className="discprice">
-                      LKR.
-                      {filteredStocks[0].discount > 0
-                        ? filteredStocks[0].UnitPrice -
-                          (filteredStocks[0].UnitPrice *
-                            filteredStocks[0].discount) /
-                            100
-                        : filteredStocks[0].UnitPrice}
-                    </span>
-                  </div>
-                  <div className="buttons">
-                    <Link to={`/game/${filteredStocks[0]._id}`}>
-                      {" "}
-                      <button className="border-none bg-[#f1683a] tracking-widest font-poppins font-medium p-[10px] rounded-[5px]">
-                        SEE MORE{" "}
-                      </button>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {filteredStocks[1] && (
-              <div className="item">
-                <img src={filteredStocks[1].AssignedGame.coverPhoto} />
-                <div
-                  className="darklayer absolute -z-0 top-0 w-[100%] h-[100%] "
-                  ref={timeRef}
-                ></div>
-                <div className="content">
-                  <div className="title">
-                    {filteredStocks[1].AssignedGame.title}
-                  </div>
-                  <div className="topic">
-                    -{filteredStocks[1].discount}% off
-                  </div>
-                  <div className="des">
-                    {filteredStocks[1].AssignedGame.Description}
-                  </div>
-
-                  <div className="author">
-                    <span className="line-through mr-1 text-editionColor">
-                      LKR.{filteredStocks[1].UnitPrice}
-                    </span>
-                    <span className="discprice">
-                      LKR.
-                      {filteredStocks[1].discount > 0
-                        ? filteredStocks[1].UnitPrice -
-                          (filteredStocks[1].UnitPrice *
-                            filteredStocks[1].discount) /
-                            100
-                        : filteredStocks[1].UnitPrice}
-                    </span>
-                  </div>
-                  <div className="buttons">
-                    <Link to={`/game/${filteredStocks[1]._id}`}>
-                      {" "}
-                      <button className="border-none bg-[#f1683a] tracking-widest font-poppins font-medium p-[10px] rounded-[5px]">
-                        SEE MORE{" "}
-                      </button>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            )}
-            {filteredStocks[2] && (
-              <div className="item">
-                <img src={filteredStocks[2].AssignedGame.coverPhoto} />
-                <div
-                  className="darklayer absolute -z-0 top-0 w-[100%] h-[100%] "
-                  ref={timeRef}
-                ></div>
-                <div className="content">
-                  <div className="title">
-                    {filteredStocks[2].AssignedGame.title}
-                  </div>
-                  <div className="topic">
-                    -{filteredStocks[2].discount}% off
-                  </div>
-                  <div className="des">
-                    {filteredStocks[2].AssignedGame.Description}
-                  </div>
-
-                  <div className="author">
-                    <span className="line-through mr-1 text-editionColor">
-                      LKR.{filteredStocks[2].UnitPrice}
-                    </span>
-                    <span className="discprice">
-                      LKR.
-                      {filteredStocks[2].discount > 0
-                        ? filteredStocks[2].UnitPrice -
-                          (filteredStocks[2].UnitPrice *
-                            filteredStocks[2].discount) /
-                            100
-                        : filteredStocks[2].UnitPrice}
-                    </span>
-                  </div>
-                  <div className="buttons">
-                    <Link to={`/game/${filteredStocks[2]._id}`}>
-                      {" "}
-                      <button className="border-none bg-[#f1683a] tracking-widest font-poppins font-medium p-[10px] rounded-[5px]">
-                        SEE MORE{" "}
-                      </button>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            )}
+                </BackgroundGradient>
+              ))}
+            </div>
+            <div className="text-center mt-12">
+              <Button color="secondary" size="lg">
+                Visit Full Shop
+              </Button>
+            </div>
           </div>
+        </section>
 
-          <div className="thumbnail " ref={thumbnailRef}>
-            {filteredStocks[0] && (
-              <div className="item">
-                <img src={filteredStocks[0].AssignedGame.coverPhoto} />
-                <div className="content">
-                  {/* <div className="title">{image.title}</div> */}
-                  {/* <div className="description">{image.description}</div> */}
+        {/* Featured Games Slider */}
+        <section className="py-16 relative overflow-hidden">
+          <BackgroundBeams />
+          <div className="container mx-auto px-4 relative z-10">
+            <h2 className="text-4xl font-bold text-white mb-8">
+              Featured Games
+            </h2>
+            <div className="relative" ref={sliderRef}>
+              <div className="overflow-hidden rounded-xl">
+                <div
+                  className="flex transition-transform duration-500 ease-in-out"
+                  style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                >
+                  {featuredGames.map((game, index) => (
+                    <div key={game._id} className="w-full flex-shrink-0">
+                      <div className="relative h-96">
+                        <img
+                          src={game.AssignedGame.coverPhoto}
+                          alt={game.AssignedGame.title}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6">
+                          <h3 className="text-3xl font-bold text-white mb-2">
+                            {game.AssignedGame.title}
+                          </h3>
+                          <p className="text-gray-300 mb-4">
+                            {game.AssignedGame.Description.substring(0, 150)}...
+                          </p>
+                          <div className="flex justify-between items-center">
+                            <span className="text-2xl font-bold text-green-400">
+                              $
+                              {(
+                                game.UnitPrice -
+                                (game.UnitPrice * game.discount) / 100
+                              ).toFixed(2)}
+                            </span>
+                            <Link to={`/game/${game._id}`}>
+                              <Button color="primary" size="lg">
+                                View Game
+                              </Button>
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            )}
-            {filteredStocks[1] && (
-              <div className="item">
-                <img src={filteredStocks[1].AssignedGame.coverPhoto} />
-                <div className="content">
-                  {/* <div className="title">{image.title}</div> */}
-                  {/* <div className="description">{image.description}</div> */}
-                </div>
-              </div>
-            )}
-            {filteredStocks[2] && (
-              <div className="item">
-                <img src={filteredStocks[2].AssignedGame.coverPhoto} />
-                <div className="content">
-                  {/* <div className="title">{image.title}</div> */}
-                  {/* <div className="description">{image.description}</div> */}
-                </div>
-              </div>
-            )}
+              <button
+                onClick={prevSlide}
+                className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
+              >
+                &#10094;
+              </button>
+              <button
+                onClick={nextSlide}
+                className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
+              >
+                &#10095;
+              </button>
+            </div>
           </div>
-          <div className="arrows hidden">
-            <button id="prev" ref={prevRef} onClick={handlePrev}>
-              &lt;
-            </button>
-            <button id="next" ref={nextRef} onClick={handleNext}>
-              &gt;
-            </button>
+        </section>
+
+        {/* AI Assistant Feature */}
+        <section className="py-16 relative overflow-hidden">
+          <BackgroundBeams />
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="flex flex-col md:flex-row items-center justify-between">
+              <div className="md:w-1/2 mb-8 md:mb-0">
+                <h2 className="text-[50px] font-primaryRegular text-white mb-4">
+                  Meet Gwen <br></br>Your AI Gaming Assistant
+                </h2>
+                <p className="text-[30px] text-gray-300 mb-6">
+                  Get personalized game recommendations, strategy tips, and
+                  instant answers to your gaming questions.
+                </p>
+              </div>
+              <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-1 rounded-[200px]">
+                <div className="bg-white rounded-[200px] p-6 shadow-xl">
+                  <div className="flex justify-center">
+                    <img
+                      src="https://res.cloudinary.com/dhcawltsr/image/upload/v1727709362/smart-girl-animation-download--unscreen_icm1qe.gif"
+                      alt="AI Assistant Gwen"
+                      className="rounded-lg w-[300px]"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="time" ref={timeRef}></div>
-        </div>
-      </div>
-      <div className="w-full mt-20 mb-20">
-        <h2 className="text-2xl font-bold mb-4 text-center text-white">
-          Latest Game Reviews
-        </h2>
-        <InfiniteMovingCards
-          items={formattedRatings}
-          direction="right"
-          speed="fast"
-        />
-      </div>
-      {/* Features Section */}
-      <div className="bg-black">
-        <GameSiteFeatures />
-      </div>
-      <Footer />
-      <script src="../components/Slider.jsx"></script>
+        </section>
+
+        {/* Indie Developers Section */}
+        <section className="py-16 relative overflow-hidden">
+          <BackgroundBeams />
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="flex flex-col md:flex-row items-center justify-between">
+              <div className="md:w-1/2 mb-8 md:mb-0">
+                <h2 className="text-4xl font-bold text-white mb-4">
+                  Calling All Indie Developers
+                </h2>
+                <p className="text-xl text-gray-300 mb-6">
+                  Join our platform and showcase your games to a passionate
+                  community of gamers. We provide the tools and support you need
+                  to succeed.
+                </p>
+                <Button color="success" size="lg">
+                  Join as a Developer
+                </Button>
+              </div>
+              <div className="md:w-1/2">
+                <img
+                  src="https://res.cloudinary.com/dhcawltsr/image/upload/v1728837460/Video_game_developer_qahcp2.gif"
+                  alt="Indie Developer"
+                  className="rounded-lg w-full"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Gaming Community Section */}
+        <section className="py-16 relative overflow-hidden">
+          <BackgroundBeams />
+          <div className="container mx-auto px-4 text-center relative z-10">
+            <h2 className="text-4xl font-bold text-white mb-8">
+              Join Our Thriving Gaming Community
+            </h2>
+            <p className="text-xl text-gray-300 mb-8">
+              Connect with fellow gamers, share experiences, participate in
+              events, and level up together!
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+              <BackgroundGradient className="rounded-xl p-1">
+                <div className="bg-gray-800 rounded-lg p-6 h-full">
+                  <h3 className="text-2xl font-bold text-white mb-4">Forums</h3>
+                  <p className="text-gray-300 mb-4">
+                    Discuss strategies, share tips, and make new friends.
+                  </p>
+                  <Button color="primary" size="sm">
+                    Visit Forums
+                  </Button>
+                </div>
+              </BackgroundGradient>
+              <BackgroundGradient className="rounded-xl p-1">
+                <div className="bg-gray-800 rounded-lg p-6 h-full">
+                  <h3 className="text-2xl font-bold text-white mb-4">Events</h3>
+                  <p className="text-gray-300 mb-4">
+                    Join tournaments, watch live streams, and attend virtual
+                    meetups.
+                  </p>
+                  <Button color="primary" size="sm">
+                    See Events
+                  </Button>
+                </div>
+              </BackgroundGradient>
+              <BackgroundGradient className="rounded-xl p-1">
+                <div className="bg-gray-800 rounded-lg p-6 h-full">
+                  <h3 className="text-2xl font-bold text-white mb-4">Groups</h3>
+                  <p className="text-gray-300 mb-4">
+                    Find like-minded gamers and form your own gaming clans.
+                  </p>
+                  <Button color="primary" size="sm">
+                    Explore Groups
+                  </Button>
+                </div>
+              </BackgroundGradient>
+            </div>
+            <Button color="secondary" size="lg">
+              Join Community
+            </Button>
+          </div>
+        </section>
+
+        {/* Support Unit Section */}
+        <section className="py-16 relative overflow-hidden">
+          <BackgroundBeams />
+          <div className="container mx-auto px-4 relative z-10">
+            <h2 className="text-4xl font-bold text-white mb-8 text-center">
+              World-Class Support at Your Service
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <BackgroundGradient className="rounded-xl p-1">
+                <div className="bg-gray-800 rounded-lg p-6 h-full">
+                  <h3 className="text-2xl font-bold text-white mb-4">
+                    24/7 Assistance
+                  </h3>
+                  <p className="text-gray-300 mb-4">
+                    Our support team is always ready to help, any time of day or
+                    night.
+                  </p>
+                  <Button color="primary" size="sm">
+                    Contact Support
+                  </Button>
+                </div>
+              </BackgroundGradient>
+              <BackgroundGradient className="rounded-xl p-1">
+                <div className="bg-gray-800 rounded-lg p-6 h-full">
+                  <h3 className="text-2xl font-bold text-white mb-4">
+                    Knowledge Base
+                  </h3>
+                  <p className="text-gray-300 mb-4">
+                    Find answers to common questions in our comprehensive guide.
+                  </p>
+                  <Button color="primary" size="sm">
+                    Browse FAQs
+                  </Button>
+                </div>
+              </BackgroundGradient>
+              <BackgroundGradient className="rounded-xl p-1">
+                <div className="bg-gray-800 rounded-lg p-6 h-full">
+                  <h3 className="text-2xl font-bold text-white mb-4">
+                    Community Support
+                  </h3>
+                  <p className="text-gray-300 mb-4">
+                    Get help from our community of experienced gamers and
+                    developers.
+                  </p>
+                  <Button color="primary" size="sm">
+                    Visit Forum
+                  </Button>
+                </div>
+              </BackgroundGradient>
+            </div>
+          </div>
+        </section>
+
+        {/* Latest Reviews */}
+        <section className="py-16 relative overflow-hidden">
+          <BackgroundBeams />
+          <div className="container mx-auto px-4 relative z-10">
+            <h2 className="text-4xl font-bold text-white mb-8 text-center">
+              Latest Reviews
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {latestRatings.map((rating, index) => (
+                <BackgroundGradient key={index} className="rounded-xl p-1">
+                  <div className="bg-gray-800 rounded-lg p-6 h-full">
+                    <p className="text-gray-300 mb-4">{rating.comment}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-white font-semibold">
+                        {rating.user?.username || "Anonymous"}
+                      </span>
+                      <span className="text-yellow-400">{rating.rating}/5</span>
+                    </div>
+                    <p className="text-sm text-gray-400 mt-2">
+                      {rating.game?.AssignedGame?.title || "Unknown Game"}
+                    </p>
+                  </div>
+                </BackgroundGradient>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Newsletter Signup */}
+        <section className="py-16 relative overflow-hidden">
+          <BackgroundBeams />
+          <div className="container mx-auto px-4 text-center relative z-10">
+            <h2 className="text-4xl font-bold text-white mb-8">
+              Stay in the Loop
+            </h2>
+            <p className="text-xl text-gray-300 mb-8">
+              Subscribe to our newsletter for the latest game releases and
+              exclusive offers.
+            </p>
+            <div className="max-w-md mx-auto">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:outline-none focus:border-primary mb-4"
+              />
+              <Button color="primary" size="lg" className="w-full">
+                Subscribe
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        <Footer />
+      </TracingBeam>
     </div>
   );
 };
