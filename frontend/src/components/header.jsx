@@ -52,125 +52,95 @@ const Header = forwardRef((props, ref) => {
   };
 
   return (
-    <div className="bg-headerDark h-[50px]">
-      <Navbar className="font-primaryRegular bg-headerDark text-white">
-
-        <NavbarContent className="hidden sm:flex gap-4" justify="center">
-          <NavbarItem>
+    <div className="bg-customDark">
+      <Navbar className="font-primaryRegular bg-customDark text-white py-2 px-4">
+        <NavbarContent className="hidden sm:flex justify-start items-center w-full" justify="start">
+          <NavbarItem className="mr-4">
             <Link
-              color={location.pathname === "/" ? "white" : "default"}
+              color={location.pathname === "/" ? "blue" : "foreground"}
               href="/"
               className={`${
-                location.pathname === "/" ? "underline" : ""
-              } text-white hover:underline`}
+                location.pathname === "/" ? "text-blue-500" : "text-white"
+              } hover:text-blue-300 transition-colors duration-200`}
             >
               HOME
             </Link>
           </NavbarItem>
-          <NavbarItem>
+          <NavbarItem className="mr-4">
             <Link
-              color={location.pathname === "/shop" ? "danger" : "default"}
+              color={location.pathname === "/shop" ? "blue" : "foreground"}
               href="/shop"
               className={`${
-                location.pathname === "/shop" ? "underline" : ""
-              } text-white hover:underline`}
+                location.pathname === "/shop" ? "text-blue-500" : "text-white"
+              } hover:text-blue-300 transition-colors duration-200`}
             >
               SHOP
             </Link>
           </NavbarItem>
-          <NavbarItem>
+          <NavbarItem className="mr-4">
             <Link
-              color={location.pathname === "/articles" ? "primary" : "white"}
+              color={location.pathname === "/articles" ? "blue" : "foreground"}
               href="/articles"
               className={`${
-                location.pathname === "/articles" ? "underline" : ""
-              } text-white hover:underline`}
+                location.pathname === "/articles" ? "text-blue-500" : "text-white"
+              } hover:text-blue-300 transition-colors duration-200`}
             >
              COMMUNITY
             </Link>
           </NavbarItem>
-          <NavbarItem>
+          <NavbarItem className="mr-4">
             <Link
-              color={location.pathname === "/chat" ? "primary" : "white"}
+              color={location.pathname === "/chat" ? "blue" : "foreground"}
               href="/chat"
               className={`${
-                location.pathname === "/chat" ? "underline" : ""
-              } text-white hover:underline`}
+                location.pathname === "/chat" ? "text-blue-500" : "text-white"
+              } hover:text-blue-300 transition-colors duration-200`}
             >
               CHAT
             </Link>
           </NavbarItem>
-
-          <NavbarItem>
+          <NavbarItem className="mr-4">
             <Link
-              color={
-                location.pathname === "/TailoredGames" ? "primary" : "white"
-              }
+              color={location.pathname === "/TailoredGames" ? "blue" : "foreground"}
               href="/TailoredGames"
               className={`${
-                location.pathname === "/TailoredGames" ? "underline" : ""
-              } text-white hover:underline`}
+                location.pathname === "/TailoredGames" ? "text-blue-500" : "text-white"
+              } hover:text-blue-300 transition-colors duration-200`}
             >
               OUR GAMES
             </Link>
           </NavbarItem>
-          <Dropdown
-            placement="bottom-start"
-            className="bg-foreground text-white"
-          >
+          <Dropdown placement="bottom-start" className="bg-gray-800 text-white">
             <DropdownTrigger>
-              <NavbarItem className="cursor-pointer">SUPPORT</NavbarItem>
+              <NavbarItem className="cursor-pointer hover:text-blue-300 transition-colors duration-200 mr-4">SUPPORT</NavbarItem>
             </DropdownTrigger>
-            <DropdownMenu
-              aria-label="Profile Actions"
-              variant="flat"
-              className="font-primaryRegular "
-            >
-              <DropdownItem key="support" onClick={() => navigate("/support")}>
+            <DropdownMenu aria-label="Profile Actions" variant="flat" className="font-primaryRegular bg-gray-800 text-white">
+              <DropdownItem key="support" onClick={() => navigate("/support")} className="hover:bg-gray-700">
                 Vortex Support
               </DropdownItem>
-              <DropdownItem
-                Key="contactus"
-                onClick={() => navigate("/support#contactForm")}
-              >
+              <DropdownItem Key="contactus" onClick={() => navigate("/support#contactForm")} className="hover:bg-gray-700">
                 Contact Us
               </DropdownItem>
-              <DropdownItem
-                key="privacy"
-                onClick={() => navigate("/privacyPolicy")}
-              >
+              <DropdownItem key="privacy" onClick={() => navigate("/privacyPolicy")} className="hover:bg-gray-700">
                 Privacy Policy
               </DropdownItem>
-              <DropdownItem key="about" onClick={() => navigate("/about")}>
+              <DropdownItem key="about" onClick={() => navigate("/about")} className="hover:bg-gray-700">
                 About Vortex
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
-          <Dropdown
-            placement="bottom-start"
-            className="bg-foreground text-white"
-          >
+          <Dropdown placement="bottom-start" className="bg-gray-800 text-white">
             <DropdownTrigger>
-              <NavbarItem className="cursor-pointer flex items-center">
+              <NavbarItem className="cursor-pointer flex items-center hover:text-blue-300 transition-colors duration-200">
                 <NotificationIcon style={{ marginRight: "8px" }} />
-                <span
-                  className={`${
-                    location.pathname === "/Notification" ? "underline" : ""
-                  } text-white hover:underline`}
-                >
-                  {" "}
-                </span>
+                <span className={`${location.pathname === "/Notification" ? "text-blue-500" : ""}`}> </span>
               </NavbarItem>
             </DropdownTrigger>
-            <DropdownMenu
-              aria-label="Notification Actions"
-              variant="flat"
-              className="font-primaryRegular"
-            >
-              <DropdownItem onClick={() => navigate("/Notification")}>
+            <DropdownMenu aria-label="Notification Actions" variant="flat" className="font-primaryRegular bg-gray-800 text-white">
+              <DropdownItem onClick={() => navigate("/Notification")} className="hover:bg-gray-700">
                 View All Notifications
               </DropdownItem>
-              <DropdownItem onClick={() => navigate("/UserMessage")}>
+              <DropdownItem onClick={() => navigate("/UserMessage")} className="hover:bg-gray-700">
                 View All Messages
               </DropdownItem>
             </DropdownMenu>
@@ -179,10 +149,7 @@ const Header = forwardRef((props, ref) => {
 
         <NavbarContent as="div" justify="end">
           {token && user ? (
-            <Dropdown
-              placement="bottom-end"
-              className="bg-foreground text-white"
-            >
+            <Dropdown placement="bottom-end" className="bg-gray-800 text-white">
               <DropdownTrigger>
                 <User
                   className="cursor-pointer text-white"
@@ -193,174 +160,98 @@ const Header = forwardRef((props, ref) => {
                   }}
                 />
               </DropdownTrigger>
-              <DropdownMenu
-                aria-label="Profile Actions"
-                variant="flat"
-                className="font-primaryRegular text-white"
-              >
+              <DropdownMenu aria-label="Profile Actions" variant="flat" className="font-primaryRegular bg-gray-800 text-white">
                 <DropdownItem key="profile" className="h-14 gap-2">
                   <p className="font-semibold">Signed in as</p>
                   <p className="font-semibold">{user.email}</p>
                 </DropdownItem>
-                <DropdownItem
-                  key="settings"
-                  onClick={() => navigate("/profile")}
-                >
+                <DropdownItem key="settings" onClick={() => navigate("/profile")} className="hover:bg-gray-700">
                   My Settings
                 </DropdownItem>
-                <DropdownItem
-                  key="orders"
-                  onClick={() => navigate("/mylibrary")}
-                >
+                <DropdownItem key="orders" onClick={() => navigate("/mylibrary")} className="hover:bg-gray-700">
                   My Library
                 </DropdownItem>
-                <DropdownItem
-                  key="cart"
-                  onClick={() => navigate("/GamingSessions")}
-                >
+                <DropdownItem key="cart" onClick={() => navigate("/GamingSessions")} className="hover:bg-gray-700">
                   Rentals
                 </DropdownItem>
-                <DropdownItem key="cart" onClick={() => navigate("/cartItems")}>
+                <DropdownItem key="cart" onClick={() => navigate("/cartItems")} className="hover:bg-gray-700">
                   My Cart
                 </DropdownItem>
-
-                <DropdownItem
-                  key="cart"
-                  onClick={() => navigate("/Transaction")}
-                >
+                <DropdownItem key="cart" onClick={() => navigate("/Transaction")} className="hover:bg-gray-700">
                   Transaction History
                 </DropdownItem>
 
-                {/* Developer Filter */}
+                {/* Role-based menu items */}
                 {user.role === "developer" && (
-                  <DropdownItem
-                    key="developer-panel"
-                    onClick={() => navigate("/GamedeveloperDashboard")}
-                  >
+                  <DropdownItem key="developer-panel" onClick={() => navigate("/GamedeveloperDashboard")} className="hover:bg-gray-700">
                     Developer Dashboard
                   </DropdownItem>
                 )}
-
-                {/* Admin Filter */}
                 {user.role === "Product Manager" && (
-                  <DropdownItem
-                    key="admin-panel"
-                    onClick={() => navigate("/productDashboard")}
-                  >
+                  <DropdownItem key="admin-panel" onClick={() => navigate("/productDashboard")} className="hover:bg-gray-700">
                     Products Dashboard
                   </DropdownItem>
                 )}
-
-                {/* Admin user Filter */}
                 {user.role === "User Manager" && (
-                  <DropdownItem
-                    key="Admin-panel"
-                    onClick={() => navigate("/UserManagementDashboard")}
-                  >
+                  <DropdownItem key="Admin-panel" onClick={() => navigate("/UserManagementDashboard")} className="hover:bg-gray-700">
                     User Management
                   </DropdownItem>
                 )}
-
-                {/* Order Manager Filter */}
                 {user.role === "Order Manager" && (
-                  <DropdownItem
-                    key="orders-panel"
-                    onClick={() => navigate("/ordersDashboard")}
-                  >
+                  <DropdownItem key="orders-panel" onClick={() => navigate("/ordersDashboard")} className="hover:bg-gray-700">
                     Order Management
                   </DropdownItem>
                 )}
-
-                {/* Blogger Filter */}
                 {user.role === "Blogger" && (
-                  <DropdownItem
-                    key="blogger-panel"
-                    onClick={() => navigate("/bloggerDashboard")}
-                  >
+                  <DropdownItem key="blogger-panel" onClick={() => navigate("/bloggerDashboard")} className="hover:bg-gray-700">
                     Blogger Dashboard
                   </DropdownItem>
                 )}
-
-                {/* Session Manager Filter */}
                 {user.role === "Session_Manager" && (
-                  <DropdownItem
-                    key="session-panel"
-                    onClick={() => navigate("/sessionDashboard")}
-                  >
+                  <DropdownItem key="session-panel" onClick={() => navigate("/sessionDashboard")} className="hover:bg-gray-700">
                     Session Dashboard
                   </DropdownItem>
                 )}
-
-                {/* Community Manager Filter */}
                 {user.role === "Community Manager" && (
-                  <DropdownItem
-                    key="community-panel"
-                    onClick={() => navigate("/CommunityDashBoard")}
-                  >
+                  <DropdownItem key="community-panel" onClick={() => navigate("/CommunityDashBoard")} className="hover:bg-gray-700">
                     Community Dashboard
                   </DropdownItem>
                 )}
-
-                {/* Review Manager */}
                 {user.role === "Review Manager" && (
-                  <DropdownItem
-                    key="Review-panel"
-                    onClick={() => navigate("/review_dashboard")}
-                  >
+                  <DropdownItem key="Review-panel" onClick={() => navigate("/review_dashboard")} className="hover:bg-gray-700">
                     Review Dashboard
                   </DropdownItem>
                 )}
-
-                {/* Customer Support Filter */}
                 {user.role === "Support Agent" && (
-                  <DropdownItem
-                    key="support-panel"
-                    onClick={() => navigate("/ContactDash")}
-                  >
+                  <DropdownItem key="support-panel" onClick={() => navigate("/ContactDash")} className="hover:bg-gray-700">
                     Customer Support Panel
                   </DropdownItem>
                 )}
-
-                {/* Staff Manager Filter */}
                 {user.role === "Staff_Manager" && (
-                  <DropdownItem
-                    key="manage-staff"
-                    onClick={() => navigate("/staffManager")}
-                  >
+                  <DropdownItem key="manage-staff" onClick={() => navigate("/staffManager")} className="hover:bg-gray-700">
                     Manage Staff
                   </DropdownItem>
                 )}
-
-                {/* Payment Manager Filter */}
                 {user.role === "Payment Manager" && (
-                  <DropdownItem
-                    key="manage-payment"
-                    onClick={() => navigate("/Payment_manager_dashboard")}
-                  >
+                  <DropdownItem key="manage-payment" onClick={() => navigate("/Payment_manager_dashboard")} className="hover:bg-gray-700">
                     Payment Management Dashboard
                   </DropdownItem>
                 )}
 
-                <DropdownItem
-                  key="logout"
-                  color="danger"
-                  onClick={handleLogout}
-                >
+                <DropdownItem key="logout" color="danger" onClick={handleLogout} className="text-red-500 hover:bg-gray-700">
                   Log Out
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
           ) : (
-            <>
-              {/* Normal Login Button */}
-              <Link className="text-white" href="/login">
-                Login
-              </Link>
-            </>
+            <Link className="text-white hover:text-blue-300 transition-colors duration-200" href="/login">
+              LOGIN
+            </Link>
           )}
         </NavbarContent>
       </Navbar>
     </div>
   );
 });
+
 export default Header;

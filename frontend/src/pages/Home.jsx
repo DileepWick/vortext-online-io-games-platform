@@ -204,6 +204,7 @@ const Home = () => {
               </div>
               <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-1 rounded-[200px]">
                 <div className="bg-white rounded-[200px] p-6 shadow-xl">
+
                   <div className="flex justify-center">
                     <img
                       src="https://res.cloudinary.com/dhcawltsr/image/upload/v1727709362/smart-girl-animation-download--unscreen_icm1qe.gif"
