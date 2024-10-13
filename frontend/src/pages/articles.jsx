@@ -34,6 +34,7 @@ const LabelInputContainer = ({
     </div>)
   );
 };
+
 const CreatePost = ({ user, onSubmit }) => {
   const [heading, setHeading] = useState("");
   const [articleBody, setArticleBody] = useState("");
@@ -41,6 +42,16 @@ const CreatePost = ({ user, onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    if (!heading.trim() || !articleBody.trim() || !image) {
+      toast.error("Please fill all fields and select an image", {
+        theme: "dark",
+        transition: Flip,
+        style: { fontFamily: "Rubik" },
+      });
+      return;
+    }
+    
     onSubmit({ heading, articleBody, image });
     setHeading("");
     setArticleBody("");
@@ -447,7 +458,7 @@ const Articles = () => {
               >
                 {article.uploader._id === userId && (
                   <button
-                    className="absolute top-2 right-2 text-red-500 hover:text-red-400"
+                  className="absolute top-2 right-2 text-red-500 hover:text-red-400"
                     onClick={() => handleDeleteArticle(article._id)}
                     disabled={deletingArticleId === article._id}
                   >
@@ -654,3 +665,4 @@ const Articles = () => {
 };
 
 export default Articles;
+                    
