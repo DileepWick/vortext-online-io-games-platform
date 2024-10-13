@@ -11,6 +11,8 @@ import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { LampContainer } from "../components/ui/lamp";
 import { SparklesCore } from "../components/ui/sparkles";
+import GameSiteFeatures from "../components/ui/GameSiteFeatures";
+import InfiniteMovingCards from "../components/ui/InfiniteMovingCards";
 
 const Home = () => {
   const [gameStocks, setGameStocks] = useState([]);
@@ -18,6 +20,7 @@ const Home = () => {
   const [ratingsData, setRatingsData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [ratings, setRatings] = useState([]);
 
   const notify = () => {
     toast.success("🦄 Wow so easy!", {
@@ -38,6 +41,32 @@ const Home = () => {
   const propFunction = () => {
     alert("Hello");
   };
+
+  useEffect(() => {
+    const fetchLatestRatings = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8098/ratings/getnewratings"
+        );
+        if (response.data && Array.isArray(response.data)) {
+          setRatings(response.data);
+        } else {
+          setError("Received unexpected data format from the server.");
+        }
+      } catch (err) {
+        console.error("Error fetching latest ratings:", err);
+        setError(
+          err.response?.data?.message ||
+            err.message ||
+            "Failed to fetch latest ratings."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLatestRatings();
+  }, []);
 
   useEffect(() => {
     const fetchGameStocks = async () => {
@@ -172,38 +201,52 @@ const Home = () => {
       carouselRef.current.classList.remove("prev");
     }, timeRunning);
   };
-
+  const formattedRatings = ratings.map((rating) => {
+    return {
+      quote: rating.comment || "No comment provided",
+      name: rating.user?.username || "Anonymous",
+      title: `${rating.game?.AssignedGame?.title || "Unknown Game"} - Rating: ${
+        rating.rating
+      }/5`, // Access game title via 'AssignedGame'
+      date: rating.createdAt
+        ? new Date(rating.createdAt).toLocaleDateString()
+        : "Date unknown",
+    };
+  });
   return (
-    <div className="font-primaryRegular bg-customDark flex flex-col min-h-screen">
+    <div className="font-primaryRegular bg-black flex flex-col min-h-screen">
       <Helmet>
         <title>Welcome to Vortex</title>
       </Helmet>
       <Header />
+
+      {/* Hero Section */}
       <div className="h-[40rem] w-full bg-black flex flex-col items-center justify-center overflow-hidden rounded-md">
-      <h1 className="md:text-7xl text-3xl lg:text-9xl  text-center text-white relative z-20">
-        Vortex
-      </h1>
-      <div className="w-[40rem] h-40 relative">
-        {/* Gradients */}
-        <div className="absolute inset-x-20 top-0 bg-gradient-to-r from-transparent via-indigo-500 to-transparent h-[2px] w-3/4 blur-sm" />
-        <div className="absolute inset-x-20 top-0 bg-gradient-to-r from-transparent via-indigo-500 to-transparent h-px w-3/4" />
-        <div className="absolute inset-x-60 top-0 bg-gradient-to-r from-transparent via-sky-500 to-transparent h-[5px] w-1/4 blur-sm" />
-        <div className="absolute inset-x-60 top-0 bg-gradient-to-r from-transparent via-sky-500 to-transparent h-px w-1/4" />
- 
-        {/* Core component */}
-        <SparklesCore
-          background="transparent"
-          minSize={0.4}
-          maxSize={1}
-          particleDensity={1200}
-          className="w-full h-full"
-          particleColor="#FFFFFF"
-        />
- 
-        {/* Radial Gradient to prevent sharp edges */}
-        <div className="absolute inset-0 w-full h-full bg-black [mask-image:radial-gradient(350px_200px_at_top,transparent_20%,white)]"></div>
+        <h1 className="md:text-7xl text-3xl lg:text-9xl text-center text-white relative z-20">
+          Vortex
+        </h1>
+        <div className="w-[40rem] h-40 relative">
+          {/* Gradients */}
+          <div className="absolute inset-x-20 top-0 bg-gradient-to-r from-transparent via-indigo-500 to-transparent h-[2px] w-3/4 blur-sm" />
+          <div className="absolute inset-x-20 top-0 bg-gradient-to-r from-transparent via-indigo-500 to-transparent h-px w-3/4" />
+          <div className="absolute inset-x-60 top-0 bg-gradient-to-r from-transparent via-sky-500 to-transparent h-[5px] w-1/4 blur-sm" />
+          <div className="absolute inset-x-60 top-0 bg-gradient-to-r from-transparent via-sky-500 to-transparent h-px w-1/4" />
+
+          {/* Sparkles Core Component */}
+          <SparklesCore
+            background="transparent"
+            minSize={0.4}
+            maxSize={1}
+            particleDensity={1200}
+            className="w-full h-full"
+            particleColor="#FFFFFF"
+          />
+
+          {/* Radial Gradient */}
+          <div className="absolute inset-0 w-full h-full bg-black [mask-image:radial-gradient(350px_200px_at_top,transparent_20%,white)]"></div>
+        </div>
       </div>
-    </div>
+
       <div className="m-auto  mt-[80px] mb-[40px]">
         <div className="carousel" ref={carouselRef}>
           <div className="list" ref={listRef}>
@@ -378,6 +421,20 @@ const Home = () => {
           </div>
           <div className="time" ref={timeRef}></div>
         </div>
+      </div>
+      <div className="w-full mt-20 mb-20">
+        <h2 className="text-2xl font-bold mb-4 text-center text-white">
+          Latest Game Reviews
+        </h2>
+        <InfiniteMovingCards
+          items={formattedRatings}
+          direction="right"
+          speed="fast"
+        />
+      </div>
+      {/* Features Section */}
+      <div className="bg-black">
+        <GameSiteFeatures />
       </div>
       <Footer />
       <script src="../components/Slider.jsx"></script>
