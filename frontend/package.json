@@ -27,6 +27,7 @@
     "@mantine/tiptap": "^7.10.2",
     "@mui/material": "^5.15.20",
     "@nextui-org/react": "^2.4.6",
+    "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-slot": "^1.1.0",
     "@tabler/icons-react": "^3.19.0",
     "@tiptap/extension-link": "^2.4.0",
