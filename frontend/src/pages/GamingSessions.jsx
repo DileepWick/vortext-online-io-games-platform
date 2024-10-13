@@ -6,8 +6,23 @@ import useAuthCheck from "../utils/authCheck";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
-import { Image, Card, CardBody, Chip, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input } from "@nextui-org/react";
+import { Image, Card, CardBody, Chip, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, RadioGroup, Radio } from "@nextui-org/react";
 import { toast, Flip } from "react-toastify";
+
+
+const CreditCardIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+    <line x1="1" y1="10" x2="23" y2="10"></line>
+  </svg>
+);
+
+const PayPalIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M7 14c-1.66 0-3-1.34-3-3 0-1.31.84-2.41 2-2.83V3.65C2.5 4.18 0 6.6 0 9.5c0 3.03 2.47 5.5 5.5 5.5h3.07c-.07-.32-.07-.66 0-1H7z"></path>
+    <path d="M17 9.5c0-2.9-2.5-5.32-5.5-5.85v4.52c1.16.42 2 1.52 2 2.83 0 1.66-1.34 3-3 3H7.07c.07.34.07.68 0 1H10.5c3.03 0 5.5-2.47 5.5-5.5z"></path>
+  </svg>
+);
 
 const GamingSessions = () => {
   useAuthCheck();
@@ -22,6 +37,8 @@ const GamingSessions = () => {
   const [rentalOptions, setRentalOptions] = useState([]);
   const [selectedExtension, setSelectedExtension] = useState(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('creditCard');
+  const [paypalEmail, setPaypalEmail] = useState('');
   const [cardDetails, setCardDetails] = useState({
     cardNumber: "",
     expirationDate: "",
@@ -251,7 +268,11 @@ const GamingSessions = () => {
   };
 
   const handlePayment = async () => {
-    if (!validateForm()) {
+    if (paymentMethod === 'creditCard' && !validateForm()) {
+      return;
+    }
+    if (paymentMethod === 'paypal' && !paypalEmail) {
+      toast.error("Please enter your PayPal email");
       return;
     }
 
@@ -263,12 +284,15 @@ const GamingSessions = () => {
         throw new Error("User ID not found. Please log in again.");
       }
 
-      // Create the payment
       const paymentData = {
         user: userId,
         game: currentGame.game._id,
         rental: currentGame._id,
-        amount: parseFloat(selectedExtension.price)
+        amount: parseFloat(selectedExtension.price),
+        paymentMethod: paymentMethod,
+        paymentDetails: paymentMethod === 'creditCard' 
+          ? { cardNumber: cardDetails.cardNumber, expirationDate: cardDetails.expirationDate, cvv: cardDetails.cvv }
+          : { paypalEmail: paypalEmail }
       };
 
       console.log("Sending payment data:", paymentData);
@@ -360,7 +384,7 @@ const GamingSessions = () => {
                     </p>
                     
                     <p className="mb-2 text-sm text-gray-300">
-                    Rental Time: {formatTime(rental.time)}
+                      Rental Time: {formatTime(rental.time)}
                     </p>
                     
                     <div className="flex flex-wrap gap-2 mb-4 font-primaryRegular">
@@ -484,53 +508,100 @@ const GamingSessions = () => {
         </Modal>
   
         <Modal
-      isOpen={isPaymentModalOpen}
-      onClose={closePaymentModal}
-      classNames={{
-        body: "text-white",
-        header: "text-white",
-        footer: "text-white",
-        base: "bg-gray-800",
-      }}
-    >
-      <ModalContent>
-        <ModalHeader className="text-white">Enter Payment Details</ModalHeader>
-        <ModalBody>
-          <Input
-            name="cardNumber"
-            label="Card Number"
-            placeholder="1234-5678-9012-3456"
-            value={cardDetails.cardNumber}
-            onChange={handleCardNumberChange}
-            maxLength={19}
-          />
-          <Input
-            name="expirationDate"
-            label="Expiration Date"
-            placeholder="MM/YY"
-            value={cardDetails.expirationDate}
-            onChange={handleExpirationDateChange}
-            maxLength={5}
-          />
-          <Input
-            name="cvv"
-            label="CVV"
-            placeholder="123"
-            value={cardDetails.cvv}
-            onChange={handleCvvChange}
-            maxLength={3}
-          />
-        </ModalBody>
-        <ModalFooter>
-          <Button color="danger" variant="light" onPress={closePaymentModal}>
-            Cancel
-          </Button>
-          <Button color="primary" onPress={handlePayment}>
-            Confirm and Pay
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+          isOpen={isPaymentModalOpen}
+          onClose={closePaymentModal}
+          size="2xl"
+          scrollBehavior="inside"
+        >
+          <ModalContent>
+            <ModalHeader className="font-primaryBold text-black">Checkout</ModalHeader>
+            <ModalBody>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-customCardDark p-4 rounded-lg">
+                  <h2 className="text-lg font-semibold mb-2 text-black">PAYMENT METHODS</h2>
+                  <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+                    <div className="border border-gray-900 p-5 rounded mb-4 w-[550px]">
+                      <Radio value="creditCard">
+                        <div className="flex items-center">
+                          <CreditCardIcon />
+                          <span className="text-black ml-2 mr-4">Credit Card</span>
+                        </div>
+                      </Radio>
+                      {paymentMethod === 'creditCard' && (
+                        <div className="mt-4">
+                          <Input
+                            label="Card Number"
+                            placeholder="1111-1111-1111-1111"
+                            value={cardDetails.cardNumber}
+                            onChange={handleCardNumberChange}
+                            className="mb-5"
+                          />
+                          <div className="flex gap-4">
+                            <Input
+                              label="Expiration (MM/YY)"
+                              placeholder="MM/YY"
+                              value={cardDetails.expirationDate}
+                              onChange={handleExpirationDateChange}
+                              className="mb-5"
+                            />
+                            <Input
+                              label="CVV"
+                              placeholder="123"
+                              value={cardDetails.cvv}
+                              onChange={handleCvvChange}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <div className="border border-gray-700 p-4 rounded">
+                      <Radio value="paypal">
+                        <div className="flex items-center">
+                          <PayPalIcon />
+                          <span className="text-black ml-2">PayPal</span>
+                        </div>
+                      </Radio>
+                      {paymentMethod === 'paypal' && (
+                        <Input
+                          label="PayPal Email"
+                          placeholder="your@email.com"
+                          value={paypalEmail}
+                          onChange={(e) => setPaypalEmail(e.target.value)}
+                          className="mt-2"
+                        />
+                      )}
+                    </div>
+                  </RadioGroup>
+                </div>
+              </div>
+              <div className="mt-4 bg-customCardDark p-4 rounded-lg">
+                <h2 className="text-lg font-semibold mb-4 text-black">ORDER SUMMARY</h2>
+                <div className="flex mb-4">
+                  <img src={currentGame?.game.coverPhoto} alt={currentGame?.game.title} className="w-16 h-20 object-cover mr-4" />
+                  <div>
+                    <h3 className="font-semibold text-black">{currentGame?.game.title}</h3>
+                    <p className="text-black">Extension: {formatTime(parseInt(selectedExtension?.time, 10))}</p>
+                    <p className="text-black">Rs.{selectedExtension?.price.toFixed(2)}</p>
+                  </div>
+                </div>
+                <div className="border-t border-gray-700 pt-4 mt-4">
+                  <div className="flex justify-between text-black">
+                    <span>Total</span>
+                    <span>Rs.{selectedExtension?.price.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+            </ModalBody>
+            <ModalFooter>
+              <Button color="danger" variant="light" onPress={closePaymentModal}>
+                Cancel
+              </Button>
+              <Button color="primary" onPress={handlePayment}>
+                EXTEND RENTAL
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       </div>
       <Footer />
     </div>

@@ -4,7 +4,11 @@ import { getToken } from '../utils/getToken';
 import { getUserIdFromToken } from '../utils/user_id_decoder';
 import Header from "../components/header";
 import { User, Input, Button, Card, Spacer } from "@nextui-org/react";
+
 import { BackgroundBeams } from "../components/ui/BackgroundBeams";
+
+import useAuthCheck from "../utils/authCheck";
+
 
 const SendIcon = (props) => (
   <svg
@@ -50,6 +54,7 @@ const UserListItem = ({ user, isSelected, onClick }) => (
 );
 
 const Chat = () => {
+  useAuthCheck();
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
