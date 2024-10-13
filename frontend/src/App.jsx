@@ -34,7 +34,7 @@ import UserMessages from "./pages/UserMessage";
 import Snake from "../Games/Snake";
 import Snake2player from "../Games/Snake2player";
 import PuzzlePlatformGame from "./components/Games/PuzzlePlatformGame";
-import ColorGuessingGame from "../Games/ColorGuessingGame";
+import ColorGuessingGame from "./components/Games/ColorGuessingGame";
 import Chat from "./pages/chat";
 
 import CodeBreaker from "./components/Games/CodeBreaker";

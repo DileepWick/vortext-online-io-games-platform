@@ -4,7 +4,11 @@ import { getToken } from '../utils/getToken';
 import { getUserIdFromToken } from '../utils/user_id_decoder';
 import Header from "../components/header";
 import { User, Input, Button, Card, Spacer } from "@nextui-org/react";
+
+import { BackgroundBeams } from "../components/ui/BackgroundBeams";
+
 import useAuthCheck from "../utils/authCheck";
+
 
 const SendIcon = (props) => (
   <svg
@@ -152,13 +156,14 @@ const Chat = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-slate-950 ">
       <Header />
+      <BackgroundBeams />
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-semibold mb-6 text-white-800">Messaging Center</h1>
+        <h1 className="text-7xl font-bold text-black bg-clip-text bg-no-repeat text-transparent bg-gradient-to-r py-4 from-blue-500 via-orange-500 to-orange-500 [text-shadow:0_0_rgba(0,0,0,0.1)]">Messaging Center</h1>
         <div className="flex flex-col md:flex-row gap-6">
-          <Card className="p-6 w-full md:w-1/3 shadow-md">
-            <div className="flex justify-between items-center mb-4">
+          <Card className="p-6 w-full md:w-1/3 shadow-md ">
+            <div className="flex justify-between items-center mb-4 ">
               <h2 className="text-xl font-semibold text-gray-800">Contacts</h2>
               <span className="text-sm text-gray-500">{filteredUsers.length} contacts</span>
             </div>
