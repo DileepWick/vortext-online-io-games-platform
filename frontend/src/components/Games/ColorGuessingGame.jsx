@@ -246,7 +246,7 @@ const ColorGuessingGame = () => {
         health={health}
       />
       <main className="flex-grow flex items-center justify-center px-4">
-        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
+        <div className="bg-gray-200 rounded-lg shadow-lg p-8 max-w-md w-full">
           {currentColor && (
             difficulty === DIFFICULTY_LEVELS.EXPERT ? (
               <div className="text-center mb-6">
@@ -273,7 +273,7 @@ const ColorGuessingGame = () => {
             ))}
           </div>
           {message && (
-            <div className="mt-6 p-4 bg-gray-100 rounded-lg">
+            <div className="mt-6 p-4 bg-gray-400 rounded-lg">
               <h3 className="font-bold mb-2 text-black">Result</h3>
               <p className={`text-black`}>
                 {message}
@@ -295,17 +295,19 @@ const ColorGuessingGame = () => {
   );
 };
 
+
 const GameHeader = ({ difficulty, score, health }) => {
   return (
     <div className="bg-gray-700 text-white p-4 flex justify-between items-center">
       <div className="flex items-center space-x-4">
         <span className="text-lg font-bold">Health: {renderHearts(health)}</span>
-        <span className="text-lg font-bold">Difficulty: {difficulty}</span>
       </div>
+      <div className="text-lg font-bold">Difficulty: {difficulty}</div>
       <div className="text-lg font-bold">Score: {score}</div>
     </div>
   );
 };
+
 
 const GameOverModal = ({ score, highScore, onRestart, onChangeDifficulty }) => {
   return (
