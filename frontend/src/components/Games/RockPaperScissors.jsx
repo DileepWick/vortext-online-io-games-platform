@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
+import useAuthCheck from "../../utils/authCheck";
 
 const AdvancedEducationalRockPaperScissors = () => {
+  useAuthCheck();
   const [playerChoice, setPlayerChoice] = useState(null);
   const [computerChoice, setComputerChoice] = useState(null);
   const [result, setResult] = useState('');
