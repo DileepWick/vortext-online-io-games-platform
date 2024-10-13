@@ -5,15 +5,18 @@ import { toast, Flip } from "react-toastify";
 import { Button } from "@nextui-org/button";
 import Header from "../components/header";
 import Footer from "../components/footer";
+import ScrollToTop from "../components/ScrollToTop";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { getToken } from "../utils/getToken";
 import useAuthCheck from "../utils/authCheck";
+import CustomToast from "../components/CustomToast";
 
 const Contact = () => {
   useAuthCheck();
-
+  const navigate = useNavigate();
   const [userData, setUserData] = useState({
     username: "",
     email: "",
@@ -40,7 +43,7 @@ const Contact = () => {
           email: response.data.profile.email,
         });
 
-        // Check if user has an open ticket
+        // Check if user has any tickets and if there is an open ticket
         const ticketResponse = await axios.get(
           `http://localhost:8098/contacts/fetchContactByUserId/${userId}`,
           {
@@ -50,14 +53,12 @@ const Contact = () => {
           }
         );
 
-        if (
-          ticketResponse.data.contact &&
-          ticketResponse.data.contact.status !== "closed"
-        ) {
-          setHasOpenTicket(true);
-        } else {
-          setHasOpenTicket(false);
-        }
+        const tickets = ticketResponse.data.contact || [];
+
+        // Check if any ticket exists and is not closed
+        const hasOpen = tickets.some((ticket) => ticket.status !== "closed");
+
+        setHasOpenTicket(hasOpen);
       } catch (error) {
         console.error("Error fetching user data:", error);
         // toast.error("Failed to fetch user data");
@@ -73,38 +74,18 @@ const Contact = () => {
     e.preventDefault();
 
     if (hasOpenTicket) {
-      toast.error(
-        "You already have an open ticket. Please wait for a response or check your existing ticket.",
-        {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-          transition: Flip,
-          progressBarClassName: "bg-gray-800",
-          style: { fontFamily: "Rubik" },
-        }
-      );
+      CustomToast({
+        message:
+          "You already have an open ticket. Please close it before submitting a new one.",
+        type: "error",
+      });
       return;
     }
 
     if (message.trim() === "") {
-      toast.error("Message cannot be empty", {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-        transition: Flip,
-        progressBarClassName: "bg-gray-800",
-        style: { fontFamily: "Rubik" },
+      CustomToast({
+        message: "Message cannot be empty",
+        type: "error",
       });
       return;
     }
@@ -125,63 +106,53 @@ const Contact = () => {
         { headers }
       );
 
-      toast.success("Message Sent", {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-        transition: Flip,
-        progressBarClassName: "bg-gray-800",
-        style: { fontFamily: "Rubik" },
+      CustomToast({
+        message: "Message sent successfully",
+        type: "success",
       });
 
       setMessage("");
       setHasOpenTicket(true);
     } catch (error) {
       console.error("Error sending message:", error);
-      toast.error(
-        `Failed to send message: ${
-          error.response?.data?.message || error.message
-        }`,
-        {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-          transition: Flip,
-          progressBarClassName: "bg-gray-800",
-          style: { fontFamily: "Rubik" },
-        }
-      );
+      CustomToast({
+        message: "Failed to send message",
+        type: "error",
+      });
     }
   };
 
   return (
     <>
       <Header />
-      <div className="contact-container font-primaryRegular">
+      <ScrollToTop />
+      <div className="contact-container font-primaryRegular bg-foreground">
         <div className="image_container">
           <img
             src="https://res.cloudinary.com/dhcawltsr/image/upload/v1719572048/wallpaperflare.com_wallpaper_3_gpe852.jpg"
             alt="Contact Us"
           />
         </div>
-        <div className="contact_us_container">
+        <div className="contact_us_container ">
           <div className="w-full flex flex-col gap-8">
-            <h1 className="text-3xl">Contact Us:</h1>
+            <h1 className="text-3xl text-white">Contact Us:</h1>
             {hasOpenTicket ? (
-              <p className="text-red-500">
-                You already have an open ticket. Please wait for a response or
-                check your existing ticket.
-              </p>
+              <div className="text-center">
+                <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 rounded">
+                  <p className="font-medium text-lg">
+                    You have an open ticket. Please wait for a response or check
+                    your existing ticket.
+                  </p>
+                </div>
+
+                <Button
+                  className="mx-auto block"
+                  onClick={() => navigate("/UserMessage")}
+                  color="primary"
+                >
+                  Show me
+                </Button>
+              </div>
             ) : (
               <form className="w-full" onSubmit={handleSubmit}>
                 <Input

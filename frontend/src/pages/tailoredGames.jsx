@@ -65,27 +65,27 @@ const TailoredGames = () => {
 
           {/* Game 2 */}
           <GameCard
-            title="Member 2 Game"
-            imageUrl="https://images5.alphacoders.com/127/1274050.jpg"
-            link="/games/chess"
+            title="Rock Paper scissors"
+            imageUrl="https://res.cloudinary.com/dhcawltsr/image/upload/v1728732978/882363a6-0b96-4cd7-b7e1-6dca080a3b24_ygxdix.jpg"
+            link="/rock-paper-scissors"
             devName={"Ranasinghe G.M.N.T.B"}
             devId={"IT22201928"}
           />
 
           {/* Game 3 */}
           <GameCard
-            title="Member 3 Game"
-            imageUrl="https://images5.alphacoders.com/127/1274050.jpg"
-            link="/games/sudoku"
+            title="Snake Game"
+            imageUrl="https://res.cloudinary.com/dhcawltsr/image/upload/v1728389582/d51605aa-b17f-42b0-8126-02c0e74d0867.png"
+            link="/Snakegame"
             devName={"Ariyawansha R.T.L "}
             devId={"IT22077356"}
           />
 
           {/* Game 4 */}
           <GameCard
-            title="Member 4 Game"
-            imageUrl="https://images5.alphacoders.com/127/1274050.jpg"
-            link="/games/tictactoe"
+            title="CodeBreaker"
+            imageUrl="https://res.cloudinary.com/dhcawltsr/image/upload/v1728753124/e495c55e-881b-49ff-a31a-07f7e62fe589_fqjcdp.jpg"
+            link="/CodeBreaker"
             devName={"Athauda A.A.D.D "}
             devId={"IT22105820"}
           />
@@ -99,17 +99,17 @@ const TailoredGames = () => {
           />
           {/* Game 6 */}
           <GameCard
-            title="Member 6 Game"
-            imageUrl="https://images5.alphacoders.com/127/1274050.jpg"
-            link="/games/tictactoe"
+            title="Color Guessing"
+            imageUrl="https://res.cloudinary.com/dhcawltsr/image/upload/v1728821392/99044073-3297-4294-ab60-58fdf017b121_o80kq4.jpg"
+            link="/ColorGuessingGame"
             devName={"Dissanayaka D.M.K.L.K"}
             devId={"IT22120748"}
           />
           {/* Game 7 */}
           <GameCard
-            title="Member 7 Game"
-            imageUrl="https://images5.alphacoders.com/127/1274050.jpg"
-            link="/games/tictactoe"
+            title="Mathz Blaster"
+            imageUrl="https://res.cloudinary.com/dhcawltsr/image/upload/v1728299817/DALLE2024-10-0716.45.01-AsimpleandfunlogoforagamecalledMathBlaster.Thelogoshouldhaveplayfulandbright_myurlb.jpg"
+            link="/PuzzlePlatformGame"
             devName={"Dissanayake K.M.S.N.B"}
             devId={"IT22231246"}
           />

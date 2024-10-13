@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, forwardRef } from "react";
 import {
   Navbar,
   NavbarBrand,
@@ -20,7 +20,7 @@ import { NotificationIcon } from "../assets/icons/NotificationIcon.jsx";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { getToken } from "../utils/getToken";
 
-export default function Header() {
+const Header = forwardRef((props, ref) => {
   const [user, setUser] = useState(null);
   const token = getToken();
   const userId = getUserIdFromToken(token);
@@ -54,9 +54,6 @@ export default function Header() {
   return (
     <div className="bg-headerDark h-[50px]">
       <Navbar className="font-primaryRegular bg-headerDark text-white">
-        <NavbarBrand>
-          <p className="font-bold text-white">VORTEX GAMING</p>
-        </NavbarBrand>
 
         <NavbarContent className="hidden sm:flex gap-4" justify="center">
           <NavbarItem>
@@ -67,7 +64,7 @@ export default function Header() {
                 location.pathname === "/" ? "underline" : ""
               } text-white hover:underline`}
             >
-              Home
+              HOME
             </Link>
           </NavbarItem>
           <NavbarItem>
@@ -78,7 +75,7 @@ export default function Header() {
                 location.pathname === "/shop" ? "underline" : ""
               } text-white hover:underline`}
             >
-              Shop
+              SHOP
             </Link>
           </NavbarItem>
           <NavbarItem>
@@ -89,7 +86,7 @@ export default function Header() {
                 location.pathname === "/articles" ? "underline" : ""
               } text-white hover:underline`}
             >
-              Article
+             COMMUNITY
             </Link>
           </NavbarItem>
           <NavbarItem>
@@ -100,7 +97,7 @@ export default function Header() {
                 location.pathname === "/chat" ? "underline" : ""
               } text-white hover:underline`}
             >
-              Chat
+              CHAT
             </Link>
           </NavbarItem>
 
@@ -114,24 +111,27 @@ export default function Header() {
                 location.pathname === "/TailoredGames" ? "underline" : ""
               } text-white hover:underline`}
             >
-              Vortex Games
+              OUR GAMES
             </Link>
           </NavbarItem>
-          <Dropdown placement="bottom-start">
+          <Dropdown
+            placement="bottom-start"
+            className="bg-foreground text-white"
+          >
             <DropdownTrigger>
-              <NavbarItem className="cursor-pointer">Help</NavbarItem>
+              <NavbarItem className="cursor-pointer">SUPPORT</NavbarItem>
             </DropdownTrigger>
             <DropdownMenu
               aria-label="Profile Actions"
               variant="flat"
-              className="font-primaryRegular text-black "
+              className="font-primaryRegular "
             >
               <DropdownItem key="support" onClick={() => navigate("/support")}>
                 Vortex Support
               </DropdownItem>
               <DropdownItem
                 Key="contactus"
-                onClick={() => navigate("/contact")}
+                onClick={() => navigate("/support#contactForm")}
               >
                 Contact Us
               </DropdownItem>
@@ -146,7 +146,10 @@ export default function Header() {
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
-          <Dropdown placement="bottom-start">
+          <Dropdown
+            placement="bottom-start"
+            className="bg-foreground text-white"
+          >
             <DropdownTrigger>
               <NavbarItem className="cursor-pointer flex items-center">
                 <NotificationIcon style={{ marginRight: "8px" }} />
@@ -162,7 +165,7 @@ export default function Header() {
             <DropdownMenu
               aria-label="Notification Actions"
               variant="flat"
-              className="font-primaryRegular text-black"
+              className="font-primaryRegular"
             >
               <DropdownItem onClick={() => navigate("/Notification")}>
                 View All Notifications
@@ -176,7 +179,10 @@ export default function Header() {
 
         <NavbarContent as="div" justify="end">
           {token && user ? (
-            <Dropdown placement="bottom-end">
+            <Dropdown
+              placement="bottom-end"
+              className="bg-foreground text-white"
+            >
               <DropdownTrigger>
                 <User
                   className="cursor-pointer text-white"
@@ -190,7 +196,7 @@ export default function Header() {
               <DropdownMenu
                 aria-label="Profile Actions"
                 variant="flat"
-                className="font-primaryRegular text-black"
+                className="font-primaryRegular text-white"
               >
                 <DropdownItem key="profile" className="h-14 gap-2">
                   <p className="font-semibold">Signed in as</p>
@@ -218,11 +224,12 @@ export default function Header() {
                   My Cart
                 </DropdownItem>
 
-
-                <DropdownItem key="cart" onClick={() => navigate("/Transaction")}>
+                <DropdownItem
+                  key="cart"
+                  onClick={() => navigate("/Transaction")}
+                >
                   Transaction History
                 </DropdownItem>
-                
 
                 {/* Developer Filter */}
                 {user.role === "developer" && (
@@ -233,7 +240,6 @@ export default function Header() {
                     Developer Dashboard
                   </DropdownItem>
                 )}
-
 
                 {/* Admin Filter */}
                 {user.role === "Product Manager" && (
@@ -356,4 +362,5 @@ export default function Header() {
       </Navbar>
     </div>
   );
-}
+});
+export default Header;

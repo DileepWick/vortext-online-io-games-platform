@@ -374,12 +374,13 @@ userRouter.get("/profile/:id", async (request, response) => {
       return response.status(404).json({ message: "User profile not found" });
     }
 
-    // Respond with user profile data
+    // Respond with user profile data including firstname and lastname
     return response.status(200).json({
       profile: userProfile,
     });
   } catch (error) {
     console.log(error.message);
+    return response.status(500).json({ message: "Server error" });
   }
 });
 
@@ -389,11 +390,8 @@ userRouter.put(
   upload.fields([{ name: "image", maxCount: 1 }]),
   async (req, res) => {
     try {
-      // Get the user ID from params
       const { id } = req.params;
-
-      // Get other details from the request body
-      const { username, email } = req.body;
+      const { username, email, firstname, lastname } = req.body;
 
       // Validate inputs
       if (!username || typeof username !== "string") {
@@ -402,10 +400,22 @@ userRouter.put(
       if (!email || typeof email !== "string" || !email.includes("@")) {
         return res.status(400).json({ message: "Invalid email" });
       }
+      if (!firstname || typeof firstname !== "string") {
+        return res.status(400).json({ message: "Invalid firstname" });
+      }
+      if (!lastname || typeof lastname !== "string") {
+        return res.status(400).json({ message: "Invalid lastname" });
+      }
 
       // Check if image file is provided
+      let updatedUser = {
+        username,
+        email,
+        firstname,
+        lastname,
+      };
+
       if (req.files && req.files.image && req.files.image[0]) {
-        // Upload new profile picture
         const imageResult = await cloudinary.uploader.upload(
           req.files.image[0].path,
           {
@@ -414,59 +424,68 @@ userRouter.put(
           }
         );
 
-        // Check the URL
         if (!imageResult.secure_url) {
           return res.status(500).json({ message: "Image upload failed" });
         }
 
-        // Create user object with updated profile picture URL
-        const updatedUser = {
-          username,
-          email,
-          profilePic: imageResult.secure_url,
-        };
-
-        // Find user by ID and update
-        const userUpdate = await User.findByIdAndUpdate(id, updatedUser, {
-          new: true, // Return updated document
-          runValidators: true, // Run model validators on update
-        });
-
-        if (!userUpdate) {
-          return res.status(404).json({ message: "Profile update failed" });
-        }
-
-        // Return the updated user
-        return res.json(userUpdate);
+        updatedUser.profilePic = imageResult.secure_url;
 
         // Remove uploaded file from server
         fs.unlinkSync(req.files.image[0].path);
-      } else {
-        // If no image file provided, update username and email only
-        const updatedUser = {
-          username,
-          email,
-        };
-
-        // Find user by ID and update
-        const userUpdate = await User.findByIdAndUpdate(id, updatedUser, {
-          new: true, // Return updated document
-          runValidators: true, // Run model validators on update
-        });
-
-        if (!userUpdate) {
-          return res.status(404).json({ message: "Profile update failed" });
-        }
-
-        // Return the updated user
-        return res.json(userUpdate);
       }
+
+      // Find user by ID and update
+      const userUpdate = await User.findByIdAndUpdate(id, updatedUser, {
+        new: true,
+        runValidators: true,
+      });
+
+      if (!userUpdate) {
+        return res.status(404).json({ message: "Profile update failed" });
+      }
+
+      // Return the updated user
+      return res.json(userUpdate);
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: "Server error" });
     }
   }
 );
+
+// Change Password
+userRouter.put("/profile/change-password/:id", async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Verify current password (assuming you are using bcrypt)
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Current password is incorrect" });
+    }
+
+    // Check password validation
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(newPassword)) {
+      return res.status(400).json({ message: "New password must be at least 8 characters long and include uppercase, lowercase, number, and symbol." });
+    }
+
+    // Hash new password and update user
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    return res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
 
 // Change Status
 userRouter.put("/changeStatus/:id", async (request, response) => {
@@ -578,7 +597,7 @@ userRouter.get('/get-income/:id', async (req, res) => {
 userRouter.get("/moderators", async (req, res) => {
   try {
     const moderatorRoles = [
-      'Product Manager', 'User Manager', 'Order Manager', 'Blogger', 
+      'Product Manager', 'User Manager', 'Order Manager',
       'Session_Manager', 'Community Manager', 'Review Manager', 
       'Support Agent', 'Staff_Manager', 'Payment Manager'
     ];

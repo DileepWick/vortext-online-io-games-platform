@@ -1,23 +1,53 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { getUserRoleFromToken } from "./user_role_decoder";
 import { getToken } from "./getToken";
+import { jwtDecode } from "jwt-decode";
 
-const useAuthCheck = (direction) => {
+const useAuthCheck = (requiredRole) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const isChecked = useRef(false);
 
   useEffect(() => {
-    //Get the token fron local storage
-    const token = getToken();
+    if (isChecked.current) return;
+    isChecked.current = true;
 
-    //If token is not found redirect to login
-    if (!token) {
-      const currentPath = encodeURIComponent(location.pathname + location.search);
-      navigate(`/login?redirect=${currentPath}`);
-    } else if (direction) { //Else give access to the section that user tried to access 
-      navigate(direction);
-    }
-  }, [navigate, location, direction]);
+    const checkAuth = async () => {
+      const token = getToken();
+
+      if (!token) {
+        const currentPath = encodeURIComponent(
+          location.pathname + location.search
+        );
+        navigate(`/login?redirect=${currentPath}`, { replace: true });
+        return;
+      }
+
+      try {
+        let userRole = getUserRoleFromToken(token);
+
+        if (!userRole) {
+          const decodedToken = jwtDecode(token);
+          userRole = decodedToken.role;
+        }
+
+        if (!userRole) {
+          throw new Error("Unable to determine user role");
+        }
+
+        if (requiredRole && userRole !== requiredRole) {
+          navigate("/unauthorized", { replace: true });
+        }
+        // We're not forcing navigation to any specific route if the role check passes
+      } catch (error) {
+        console.error("Token decoding failed", error);
+        navigate(`/login`, { replace: true });
+      }
+    };
+
+    checkAuth();
+  }, [navigate, location, requiredRole]);
 };
-export default useAuthCheck;
 
+export default useAuthCheck;

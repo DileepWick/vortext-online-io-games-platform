@@ -121,14 +121,18 @@ const DeveloperDashboard = () => {
 
   return (
     <div>
+      <div className="flex items-center mb-4">
       <Input
-        className="ml-2 font-primaryRegular w-48 sm:w-64"
+        className="ml-2 font-primaryRegular w-full" // Use w-full to make it full width
         placeholder="Search by Developer..."
         startContent={<SearchIcon />}
         value={searchQuery}
         onChange={handleSearchChange}
         onClear={() => handleSearchChange({ target: { value: "" } })}
+        style={{ maxWidth: "600px" }} // Optional: Set a maximum width
       />
+      </div>
+      
       <Table
         className="text-black"
         isHeaderSticky
@@ -151,7 +155,7 @@ const DeveloperDashboard = () => {
         <TableHeader>
           <TableColumn>FULL NAME</TableColumn>
           <TableColumn>USERNAME</TableColumn>
-          <TableColumn>PORTFOLIO LINK</TableColumn>
+          <TableColumn>LINKEDIN LINK</TableColumn>
           <TableColumn>EMAIL</TableColumn>
           <TableColumn>STATUS</TableColumn>
           <TableColumn>ACTIONS</TableColumn>
@@ -164,11 +168,11 @@ const DeveloperDashboard = () => {
               <TableCell>{developer.username}</TableCell>
               <TableCell>
                 <a
-                  href={developer.portfolioLink || `https://github.com/${developer.username}`}
+                  href={developer.portfolioLink || `www.linkedin.com/${developer.username}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {developer.portfolioLink || `https://github.com/${developer.username}`}
+                  {developer.portfolioLink || `www.linkedin.com/${developer.username}`}
                 </a>
               </TableCell>
               <TableCell>{developer.email}</TableCell>

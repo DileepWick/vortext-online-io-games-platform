@@ -115,9 +115,9 @@ const GameEmbed = () => {
   };
 
   return (
-    <>
+    <div>
       <Header />
-      <div className="relative flex min-h-screen bg-white ">
+      <div className="relative flex min-h-screen bg-customDark ">
         {/* Ai assistance */}
         <ChatComponent game={decodedTitle} />
         {/* Game iframe on the left */}
@@ -172,7 +172,7 @@ const GameEmbed = () => {
         </div>
       </div>
       <Footer />
-    </>
+    </div>
   );
 };
 
