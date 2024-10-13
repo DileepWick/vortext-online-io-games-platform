@@ -1,0 +1,94 @@
+.rank {
+    animation: slideIn 3s ease-out infinite;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(45deg, #0d0d0d, #1f1f1f); /* Dark gradient */
+    color: #00ffcc; /* Neon cyan color for text */
+    font-family: 'Press Start 2P', cursive;
+    text-align: center;
+    /* border: 2px solid #00ffcc;  */
+    position: absolute;
+    transform: translateX(-50%);
+    z-index: 50;
+    perspective: 1000px;
+    width: 250px;
+    height: 400px;
+    display: none;
+  }
+  
+  .rank::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    /* border: 2px solid #00ff99;
+    border-radius: 0.25rem; */
+    filter: blur(8px); 
+    z-index: -1;
+  }
+  
+  .swiper-slide-active .rank,.swiper-slide-active .rankNum {
+    display: block;
+  }
+  
+  @keyframes slideIn {
+    0% {
+      transform: translateY(-100%) rotateX(90deg);
+      opacity: 0;
+    }
+    50% {
+      transform: translateY(-53.5%) rotateX(0deg);
+      opacity: 0.7;
+    }
+    100% {
+      transform: translateY(-100%) rotateX(-90deg);
+      opacity: 0;
+    }
+  }
+  
+  .text-animation {
+    animation: fadeIn 1.5s ease-in-out 1.5s forwards infinite; /* Delayed start after 50% of 3s (slideIn) */
+    color: #00ffcc;
+  }
+  
+  @keyframes fadeIn {
+    0%, 100% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  
+  /* New gaming effect animation */
+  @keyframes gamingEffect {
+    0% { transform: translateY(0) scale(1);opacity: 0; }
+    50% { transform: translateY(-10px) scale(1.1); opacity: 1; }
+    100% { transform: translateY(0) scale(1);opacity: 0; }
+  }
+  
+  .gaming-animation {
+    animation: gamingEffect 3s infinite;
+    color: #f21160; /* Neon pink text for a vibrant look */
+    text-shadow: 0 0 10px #f21160, 0 0 20px #f21160, 0 0 30px #f21160;
+    display: none;
+  }
+  
+  body {
+    background-color: #121212; /* Very dark background */
+    color: #00ffcc; /* General neon cyan text color */
+  }
+  .rankNum {
+    text-shadow: 
+      1px 1px 0 #000, 
+      2px 2px 0 #333, 
+      3px 3px 2px #555, 
+      4px 4px 2px rgba(0, 0, 0, 0.5);
+    perspective: 500px;
+    transform: rotateX(10deg) rotateY(10deg);
+    font-weight: bold;
+     /* Adjust color for visibility */
+  }

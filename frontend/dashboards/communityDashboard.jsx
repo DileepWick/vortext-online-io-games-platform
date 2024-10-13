@@ -4,6 +4,8 @@ import Header from "../src/components/header";
 import Footer from "../src/components/footer";
 import { toast, Flip } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import {
   Table,
   TableHeader,
@@ -23,12 +25,28 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "../src/assets/icons/SearchIcon";
 import { DeleteIcon } from "../src/assets/icons/DeleteIcon";
+import { Download } from "lucide-react";
 import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip as ChartTooltip, Legend } from 'chart.js';
+import { 
+  Chart as ChartJS, 
+  CategoryScale, 
+  LinearScale, 
+  BarElement, 
+  Title, 
+  Tooltip as ChartTooltip, 
+  Legend 
+} from 'chart.js';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, ChartTooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  ChartTooltip,
+  Legend
+);
 
-const CommunityPostsChart = ({ data }) => {
+const CommunityPostsChart = ({ data, chartRef }) => {
   if (!data || data.length === 0) {
     return <div>No data available for the chart</div>;
   }
@@ -72,7 +90,30 @@ const CommunityPostsChart = ({ data }) => {
     },
   };
 
-  return <Bar data={chartData} options={options} style={{ height: '400px' }} />;
+  return <Bar ref={chartRef} data={chartData} options={options} style={{ height: '400px' }} />;
+};
+
+const AnalyticsTable = ({ data }) => {
+  return (
+    <Table aria-label="Analytics table">
+      <TableHeader>
+        <TableColumn>POST TITLE</TableColumn>
+        <TableColumn>LIKES</TableColumn>
+        <TableColumn>COMMENTS</TableColumn>
+        <TableColumn>REPORTS</TableColumn>
+      </TableHeader>
+      <TableBody>
+        {data.map((item) => (
+          <TableRow key={item._id}>
+            <TableCell>{item.heading}</TableCell>
+            <TableCell>{item.likes || 0}</TableCell>
+            <TableCell>{item.comments?.length || 0}</TableCell>
+            <TableCell>{item.reportedBy?.length || 0}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
 };
 
 const CommunityDashboard = () => {
@@ -83,6 +124,7 @@ const CommunityDashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("allArticles");
   const [page, setPage] = useState(1);
+  const chartRef = React.useRef(null);
 
   const rowsPerPage = 5;
 
@@ -170,6 +212,61 @@ const CommunityDashboard = () => {
     }
   };
 
+  const downloadPDF = () => {
+    const doc = new jsPDF();
+    
+    // Add title and header
+    doc.setFontSize(20);
+    doc.setTextColor(44, 62, 80); // Dark blue color
+    doc.text('Community Analytics Report', 15, 20);
+    
+    // Add timestamp
+    doc.setFontSize(10);
+    doc.setTextColor(127, 140, 141); // Gray color
+    doc.text(`Generated on: ${new Date().toLocaleString()}`, 15, 30);
+
+    // Add summary statistics
+    doc.setFontSize(12);
+    doc.setTextColor(44, 62, 80);
+    doc.text(`Total Posts: ${articles.length}`, 15, 45);
+    doc.text(`Total Reported Posts: ${reportedArticles.length}`, 15, 55);
+
+    // Add analytics table
+    const tableData = articles.map(article => [
+      article.heading,
+      article.likes || 0,
+      article.comments?.length || 0,
+      article.reportedBy?.length || 0
+    ]);
+
+    doc.autoTable({
+      startY: 70,
+      head: [['Post Title', 'Likes', 'Comments', 'Reports']],
+      body: tableData,
+      theme: 'grid',
+      headStyles: { fillColor: [41, 128, 185], textColor: 255 }, // Blue header
+      alternateRowStyles: { fillColor: [241, 245, 249] }, // Light blue alternate rows
+    });
+
+    // Add chart on new page
+    if (chartRef.current) {
+      const chartCanvas = chartRef.current.canvas;
+      const chartImage = chartCanvas.toDataURL('image/png');
+      doc.addPage();
+      doc.text('Analytics Visualization', 15, 20);
+      doc.addImage(chartImage, 'PNG', 15, 30, 180, 100);
+    }
+
+    // Save the PDF
+    doc.save('community-analytics.pdf');
+    
+    toast.success("PDF downloaded successfully!", {
+      theme: "dark",
+      transition: Flip,
+      style: { fontFamily: "Rubik" },
+    });
+  };
+
   const filteredItems = useMemo(() => {
     const currentArticles = activeTab === "allArticles" ? articles : reportedArticles;
     return currentArticles.filter((article) =>
@@ -221,95 +318,117 @@ const CommunityDashboard = () => {
               <Tab key="analytics" title="Analytics" />
             </Tabs>
           </div>
-          {activeTab !== "analytics" && (
-            <div className="flex justify-between items-center mb-4">
-              <Input
-                className="w-64"
-                placeholder="Search by article title..."
-                startContent={<SearchIcon />}
-                value={searchQuery}
-                onChange={handleSearchChange}
-                onClear={handleClearSearch}
-              />
-            </div>
+
+          {activeTab === "analytics" && (
+            <>
+              <div className="flex justify-end mb-4">
+                <Button
+                  color="primary"
+                  endContent={<Download size={16} />}
+                  onClick={downloadPDF}
+                  className="ml-auto"
+                >
+                  Download Analytics Report
+                </Button>
+              </div>
+              <div className="grid gap-4">
+                <Card>
+                  <CardBody>
+                    <CommunityPostsChart data={articles} chartRef={chartRef} />
+                  </CardBody>
+                </Card>
+                <Card>
+                  <CardBody>
+                    <AnalyticsTable data={articles} />
+                  </CardBody>
+                </Card>
+              </div>
+            </>
           )}
-          {activeTab === "analytics" ? (
-            <Card>
-              <CardBody>
-                <CommunityPostsChart data={articles} />
-              </CardBody>
-            </Card>
-          ) : (
-            <Table
-              className="text-black"
-              aria-label="Articles table"
-              bottomContent={
-                <div className="flex w-full justify-center">
-                  <Pagination
-                    isCompact
-                    showControls
-                    showShadow
-                    color="primary"
-                    page={page}
-                    total={Math.ceil(filteredItems.length / rowsPerPage)}
-                    onChange={(page) => setPage(page)}
-                  />
-                </div>
-              }
-              classNames={{
-                wrapper: "min-h-[222px]",
-              }}
-            >
-              <TableHeader columns={columns}>
-                {(column) => (
-                  <TableColumn key={column.key}>{column.label}</TableColumn>
-                )}
-              </TableHeader>
-              <TableBody items={items}>
-                {(item) => (
-                  <TableRow key={item._id}>
-                    {(columnKey) => (
-                      <TableCell>
-                        {columnKey === "title" && item.heading}
-                        {columnKey === "author" && activeTab === "allArticles" && (item.uploader?.name || item.uploader?.username)}
-                        {columnKey === "likes" && item.likes}
-                        {columnKey === "comments" && item.comments.length}
-                        {columnKey === "reports" && (
-                          <Chip color="danger" variant="flat">
-                            {item.reportedBy.length}
-                          </Chip>
-                        )}
-                        {columnKey === "actions" && (
-                          <div className="flex items-center gap-4">
-                            <Tooltip
-                              content="Delete article"
-                              color="danger"
-                              className="font-primaryRegular"
-                            >
-                              <span
-                                className="text-lg text-danger cursor-pointer active:opacity-50"
-                                onClick={() => handleDeleteArticle(item._id)}
+
+          {activeTab !== "analytics" && (
+            <>
+              <div className="flex justify-between items-center mb-4">
+                <Input
+                  className="w-64"
+                  placeholder="Search by article title..."
+                  startContent={<SearchIcon />}
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  onClear={handleClearSearch}
+                />
+              </div>
+              <Table
+                className="text-black"
+                aria-label="Articles table"
+                bottomContent={
+                  <div className="flex w-full justify-center">
+                    <Pagination
+                      isCompact
+                      showControls
+                      showShadow
+                      color="primary"
+                      page={page}
+                      total={Math.ceil(filteredItems.length / rowsPerPage)}
+                      onChange={(page) => setPage(page)}
+                    />
+                  </div>
+                }
+                classNames={{
+                  wrapper: "min-h-[222px]",
+                }}
+              >
+                <TableHeader columns={columns}>
+                  {(column) => (
+                    <TableColumn key={column.key}>{column.label}</TableColumn>
+                  )}
+                </TableHeader>
+                <TableBody items={items}>
+                  {(item) => (
+                    <TableRow key={item._id}>
+                      {(columnKey) => (
+                        <TableCell>
+                          {columnKey === "title" && item.heading}
+                          {columnKey === "author" && activeTab === "allArticles" && (item.uploader?.name || item.uploader?.username)}
+                          {columnKey === "likes" && item.likes}
+                          {columnKey === "comments" && item.comments.length}
+                          {columnKey === "reports" && (
+                            <Chip color="danger" variant="flat">
+                              {item.reportedBy.length}
+                            </Chip>
+                          )}
+                          {columnKey === "actions" && (
+                            <div className="flex items-center gap-4">
+                              <Tooltip
+                                content="Delete article"
+                                color="danger"
+                                className="font-primaryRegular"
                               >
-                                <DeleteIcon />
-                              </span>
-                            </Tooltip>
-                            {activeTab === "reportedArticles" && (
-                              <Button
-                                size="sm"
-                                color="warning"
-                                onClick={() => handleDismissReport(item._id)}
-                              >
-                                Dismiss Report
-                              </Button>
-                            )}
-                          </div>
-                        )}
-                      </TableCell>
-                    )}
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                                <span
+                                  className="text-lg text-danger cursor-pointer active:opacity-50"
+                                  onClick={() => handleDeleteArticle(item._id)}
+                                >
+                                  <DeleteIcon />
+                                </span>
+                              </Tooltip>
+                              {activeTab === "reportedArticles" && (
+                                <Button
+                                  size="sm"
+                                  color="warning"
+                                  onClick={() => handleDismissReport(item._id)}
+                                >
+                                  Dismiss Report
+                                </Button>
+                              )}
+                            </div>
+                          )}
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </>
           )}
         </div>
       </main>

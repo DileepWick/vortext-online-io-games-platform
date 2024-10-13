@@ -65,18 +65,18 @@ const TailoredGames = () => {
 
           {/* Game 2 */}
           <GameCard
-            title="Member 2 Game"
-            imageUrl="https://images5.alphacoders.com/127/1274050.jpg"
-            link="/games/chess"
+            title="Rock Paper scissors"
+            imageUrl="https://res.cloudinary.com/dhcawltsr/image/upload/v1728732978/882363a6-0b96-4cd7-b7e1-6dca080a3b24_ygxdix.jpg"
+            link="/rock-paper-scissors"
             devName={"Ranasinghe G.M.N.T.B"}
             devId={"IT22201928"}
           />
 
           {/* Game 3 */}
           <GameCard
-            title="Member 3 Game"
-            imageUrl="https://images5.alphacoders.com/127/1274050.jpg"
-            link="/games/sudoku"
+            title="Snake Game"
+            imageUrl="https://res.cloudinary.com/dhcawltsr/image/upload/v1728389582/d51605aa-b17f-42b0-8126-02c0e74d0867.png"
+            link="/Snakegame"
             devName={"Ariyawansha R.T.L "}
             devId={"IT22077356"}
           />
@@ -99,9 +99,9 @@ const TailoredGames = () => {
           />
           {/* Game 6 */}
           <GameCard
-            title="Member 6 Game"
+            title="Color Guessing"
             imageUrl="https://images5.alphacoders.com/127/1274050.jpg"
-            link="/games/tictactoe"
+            link="/ColorGuessingGame"
             devName={"Dissanayaka D.M.K.L.K"}
             devId={"IT22120748"}
           />

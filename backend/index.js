@@ -23,14 +23,17 @@ import faqRouter from "./routes/faq_routes.js";
 import RentalRouter from "./routes/rental_routes.js";
 import chatRouter from "./routes/chat_bot_route.js";
 import rentalPaymentsRouter from "./routes/rentalPaymentRoutes.js";
-
-
+import MathzBlasterScore from "./routes/math_blaster_routes.js";
 
 import CommunityPost from "./routes/communityPost_routes.js";
 import contactRouter from "./routes/contact_us_route.js";
 import messageRoutes from "./routes/messageRoutes.js";
+import DirectContactUsRoute from "./routes/direct_contact_us_route.js";
 
 import { RentalDurationRouter } from "./routes/rentalDurationRoutes.js";
+
+
+import rockPaperScissorsRouter from "./routes/rock_paper_scissors_routes.js";
 
 //Create the app
 const app = express();
@@ -100,10 +103,13 @@ app.use("/Rentals", RentalRouter); //Rentals
 app.use("/api", chatRouter); // Use chatbot routes
 app.use("/rentalDurations", RentalDurationRouter);
 app.use("/rentalPayments", rentalPaymentsRouter); //payments for the rentals
+app.use("/mathzblaster", MathzBlasterScore);
+app.use("/directContactUs", DirectContactUsRoute);
 
 app.use("/api", GPTRouter);
-
-
 app.use("/api", GPTRouter);
 app.use("/contacts", contactRouter);
 app.use("/api/messages", messageRoutes); // Changed the path to "/api/messages"
+
+
+app.use("/api/rock-paper-scissors", rockPaperScissorsRouter);
