@@ -1,102 +1,312 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { Target } from "lucide-react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { FaTrophy } from "react-icons/fa"; // Ensure the import is correct
+import { useNavigate } from "react-router-dom"; // Import useHistory for navigation
+import axios from "axios";
+import { Loader, Target } from "lucide-react";
+import { MathzBlasterScore } from "../../../../backend/models/MathzBlasterScore";
+import { BackgroundBeamsWithCollision } from "../ui/BackgroundBeamsWithCollision";
+import Header from "../header";
+import Footer from "../footer";
+import { TextGenerateEffect } from "../ui/TextGenerateEffect";
+import ScrollToTop from "../ScrollToTop";
+import { getToken } from "../../utils/getToken";
+import { getUserIdFromToken } from "../../utils/user_id_decoder";
+import { Button } from "@nextui-org/react";
+import useAuthCheck from "../../utils/authCheck";
+import usePreventNavigation from "../PreventNavigation";
+
+const DIFFICULTY_LEVELS = {
+  EASY: "easy",
+  MEDIUM: "medium",
+  HARD: "hard",
+};
+const words = `How High Can You Aim for the Equation?`;
 
 const PuzzlePlatformGame = () => {
-  // Game state hooks
-  const [score, setScore] = useState(0); // Player's score
-  const [question, setQuestion] = useState(""); // Current math question
-  const [correctAnswer, setCorrectAnswer] = useState(null); // Correct answer to the question
-  const [enemies, setEnemies] = useState([]); // Array of enemy objects
-  const [gameOver, setGameOver] = useState(false); // Flag for game over state
-  const [playerPosition, setPlayerPosition] = useState({ x: 300, y: 550 }); // Player's position
-  const [bullets, setBullets] = useState([]); // Array of bullets shot by the player
-  const [health, setHealth] = useState(3); // Player's health points
+  useAuthCheck();
+  const [score, setScore] = useState(0);
+  const [question, setQuestion] = useState("");
+  const [correctAnswer, setCorrectAnswer] = useState(null);
+  const [enemies, setEnemies] = useState([]);
+  const [gameOver, setGameOver] = useState(false);
+  const [playerPosition, setPlayerPosition] = useState({ x: 300, y: 550 });
+  const [bullets, setBullets] = useState([]);
+  const [health, setHealth] = useState(3);
   const [enemySpeed, setEnemySpeed] = useState(1);
   const [level, setLevel] = useState(1);
+  const [difficulty, setDifficulty] = useState(null);
+  const [paused, setPaused] = useState(false);
+  const [startTime, setStartTime] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [transform, setTransform] = useState("translate(0, 0)"); // Default position
+  const [currentUser, setCurrentUser] = useState(null);
+  const navigate = useNavigate();
 
-  // Helper function to check if two enemies are overlapping
-  const isOverlapping = (enemy1, enemy2) => {
-    const distance = Math.sqrt(
-      Math.pow(enemy1.x - enemy2.x, 2) + Math.pow(enemy1.y - enemy2.y, 2)
-    );
-    return distance < 50; // Ensure at least a 50px gap between enemies
-  };
+  const handleMouseEnter = (e) => {
+    const { clientX, clientY, target } = e;
+    const { left, top, width, height } = target.getBoundingClientRect();
 
-  // Function to generate a unique enemy position that does not overlap with others
-  const generateUniquePosition = (existingEnemies) => {
-    let newEnemy;
-    do {
-      // Randomize enemy position within window boundaries
-      newEnemy = {
-        x: Math.random() * (window.innerWidth - 60) + 30,
-        y: -50, // Spawn above the screen
-      };
-    } while (
-      existingEnemies.some((enemy) => isOverlapping(enemy, newEnemy)) // Avoid overlap
-    );
-    return newEnemy;
-  };
+    const x = clientX - (left + width / 2); // Mouse position relative to the center of the button
+    const y = clientY - (top + height / 2);
 
-  // Generate a new math question and create enemy positions with answers
-  const generateQuestion = useCallback(() => {
-    const num1 = Math.floor(Math.random() * 10) + 1; // Random number 1
-    const num2 = Math.floor(Math.random() * 10) + 1; // Random number 2
-    const operation = Math.random() < 0.5 ? "+" : "-"; // Randomly choose between addition and subtraction
-    let answer;
-
-    // Calculate correct answer based on chosen operation
-    if (operation === "+") {
-      answer = num1 + num2;
+    // Determine the direction of the hover
+    if (Math.abs(x) > Math.abs(y)) {
+      // Horizontal hover
+      if (x > 0) {
+        // Hovering from the left
+        setTransform("translate(-10px, 0)"); // Move left
+      } else {
+        // Hovering from the right
+        setTransform("translate(10px, 0)"); // Move right
+      }
     } else {
-      answer = num1 - num2;
+      // Vertical hover
+      if (y > 0) {
+        // Hovering from the top
+        setTransform("translate(0, -10px)"); // Move down
+      } else {
+        // Hovering from the bottom
+        setTransform("translate(0, 10px)"); // Move up
+      }
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setTransform("translate(0, 0)"); // Reset to default position
+  };
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const token = getToken();
+        const userId = getUserIdFromToken(token);
+        console.log("User ID:", userId);
+        const response = await axios.get(
+          "http://localhost:8098/users/allusers",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log("User profile fetched:", response.data);
+        setUserData({
+          userId: response.data._id,
+          username: response.data.username,
+          email: response.data.email,
+        });
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
+  const saveGameStats = async (score, playtime, level, difficulty) => {
+    try {
+      const token = getToken();
+      const userId = getUserIdFromToken(token);
+
+      const response = await axios.post(
+        "http://localhost:8098/mathzblaster/save",
+        { userId, score, playtime, level, difficulty },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Game stats saved:", response.data);
+    } catch (error) {
+      console.error("Error saving game stats:", error);
+    }
+  };
+
+  const togglePause = useCallback(() => {
+    setPaused((prev) => !prev);
+  }, []);
+
+  const isOverlapping = useMemo(
+    () => (enemy1, enemy2) => {
+      const distance = Math.sqrt(
+        Math.pow(enemy1.x - enemy2.x, 2) + Math.pow(enemy1.y - enemy2.y, 2)
+      );
+      return distance < 50;
+    },
+    []
+  );
+
+  const generateUniquePosition = useCallback((existingEnemies) => {
+    const margin = 50; // Margin from the edges of the screen
+    const enemySize = 40; // Size of the enemy
+    let attempts = 0;
+    const maxAttempts = 100; // Prevent infinite loop
+
+    while (attempts < maxAttempts) {
+      const newEnemy = {
+        x:
+          Math.random() * (window.innerWidth - 2 * margin - enemySize) + margin,
+        y: -50 - Math.random() * 100, // Randomize initial vertical position above the screen
+      };
+
+      // Check collision with existing enemies
+      const collision = existingEnemies.some(
+        (enemy) =>
+          Math.abs(enemy.x - newEnemy.x) < enemySize &&
+          Math.abs(enemy.y - newEnemy.y) < enemySize
+      );
+
+      if (!collision) {
+        return newEnemy;
+      }
+
+      attempts++;
     }
 
-    setQuestion(`${num1} ${operation} ${num2}`); // Update question text
-    setCorrectAnswer(answer); // Set the correct answer
+    // If we couldn't find a non-colliding position, return null
+    return null;
+  }, []);
 
-    // Generate a few wrong answers for the enemies
+  const generateQuestion = useCallback(() => {
+    let num1, num2, operation, answer;
+
+    const getRandomNumber = (max) => Math.floor(Math.random() * max) + 1;
+
+    switch (difficulty) {
+      case DIFFICULTY_LEVELS.EASY:
+        num1 = getRandomNumber(10 + level);
+        num2 = getRandomNumber(10 + level);
+        operation = Math.random() < 0.5 ? "+" : "-";
+        answer = operation === "+" ? num1 + num2 : num1 - num2;
+        break;
+      case DIFFICULTY_LEVELS.MEDIUM:
+        num1 = getRandomNumber(12 + level);
+        num2 = getRandomNumber(12 + level);
+        const mediumOps = ["+", "-", "*", "/"];
+        operation = mediumOps[Math.floor(Math.random() * mediumOps.length)];
+        switch (operation) {
+          case "+":
+            answer = num1 + num2;
+            break;
+          case "-":
+            answer = num1 - num2;
+            break;
+          case "*":
+            answer = num1 * num2;
+            break;
+          case "/":
+            num1 = num2 * getRandomNumber(10 + level);
+            answer = num1 / num2;
+            break;
+        }
+        break;
+      case DIFFICULTY_LEVELS.HARD:
+        const hardOps = ["+", "-", "*", "/", "^", "√"];
+        operation = hardOps[Math.floor(Math.random() * hardOps.length)];
+        switch (operation) {
+          case "+":
+          case "-":
+          case "*":
+            num1 = getRandomNumber(20 + level);
+            num2 = getRandomNumber(20 + level);
+            answer =
+              operation === "+"
+                ? num1 + num2
+                : operation === "-"
+                ? num1 - num2
+                : num1 * num2;
+            break;
+          case "/":
+            num2 = getRandomNumber(10 + level);
+            num1 = num2 * getRandomNumber(10 + level);
+            answer = num1 / num2;
+            break;
+          case "^":
+            num1 = getRandomNumber(10 + Math.floor(level / 2));
+            num2 = getRandomNumber(3) + 2;
+            answer = Math.pow(num1, num2);
+            break;
+          case "√":
+            answer = getRandomNumber(10 + Math.floor(level / 2));
+            num1 = answer * answer;
+            num2 = null;
+            break;
+        }
+        break;
+    }
+
+    let questionText =
+      num2 !== null ? `${num1} ${operation} ${num2}` : `${operation}${num1}`;
+    setQuestion(questionText);
+    setCorrectAnswer(Math.round(answer * 100) / 100); // Round to 2 decimal places
+
     const wrongAnswers = [
-      answer + Math.floor(Math.random() * 5) + 1, // Slightly off answer
-      answer - Math.floor(Math.random() * 5) + 1, // Another wrong answer
-      answer + Math.floor(Math.random() * 10) - 5, // Random incorrect answer
-    ];
+      answer + getRandomNumber(5 + level),
+      answer - getRandomNumber(5 + level),
+      answer + getRandomNumber(10 + level) - 5,
+    ].map((a) => Math.round(a * 100) / 100); // Round wrong answers too
 
-    // Shuffle the correct and wrong answers together
     const allAnswers = [answer, ...wrongAnswers].sort(
       () => Math.random() - 0.5
     );
 
-    // Map answers to enemies with unique positions
-    const newEnemies = allAnswers.map((ans, index) => ({
-      id: Date.now() + index, // Unique ID for each enemy
-      value: ans, // Set answer as the value displayed on the enemy
-      ...generateUniquePosition([]), // Assign a random unique position
-    }));
-
-    setEnemies(newEnemies); // Update the enemies state
-  }, []);
+    const newEnemies = [];
+    for (let i = 0; i < allAnswers.length; i++) {
+      const position = generateUniquePosition(newEnemies);
+      if (position) {
+        newEnemies.push({
+          id: Date.now() + i,
+          value: allAnswers[i],
+          ...position,
+        });
+      }
+    }
+    setEnemies(newEnemies);
+  }, [difficulty, level, generateUniquePosition]);
 
   useEffect(() => {
-    // Increase level and speed every 5 points
     const newLevel = Math.floor(score / 5) + 1;
     if (newLevel !== level) {
       setLevel(newLevel);
-      setEnemySpeed(1 + (newLevel - 1) * 0.5); // Increase speed by 0.5 for each level
+      setEnemySpeed(0.5 + (newLevel - 1) * 0.5);
     }
   }, [score, level]);
 
-  // Effect to generate a question when the game starts or when it's not over
   useEffect(() => {
-    if (!gameOver) {
-      generateQuestion(); // Generate a new question
+    if (difficulty && !gameOver) {
+      generateQuestion();
     }
-  }, [gameOver, generateQuestion]);
+  }, [difficulty, gameOver, generateQuestion]);
 
-  // Main game loop to handle enemy movement, bullet movement, and collisions
+  usePreventNavigation(!paused && !gameOver);
+
   useEffect(() => {
-    if (gameOver) return; // Stop the game loop if the game is over
+    const handleBeforeUnload = (e) => {
+      if (!paused && !gameOver) {
+        e.preventDefault(); // Prevent default action
+        e.returnValue = ""; // Required for Chrome to show the dialog
+      }
+    };
 
-    const gameLoop = setInterval(() => {
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [paused, gameOver]);
+
+  useEffect(() => {
+    if (gameOver) return;
+
+    let animationFrameId;
+    const gameLoop = () => {
+      if (paused) {
+        animationFrameId = requestAnimationFrame(gameLoop);
+        return;
+      }
       setEnemies((prevEnemies) =>
         prevEnemies.map((enemy) => ({
           ...enemy,
@@ -104,31 +314,28 @@ const PuzzlePlatformGame = () => {
         }))
       );
 
-      // Move bullets upwards
       setBullets((prevBullets) =>
         prevBullets.map((bullet) => ({
           ...bullet,
-          y: bullet.y - 5, // Decrease bullet y position
+          y: bullet.y - 5,
         }))
       );
 
-      // Check for bullet collisions with enemies
-      setEnemies((prevEnemies) =>
-        prevEnemies.filter((enemy) => {
-          // Find if a bullet hits an enemy
+      let bulletsToRemove = new Set();
+
+      setEnemies((prevEnemies) => {
+        let enemiesOffScreen = false;
+        const updatedEnemies = prevEnemies.filter((enemy) => {
           const hitBullet = bullets.find(
             (bullet) =>
               Math.sqrt(
                 Math.pow(bullet.x - (enemy.x + 20), 2) +
                   Math.pow(bullet.y - (enemy.y + 20), 2)
-              ) < 20 // Check if bullet is within 20px of enemy center
+              ) < 20
           );
 
           if (hitBullet) {
-            // Remove the bullet that hit the target
-            setBullets((prevBullets) =>
-              prevBullets.filter((bullet) => bullet !== hitBullet)
-            );
+            bulletsToRemove.add(hitBullet.id);
 
             if (enemy.value === correctAnswer) {
               setScore((prevScore) => prevScore + 1);
@@ -143,23 +350,44 @@ const PuzzlePlatformGame = () => {
               });
             }
 
-            return false; // Remove the enemy
+            return false;
           }
 
-          return enemy.y < window.innerHeight;
-        })
+          if (enemy.y >= window.innerHeight) {
+            enemiesOffScreen = true;
+            return false;
+          }
+
+          return true;
+        });
+
+        if (enemiesOffScreen) {
+          setHealth((prevHealth) => {
+            const newHealth = prevHealth - 1;
+            if (newHealth <= 0) {
+              setGameOver(true);
+            } else {
+              generateQuestion(); // Generate a new question when enemies fall off screen
+            }
+            return newHealth;
+          });
+        }
+
+        return updatedEnemies;
+      });
+
+      setBullets((prevBullets) =>
+        prevBullets.filter(
+          (bullet) => !bulletsToRemove.has(bullet.id) && bullet.y > 0
+        )
       );
 
-      // Remove bullets that have gone off screen
-      setBullets((prevBullets) => prevBullets.filter((bullet) => bullet.y > 0));
+      animationFrameId = requestAnimationFrame(gameLoop);
+    };
 
-      // End the game if any enemy reaches the player position
-      if (enemies.some((enemy) => enemy.y >= playerPosition.y)) {
-        setGameOver(true); // Set game over if enemy hits player
-      }
-    }, 50); // Run game loop every 50ms
+    animationFrameId = requestAnimationFrame(gameLoop);
 
-    return () => clearInterval(gameLoop); // Clean up on unmount
+    return () => cancelAnimationFrame(animationFrameId);
   }, [
     enemies,
     bullets,
@@ -168,50 +396,177 @@ const PuzzlePlatformGame = () => {
     generateQuestion,
     playerPosition,
     enemySpeed,
+    paused,
   ]);
 
-  // Handle player movement with mouse
-  const handleMouseMove = (e) => {
-    if (gameOver) return; // Prevent movement if game is over
-    const rect = e.currentTarget.getBoundingClientRect();
-    setPlayerPosition({
-      x: e.clientX - rect.left - 25, // Set player x position based on mouse
-      y: window.innerHeight - 50, // Fixed y position for player
-    });
+  const handleMouseMove = useCallback(
+    (e) => {
+      if (gameOver) return;
+      const rect = e.currentTarget.getBoundingClientRect();
+      setPlayerPosition({
+        x: e.clientX - rect.left - 25,
+        y: window.innerHeight - 50,
+      });
+    },
+    [gameOver]
+  );
+  const handleClick = useCallback(
+    (e) => {
+      // Prevent firing bullets if the game is over or paused
+      if (gameOver || paused) return;
+
+      // If the game is not paused, fire a bullet
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+
+      // Fire a bullet at the clicked position
+      setBullets((prevBullets) => [
+        ...prevBullets,
+        { id: Date.now(), x: clickX, y: playerPosition.y },
+      ]);
+    },
+    [gameOver, paused, playerPosition]
+  );
+
+  const endGame = async () => {
+    setGameOver(true);
+    const endTime = Date.now();
+    const playtime = Math.round((endTime - startTime) / 1000);
+
+    if (userData) {
+      console.log("Saving game stats:", { score, playtime, level, difficulty });
+      await saveGameStats(score, playtime, level, difficulty);
+    } else {
+      console.log("No user data available, score not saved");
+    }
   };
 
-  // Handle player shooting (mouse click)
-  const handleClick = () => {
-    if (gameOver) return; // Prevent shooting if game is over
-    setBullets((prevBullets) => [
-      ...prevBullets,
-      { x: playerPosition.x + 25, y: playerPosition.y }, // Add new bullet at player's position
-    ]);
+  const startGame = useCallback(
+    (selectedDifficulty) => {
+      setDifficulty(selectedDifficulty);
+      setScore(0);
+      setGameOver(false);
+      setEnemies([]);
+      setBullets([]);
+      setHealth(3);
+      setEnemySpeed(0.5);
+      setLevel(1);
+      setStartTime(Date.now());
+      setPaused(false); // Ensure the game is unpaused when starting
+      generateQuestion(); // Make sure to generate the first question
+    },
+    [difficulty, generateQuestion]
+  );
+  const restartGame = useCallback(() => {
+    startGame(difficulty);
+    setPaused(false); // Explicitly unpause the game when restarting
+  }, [startGame, difficulty]);
+
+  useEffect(() => {
+    if (gameOver) {
+      endGame();
+    }
+  }, [gameOver, endGame]);
+
+  const handleLeaderboardClick = () => {
+    // Log userData to check if it's correctly set
+    console.log("userData before navigating:", userData);
+
+    // Ensure userData is defined
+    if (userData) {
+      navigate("/leaderboard", { state: { currentUser: userData.userId } });
+    } else {
+      console.error("User data not available.");
+    }
   };
 
-  // Restart the game by resetting state values
-  const restartGame = () => {
-    setScore(0); // Reset score
-    setGameOver(false); // Remove game over state
-    setEnemies([]); // Clear enemies
-    setBullets([]); // Clear bullets
-    setHealth(3); // Reset player health
-    generateQuestion(); // Generate a new question
-  };
+  const handlePauseClick = useCallback(() => {
+    // Toggle pause state
+    togglePause();
+  }, [togglePause]);
+
+  // if (!userData) {
+  //   return (
+  //     <div>
+  //       <Loader />
+  //     </div>
+  //   );
+  // }
+
+  if (!difficulty) {
+    return (
+      <div className="bg-foreground ">
+        <ScrollToTop />
+        <Header />
+        <BackgroundBeamsWithCollision>
+          <div className="flex flex-col items-center justify-center min-h-screen">
+            <div className="mb-8 text-center">
+              <h1 className="text-7xl font-bold text-black bg-clip-text bg-no-repeat text-transparent bg-gradient-to-r py-4 from-purple-500 via-violet-500 to-pink-500 [text-shadow:0_0_rgba(0,0,0,0.1)]">
+                Mathz Blaster
+              </h1>
+            </div>
+            <div className="flex items-center justify-center mb-4">
+              <div className="relative">
+                <div className="bg-gradient-to-r from-indigo-500 to-purple-500 text-transparent bg-clip-text text-4xl font-bold text-center">
+                  <TextGenerateEffect words={words} />
+                </div>
+              </div>
+            </div>
+
+            <div className="items-center space-y-4">
+              {Object.values(DIFFICULTY_LEVELS).map((level) => (
+                <button
+                  key={level}
+                  className="p-[3px] relative m-2"
+                  onClick={() => startGame(level)} // Outer button styling
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg" />
+                  <div className="px-6 py-3 bg-black rounded-[6px] relative group transition duration-200 text-white text-xl hover:bg-transparent">
+                    {level.charAt(0).toUpperCase() + level.slice(1)}
+                  </div>
+                </button>
+              ))}
+            </div>
+            <button
+              className="shadow-[0_0_0_3px_#000000_inset] px-6 py-4 bg-black border border-black dark:border-white dark:text-white text-white text-sm rounded-lg font-bold transform transition duration-400 mt-4 hover:bg-transparent flex items-center"
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+              onClick={handleLeaderboardClick} // Handle the button click
+            >
+              <FaTrophy className="mr-2" />
+              <span>Leaderboard</span>
+            </button>
+          </div>
+        </BackgroundBeamsWithCollision>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div
       className="relative w-full h-full bg-gray-800 overflow-hidden"
-      onMouseMove={handleMouseMove} // Track mouse movement
-      onClick={handleClick} // Handle player shooting
-      style={{ width: "100vw", height: "100vh" }} // Full screen width and height
+      onMouseMove={!paused ? handleMouseMove : undefined}
+      onClick={handleClick}
+      style={{ width: "100vw", height: "100vh" }}
     >
+      {/* Add the GameHeader component here */}
+      <GameHeader
+        question={question}
+        score={score}
+        health={health}
+        difficulty={difficulty}
+        level={level}
+        paused={paused}
+        onTogglePause={handlePauseClick}
+      />
+
       {/* Player Character */}
       <div
         className="absolute w-[50px] h-[50px] bg-blue-500"
-        style={{ left: `${playerPosition.x}px`, top: `${playerPosition.y}px` }} // Update position dynamically
+        style={{ left: `${playerPosition.x}px`, top: `${playerPosition.y}px` }}
       >
-        <Target className="w-full h-full text-white" /> {/* Player icon */}
+        <Target className="w-full h-full text-white" />
       </div>
 
       {/* Render Enemies */}
@@ -219,39 +574,28 @@ const PuzzlePlatformGame = () => {
         <div
           key={enemy.id}
           className="absolute w-[40px] h-[40px] bg-red-500 rounded-full flex items-center justify-center text-white font-bold"
-          style={{ left: `${enemy.x}px`, top: `${enemy.y}px` }} // Position each enemy
+          style={{ left: `${enemy.x}px`, top: `${enemy.y}px` }}
         >
-          {enemy.value} {/* Display enemy's value (math answer) */}
+          {enemy.value}
         </div>
       ))}
 
       {/* Render Bullets */}
-      {bullets.map((bullet, index) => (
+      {bullets.map((bullet) => (
         <div
-          key={index}
+          key={bullet.id}
           className="absolute w-[5px] h-[10px] bg-yellow-400"
-          style={{ left: `${bullet.x}px`, top: `${bullet.y}px` }} // Position each bullet
+          style={{ left: `${bullet.x}px`, top: `${bullet.y}px` }}
         />
       ))}
 
-      {/* Display Question */}
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-white px-4 py-2 rounded">
-        <span className="text-2xl font-bold text-black">{question} = ?</span>
-      </div>
-
-      {/* Display Score */}
-      <div className="absolute top-4 right-4 bg-white px-4 py-2 rounded">
-        <span className="text-xl font-bold text-black">Score: {score}</span>
-      </div>
-
-      {/* Display Health */}
-      <div className="absolute top-4 left-4 bg-white px-4 py-2 rounded">
-        <span className="text-xl font-bold text-black">Health: {health}</span>
-      </div>
-      {/* Display Level */}
-      <div className="absolute top-16 left-4 bg-white px-4 py-2 rounded">
-        <span className="text-xl font-bold">Level: {level}</span>
-      </div>
+      {/* Display Pause Screen */}
+      {paused && (
+        <PauseScreen
+          onResume={togglePause}
+          onRestart={() => startGame(difficulty)}
+        />
+      )}
 
       {/* Game Over Screen */}
       {gameOver && (
@@ -259,13 +603,77 @@ const PuzzlePlatformGame = () => {
           <h2 className="text-4xl font-bold text-white mb-4">Game Over</h2>
           <p className="text-2xl text-white mb-4">Your Score: {score}</p>
           <button
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            onClick={restartGame} // Restart game on click
+            className="p-[3px] relative m-5"
+            onClick={() => startGame(difficulty)}
           >
-            Play Again
+            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg" />
+            <div className="px-8 py-2  bg-black rounded-[6px]  relative group transition duration-200 text-white hover:bg-transparent">
+              Play Again
+            </div>
+          </button>
+          <button
+            className="p-[3px] relative"
+            onClick={() => setDifficulty(null)}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg" />
+            <div className="px-8 py-2  bg-black rounded-[6px]  relative group transition duration-200 text-white hover:bg-transparent">
+              Change Difficulty
+            </div>
           </button>
         </div>
       )}
+    </div>
+  );
+};
+
+const PauseScreen = ({ onResume, onRestart }) => {
+  return (
+    <div className="absolute inset-0 bg-black bg-opacity-75 flex flex-col items-center justify-center">
+      <h2 className="text-4xl font-bold text-white mb-4">Paused</h2>
+      <button className="p-[3px] relative m-5" onClick={onResume}>
+        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg" />
+        <div className="px-8 py-2  bg-black rounded-[6px]  relative group transition duration-200 text-white hover:bg-transparent">
+          Resume
+        </div>
+      </button>
+      <button className="p-[3px] relative" onClick={onRestart}>
+        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg" />
+        <div className="px-8 py-2  bg-black rounded-[6px]  relative group transition duration-200 text-white hover:bg-transparent">
+          Restart
+        </div>
+      </button>
+    </div>
+  );
+};
+
+const GameHeader = ({
+  question,
+  score,
+  health,
+  difficulty,
+  level,
+  paused,
+  onTogglePause,
+}) => {
+  const handlePauseClick = (e) => {
+    e.stopPropagation(); // Prevent click event from bubbling up
+    onTogglePause(); // Call the toggle pause function
+  };
+  return (
+    <div className="absolute top-0 left-0 w-full flex justify-between items-center bg-gray-800 text-white p-4">
+      <div className="flex items-center space-x-4">
+        <span className="text-lg font-bold">Health: {health}</span>
+        <span className="text-lg font-bold">Level: {level}</span>
+        <span className="text-lg font-bold">Difficulty: {difficulty}</span>
+        <button className="p-[3px] relative" onClick={handlePauseClick}>
+          <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg" />
+          <div className="px-8 py-2  bg-black rounded-[6px]  relative group transition duration-200 text-white hover:bg-transparent">
+            {paused ? "Resume" : "Pause"}
+          </div>
+        </button>
+      </div>
+      <div className="text-xl font-bold">{question} = ?</div>
+      <div className="text-lg font-bold">Score: {score}</div>
     </div>
   );
 };

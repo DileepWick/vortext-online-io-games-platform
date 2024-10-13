@@ -198,7 +198,30 @@ const UserMessages = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         className="dark text-foreground bg-background"
-        size="2xl"
+        size="3xl"
+        backdrop="blur"
+        isDismissable={false}
+        isKeyboardDismissDisabled={false}
+        motionProps={{
+          variants: {
+            enter: {
+              y: 0,
+              opacity: 1,
+              transition: {
+                duration: 0.3,
+                ease: "easeOut",
+              },
+            },
+            exit: {
+              y: -20,
+              opacity: 0,
+              transition: {
+                duration: 0.2,
+                ease: "easeIn",
+              },
+            },
+          },
+        }}
       >
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">

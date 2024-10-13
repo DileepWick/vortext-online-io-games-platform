@@ -577,7 +577,7 @@ userRouter.get('/get-income/:id', async (req, res) => {
 userRouter.get("/moderators", async (req, res) => {
   try {
     const moderatorRoles = [
-      'Product Manager', 'User Manager', 'Order Manager', 'Blogger', 
+      'Product Manager', 'User Manager', 'Order Manager',
       'Session_Manager', 'Community Manager', 'Review Manager', 
       'Support Agent', 'Staff_Manager', 'Payment Manager'
     ];
