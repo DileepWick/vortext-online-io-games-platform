@@ -65,9 +65,9 @@ const TailoredGames = () => {
 
           {/* Game 2 */}
           <GameCard
-            title="Member 2 Game"
-            imageUrl="https://images5.alphacoders.com/127/1274050.jpg"
-            link="/games/chess"
+            title="Rock Paper scissors"
+            imageUrl="https://res.cloudinary.com/dhcawltsr/image/upload/v1728732978/882363a6-0b96-4cd7-b7e1-6dca080a3b24_ygxdix.jpg"
+            link="/rock-paper-scissors"
             devName={"Ranasinghe G.M.N.T.B"}
             devId={"IT22201928"}
           />

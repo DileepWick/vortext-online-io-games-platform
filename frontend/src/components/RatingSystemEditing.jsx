@@ -109,7 +109,7 @@ const RatingSystemEditing = ({
           className="mb-4"
           css={{
             backgroundColor: "#333333",
-            color: "#e0e0e0",
+            color: "#e0e0e0", 
             width: "100%",
             height: "150px", // Adjusted height for the review box
             borderColor: "gray-600",

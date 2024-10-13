@@ -179,7 +179,6 @@ const Home = () => {
         <title>Welcome to Vortex</title>
       </Helmet>
       <Header />
-
       <div className="h-[40rem] w-full bg-black flex flex-col items-center justify-center overflow-hidden rounded-md">
       <h1 className="md:text-7xl text-3xl lg:text-9xl  text-center text-white relative z-20">
         Vortex
@@ -205,31 +204,6 @@ const Home = () => {
         <div className="absolute inset-0 w-full h-full bg-black [mask-image:radial-gradient(350px_200px_at_top,transparent_20%,white)]"></div>
       </div>
     </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      
       <div className="m-auto  mt-[80px] mb-[40px]">
         <div className="carousel" ref={carouselRef}>
           <div className="list" ref={listRef}>

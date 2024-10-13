@@ -62,7 +62,7 @@ import Unauthorized from "./pages/Unauthorized";
 
 //Games
 import Hangman from "./components/Games/Hangaman";
-
+import RockPaperScissors from "./components/Games/RockPaperScissors";
 import { BackgroundBeamsWithCollision } from "./components/ui/BackgroundBeamsWithCollision";
 
 const App = () => {
@@ -138,6 +138,7 @@ const App = () => {
       <Route path="DeveloperEarningTable" element={<DeveloperIncomeTable />} />
       {/*Game Routes*/}
       <Route path="/HangmanGame" element={<Hangman />} />
+      <Route path="/rock-paper-scissors" element={<RockPaperScissors />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

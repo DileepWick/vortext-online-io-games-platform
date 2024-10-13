@@ -32,6 +32,9 @@ import DirectContactUsRoute from "./routes/direct_contact_us_route.js";
 
 import { RentalDurationRouter } from "./routes/rentalDurationRoutes.js";
 
+
+import rockPaperScissorsRouter from "./routes/rock_paper_scissors_routes.js";
+
 //Create the app
 const app = express();
 
@@ -107,3 +110,6 @@ app.use("/api", GPTRouter);
 app.use("/api", GPTRouter);
 app.use("/contacts", contactRouter);
 app.use("/api/messages", messageRoutes); // Changed the path to "/api/messages"
+
+
+app.use("/api/rock-paper-scissors", rockPaperScissorsRouter);
