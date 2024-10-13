@@ -126,16 +126,16 @@ const Contact = () => {
     <>
       <Header />
       <ScrollToTop />
-      <div className="contact-container font-primaryRegular">
+      <div className="contact-container font-primaryRegular bg-foreground">
         <div className="image_container">
           <img
             src="https://res.cloudinary.com/dhcawltsr/image/upload/v1719572048/wallpaperflare.com_wallpaper_3_gpe852.jpg"
             alt="Contact Us"
           />
         </div>
-        <div className="contact_us_container">
+        <div className="contact_us_container ">
           <div className="w-full flex flex-col gap-8">
-            <h1 className="text-3xl text-black">Contact Us:</h1>
+            <h1 className="text-3xl text-white">Contact Us:</h1>
             {hasOpenTicket ? (
               <div className="text-center">
                 <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 rounded">

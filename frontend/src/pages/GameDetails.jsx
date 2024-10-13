@@ -19,6 +19,7 @@ import { Button, Chip } from "@nextui-org/react";
 import { Card, CardBody, CardFooter, Image, Textarea } from "@nextui-org/react";
 import { ScrollShadow } from "@nextui-org/react";
 import RatingSystemEditing from "../components/RatingSystemEditing";
+import Loader from "../components/Loader/loader";
 
 const GameDetails = () => {
   // Authenticate user
@@ -290,7 +291,6 @@ const GameDetails = () => {
     setQuantityByStockId({ ...quantityByStockId, [stockId]: newQuantity });
   };
 
-
   //Rating Update Function
   const handleRateUpdate = async (ratingId, rating, comment) => {
     try {
@@ -330,7 +330,7 @@ const GameDetails = () => {
     }
   };
 
-  if (loading) return <p className="text-center mt-8 text-black">Loading...</p>;
+  if (loading) return <Loader />;
   if (error)
     return <p className="text-center mt-8 text-black">Error: {error}</p>;
   if (!gameStock)

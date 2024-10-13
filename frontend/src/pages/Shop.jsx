@@ -5,7 +5,6 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import GameIcon from "../assets/icons/detailsIcon";
 import {
-  Spinner,
   Card,
   CardBody,
   Chip,
@@ -13,7 +12,13 @@ import {
   Input,
 } from "@nextui-org/react";
 import Loader from "../components/Loader/loader";
-
+import { IoIosArrowForward } from "react-icons/io";  
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/effect-coverflow';
+import 'swiper/css/pagination';
+import { EffectCoverflow, Pagination, Navigation, Autoplay } from 'swiper/modules';
+import '../style/Shop.css';
 
 const Shop = () => {
   const [gameStocks, setGameStocks] = useState([]);
@@ -23,6 +28,7 @@ const Shop = () => {
   const [error, setError] = useState(null);
   const [ratingsData, setRatingsData] = useState([]);
   const [showtoprated, setShowTopRated] = useState(false);
+  const [swiperLoading, setSwiperLoading] = useState(false);
 
   useEffect(() => {
     const fetchGameStocks = async () => {
@@ -35,20 +41,13 @@ const Shop = () => {
       } catch (err) {
         setError(err.message);
       } finally {
-        // Delay the end of loading to ensure the Loader is visible for at least 2 seconds
-        const minLoadingTime = 1000; // 2 seconds
-        const actualLoadingTime = Date.now() - startLoadingTime;
-        const delay = Math.max(minLoadingTime - actualLoadingTime, 0);
-
-        setTimeout(() => {
-          setLoading(false);
-        }, delay);
+        setLoading(false); 
       }
     };
 
-    const startLoadingTime = Date.now();
+    
     fetchGameStocks();
-  }, []);
+  }, [showtoprated]);
 
   const fetchRatings = async (id) => {
     try {
@@ -157,116 +156,271 @@ const Shop = () => {
         </div>
 
         <button
-          className="text-[#f21160] px-16 pb-8"
-          onClick={() => {
-            setShowTopRated(true);
-          }}
-        >
-          Show Top Rated This week...
-        </button>
+  className="text-[white] font-bold px-16 pb-8 flex flex-row gap-2 items-center  text-left text-[22px]"
+  onClick={() => {
+    setSwiperLoading(true); // Start loading state immediately when clicked
+    setShowTopRated(true); // Set the showtoprated state to true
+
+    // Set timeout to simulate delay (if you still need it), but move state management into useEffect
+    setTimeout(() => {
+      setSwiperLoading(false); // After 500ms, stop loading
+    }, 1500);
+  }}
+>
+  Show Top Rated This week <IoIosArrowForward />
+</button>
+
 
         {filteredStocks.length === 0 ? (
           <p className="text-gray-400 text-center">No Games Found</p>
         ) : (
-          <ScrollShadow hideScrollBar>
-            <div className="flex flex-wrap justify-center gap-8">
-              {" "}
-              {/* Adjusted gap */}
-              {filteredStocks.map((stock) => {
-                const originalPrice = stock.UnitPrice;
-                const discount = stock.discount;
-                const discountedPrice =
-                  discount > 0
-                    ? originalPrice - (originalPrice * discount) / 100
-                    : originalPrice;
+          <ScrollShadow hideScrollBar className="">
+            {showtoprated ? (
+              swiperLoading ? (
+                <div className="flex justify-center items-center h-64">
+                <div className="w-10 h-10 border-4 border-t-customPink border-transparent border-solid rounded-full animate-spin"></div>
+                </div>
+              ) : (
+                <Swiper
+                  effect={'coverflow'}
+                  grabCursor={true}
+                  centeredSlides={true}
+                  loop={true}
+                  autoplay={{
+                    delay: 2500,
+                    disableOnInteraction: false,
+                  }}
+                  slidesPerView={'auto'}
+                  spaceBetween={100}
+                  coverflowEffect={{
+                    rotate: 30,
+                    stretch: 0,
+                    depth: 200,
+                    modifier: 1,
+                    slideShadows: true,
+                  }}
+                  pagination={{ el: '.swiper-pagination', clickable: true }}
+                  navigation={{
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                    clickable: true,
+                  }}
+                  modules={[EffectCoverflow, Pagination, Navigation, Autoplay]}
+                  className="swiper_container overflow-hidden w-[850px] "
+                >
+                  {filteredStocks.map((stock,index) => {
+                    const originalPrice = stock.UnitPrice;
+                    const discount = stock.discount;
+                    const discountedPrice =
+                      discount > 0
+                        ? originalPrice - (originalPrice * discount) / 100
+                        : originalPrice;
 
-                return (
-                  <Card
-                    key={stock._id}
-                    className="relative  bg-opacity-20 rounded-lg shadow-lg text-white transform transition-transform duration-300 hover:scale-105 hover:z-10 hover:shadow-2xl hover:bg-opacity-80 w-[250px] h-[500px]"
-                  >
-                    <Link to={`/game/${stock._id}`}>
-                      <div className="relative">
-                        <img
-                          alt={stock.AssignedGame.title}
-                          style={{
-                            width: "250px",
-                            height: "350px",
-                            objectFit: "cover",
-                          }}
-                          src={stock.AssignedGame.coverPhoto}
-                        />
+                    return (
+                      <SwiperSlide key={stock._id} className='slide w-fit '>
+                        <Card
+                          className="relative bg-opacity-20 z-40 rounded-lg shadow-lg text-white transform transition-transform duration-300  hover:z-10 hover:shadow-2xl hover:bg-opacity-80 w-[250px] h-[500px] hover:scale-1"
+                        > 
+                          
+                          
+                          <Link to={`/game/${stock._id}`}>
+                          <div className="rank absolute z-49 top-[34%] text-center justify-center items-center text-white "></div>
+                          <p className="rankNum absolute top-[30%] z-50  left-[28%] text-[35px]  gaming-animation">Top : {index + 1} </p>
+                            <div className="relative">
+                              <img
+                                alt={stock.AssignedGame.title}
+                                style={{
+                                  width: "250px",
+                                  height: "350px",
+                                  objectFit: "cover",
+                                }}
+                                src={stock.AssignedGame.coverPhoto}
+                              />
+                              
 
-                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity duration-300 hover:opacity-100">
-                          <GameIcon />
+                              <div className="absolute  inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity duration-300  hover:opacity-100">
+                                <GameIcon />
+                              </div>
+                            </div>
+                            <CardBody className="p-2 text-white">
+                              <h2 className="text-lg font-primaryRegular text-white mb-1">
+                                {stock.AssignedGame.title}
+                              </h2>
+                              <p className="font-primaryRegular text-white mb-1">
+                                {discount > 0 && (
+                                  <>
+                                    <Chip
+                                      color="danger"
+                                      radius="none"
+                                      className="font-primaryRegular mr-1"
+                                      size="sm"
+                                    >
+                                      -{stock.discount}% off
+                                    </Chip>
+                                    <span
+                                      className="line-through mr-1 text-editionColor"
+                                      style={{ fontSize: "15px" }}
+                                    >
+                                      LKR.{originalPrice}
+                                    </span>
+                                  </>
+                                )}
+                                <span style={{ fontSize: "15px" }}>
+                                  LKR.{discountedPrice}
+                                </span>
+                              </p>
+                              <div className="flex flex-wrap mb-1 text-white">
+                                {stock.AssignedGame.Genre.flatMap((genre) =>
+                                  genre.includes(",") ? genre.split(",") : genre
+                                ).map((genre, index) => (
+                                  <Chip
+                                    variant="dot"
+                                    size="sm"
+                                    radius="none"
+                                    className="font-primaryRegular"
+                                    color="danger"
+                                    key={index}
+                                  >
+                                    {(() => {
+                                      const genreName =
+                                        genre.trim().charAt(0).toUpperCase() +
+                                        genre.trim().slice(1);
+                                      if (genreName === "Action")
+                                        return `Action ⚔️`;
+                                      if (genreName === "Adventure")
+                                        return `Adventure 🐾`;
+                                      if (genreName === "Racing")
+                                        return `Racing 🏎️`;
+                                      if (genreName === "Puzzle")
+                                        return `Puzzle 🧩`;
+                                      if (genreName === "Fighting")
+                                        return `Fighting 🥷🏻`;
+                                      if (genreName === "Strategy")
+                                        return `Strategy 🙄`;
+                                      if (genreName === "Sport")
+                                        return `Sport 🏅`;
+                                      return genreName; // Fallback in case no match is found
+                                    })()}
+                                  </Chip>
+                                ))}
+                              </div>
+                            </CardBody>
+                          </Link>
+                        </Card>
+                      </SwiperSlide>
+                    );
+                  })}
+                  <div className="slider-controler hidden">
+                    <div className="swiper-button-prev slider-arrow">
+                      <ion-icon name="arrow-back-outline"></ion-icon>
+                    </div>
+                    <div className="swiper-button-next slider-arrow">
+                      <ion-icon name="arrow-forward-outline"></ion-icon>
+                    </div>
+                    <div className="swiper-pagination hidden"></div>
+                  </div>
+                </Swiper>
+              )
+            ) : (
+              <div className="flex flex-wrap justify-center gap-8">
+                {filteredStocks.map((stock) => {
+                  const originalPrice = stock.UnitPrice;
+                  const discount = stock.discount;
+                  const discountedPrice =
+                    discount > 0
+                      ? originalPrice - (originalPrice * discount) / 100
+                      : originalPrice;
+
+                  return (
+                    <Card
+                      key={stock._id}
+                      className="relative bg-opacity-20 rounded-lg shadow-lg text-white transform transition-transform duration-300 hover:scale-105 hover:z-10 hover:shadow-2xl hover:bg-opacity-80 w-[250px] h-[500px]"
+                    >
+                      <Link to={`/game/${stock._id}`}>
+                        <div className="relative">
+                          <img
+                            alt={stock.AssignedGame.title}
+                            style={{
+                              width: "250px",
+                              height: "350px",
+                              objectFit: "cover",
+                            }}
+                            src={stock.AssignedGame.coverPhoto}
+                          />
+
+                          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity duration-300 hover:opacity-100">
+                            <GameIcon />
+                          </div>
                         </div>
-                      </div>
-                      <CardBody className="p-2 text-white">
-                        {" "}
-                        {/* Reduced padding */}
-                        <h2 className="text-lg font-primaryRegular text-white mb-1">
-                          {stock.AssignedGame.title}
-                        </h2>
-                        <p className="font-primaryRegular text-white mb-1">
-                          {discount > 0 && (
-                            <>
+                        <CardBody className="p-2 text-white">
+                          <h2 className="text-lg font-primaryRegular text-white mb-1">
+                            {stock.AssignedGame.title}
+                          </h2>
+                          <p className="font-primaryRegular text-white mb-1">
+                            {discount > 0 && (
+                              <>
+                                <Chip
+                                  color="danger"
+                                  radius="none"
+                                  className="font-primaryRegular mr-1"
+                                  size="sm"
+                                >
+                                  -{stock.discount}% off
+                                </Chip>
+                                <span
+                                  className="line-through mr-1 text-editionColor"
+                                  style={{ fontSize: "15px" }}
+                                >
+                                  LKR.{originalPrice}
+                                </span>
+                              </>
+                            )}
+                            <span style={{ fontSize: "15px" }}>
+                              LKR.{discountedPrice}
+                            </span>
+                          </p>
+                          <div className="flex flex-wrap mb-1 text-white">
+                            {stock.AssignedGame.Genre.flatMap((genre) =>
+                              genre.includes(",") ? genre.split(",") : genre
+                            ).map((genre, index) => (
                               <Chip
-                                color="danger"
-                                radius="none"
-                                className="font-primaryRegular mr-1"
+                                variant="dot"
                                 size="sm"
+                                radius="none"
+                                className="font-primaryRegular"
+                                color="danger"
+                                key={index}
                               >
-                                -{stock.discount}% off
+                                {(() => {
+                                  const genreName =
+                                    genre.trim().charAt(0).toUpperCase() +
+                                    genre.trim().slice(1);
+                                  if (genreName === "Action")
+                                    return `Action ⚔️`;
+                                  if (genreName === "Adventure")
+                                    return `Adventure 🐾`;
+                                  if (genreName === "Racing")
+                                    return `Racing 🏎️`;
+                                  if (genreName === "Puzzle")
+                                    return `Puzzle 🧩`;
+                                  if (genreName === "Fighting")
+                                    return `Fighting 🥷🏻`;
+                                  if (genreName === "Strategy")
+                                    return `Strategy 🙄`;
+                                  if (genreName === "Sport")
+                                    return `Sport 🏅`;
+                                  return genreName; // Fallback in case no match is found
+                                })()}
                               </Chip>
-                              <span
-                                className="line-through mr-1 text-editionColor"
-                                style={{ fontSize: "15px" }}
-                              >
-                                LKR.{originalPrice}
-                              </span>
-                            </>
-                          )}
-                          <span style={{ fontSize: "15px" }}>
-                            LKR.{discountedPrice}
-                          </span>
-                        </p>
-                        <div className="flex flex-wrap mb-1 text-white">
-                          {stock.AssignedGame.Genre.flatMap((genre) =>
-                            genre.includes(",") ? genre.split(",") : genre
-                          ).map((genre, index) => (
-                            <Chip
-                              variant="dot"
-                              size="sm"
-                              radius="none"
-                              className="font-primaryRegular"
-                              color="danger"
-                              key={index}
-                            >
-                              {(() => {
-                                const genreName =
-                                  genre.trim().charAt(0).toUpperCase() +
-                                  genre.trim().slice(1);
-                                if (genreName === "Action") return `Action ⚔️`;
-                                if (genreName === "Adventure")
-                                  return `Adventure 🐾`;
-                                if (genreName === "Racing") return `Racing 🏎️`;
-                                if (genreName === "Puzzle") return `Puzzle 🧩`;
-                                if (genreName === "Fighting")
-                                  return `Fighting 🥷🏻`;
-                                if (genreName === "Strategy")
-                                  return `Strategy 🙄`;
-                                if (genreName === "Sport") return `Sport 🏅`;
-                                return genreName; // Fallback in case no match is found
-                              })()}
-                            </Chip>
-                          ))}
-                        </div>
-                      </CardBody>
-                    </Link>
-                  </Card>
-                );
-              })}
-            </div>
+                            ))}
+                          </div>
+                        </CardBody>
+                      </Link>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
           </ScrollShadow>
         )}
       </div>
