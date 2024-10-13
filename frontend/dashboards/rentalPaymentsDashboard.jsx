@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import axios from "axios";
-import { toast, Flip } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import {
   Table,
   TableHeader,
@@ -9,91 +7,74 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  Pagination,
   Input,
   Button,
-  Chip,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
   Tooltip,
-  Pagination,
+  User,
+  Chip,
 } from "@nextui-org/react";
 import { SearchIcon } from "../src/assets/icons/SearchIcon";
-import { DeleteIcon } from "../src/assets/icons/DeleteIcon";
+import { toast } from "react-toastify";
+
+const API_BASE_URL = "http://localhost:8098";
+const DEVELOPER_SHARE_PERCENTAGE = 0.7; // 70% share for the developer
 
 const RentalPaymentsDash = () => {
   const [rentalPayments, setRentalPayments] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [distributedPayments, setDistributedPayments] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const rowsPerPage = 7;
 
-  const rowsPerPage = 10;
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   useEffect(() => {
     fetchRentalPayments();
+    fetchDistributedPayments();
   }, []);
 
   const fetchRentalPayments = async () => {
-    setIsLoading(true);
     try {
-      const response = await axios.get("http://localhost:8098/rentalPayments/");
-      setRentalPayments(response.data.rentalPayments || []);
-      setError("");
+      const response = await axios.get(`${API_BASE_URL}/rentalPayments/`);
+      if (response.data && response.data.rentalPayments) {
+        setRentalPayments(response.data.rentalPayments);
+      }
     } catch (error) {
       console.error("Error fetching rental payments:", error);
-      setError("Failed to fetch rental payments. Please try again.");
-      toast.error("Failed to fetch rental payments. Please try again.", {
-        theme: "dark",
-        transition: Flip,
-        style: { fontFamily: "Rubik" },
-      });
-    } finally {
-      setIsLoading(false);
+      toast.error("Failed to fetch rental payment data");
     }
   };
 
-  const handleDelete = async (payment) => {
-    if (payment.rental?._id) {
-      toast.error("Cannot delete an active rental payment.", {
-        theme: "dark",
-        transition: Flip,
-        style: { fontFamily: "Rubik" },
-      });
-      return;
-    }
-
-    if (window.confirm("Are you sure you want to delete this rental payment?")) {
-      try {
-        await axios.delete(`http://localhost:8098/rentalPayments/${payment._id}`);
-        await fetchRentalPayments();
-        toast.success("Rental payment deleted successfully", {
-          theme: "dark",
-          transition: Flip,
-          style: { fontFamily: "Rubik" },
-        });
-      } catch (error) {
-        console.error("Error deleting rental payment:", error);
-        toast.error("Failed to delete rental payment. Please try again.", {
-          theme: "dark",
-          transition: Flip,
-          style: { fontFamily: "Rubik" },
-        });
-      }
+  const fetchDistributedPayments = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/distributed-payments/all`);
+      const distributedPayments = response.data.reduce((acc, payment) => {
+        acc[payment.paymentId] = payment.amount;
+        return acc;
+      }, {});
+      setDistributedPayments(distributedPayments);
+    } catch (error) {
+      console.error("Error fetching distributed payments:", error);
+      toast.error("Failed to fetch distributed payments");
     }
   };
 
   const filteredItems = useMemo(() => {
-    return rentalPayments.filter((payment) => {
-      const searchFields = [
-        payment.user?.username,
-        payment.game?.title,
-        payment.rental?._id ? 'active' : 'expired',
-      ].filter(Boolean);
-      
-      const searchString = searchFields.join(' ').toLowerCase();
-      return searchString.includes(searchQuery.toLowerCase());
-    });
+    return rentalPayments.filter((item) =>
+      item.game?.title?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
   }, [rentalPayments, searchQuery]);
 
-  const items = useMemo(() => {
+  const paginatedItems = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
     return filteredItems.slice(start, end);
@@ -109,33 +90,90 @@ const RentalPaymentsDash = () => {
     setPage(1);
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  const handleDistributePayment = (item) => {
+    setSelectedItem(item);
+    onOpen();
+  };
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  const updateDeveloperIncome = async (developerId, amount) => {
+    try {
+      const updateResponse = await axios.put(
+        `${API_BASE_URL}/users/update-income/${developerId}`,
+        { saleAmount: amount }
+      );
+      return updateResponse.data;
+    } catch (error) {
+      console.error("Error updating developer income:", error);
+      throw error;
+    }
+  };
+
+  const saveDistributedPayment = async (paymentId, developerId, amount) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/distributed-payments/save`, {
+        paymentId,
+        developerId,
+        amount,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error saving distributed payment:", error);
+      throw error;
+    }
+  };
+
+  const handleDistribute = async () => {
+    if (selectedItem) {
+      setIsLoading(true);
+      try {
+        const saleAmount = selectedItem.amount * DEVELOPER_SHARE_PERCENTAGE;
+        const developerId = selectedItem.game?.developer?._id;
+
+        if (!developerId) {
+          throw new Error("Developer ID not found");
+        }
+
+        await updateDeveloperIncome(developerId, saleAmount);
+
+        // Save distributed payment to the database
+        await saveDistributedPayment(selectedItem._id, developerId, saleAmount);
+
+        // Update distributed payments state
+        setDistributedPayments((prev) => ({
+          ...prev,
+          [selectedItem._id]: saleAmount,
+        }));
+
+        toast.success("Payment distributed successfully");
+        onOpenChange(false);
+      } catch (error) {
+        console.error("Error distributing payment:", error);
+        toast.error(`Failed to distribute payment: ${error.message}`);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
 
   return (
-    <div className="flex flex-col p-4">
-      
-      <div className="flex justify-between items-center mb-4">
-        <Input
-          className="w-64"
-          placeholder="Search payments by user..."
-          startContent={<SearchIcon />}
-          value={searchQuery}
-          onChange={handleSearchChange}
-          onClear={handleClearSearch}
-        />
-      </div>
+    <div>
+      <Input
+        className="ml-2 font-primaryRegular w-48 sm:w-64"
+        placeholder="Search by GAME . . ."
+        startContent={<SearchIcon />}
+        value={searchQuery}
+        onChange={handleSearchChange}
+        onClear={handleClearSearch}
+      />
       <Table
-        aria-label="Rental Payments table"
+        isHeaderSticky
+        aria-label="Rental Payments table with client-side pagination"
+        className="font-primaryRegular"
         bottomContent={
-          <div className="flex w-full justify-center">
+          <div className="flex w-full justify-center font-primaryRegular">
             <Pagination
               isCompact
+              loop
               showControls
               showShadow
               color="primary"
@@ -150,63 +188,109 @@ const RentalPaymentsDash = () => {
         }}
       >
         <TableHeader>
-          <TableColumn>USER</TableColumn>
-          <TableColumn>GAME</TableColumn>
-          <TableColumn>STATUS</TableColumn>
-          <TableColumn>AMOUNT (LKR)</TableColumn>
-          <TableColumn>DATE</TableColumn>
-          <TableColumn>ACTIONS</TableColumn>
+          <TableColumn key="GAME">GAME</TableColumn>
+          <TableColumn key="CUSTOMER">CUSTOMER</TableColumn>
+          <TableColumn key="AMOUNT">AMOUNT (LKR)</TableColumn>
+          <TableColumn key="DATE">DATE</TableColumn>
+          <TableColumn key="DEVELOPER">DEVELOPER</TableColumn>
+          <TableColumn key="DEVFUNDS">DevFUNDS (70%)</TableColumn>
+          <TableColumn key="ACTIVE">ACTIVE STATUS</TableColumn>
+          <TableColumn key="ACTIONS">ACTIONS</TableColumn>
         </TableHeader>
-        <TableBody>
-          {items.map((payment) => (
-            <TableRow key={payment._id}>
+        <TableBody className="text-black">
+          {paginatedItems.map((item) => (
+            <TableRow key={item._id} className="text-black">
+              <TableCell>{item.game?.title || "N/A"}</TableCell>
               <TableCell>
-                <span className="text-blue-500 font-medium">
-                  {payment.user?.username || 'N/A'}
-                </span>
+                <User
+                  name={item.user?.username || "N/A"}
+                  description={item.user?.email || "N/A"}
+                  avatarProps={{
+                    src: item.user?.profilePic,
+                  }}
+                />
+              </TableCell>
+              <TableCell>Rs.{item.amount?.toFixed(2) || "N/A"}</TableCell>
+              <TableCell>
+                {item.date
+                  ? new Date(item.date).toLocaleDateString()
+                  : "N/A"}
               </TableCell>
               <TableCell>
-                <span className="text-green-500 font-medium">
-                  {payment.game?.title || 'N/A'}
-                </span>
+                <User
+                  name={item.game?.developer?.username || "N/A"}
+                  description={item.game?.developer?.email || "N/A"}
+                  avatarProps={{
+                    src: item.game?.developer?.profilePic || "N/A",
+                  }}
+                />
               </TableCell>
+              <TableCell>Rs.{item.amount ? (item.amount * DEVELOPER_SHARE_PERCENTAGE).toFixed(2) : "N/A"}</TableCell>
+              
               <TableCell>
-                <Chip color={payment.rental?._id ? "success" : "warning"} variant="flat">
-                  {payment.rental?._id ? 'Active' : 'Expired'}
+                <Chip color={item.rental?._id ? "success" : "warning"} variant="flat">
+                  {item.rental?._id ? 'Active' : 'Expired'}
                 </Chip>
               </TableCell>
               <TableCell>
-                <span className="text-primary font-medium">
-                  LKR {payment.amount ? payment.amount.toFixed(2) : 'N/A'}
-                </span>
-              </TableCell>
-              <TableCell>
-                <span className="text-primary font-medium">
-                  {payment.date ? new Date(payment.date).toLocaleString() : 'N/A'}
-                </span>
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-4">
-                  <Tooltip 
-                    content={payment.rental?._id ? "Cannot delete active rental" : "Delete payment"} 
-                    color={payment.rental?._id ? "default" : "danger"} 
-                    className="font-primaryRegular"
-                  >
-                    <span
-                      className={`text-lg cursor-pointer active:opacity-50 ${
-                        payment.rental?._id ? "text-gray-400" : "text-danger"
-                      }`}
-                      onClick={() => handleDelete(payment)}
-                    >
-                      <DeleteIcon />
-                    </span>
+                {distributedPayments[item._id] ? (
+                  <Tooltip content="Payment already distributed" className="text-yellow-500">
+                    <span className="text-green-500">Done</span>
                   </Tooltip>
-                </div>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    color="danger"
+                    onPress={() => handleDistributePayment(item)}
+                  >
+                    Distribute Payment
+                  </Button>
+                )}
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        isDismissable={false}
+        isKeyboardDismissDisabled={true}
+      >
+        <ModalContent className="text-black">
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Distribute Payment
+              </ModalHeader>
+              <ModalBody>
+                {selectedItem && (
+                  <div>
+                    <p>
+                      You are about to distribute payment of Rs.
+                      {(selectedItem.amount * DEVELOPER_SHARE_PERCENTAGE).toFixed(2)} to{" "}
+                      {selectedItem.game?.developer?.username}
+                    </p>
+                  </div>
+                )}
+              </ModalBody>
+              <ModalFooter>
+                <Button color="primary" variant="flat" onPress={onClose}>
+                  Cancel
+                </Button>
+                <Button
+                  color="danger"
+                  isLoading={isLoading}
+                  onPress={handleDistribute}
+                >
+                  Distribute Payment
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

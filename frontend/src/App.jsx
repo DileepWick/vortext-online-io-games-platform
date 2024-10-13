@@ -23,17 +23,20 @@ import TailoredGames from "./pages/tailoredGames";
 import TransactionHistory from "./pages/TransactionHistoryPage";
 import DeveloperIncomeTable from "./pages/DeveloperEarningTable";
 import ChatHistory from "./pages/ChatHistory";
-
+import ChatHistory from "./pages/ChatHistory";
+import RentalTableHistory from "./pages/RentalTableHistory";
 
 import DeveloperLoginSignup from "./pages/DeveloperLoginSignup";
 
 import UserMessages from "./pages/UserMessage";
+
 
 //Games
 import Snake from "../Games/Snake";
 import PuzzlePlatformGame from "./components/Games/PuzzlePlatformGame";
 import ColorGuessingGame from "../Games/ColorGuessingGame";
 import Chat from "./pages/chat";
+import WordSearch from "./components/Games/WordSearch";
 
 //Gameplay
 import GameEmbed from "./pages/GameEmbed";
@@ -123,8 +126,11 @@ const App = () => {
       <Route path="/SessionAnalytics" element={<SessionAnalytics />} />
 
       <Route path="DeveloperEarningTable" element={<DeveloperIncomeTable/>} />
+      <Route path="RentalTableHistory" element={<RentalTableHistory/>} />
       {/*Game Routes*/}
       <Route path="/HangmanGame" element={<Hangman />} />
+      <Route path="/WordSearch" element={<WordSearch />} />
+
     </Routes>
   );
 };

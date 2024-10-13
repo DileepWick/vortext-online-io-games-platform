@@ -7,9 +7,9 @@ import { Tabs, Tab } from "@nextui-org/react";
 import AllPayments from "../dashboards/Payment_Management/all_payments";
 import Chart from "./Payment_Management/chart";
 import GamesSortChart from "./Payment_Management/Games_Sort";
-import RentalPaymentsDash from "./rentalPaymentsDashboard";;
-
-//import DevFunds from "./Payment_Management/DevFunds"; 
+import RentalPaymentsDash from "./rentalPaymentsDashboard";
+import MostRentedGamesChart from './Payment_Management/MostRentedGamesChart';
+import IncomeExpenseAnalysis from './Payment_Management/IncomeExpenseAnalysis';
 
 const API_BASE_URL = "http://localhost:8098";
 
@@ -17,6 +17,7 @@ const Payment_Manager = () => {
   useAuthCheck();
   const [activeTab, setActiveTab] = useState("tab1");
   const [tableData, setTableData] = useState([]);
+  const [rentalPayments, setRentalPayments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -40,6 +41,23 @@ const Payment_Manager = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const fetchRentalPayments = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/rentalPayments/`);
+        if (response.data && response.data.rentalPayments) {
+          setRentalPayments(response.data.rentalPayments);
+        } else {
+          console.error("Unexpected data format from rental payments API");
+        }
+      } catch (error) {
+        console.error("Error fetching rental payments:", error);
+      }
+    };
+
+    fetchRentalPayments();
+  }, []);
+
   return (
     <div>
       <Header />
@@ -54,14 +72,17 @@ const Payment_Manager = () => {
             color="primary"
           >
             <Tab key="tab1" title="All Order Items" />
-            <Tab key="tab2" title="Price Comparison Chart" />
-            <Tab key="tab3" title="Most Sold Games" />
-            <Tab key="tab4" title="Rentals " />
+            <Tab key="tab2" title="Rentals" />
+            <Tab key="tab3" title="Price Comparison Chart" />
+            <Tab key="tab4" title="Most Sold Games " />
+            <Tab key="tab5" title="Most Rented Games " />
+            <Tab key="tab6" title="Income Expense Analysis" />
           </Tabs>
         </div>
         <div className="p-4">
           {activeTab === "tab1" && <AllPayments />}
-          {activeTab === "tab2" && (
+          {activeTab === "tab2" && <RentalPaymentsDash />}
+          {activeTab === "tab3" && (
             <div className="w-full h-[500px]">
               {isLoading ? (
                 <div>Loading chart data...</div>
@@ -72,7 +93,7 @@ const Payment_Manager = () => {
               )}
             </div>
           )}
-          {activeTab === "tab3" && (
+          {activeTab === "tab4" && (
             <div className="w-full h-[500px]">
               {isLoading ? (
                 <div>Loading chart data...</div>
@@ -83,7 +104,20 @@ const Payment_Manager = () => {
               )}
             </div>
           )}
-          {activeTab === "tab4" && <RentalPaymentsDash />}
+          {activeTab === "tab5" && (
+            <div className="w-full h-[500px]">
+              {isLoading ? (
+                <div>Loading chart data...</div>
+              ) : error ? (
+                <div>{error}</div>
+              ) : rentalPayments.length === 0 ? (
+                <div>No rental payment data available.</div>
+              ) : (
+                <MostRentedGamesChart rentalPayments={rentalPayments} />
+              )}
+            </div>
+          )}
+          {activeTab === "tab6" && <IncomeExpenseAnalysis />}
         </div>
       </div>
     </div>
