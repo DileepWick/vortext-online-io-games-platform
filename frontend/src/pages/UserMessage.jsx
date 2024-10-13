@@ -11,9 +11,11 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Pagination,
 } from "@nextui-org/react";
 import { getToken } from "../utils/getToken";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
+import { motion } from "framer-motion";
 
 import Header from "../components/header";
 import Footer from "../components/footer";
@@ -25,9 +27,16 @@ const UserMessages = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [replyMessage, setReplyMessage] = useState("");
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const TICKETS_PER_PAGE = 6;
   const token = getToken();
   const userId = getUserIdFromToken(token);
+  const totalPages = Math.ceil(userTickets.length / TICKETS_PER_PAGE);
+
+  const paginatedTickets = userTickets.slice(
+    (currentPage - 1) * TICKETS_PER_PAGE,
+    currentPage * TICKETS_PER_PAGE
+  );
 
   useEffect(() => {
     const fetchUserTickets = async () => {
@@ -49,6 +58,12 @@ const UserMessages = () => {
         let tickets = [];
         if (response.data && Array.isArray(response.data.contact)) {
           tickets = response.data.contact;
+          // Sort tickets: open tickets first, then by creation date (newest first)
+          tickets.sort((a, b) => {
+            if (a.status === "open" && b.status !== "open") return -1;
+            if (a.status !== "open" && b.status === "open") return 1;
+            return new Date(b.createdAt) - new Date(a.createdAt);
+          });
         }
 
         setUserTickets(tickets);
@@ -146,6 +161,42 @@ const UserMessages = () => {
     );
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+      },
+    },
+  };
+
+  const cardVariants = {
+    hover: {
+      scale: 1.03,
+      boxShadow: "0px 5px 15px rgba(0,0,0,0.3)",
+      transition: {
+        type: "spring",
+        stiffness: 300,
+      },
+    },
+    tap: {
+      scale: 0.98,
+    },
+  };
+
   if (loading) {
     return <Spinner />;
   }
@@ -153,45 +204,110 @@ const UserMessages = () => {
   return (
     <div className="bg-gray-900 min-h-screen flex flex-col">
       <Header />
-      <div className="max-w-4xl mx-auto p-4 flex-grow">
+      <motion.div
+        className="max-w-4xl mx-auto p-4 flex-grow"
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+      >
         {error ? (
-          <Card className="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-            <CardBody className="p-4 bg-gray-700 text-red-500 text-center">
-              <div>{error}</div>
-            </CardBody>
-          </Card>
+          <motion.div variants={itemVariants}>
+            <Card className="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+              <CardBody className="p-4 bg-gray-700 text-red-500 text-center">
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  {error}
+                </motion.div>
+              </CardBody>
+            </Card>
+          </motion.div>
         ) : userTickets.length === 0 ? (
-          <Card className="bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-10">
-            <CardBody className="p-4 bg-gray-700 text-white text-center">
-              <div className="text-lg">You have no raised tickets</div>
-            </CardBody>
-          </Card>
+          <motion.div variants={itemVariants}>
+            <Card className="bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-10">
+              <CardBody className="p-4 bg-gray-700 text-white text-center">
+                <motion.div
+                  className="text-lg"
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  You have no raised tickets
+                </motion.div>
+              </CardBody>
+            </Card>
+          </motion.div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Ticket list */}
-            {userTickets.map((ticket) => (
-              <Card
-                key={ticket._id}
-                className="bg-gray-800 rounded-lg shadow-lg overflow-hidden cursor-pointer mt-8"
-                isPressable
-                onPress={() => handleSelectTicket(ticket)}
-              >
-                <CardBody className="p-4">
-                  <h2 className="text-lg font-semibold text-white">
-                    Ticket: {ticket._id}
-                  </h2>
-                  <p className="text-sm text-gray-400">
-                    Status: {ticket.status}
-                  </p>
-                  <p className="text-sm text-gray-400">
-                    Created: {new Date(ticket.createdAt).toLocaleString()}
-                  </p>
-                </CardBody>
-              </Card>
-            ))}
-          </div>
+          <>
+            <motion.div
+              className="grid grid-cols-1 md:grid-cols-2 gap-4"
+              variants={containerVariants}
+              style={{ minHeight: "450px" }} // Adjust this value based on your card size
+            >
+              {paginatedTickets.map((ticket) => (
+                <motion.div key={ticket._id} variants={itemVariants}>
+                  <motion.div
+                    variants={cardVariants}
+                    whileHover="hover"
+                    whileTap="tap"
+                  >
+                    <Card
+                      className={`bg-gray-800 rounded-lg shadow-lg overflow-hidden cursor-pointer mt-8 ${
+                        ticket.status === "open"
+                          ? "border-2 border-green-500"
+                          : ""
+                      }`}
+                      isPressable
+                      onPress={() => handleSelectTicket(ticket)}
+                    >
+                      <CardBody className="p-4">
+                        <motion.h2
+                          className="text-lg font-semibold text-white"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.2 }}
+                        >
+                          Ticket: {ticket._id}
+                        </motion.h2>
+                        <motion.p
+                          className={`text-sm ${
+                            ticket.status === "open"
+                              ? "text-green-400"
+                              : "text-gray-400"
+                          }`}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.3 }}
+                        >
+                          Status: {ticket.status}
+                        </motion.p>
+                        <motion.p
+                          className="text-sm text-gray-400"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.4 }}
+                        >
+                          Created: {new Date(ticket.createdAt).toLocaleString()}
+                        </motion.p>
+                      </CardBody>
+                    </Card>
+                  </motion.div>
+                </motion.div>
+              ))}
+            </motion.div>
+            <div className="flex justify-center mt-8">
+              <Pagination
+                total={totalPages}
+                initialPage={1}
+                page={currentPage}
+                onChange={setCurrentPage}
+              />
+            </div>
+          </>
         )}
-      </div>
+      </motion.div>
 
       {/* Modal for Chat History */}
       <Modal

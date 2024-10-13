@@ -24,6 +24,8 @@ import EditionSelector from "./Edition_selector";
 import Header from "../header";
 import Footer from "../footer";
 
+import useAuthCheck from "../../utils/authCheck";
+
 // Default Questions
 const defaultQuestions = [
   {
@@ -44,6 +46,7 @@ const defaultQuestions = [
 ];
 
 const Hangman = () => {
+  useAuthCheck();
   //States
   const maxWrongGuesses = 6;
   const [questions, setQuestions] = useState(defaultQuestions);

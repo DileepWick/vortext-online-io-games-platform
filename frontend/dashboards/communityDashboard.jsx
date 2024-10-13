@@ -4,6 +4,7 @@ import Header from "../src/components/header";
 import Footer from "../src/components/footer";
 import { toast, Flip } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { BackgroundBeams } from "../src/components/ui/BackgroundBeams";
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import {
@@ -92,7 +93,6 @@ const CommunityPostsChart = ({ data, chartRef }) => {
 
   return <Bar ref={chartRef} data={chartData} options={options} style={{ height: '400px' }} />;
 };
-
 const AnalyticsTable = ({ data }) => {
   return (
     <Table aria-label="Analytics table">
@@ -301,8 +301,12 @@ const CommunityDashboard = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-black">
+      
+      <BackgroundBeams />
       <Header />
+      
       <main className="flex-grow p-4">
+      <h1 className="text-5xl font-bold text-black bg-clip-text bg-no-repeat text-transparent bg-gradient-to-r py-4 from-blue-500 via-orange-500 to-orange-500 [text-shadow:0_0_rgba(0,0,0,0.1)]">Community Dashboard</h1>
         <div className="flex w-full flex-col">
           <div className="flex items-center p-4 font-primaryRegular">
             <Tabs

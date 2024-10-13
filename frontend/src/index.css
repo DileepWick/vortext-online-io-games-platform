@@ -2,37 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face{
-    font-family:"Rubik";
-    src:local("Rubik-Regular"),
-    url('./assets/fonts/Rubik-Regular.ttf') format("truetype");
-
+@font-face {
+  font-family: "Rubik";
+  src: local("Rubik-Regular"),
+    url("./assets/fonts/Rubik-Regular.ttf") format("truetype");
 }
 
-@font-face{
-  font-family:"scary";
-  src:local("HelpMe"),
-  url('./assets/fonts/HelpMe.ttf') format("truetype");
-
+@font-face {
+  font-family: "scary";
+  src: local("HelpMe"), url("./assets/fonts/HelpMe.ttf") format("truetype");
 }
 
-@font-face{
-  font-family:"scary2";
-  src:local("BLOODY"),
-  url('./assets/fonts/BLOODY.TTF') format("truetype");
-
+@font-face {
+  font-family: "scary2";
+  src: local("BLOODY"), url("./assets/fonts/BLOODY.TTF") format("truetype");
 }
 
 /* Hide scrollbar */
 .hide-scrollbar {
-    scrollbar-width: none; /* Firefox */
-  }
-  
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
-  }
+  scrollbar-width: none; /* Firefox */
+}
 
-.printBtn{
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.printBtn {
   position: absolute;
   top: 60px;
   right: 0;
@@ -40,4 +35,33 @@
   padding: 10px;
   background-color: black;
   z-index: 1000;
+}
+@keyframes moveLeft {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes moveRight {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-moveLeft {
+  animation-name: moveLeft;
+}
+
+.animate-moveRight {
+  animation-name: moveRight;
+}
+
+.paused {
+  animation-play-state: paused;
 }

@@ -1,4 +1,3 @@
-//articles.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Header from "../components/header";
@@ -6,7 +5,6 @@ import Footer from "../components/footer";
 import { getToken } from "../utils/getToken";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { User } from "@nextui-org/react";
-import { Button } from "@nextui-org/button";
 import {
   FaHeart,
   FaRegHeart,
@@ -14,17 +12,121 @@ import {
   FaComments,
   FaFlag,
   FaEdit,
+  FaImage,
 } from "react-icons/fa";
 import { toast, Flip } from "react-toastify";
 import Loader from "../components/Loader/loader";
 import "react-toastify/dist/ReactToastify.css";
-
 import useAuthCheck from "../utils/authCheck";
-const Articles = () => {
-  useAuthCheck();
+import {cn} from "../libs/util";
+import  {Input}  from "../components/ui/Input";
+import  {Label}  from "../components/ui/Lable";
+import { TracingBeam } from "../components/ui/TracingBeam";
+import { BackgroundBeams } from "../components/ui/BackgroundBeams";
+
+const LabelInputContainer = ({
+  children,
+  className
+}) => {
+  return (
+    (<div className={cn("flex flex-col space-y-2 w-full", className)}>
+      {children}
+    </div>)
+  );
+};
+
+const CreatePost = ({ user, onSubmit }) => {
   const [heading, setHeading] = useState("");
   const [articleBody, setArticleBody] = useState("");
   const [image, setImage] = useState(null);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    if (!heading.trim() || !articleBody.trim() || !image) {
+      toast.error("Please fill all fields and select an image", {
+        theme: "dark",
+        transition: Flip,
+        style: { fontFamily: "Rubik" },
+      });
+      return;
+    }
+    
+    onSubmit({ heading, articleBody, image });
+    setHeading("");
+    setArticleBody("");
+    setImage(null);
+  };
+
+  return (
+    <div className="max-w-lg mx-auto bg-gray-400 dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+      <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Create Post</h2>
+      <form onSubmit={handleSubmit}>
+        <div className="flex items-center mb-4">
+          {user && (
+            <User
+              avatarProps={{
+                src: user.profilePic,
+                size: "sm",
+              }}
+              className="mr-3"
+            />
+          )}
+          <Input
+            type="text"
+            id="heading"
+            value={heading}
+            onChange={(e) => setHeading(e.target.value)}
+            placeholder="What's on your mind?"
+            className="w-full"
+          />
+        </div>
+        <div className="mb-4">
+          <Label htmlFor="articleBody" className="mb-2 block">
+            Write something...
+          </Label>
+          <textarea
+            id="articleBody"
+            value={articleBody}
+            onChange={(e) => setArticleBody(e.target.value)}
+            placeholder="Share your thoughts..."
+            className="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-lg p-2 min-h-[100px] focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition duration-200"
+            rows="4"
+          ></textarea>
+        </div>
+        <div className="mb-4">
+          <Label htmlFor="image" className="mb-2 block">
+            Add to your post
+          </Label>
+          <div className="relative">
+            <Input
+              type="file"
+              id="image"
+              onChange={(e) => setImage(e.target.files[0])}
+              className="hidden"
+            />
+            <label
+              htmlFor="image"
+              className="flex items-center justify-center w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-200"
+            >
+              <FaImage className="mr-2" />
+              {image ? image.name : "Choose an image"}
+            </label>
+          </div>
+        </div>
+        <button
+          type="submit"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200"
+        >
+          Post
+        </button>
+      </form>
+    </div>
+  );
+};
+
+const Articles = () => {
+  useAuthCheck();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [user, setUser] = useState(null);
@@ -86,12 +188,7 @@ const Articles = () => {
     fetchArticles();
   }, [userId]);
 
-  const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async ({ heading, articleBody, image }) => {
     setError("");
     setSuccess("");
 
@@ -123,9 +220,6 @@ const Articles = () => {
           transition: Flip,
           style: { fontFamily: "Rubik" },
         });
-        setHeading("");
-        setArticleBody("");
-        setImage(null);
         fetchArticles();
       }
     } catch (err) {
@@ -200,7 +294,7 @@ const Articles = () => {
                       user: {
                         _id: userId,
                         name: user.name,
-                        profilePic: user.profilePic, // Include the user's profile picture
+                        profilePic: user.profilePic,
                       },
                     },
                   ],
@@ -346,66 +440,11 @@ const Articles = () => {
 
   return (
     <div className="bg-customDark min-h-screen text-white font-sans">
+      <TracingBeam>
       <Header />
 
       <div className="container mx-auto p-4">
-        <div className="max-w-lg mx-auto bg-gray-800 rounded-lg shadow-md p-4 mb-6">
-          <h2 className="text-2xl font-bold mb-4">Create Post</h2>
-          <form onSubmit={handleSubmit}>
-            <div className="flex items-center mb-4">
-              {user && (
-                <User
-                  avatarProps={{
-                    src: user.profilePic,
-                  }}
-                  className="mr-3"
-                />
-              )}
-              <input
-                type="text"
-                id="heading"
-                value={heading}
-                onChange={(e) => setHeading(e.target.value)}
-                placeholder=" What's on your mind?"
-                className="w-full border-none bg-gray-700 text-white text-lg focus:outline-none"
-              />
-            </div>
-            <div className="mb-4">
-              <textarea
-                id="articleBody"
-                value={articleBody}
-                onChange={(e) => setArticleBody(e.target.value)}
-                placeholder="Write something..."
-                className="w-full border border-gray-600 bg-gray-700 text-white rounded-lg p-2"
-                rows="4"
-              ></textarea>
-            </div>
-            <div className="mb-4">
-              <label
-                htmlFor="image"
-                className="block text-sm font-medium text-gray-500"
-              >
-                Add to your post
-              </label>
-              <input
-                type="file"
-                id="image"
-                onChange={handleImageChange}
-                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-none file:bg-gray-600 file:text-blue-400 hover:file:bg-gray-700"
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Post
-            </button>
-          </form>
-          {error && <p className="text-red-500 mt-4 text-center">{error}</p>}
-          {success && (
-            <p className="text-green-500 mt-4 text-center">{success}</p>
-          )}
-        </div>
+        <CreatePost user={user} onSubmit={handleSubmit} />
 
         <h2 className="text-3xl font-bold mb-6">Posts</h2>
         {articles.length === 0 ? (
@@ -419,7 +458,7 @@ const Articles = () => {
               >
                 {article.uploader._id === userId && (
                   <button
-                    className="absolute top-2 right-2 text-red-500 hover:text-red-400"
+                  className="absolute top-2 right-2 text-red-500 hover:text-red-400"
                     onClick={() => handleDeleteArticle(article._id)}
                     disabled={deletingArticleId === article._id}
                   >
@@ -492,18 +531,18 @@ const Articles = () => {
                         handleCommentSubmit(article._id);
                       }}
                     >
-                      <textarea
+                      <Input
+                        type="text"
                         value={commentTexts[article._id] || ""}
                         onChange={(e) =>
                           handleCommentChange(article._id, e.target.value)
                         }
                         placeholder="Add a comment..."
-                        className="w-full border-none bg-gray-700 text-white rounded-lg p-2"
-                        rows="2"
-                      ></textarea>
+                        className="w-full mb-2"
+                      />
                       <button
                         type="submit"
-                        className="mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded"
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded"
                         disabled={
                           !commentTexts[article._id] ||
                           commentTexts[article._id].trim() === ""
@@ -513,11 +552,11 @@ const Articles = () => {
                       </button>
                     </form>
 
-                    <div className="mt-4">
+                    <div className="mt-4 space-y-2">
                       {article.comments.map((comment) => (
                         <div
                           key={comment._id}
-                          className="bg-gray-900 p-2 rounded-lg mb-2 flex justify-between items-start"
+                          className="bg-gray-900 p-2 rounded-lg flex justify-between items-start"
                         >
                           <div className="w-full">
                             <div className="flex items-center mb-1">
@@ -546,14 +585,14 @@ const Articles = () => {
                                   );
                                 }}
                               >
-                                <textarea
+                                <Input
+                                  type="text"
                                   value={editedCommentText}
                                   onChange={(e) =>
                                     setEditedCommentText(e.target.value)
                                   }
-                                  className="w-full border-none bg-gray-700 text-white rounded-lg p-2 mb-2"
-                                  rows="2"
-                                ></textarea>
+                                  className="w-full mb-2"
+                                />
                                 <div>
                                   <button
                                     type="submit"
@@ -619,9 +658,11 @@ const Articles = () => {
           </div>
         )}
       </div>
+      </TracingBeam>
       <Footer />
     </div>
   );
 };
 
 export default Articles;
+                    

@@ -32,8 +32,9 @@ import UserMessages from "./pages/UserMessage";
 
 //Games
 import Snake from "../Games/Snake";
+import Snake2player from "../Games/Snake2player";
 import PuzzlePlatformGame from "./components/Games/PuzzlePlatformGame";
-import ColorGuessingGame from "../Games/ColorGuessingGame";
+import ColorGuessingGame from "./components/Games/ColorGuessingGame";
 import Chat from "./pages/chat";
 
 import CodeBreaker from "./components/Games/CodeBreaker";
@@ -125,6 +126,8 @@ const App = () => {
       <Route path="/RentedGamesSection" element={<RentedGamesSection />} />
       <Route path="/Transaction" element={<TransactionHistory />} />
       <Route path="/Snakegame" element={<Snake />} />
+      <Route path="/Snakegame2player" element={<Snake2player />} />
+
       <Route path="/PuzzlePlatformGame" element={<PuzzlePlatformGame />} />
 
       <Route path="/ColorGuessingGame" element={<ColorGuessingGame />} />
@@ -141,13 +144,10 @@ const App = () => {
       {/*Game Routes*/}
       <Route path="/HangmanGame" element={<Hangman />} />
 
-      
-      <Route path ="/CodeBreaker" element={<CodeBreaker />} />
-      
+      <Route path="/CodeBreaker" element={<CodeBreaker />} />
 
       <Route path="/rock-paper-scissors" element={<RockPaperScissors />} />
       <Route path="*" element={<NotFoundPage />} />
-
     </Routes>
   );
 };

@@ -1,6 +1,6 @@
-import Rating from '../models/ratingModel.js';
-import { Game } from '../models/game.js';
-import mongoose from 'mongoose';
+import Rating from "../models/ratingModel.js";
+import { Game } from "../models/game.js";
+import mongoose from "mongoose";
 
 export const createRating = async (req, res) => {
   try {
@@ -27,7 +27,7 @@ export const createRating = async (req, res) => {
 export const getRatings = async (req, res) => {
   try {
     const { gameId } = req.params;
-    const ratings = await Rating.find({ game: gameId }).populate('user');
+    const ratings = await Rating.find({ game: gameId }).populate("user");
     console.log(`Fetched ${ratings.length} ratings for game ${gameId}`);
     res.json(ratings);
   } catch (error) {
@@ -47,46 +47,56 @@ export const getRatings = async (req, res) => {
 //   }
 // };
 
-
-
 export const getallRatings = async (req, res) => {
   try {
     // Step 1: Fetch ratings without population
     const unpopulatedRatings = await Rating.find().lean();
-    console.log('Unpopulated ratings:', JSON.stringify(unpopulatedRatings.slice(0, 2), null, 2));
+    console.log(
+      "Unpopulated ratings:",
+      JSON.stringify(unpopulatedRatings.slice(0, 2), null, 2)
+    );
 
     // Step 2: Check if game IDs exist and are valid
-    const gameIds = unpopulatedRatings.map(rating => rating.game).filter(id => id);
-    console.log('Game IDs from ratings:', gameIds);
+    const gameIds = unpopulatedRatings
+      .map((rating) => rating.game)
+      .filter((id) => id);
+    console.log("Game IDs from ratings:", gameIds);
 
     // Step 3: Fetch games directly
-    const games = await mongoose.model('Game').find({ _id: { $in: gameIds } }).lean();
-    console.log('Found games:', JSON.stringify(games, null, 2));
+    const games = await mongoose
+      .model("Game")
+      .find({ _id: { $in: gameIds } })
+      .lean();
+    console.log("Found games:", JSON.stringify(games, null, 2));
 
     // Step 4: Attempt population
     const ratings = await Rating.find()
       .populate({
-        path: 'user',
-        select: 'email username'
+        path: "user",
+        select: "email username",
       })
       .populate({
-        path: 'game',
+        path: "game",
         populate: {
           path: "AssignedGame",
-          select: 'title'
-        }
+          select: "title",
+        },
       });
 
     console.log(`Fetched ${ratings.length} ratings`);
-    console.log('Sample populated rating:', JSON.stringify(ratings[0], null, 2));
+    console.log(
+      "Sample populated rating:",
+      JSON.stringify(ratings[0], null, 2)
+    );
 
     res.json(ratings);
   } catch (error) {
     console.error("Error in getAllRatings:", error);
-    res.status(500).json({ message: 'There is an error', error: error.message });
+    res
+      .status(500)
+      .json({ message: "There is an error", error: error.message });
   }
 };
-
 
 export const updateRating = async (req, res) => {
   try {
@@ -94,7 +104,11 @@ export const updateRating = async (req, res) => {
     const { rating, comment } = req.body;
     console.log("Received updated rating data:", { ratingId, rating, comment });
 
-    const updatedRating = await Rating.findByIdAndUpdate(ratingId, { rating, comment }, { new: true });
+    const updatedRating = await Rating.findByIdAndUpdate(
+      ratingId,
+      { rating, comment },
+      { new: true }
+    );
     if (!updatedRating) {
       throw new Error(`Rating with ID ${ratingId} not found`);
     }
@@ -111,7 +125,7 @@ export const updateRating = async (req, res) => {
     console.error("Error in updateRating:", error);
     res.status(400).json({ message: error.message });
   }
-}
+};
 
 export const deleteRatingbyId = async (req, res) => {
   try {
@@ -135,5 +149,44 @@ export const deleteRatingbyId = async (req, res) => {
   } catch (error) {
     console.error("Error in deleteRatingbyId:", error);
     res.status(400).json({ message: error.message });
+  }
+};
+
+export const getNewRatings = async (req, res) => {
+  try {
+    const ratings = await Rating.find()
+      .sort({ createdAt: -1 })
+      .limit(20)
+      .populate({
+        path: "game", // This populates the 'game' field, which is referencing GameStock
+        populate: {
+          path: "AssignedGame", // This populates the 'AssignedGame' field from GameStock, which references Game
+          select: "title", // Select only the 'title' field from the Game model
+        },
+      })
+      .populate("user", "username"); // Also populate the 'user' field to get the username
+
+    if (!Array.isArray(ratings)) {
+      console.error("Unexpected ratings data type:", typeof ratings);
+      return res
+        .status(500)
+        .json({ message: "Unexpected data format from database" });
+    }
+
+    res.json(ratings);
+  } catch (error) {
+    console.error("Error in getLatestRatings:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const deleteAllRatings = async (req, res) => {
+  try {
+    // Delete all documents from the ratings collection
+    await Rating.deleteMany({});
+
+    res.status(200).json({ message: "All ratings have been deleted." });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to delete ratings.", error });
   }
 };
