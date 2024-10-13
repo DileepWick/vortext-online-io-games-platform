@@ -28,6 +28,8 @@ const Login = () => {
   const [selectedRole, setSelectedRole] = useState("User"); // New state for role selection
   const [portfolioLink, setPortfolioLinks] = useState(""); // Initialize with one empty input
   const [showPassword, setShowPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState(""); // New state for confirm password
+
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -89,6 +91,12 @@ const handlePortfolioLinkChange = (e) => {
       password
     );
 
+
+    const handleConfirmPasswordChange = (e) => {
+      setConfirmPassword(e.target.value);
+    };
+    
+
   const validateForm = () => {
     const errors = {};
 
@@ -108,6 +116,9 @@ const handlePortfolioLinkChange = (e) => {
     if (!validatePassword(formData.password)) {
       errors.password =
         "Password must be at least 8 characters long and include uppercase, lowercase, number, and symbol.";
+    }
+    if (formData.password !== confirmPassword) {
+      errors.confirmPassword = "Passwords do not match.";
     }
 
     setValidationErrors(errors);
@@ -483,7 +494,9 @@ const handlePortfolioLinkChange = (e) => {
                         color={validationErrors.password ? "error" : "default"}
                         className="max-w-full"
                       />
+                      
                       <Input
+                      
   label="LinkedIn Link"
   placeholder="Enter your LinkedIn URL (www.linkedin.com/)"
   value={portfolioLink}
