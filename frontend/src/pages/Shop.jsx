@@ -137,78 +137,197 @@ const Shop = () => {
 
   return (
     <div className="min-h-screen bg-customDark text-white dark">
-      <TracingBeam>
       <Header />
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
-          {/* Search Bar */}
-          <Input
-            clearable
-            underlined
-            placeholder="SEARCH GAMES ..."
-            className="w-[400px] font-primaryRegular dark ml-[50px] mt-8"
-            size="lg"
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setShowTopRated(false);
+      <TracingBeam>
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex justify-between items-center mb-8">
+            {/* Search Bar */}
+            <Input
+              clearable
+              underlined
+              placeholder="SEARCH GAMES ..."
+              className="w-[400px] font-primaryRegular dark ml-[50px] mt-8"
+              size="lg"
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setShowTopRated(false);
+              }}
+              value={searchTerm}
+            />
+          </div>
+
+          <button
+            className="text-[white] font-bold px-16 pb-8 flex flex-row gap-2 items-center  text-left text-[22px]"
+            onClick={() => {
+              setSwiperLoading(true); // Start loading state immediately when clicked
+              setShowTopRated(true); // Set the showtoprated state to true
+
+              // Set timeout to simulate delay (if you still need it), but move state management into useEffect
+              setTimeout(() => {
+                setSwiperLoading(false); // After 500ms, stop loading
+              }, 1500);
             }}
-            value={searchTerm}
-          />
-        </div>
+          >
+            Show Top Rated This week <IoIosArrowForward />
+          </button>
 
-        <button
-          className="text-[white] font-bold px-16 pb-8 flex flex-row gap-2 items-center  text-left text-[22px]"
-          onClick={() => {
-            setSwiperLoading(true); // Start loading state immediately when clicked
-            setShowTopRated(true); // Set the showtoprated state to true
+          {filteredStocks.length === 0 ? (
+            <p className="text-gray-400 text-center">No Games Found</p>
+          ) : (
+            <ScrollShadow hideScrollBar className="">
+              {showtoprated ? (
+                swiperLoading ? (
+                  <div className="flex justify-center items-center h-64">
+                    <div className="w-10 h-10 border-4 border-t-customPink border-transparent border-solid rounded-full animate-spin"></div>
+                  </div>
+                ) : (
+                  <Swiper
+                    effect={"coverflow"}
+                    grabCursor={true}
+                    centeredSlides={true}
+                    loop={true}
+                    autoplay={{
+                      delay: 2500,
+                      disableOnInteraction: false,
+                    }}
+                    slidesPerView={"auto"}
+                    spaceBetween={100}
+                    coverflowEffect={{
+                      rotate: 30,
+                      stretch: 0,
+                      depth: 200,
+                      modifier: 1,
+                      slideShadows: true,
+                    }}
+                    pagination={{ el: ".swiper-pagination", clickable: true }}
+                    navigation={{
+                      nextEl: ".swiper-button-next",
+                      prevEl: ".swiper-button-prev",
+                      clickable: true,
+                    }}
+                    modules={[
+                      EffectCoverflow,
+                      Pagination,
+                      Navigation,
+                      Autoplay,
+                    ]}
+                    className="swiper_container overflow-hidden w-[850px] "
+                  >
+                    {filteredStocks.map((stock, index) => {
+                      const originalPrice = stock.UnitPrice;
+                      const discount = stock.discount;
+                      const discountedPrice =
+                        discount > 0
+                          ? originalPrice - (originalPrice * discount) / 100
+                          : originalPrice;
 
-            // Set timeout to simulate delay (if you still need it), but move state management into useEffect
-            setTimeout(() => {
-              setSwiperLoading(false); // After 500ms, stop loading
-            }, 1500);
-          }}
-        >
-          Show Top Rated This week <IoIosArrowForward />
-        </button>
+                      return (
+                        <SwiperSlide key={stock._id} className="slide w-fit ">
+                          <Card className="relative bg-opacity-20 z-40 rounded-lg shadow-lg text-white transform transition-transform duration-300  hover:z-10 hover:shadow-2xl hover:bg-opacity-80 w-[250px] h-[500px] hover:scale-1">
+                            <Link to={`/game/${stock._id}`}>
+                              <div className="rank absolute z-49 top-[34%] text-center justify-center items-center text-white "></div>
+                              <p className="rankNum absolute top-[30%] z-50  left-[28%] text-[35px]  gaming-animation">
+                                Top : {index + 1}{" "}
+                              </p>
+                              <div className="relative">
+                                <img
+                                  alt={stock.AssignedGame.title}
+                                  style={{
+                                    width: "250px",
+                                    height: "350px",
+                                    objectFit: "cover",
+                                  }}
+                                  src={stock.AssignedGame.coverPhoto}
+                                />
 
-        {filteredStocks.length === 0 ? (
-          <p className="text-gray-400 text-center">No Games Found</p>
-        ) : (
-          <ScrollShadow hideScrollBar className="">
-            {showtoprated ? (
-              swiperLoading ? (
-                <div className="flex justify-center items-center h-64">
-                  <div className="w-10 h-10 border-4 border-t-customPink border-transparent border-solid rounded-full animate-spin"></div>
-                </div>
+                                <div className="absolute  inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity duration-300  hover:opacity-100">
+                                  <GameIcon />
+                                </div>
+                              </div>
+                              <CardBody className="p-2 text-white">
+                                <h2 className="text-lg font-primaryRegular text-white mb-1">
+                                  {stock.AssignedGame.title}
+                                </h2>
+                                <p className="font-primaryRegular text-white mb-1">
+                                  {discount > 0 && (
+                                    <>
+                                      <Chip
+                                        color="danger"
+                                        radius="none"
+                                        className="font-primaryRegular mr-1"
+                                        size="sm"
+                                      >
+                                        -{stock.discount}% off
+                                      </Chip>
+                                      <span
+                                        className="line-through mr-1 text-editionColor"
+                                        style={{ fontSize: "15px" }}
+                                      >
+                                        LKR.{originalPrice}
+                                      </span>
+                                    </>
+                                  )}
+                                  <span style={{ fontSize: "15px" }}>
+                                    LKR.{discountedPrice}
+                                  </span>
+                                </p>
+                                <div className="flex flex-wrap mb-1 text-white">
+                                  {stock.AssignedGame.Genre.flatMap((genre) =>
+                                    genre.includes(",")
+                                      ? genre.split(",")
+                                      : genre
+                                  ).map((genre, index) => (
+                                    <Chip
+                                      variant="dot"
+                                      size="sm"
+                                      radius="none"
+                                      className="font-primaryRegular"
+                                      color="danger"
+                                      key={index}
+                                    >
+                                      {(() => {
+                                        const genreName =
+                                          genre.trim().charAt(0).toUpperCase() +
+                                          genre.trim().slice(1);
+                                        if (genreName === "Action")
+                                          return `Action ⚔️`;
+                                        if (genreName === "Adventure")
+                                          return `Adventure 🐾`;
+                                        if (genreName === "Racing")
+                                          return `Racing 🏎️`;
+                                        if (genreName === "Puzzle")
+                                          return `Puzzle 🧩`;
+                                        if (genreName === "Fighting")
+                                          return `Fighting 🥷🏻`;
+                                        if (genreName === "Strategy")
+                                          return `Strategy 🙄`;
+                                        if (genreName === "Sport")
+                                          return `Sport 🏅`;
+                                        return genreName; // Fallback in case no match is found
+                                      })()}
+                                    </Chip>
+                                  ))}
+                                </div>
+                              </CardBody>
+                            </Link>
+                          </Card>
+                        </SwiperSlide>
+                      );
+                    })}
+                    <div className="slider-controler hidden">
+                      <div className="swiper-button-prev slider-arrow">
+                        <ion-icon name="arrow-back-outline"></ion-icon>
+                      </div>
+                      <div className="swiper-button-next slider-arrow">
+                        <ion-icon name="arrow-forward-outline"></ion-icon>
+                      </div>
+                      <div className="swiper-pagination hidden"></div>
+                    </div>
+                  </Swiper>
+                )
               ) : (
-                <Swiper
-                  effect={"coverflow"}
-                  grabCursor={true}
-                  centeredSlides={true}
-                  loop={true}
-                  autoplay={{
-                    delay: 2500,
-                    disableOnInteraction: false,
-                  }}
-                  slidesPerView={"auto"}
-                  spaceBetween={100}
-                  coverflowEffect={{
-                    rotate: 30,
-                    stretch: 0,
-                    depth: 200,
-                    modifier: 1,
-                    slideShadows: true,
-                  }}
-                  pagination={{ el: ".swiper-pagination", clickable: true }}
-                  navigation={{
-                    nextEl: ".swiper-button-next",
-                    prevEl: ".swiper-button-prev",
-                    clickable: true,
-                  }}
-                  modules={[EffectCoverflow, Pagination, Navigation, Autoplay]}
-                  className="swiper_container overflow-hidden w-[850px] "
-                >
-                  {filteredStocks.map((stock, index) => {
+                <div className="flex flex-wrap justify-center gap-8">
+                  {filteredStocks.map((stock) => {
                     const originalPrice = stock.UnitPrice;
                     const discount = stock.discount;
                     const discountedPrice =
@@ -217,208 +336,96 @@ const Shop = () => {
                         : originalPrice;
 
                     return (
-                      <SwiperSlide key={stock._id} className="slide w-fit ">
-                        <Card className="relative bg-opacity-20 z-40 rounded-lg shadow-lg text-white transform transition-transform duration-300  hover:z-10 hover:shadow-2xl hover:bg-opacity-80 w-[250px] h-[500px] hover:scale-1">
-                          <Link to={`/game/${stock._id}`}>
-                            <div className="rank absolute z-49 top-[34%] text-center justify-center items-center text-white "></div>
-                            <p className="rankNum absolute top-[30%] z-50  left-[28%] text-[35px]  gaming-animation">
-                              Top : {index + 1}{" "}
-                            </p>
-                            <div className="relative">
-                              <img
-                                alt={stock.AssignedGame.title}
-                                style={{
-                                  width: "250px",
-                                  height: "350px",
-                                  objectFit: "cover",
-                                }}
-                                src={stock.AssignedGame.coverPhoto}
-                              />
+                      <Card
+                        key={stock._id}
+                        className="relative bg-customDark bg-opacity-20 rounded-lg shadow-lg text-white transform transition-transform duration-300 hover:scale-105 hover:z-10 hover:shadow-2xl hover:bg-opacity-80 w-[250px] h-[500px]"
+                      >
+                        <Link to={`/game/${stock._id}`}>
+                          <div className="relative">
+                            <img
+                              alt={stock.AssignedGame.title}
+                              style={{
+                                width: "250px",
+                                height: "350px",
+                                objectFit: "cover",
+                              }}
+                              src={stock.AssignedGame.coverPhoto}
+                            />
 
-                              <div className="absolute  inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity duration-300  hover:opacity-100">
-                                <GameIcon />
-                              </div>
+                            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity duration-300 hover:opacity-100">
+                              <GameIcon />
                             </div>
-                            <CardBody className="p-2 text-white">
-                              <h2 className="text-lg font-primaryRegular text-white mb-1">
-                                {stock.AssignedGame.title}
-                              </h2>
-                              <p className="font-primaryRegular text-white mb-1">
-                                {discount > 0 && (
-                                  <>
-                                    <Chip
-                                      color="danger"
-                                      radius="none"
-                                      className="font-primaryRegular mr-1"
-                                      size="sm"
-                                    >
-                                      -{stock.discount}% off
-                                    </Chip>
-                                    <span
-                                      className="line-through mr-1 text-editionColor"
-                                      style={{ fontSize: "15px" }}
-                                    >
-                                      LKR.{originalPrice}
-                                    </span>
-                                  </>
-                                )}
-                                <span style={{ fontSize: "15px" }}>
-                                  LKR.{discountedPrice}
-                                </span>
-                              </p>
-                              <div className="flex flex-wrap mb-1 text-white">
-                                {stock.AssignedGame.Genre.flatMap((genre) =>
-                                  genre.includes(",") ? genre.split(",") : genre
-                                ).map((genre, index) => (
+                          </div>
+                          <CardBody className="p-2 text-white">
+                            <h2 className="text-lg font-primaryRegular text-white mb-1">
+                              {stock.AssignedGame.title}
+                            </h2>
+                            <p className="font-primaryRegular text-white mb-1">
+                              {discount > 0 && (
+                                <>
                                   <Chip
-                                    variant="dot"
-                                    size="sm"
+                                    color="primary"
                                     radius="none"
-                                    className="font-primaryRegular"
-                                    color="danger"
-                                    key={index}
+                                    className="font-primaryRegular mr-1"
+                                    size="sm"
                                   >
-                                    {(() => {
-                                      const genreName =
-                                        genre.trim().charAt(0).toUpperCase() +
-                                        genre.trim().slice(1);
-                                      if (genreName === "Action")
-                                        return `Action ⚔️`;
-                                      if (genreName === "Adventure")
-                                        return `Adventure 🐾`;
-                                      if (genreName === "Racing")
-                                        return `Racing 🏎️`;
-                                      if (genreName === "Puzzle")
-                                        return `Puzzle 🧩`;
-                                      if (genreName === "Fighting")
-                                        return `Fighting 🥷🏻`;
-                                      if (genreName === "Strategy")
-                                        return `Strategy 🙄`;
-                                      if (genreName === "Sport")
-                                        return `Sport 🏅`;
-                                      return genreName; // Fallback in case no match is found
-                                    })()}
+                                    -{stock.discount}% off
                                   </Chip>
-                                ))}
-                              </div>
-                            </CardBody>
-                          </Link>
-                        </Card>
-                      </SwiperSlide>
+                                  <span
+                                    className="line-through mr-1 text-editionColor"
+                                    style={{ fontSize: "15px" }}
+                                  >
+                                    LKR.{originalPrice}
+                                  </span>
+                                </>
+                              )}
+                              <span style={{ fontSize: "15px" }}>
+                                LKR.{discountedPrice}
+                              </span>
+                            </p>
+                            <div className="flex flex-wrap mb-1 text-white">
+                              {stock.AssignedGame.Genre.flatMap((genre) =>
+                                genre.includes(",") ? genre.split(",") : genre
+                              ).map((genre, index) => (
+                                <Chip
+                                  variant="dot"
+                                  size="sm"
+                                  radius="none"
+                                  className="font-primaryRegular"
+                                  color="primary"
+                                  key={index}
+                                >
+                                  {(() => {
+                                    const genreName =
+                                      genre.trim().charAt(0).toUpperCase() +
+                                      genre.trim().slice(1);
+                                    if (genreName === "Action") return `ACTION`;
+                                    if (genreName === "Adventure")
+                                      return `ADVENTURE`;
+                                    if (genreName === "Racing") return `RACING`;
+                                    if (genreName === "Puzzle") return `PUZZLE`;
+                                    if (genreName === "Fighting")
+                                      return `FIGHTING `;
+                                    if (genreName === "Strategy")
+                                      return `STRATEGY`;
+                                    if (genreName === "Sport") return `SPORT`;
+                                    return genreName; // Fallback in case no match is found
+                                  })()}
+                                </Chip>
+                              ))}
+                            </div>
+                          </CardBody>
+                        </Link>
+                      </Card>
                     );
                   })}
-                  <div className="slider-controler hidden">
-                    <div className="swiper-button-prev slider-arrow">
-                      <ion-icon name="arrow-back-outline"></ion-icon>
-                    </div>
-                    <div className="swiper-button-next slider-arrow">
-                      <ion-icon name="arrow-forward-outline"></ion-icon>
-                    </div>
-                    <div className="swiper-pagination hidden"></div>
-                  </div>
-                </Swiper>
-              )
-            ) : (
-              <div className="flex flex-wrap justify-center gap-8">
-                {filteredStocks.map((stock) => {
-                  const originalPrice = stock.UnitPrice;
-                  const discount = stock.discount;
-                  const discountedPrice =
-                    discount > 0
-                      ? originalPrice - (originalPrice * discount) / 100
-                      : originalPrice;
-
-                  return (
-                    <Card
-                      key={stock._id}
-                      className="relative bg-customDark bg-opacity-20 rounded-lg shadow-lg text-white transform transition-transform duration-300 hover:scale-105 hover:z-10 hover:shadow-2xl hover:bg-opacity-80 w-[250px] h-[500px]"
-                    >
-                      <Link to={`/game/${stock._id}`}>
-                        <div className="relative">
-                          <img
-                            alt={stock.AssignedGame.title}
-                            style={{
-                              width: "250px",
-                              height: "350px",
-                              objectFit: "cover",
-                            }}
-                            src={stock.AssignedGame.coverPhoto}
-                          />
-
-                          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity duration-300 hover:opacity-100">
-                            <GameIcon />
-                          </div>
-                        </div>
-                        <CardBody className="p-2 text-white">
-                          <h2 className="text-lg font-primaryRegular text-white mb-1">
-                            {stock.AssignedGame.title}
-                          </h2>
-                          <p className="font-primaryRegular text-white mb-1">
-                            {discount > 0 && (
-                              <>
-                                <Chip
-                                  color="primary"
-                                  radius="none"
-                                  className="font-primaryRegular mr-1"
-                                  size="sm"
-                                >
-                                  -{stock.discount}% off
-                                </Chip>
-                                <span
-                                  className="line-through mr-1 text-editionColor"
-                                  style={{ fontSize: "15px" }}
-                                >
-                                  LKR.{originalPrice}
-                                </span>
-                              </>
-                            )}
-                            <span style={{ fontSize: "15px" }}>
-                              LKR.{discountedPrice}
-                            </span>
-                          </p>
-                          <div className="flex flex-wrap mb-1 text-white">
-                            {stock.AssignedGame.Genre.flatMap((genre) =>
-                              genre.includes(",") ? genre.split(",") : genre
-                            ).map((genre, index) => (
-                              <Chip
-                                variant="dot"
-                                size="sm"
-                                radius="none"
-                                className="font-primaryRegular"
-                                color="primary"
-                                key={index}
-                              >
-                                {(() => {
-                                  const genreName =
-                                    genre.trim().charAt(0).toUpperCase() +
-                                    genre.trim().slice(1);
-                                  if (genreName === "Action") return `ACTION`;
-                                  if (genreName === "Adventure")
-                                    return `ADVENTURE`;
-                                  if (genreName === "Racing") return `RACING`;
-                                  if (genreName === "Puzzle") return `PUZZLE`;
-                                  if (genreName === "Fighting")
-                                    return `FIGHTING `;
-                                  if (genreName === "Strategy")
-                                    return `STRATEGY`;
-                                  if (genreName === "Sport") return `SPORT`;
-                                  return genreName; // Fallback in case no match is found
-                                })()}
-                              </Chip>
-                            ))}
-                          </div>
-                        </CardBody>
-                      </Link>
-                    </Card>
-                  );
-                })}
-              </div>
-            )}
-          </ScrollShadow>
-        )}
-      </div>
-      <Footer />
+                </div>
+              )}
+            </ScrollShadow>
+          )}
+        </div>
       </TracingBeam>
+      <Footer />
     </div>
   );
 };
