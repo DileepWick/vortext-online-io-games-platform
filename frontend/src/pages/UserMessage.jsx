@@ -32,6 +32,7 @@ const UserMessages = () => {
   const token = getToken();
   const userId = getUserIdFromToken(token);
   const totalPages = Math.ceil(userTickets.length / TICKETS_PER_PAGE);
+  const [scrollBehavior, setScrollBehavior] = React.useState("inside");
 
   const paginatedTickets = userTickets.slice(
     (currentPage - 1) * TICKETS_PER_PAGE,
@@ -298,12 +299,14 @@ const UserMessages = () => {
               ))}
             </motion.div>
             <div className="flex justify-center mt-8">
-              <Pagination
-                total={totalPages}
-                initialPage={1}
-                page={currentPage}
-                onChange={setCurrentPage}
-              />
+              {totalPages > 1 && (
+                <Pagination
+                  total={totalPages}
+                  initialPage={1}
+                  page={currentPage}
+                  onChange={setCurrentPage}
+                />
+              )}
             </div>
           </>
         )}
@@ -318,6 +321,7 @@ const UserMessages = () => {
         backdrop="blur"
         isDismissable={false}
         isKeyboardDismissDisabled={false}
+        scrollBehavior={scrollBehavior}
         motionProps={{
           variants: {
             enter: {

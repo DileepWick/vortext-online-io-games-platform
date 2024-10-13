@@ -2,6 +2,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { cn } from "../../libs/util";
+import video from "./Ghost.mp4";
 
 export function LampDemo() {
   return (
@@ -38,17 +39,18 @@ export const LampContainer = ({ children, className }) => {
         playsInline
         className="absolute top-0 left-0 w-full h-full object-cover z-0"
       >
-        <source src="https://res.cloudinary.com/dhcawltsr/video/upload/v1727786769/Games%20cover%20images/rwflvmlujtmq9iz25fwh.mp4" type="video/mp4" /> {/* Replace with your actual video URL */}
+        <source src={video} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
 
       {/* Semi-transparent overlay */}
-      <div className="absolute inset-0 bg-slate-950 opacity-0 z-10"></div>
+      <div className="absolute inset-0 bg-slate-950 opacity-40 z-10"></div>
 
-      <div className="relative flex w-full flex-1 scale-y-125 items-center justify-center isolate z-20">
+      <div className="relative flex w-full flex-1 items-center justify-center isolate z-20">
+        {/* Light effect, set to be transparent */}
         <motion.div
-          initial={{ opacity: 0.5, width: "15rem" }}
-          whileInView={{ opacity: 1, width: "30rem" }}
+          initial={{ opacity: 0, width: "15rem" }} // Set opacity to 0 for transparency
+          whileInView={{ opacity: 0, width: "30rem" }} // Keep opacity 0 when in view
           transition={{
             delay: 0.3,
             duration: 0.8,
@@ -57,14 +59,13 @@ export const LampContainer = ({ children, className }) => {
           style={{
             backgroundImage: `conic-gradient(var(--conic-position), var(--tw-gradient-stops))`,
           }}
-          className="absolute inset-auto right-1/2 h-56 overflow-visible w-[30rem] bg-gradient-conic from-cyan-500 via-transparent to-transparent text-white [--conic-position:from_70deg_at_center_top]"
+          className="absolute inset-auto h-56 w-[30rem] bg-gradient-conic from-cyan-500 via-transparent to-transparent text-white [--conic-position:from_70deg_at_center_top]"
         >
-          <div className="absolute  w-[100%] left-0 bg-slate-950 h-40 bottom-0 z-20 [mask-image:linear-gradient(to_top,white,transparent)]" />
-          <div className="absolute  w-40 h-[100%] left-0 bg-slate-950  bottom-0 z-20 [mask-image:linear-gradient(to_right,white,transparent)]" />
+          <div className="absolute w-[100%] left-0 bg-slate-950 h-40 bottom-0 z-20 [mask-image:linear-gradient(to_top,white,transparent)]" />
         </motion.div>
         <motion.div
-          initial={{ opacity: 0.5, width: "15rem" }}
-          whileInView={{ opacity: 1, width: "30rem" }}
+          initial={{ opacity: 0, width: "15rem" }} // Set opacity to 0 for transparency
+          whileInView={{ opacity: 0, width: "30rem" }} // Keep opacity 0 when in view
           transition={{
             delay: 0.3,
             duration: 0.8,
@@ -73,12 +74,10 @@ export const LampContainer = ({ children, className }) => {
           style={{
             backgroundImage: `conic-gradient(var(--conic-position), var(--tw-gradient-stops))`,
           }}
-          className="absolute inset-auto left-1/2 h-56 w-[30rem] bg-gradient-conic from-transparent via-transparent to-cyan-500 text-white [--conic-position:from_290deg_at_center_top]"
+          className="absolute inset-auto h-56 w-[30rem] bg-gradient-conic from-transparent via-transparent to-cyan-500 text-white [--conic-position:from_290deg_at_center_top]"
         >
-          <div className="absolute  w-40 h-[100%] right-0 bg-slate-950  bottom-0 z-20 [mask-image:linear-gradient(to_left,white,transparent)]" />
-          <div className="absolute  w-[100%] right-0 bg-slate-950 h-40 bottom-0 z-20 [mask-image:linear-gradient(to_top,white,transparent)]" />
+          <div className="absolute w-40 h-[100%] right-0 bg-slate-950 bottom-0 z-20 [mask-image:linear-gradient(to_left,white,transparent)]" />
         </motion.div>
-        {/* ... rest of the lamp effect divs ... */}
       </div>
       <div className="relative z-50 flex -translate-y-80 flex-col items-center px-5">
         {children}
