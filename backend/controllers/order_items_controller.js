@@ -1,6 +1,7 @@
 import { OrderItems } from "../models/orderItems.js";
 import { Order } from "../models/order.js";
 import { populate } from "dotenv";
+import {Game} from "../models/game.js"
 
 // Create a new order item
 export const createOrderItem = async (req, res) => {
@@ -243,3 +244,62 @@ export const getOrderItemsByUserId = async (req, res) => {
 };
 
 
+export const getOrderItemsByDeveloperId = async (req, res) => {
+  try {
+    const { developerId } = req.params; // Assuming developerId is now a route parameter
+
+    // Validate developer ID
+    if (!developerId) {
+      return res.status(400).json({ message: "Developer ID is required" });
+    }
+
+    // Find all games by the developer
+    const developerGames = await Game.find({ developer: developerId }).select('_id');
+    const gameIds = developerGames.map(game => game._id);
+
+    // Find all order items for these games
+    const orderItems = await OrderItems.aggregate([
+      {
+        $lookup: {
+          from: 'gamestocks',
+          localField: 'stockid',
+          foreignField: '_id',
+          as: 'stockid'
+        }
+      },
+      { $unwind: '$stockid' },
+      {
+        $match: {
+          'stockid.AssignedGame': { $in: gameIds }
+        }
+      },
+      {
+        $lookup: {
+          from: 'games',
+          localField: 'stockid.AssignedGame',
+          foreignField: '_id',
+          as: 'game'
+        }
+      },
+      { $unwind: '$game' },
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'order',
+          foreignField: '_id',
+          as: 'order'
+        }
+      },
+      { $unwind: '$order' }
+    ]);
+
+    if (orderItems.length === 0) {
+      return res.status(404).json({ message: "No order items found for the specified developer" });
+    }
+
+    res.status(200).json(orderItems);
+  } catch (error) {
+    console.error("Error fetching order items by developer ID:", error);
+    res.status(500).json({ message: "Error fetching order items", error: error.message });
+  }
+};

@@ -5,6 +5,13 @@ import {
   CardBody,
   Progress,
   Button,
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Chip,
 } from '@nextui-org/react';
 import {
   BarChart,
@@ -23,6 +30,8 @@ import {
 } from 'recharts';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
+import { getToken } from "../../src/utils/getToken";
+import { getUserIdFromToken } from "../../src/utils/user_id_decoder";
 
 const API_BASE_URL = 'http://localhost:8098';
 
@@ -31,6 +40,9 @@ const DeveloperEarningsAnalysis = () => {
   const [rentalEarnings, setRentalEarnings] = useState([]);
   const [distributedPayments, setDistributedPayments] = useState({});
   const reportRef = useRef(null);
+
+  const token = getToken();
+  const userId = getUserIdFromToken(token);
 
   useEffect(() => {
     fetchPurchaseEarnings();
@@ -42,7 +54,10 @@ const DeveloperEarningsAnalysis = () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/orderItems`);
       if (response.data && response.data.orderHistory) {
-        setPurchaseEarnings(response.data.orderHistory);
+        const filteredEarnings = response.data.orderHistory.filter(
+          item => item.stockid?.AssignedGame?.developer?._id === userId
+        );
+        setPurchaseEarnings(filteredEarnings);
       }
     } catch (error) {
       console.error("Error fetching purchase earnings:", error);
@@ -53,7 +68,10 @@ const DeveloperEarningsAnalysis = () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/rentalPayments/`);
       if (response.data && response.data.rentalPayments) {
-        setRentalEarnings(response.data.rentalPayments);
+        const filteredEarnings = response.data.rentalPayments.filter(
+          item => item.game?.developer?._id === userId
+        );
+        setRentalEarnings(filteredEarnings);
       }
     } catch (error) {
       console.error("Error fetching rental earnings:", error);
@@ -71,6 +89,13 @@ const DeveloperEarningsAnalysis = () => {
     } catch (error) {
       console.error("Error fetching distributed payments:", error);
     }
+  };
+
+  const getWeekNumber = (d) => {
+    d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
   };
 
   const totalEarnings = useMemo(() => {
@@ -130,6 +155,53 @@ const DeveloperEarningsAnalysis = () => {
       { name: 'Purchases', value: purchaseTotal },
       { name: 'Rentals', value: rentalTotal },
     ];
+  }, [purchaseEarnings, rentalEarnings, distributedPayments]);
+
+  const gamePerformance = useMemo(() => {
+    const gameData = {};
+    [...purchaseEarnings, ...rentalEarnings].forEach(item => {
+      const gameTitle = item.stockid?.AssignedGame?.title || item.game?.title || 'Unknown Game';
+      if (!gameData[gameTitle]) {
+        gameData[gameTitle] = { purchases: 0, rentals: 0, totalEarnings: 0 };
+      }
+      const amount = distributedPayments[item._id] || 0;
+      gameData[gameTitle].totalEarnings += amount;
+      if (purchaseEarnings.includes(item)) {
+        gameData[gameTitle].purchases++;
+      } else {
+        gameData[gameTitle].rentals++;
+      }
+    });
+    return Object.entries(gameData).map(([title, data]) => ({
+      title,
+      ...data,
+      totalTransactions: data.purchases + data.rentals,
+    }));
+  }, [purchaseEarnings, rentalEarnings, distributedPayments]);
+
+  const weeklyTrends = useMemo(() => {
+    const weeklyData = {};
+    [...purchaseEarnings, ...rentalEarnings].forEach(item => {
+      const date = new Date(item.date);
+      const weekYear = `${getWeekNumber(date)}/${date.getFullYear()}`;
+      if (!weeklyData[weekYear]) {
+        weeklyData[weekYear] = { purchases: 0, rentals: 0, totalEarnings: 0 };
+      }
+      const amount = distributedPayments[item._id] || 0;
+      weeklyData[weekYear].totalEarnings += amount;
+      if (purchaseEarnings.includes(item)) {
+        weeklyData[weekYear].purchases++;
+      } else {
+        weeklyData[weekYear].rentals++;
+      }
+    });
+    return Object.entries(weeklyData)
+      .map(([week, data]) => ({ week, ...data }))
+      .sort((a, b) => {
+        const [aWeek, aYear] = a.week.split('/').map(Number);
+        const [bWeek, bYear] = b.week.split('/').map(Number);
+        return aYear - bYear || aWeek - bWeek;
+      });
   }, [purchaseEarnings, rentalEarnings, distributedPayments]);
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
@@ -225,7 +297,7 @@ const DeveloperEarningsAnalysis = () => {
           </Card>
         </div>
         
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-4 mb-4">
           <Card>
             <CardBody>
               <p className="text-sm mb-2 font-semibold">Monthly Earnings Trend</p>
@@ -258,6 +330,90 @@ const DeveloperEarningsAnalysis = () => {
                   <Bar dataKey="rental" stackId="a" fill="#ffc658" name="Rentals" />
                 </BarChart>
               </ResponsiveContainer>
+            </CardBody>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 mt-4">
+          <Card>
+            <CardBody>
+              <h2 className="text-xl font-semibold mb-4">Game Performance Analysis</h2>
+              <Table aria-label="Game Performance Table">
+                <TableHeader>
+                <TableColumn>GAME</TableColumn>
+                  <TableColumn>PURCHASES</TableColumn>
+                  <TableColumn>RENTALS</TableColumn>
+                  <TableColumn>TOTAL TRANSACTIONS</TableColumn>
+                  <TableColumn>TOTAL EARNINGS</TableColumn>
+                </TableHeader>
+                <TableBody>
+                  {gamePerformance.map((game, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{game.title}</TableCell>
+                      <TableCell>{game.purchases}</TableCell>
+                      <TableCell>{game.rentals}</TableCell>
+                      <TableCell>{game.totalTransactions}</TableCell>
+                      <TableCell>Rs.{game.totalEarnings.toFixed(2)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardBody>
+          </Card>
+
+          <Card>
+            <CardBody>
+              <h2 className="text-xl font-semibold mb-4">Weekly Earnings Trends</h2>
+              <Table aria-label="Weekly Earnings Trends Table">
+                <TableHeader>
+                  <TableColumn>WEEK/YEAR</TableColumn>
+                  <TableColumn>PURCHASES</TableColumn>
+                  <TableColumn>RENTALS</TableColumn>
+                  <TableColumn>TOTAL EARNINGS</TableColumn>
+                </TableHeader>
+                <TableBody>
+                  {weeklyTrends.map((week, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{week.week}</TableCell>
+                      <TableCell>{week.purchases}</TableCell>
+                      <TableCell>{week.rentals}</TableCell>
+                      <TableCell>Rs.{week.totalEarnings.toFixed(2)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardBody>
+          </Card>
+
+          <Card>
+            <CardBody>
+              <h2 className="text-xl font-semibold mb-4">Monthly Earnings Breakdown</h2>
+              <Table aria-label="Monthly Earnings Breakdown Table">
+                <TableHeader>
+                  <TableColumn>MONTH/YEAR</TableColumn>
+                  <TableColumn>PURCHASE EARNINGS</TableColumn>
+                  <TableColumn>RENTAL EARNINGS</TableColumn>
+                  <TableColumn>TOTAL EARNINGS</TableColumn>
+                  <TableColumn>GROWTH</TableColumn>
+                </TableHeader>
+                <TableBody>
+                  {monthlyEarnings.map((month, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{month.month}</TableCell>
+                      <TableCell>Rs.{month.purchase.toFixed(2)}</TableCell>
+                      <TableCell>Rs.{month.rental.toFixed(2)}</TableCell>
+                      <TableCell>Rs.{month.total.toFixed(2)}</TableCell>
+                      <TableCell>
+                        {index > 0 ? (
+                          <Chip color={(month.total - monthlyEarnings[index-1].total) >= 0 ? "success" : "danger"}>
+                            {((month.total - monthlyEarnings[index-1].total) / monthlyEarnings[index-1].total * 100).toFixed(2)}%
+                          </Chip>
+                        ) : "-"}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </CardBody>
           </Card>
         </div>
