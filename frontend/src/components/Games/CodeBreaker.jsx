@@ -814,7 +814,7 @@ const CodeBreaker = () => {
     transition={{ duration: 0.5 }}
     className="text-center"
   >
-    <p className="mb-4 text-xl">Welcome, agent! The Cyber Security Agency needs your help. Choose your difficulty level:</p>
+    <p className="mb-4 text-2xl">Welcome, Code Master! The Programming Guild needs your expertise. Choose your challenge level:</p>
     <div className="items-center space-y-4">
       {Object.values(DIFFICULTY_LEVELS).map((level) => (
         <button

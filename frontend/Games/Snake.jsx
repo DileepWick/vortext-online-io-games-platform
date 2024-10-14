@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../src/components/header";
 import Footer from "../src/components/footer";
+import useAuthCheck from "../src/utils/authCheck";
 
 
 const GRID_SIZE = 30;
@@ -57,6 +58,7 @@ const generateAnswerOptions = (correctAnswer) => {
 };
 
 const Snake = () => {
+  useAuthCheck();
   const [gameMode, setGameMode] = useState(null);
   const [snake, setSnake] = useState(INITIAL_SNAKE);
   const [direction, setDirection] = useState(INITIAL_DIRECTION);

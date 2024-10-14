@@ -6,6 +6,7 @@ import Header from "../header";
 import Footer from "../footer";
 import { TextGenerateEffect } from "../ui/TextGenerateEffect";
 import ScrollToTop from "../ScrollToTop";
+import useAuthCheck from "../../utils/authCheck";
 
 const DIFFICULTY_LEVELS = {
   EASY: "easy",
@@ -52,6 +53,7 @@ const expertColorCombinations = [
 const words = "Can You Master the Art of Color?";
 
 const ColorGuessingGame = () => {
+  useAuthCheck();
   const [difficulty, setDifficulty] = useState(null);
   const [currentColor, setCurrentColor] = useState(null);
   const [options, setOptions] = useState([]);
