@@ -49,14 +49,13 @@ const RatingSystem = ({
 
   return (
     <div
-      className="mt-4 rounded-lg shadow-lg"
-      style={{ backgroundColor: "#131213" }}
+      className="mt-4 rounded-lg shadow-lg bg-customDark"
     >
-      <h3 className="text-2xl font-bold text-white mb-6">User Ratings</h3>
+      <h3 className="text-2xl font-primaryRegular text-white mb-6 bg-customDark">User Ratings</h3>
 
       {/* Main User Rating */}
-      <div className="flex items-center mb-6">
-        <span className="text-5xl font-bold text-white mr-4">
+      <div className="flex items-center mb-6 bg-customDark">
+        <span className="text-5xl font-primaryRegular text-white mr-4">
           {isNaN(averageRating) ? "N/A" : averageRating.toFixed(1)}
         </span>
         <div className="flex">
@@ -136,13 +135,13 @@ const RatingSystem = ({
 
       {/* User Reviews */}
       <div className="mt-10">
-        <h4 className="text-xl font-bold text-white mb-4">User Reviews:</h4>
+        <h4 className="text-xl font-bold text-white mb-4 bg-customDark">User Reviews:</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {ratings.map((rating, index) => (
             <div
               key={index}
-              className={`p-6 rounded-lg `}
-              style={{ backgroundColor: "#333333" }}
+              className={`p-6 rounded-lg bg-black`}
+              cla
             >
               <div className="flex items-center mb-2">
                 <div className="flex">

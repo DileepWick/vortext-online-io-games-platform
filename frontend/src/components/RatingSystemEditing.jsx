@@ -49,7 +49,7 @@ const RatingSystemEditing = ({
       className="p-6 rounded-lg shadow-lg"
       style={{ backgroundColor: "#131213" }}
     >
-      <h3 className="text-2xl font-bold text-white mb-6">User Ratings</h3>
+      <h3 className="text-2xl font-bold text-white mb-6 bg-black">User Ratings</h3>
 
       {/* Main User Rating */}
       <div className="flex items-center mb-6">
