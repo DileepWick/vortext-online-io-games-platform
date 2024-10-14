@@ -2,12 +2,16 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Input, Avatar } from "@nextui-org/react";
+import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
 import { toast, Flip } from 'react-toastify';
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { getToken } from "../utils/getToken";
 import { FaGamepad, FaTrophy, FaUserNinja } from 'react-icons/fa';
+import { TracingBeam } from "../components/ui/TracingBeam";
+import { BackgroundBeams } from "../components/ui/BackgroundBeams";
+import { BackgroundGradient } from "../components/ui/BackgroundGradient";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -20,6 +24,7 @@ const Profile = () => {
   const [currentPassword, setCurrentPassword] = useState(""); // New state for current password
   const [newPassword, setNewPassword] = useState("");         // New state for new password
   const [showChangePassword, setShowChangePassword] = useState(false); // Show change password section
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -152,14 +157,58 @@ const Profile = () => {
       toast.error("Failed to change password. Please check your current password.");
     }
   };
+  const handleDeleteAccount = async () => {
+    try {
+      const token = getToken();
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+      const userId = getUserIdFromToken(token);
+  
+      await axios.delete(
+        `http://localhost:8098/users/delete/${userId}`,
+        {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        }
+      );
+  
+      toast.success('Account deleted successfully!', {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "dark",
+        transition: Flip,
+        style: { fontFamily: 'Rubik' }
+      });
+  
+      localStorage.removeItem('token');
+      navigate("/");
+  
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      toast.error("Failed to delete account. Please try again.");
+    }
+  };
+  
+  
+  
 
   return (
-    <div className="bg-gray-900 min-h-screen text-white">
+    <div className="bg-[#0a0b14] min-h-screen text-white">
       <Header />
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden border-2 border-purple-500">
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 relative overflow-hidden">
-            <h2 className="text-3xl font-bold text-white text-center z-10 relative">
+      
+      <div className="rounded-[5px] container mx-auto px-4 py-8 w-[700px]">
+      <BackgroundGradient className="rounded-[5px]  bg-zinc-900 transition-transform duration-300 transform hover:scale-10">
+        <div className="max-w-2xl mx-auto bg-[#13141f] rounded-[10px] shadow-lg overflow-hidden border-2 border-[#6366f1]">
+        
+          <div className="bg-gradient-to-r from-[#060c2c] to-[#6366f1] p-6 relative overflow-hidden">
+            <h2 className="font-primaryRegular text-3xl font-bold text-white text-center z-10 relative">
               Player Profile
             </h2>
             <FaGamepad className="text-6xl text-white opacity-20 absolute top-2 left-2 animate-pulse" />
@@ -174,16 +223,16 @@ const Profile = () => {
                     isBordered
                     color="secondary"
                     src={profilePic ? URL.createObjectURL(profilePic) : existingProfilePic}
-                    className="w-32 h-32 text-large border-4 border-purple-500"
+                    className="w-32 h-32 text-large border-4 border-[#6366f1]"
                   />
-                  <div className="absolute -bottom-2 -right-2 bg-yellow-400 rounded-full p-2 animate-ping">
-                    <FaUserNinja className="text-gray-900" />
+                  <div className="absolute -bottom-2 -right-2 bg-[#6366f1] rounded-full p-2 animate-ping">
+                    <FaUserNinja className="text-[#13141f]" />
                   </div>
                 </div>
               </div>
               {user ? (
                 <form onSubmit={handleUpdate} encType="multipart/form-data">
-                  <div className="space-y-4">
+                  <div className="space-y-4 font-primaryRegular">
                     <Input
                       label="First Name"
                       value={firstname}
@@ -192,6 +241,7 @@ const Profile = () => {
                       size="lg"
                       bordered
                       color="secondary"
+                      style={{ backgroundColor: '#1c1d2b', color: '#060c2c' }}
                     />
                     <Input
                       label="Last Name"
@@ -201,6 +251,7 @@ const Profile = () => {
                       size="lg"
                       bordered
                       color="secondary"
+                      style={{ backgroundColor: '#1c1d2b', color: '#060c2c' }}
                     />
                     <Input
                       label="Username"
@@ -210,6 +261,7 @@ const Profile = () => {
                       size="lg"
                       bordered
                       color="secondary"
+                      style={{ backgroundColor: '#1c1d2b', color: '#060c2c' }}
                     />
                     <Input
                       label="Email"
@@ -220,18 +272,17 @@ const Profile = () => {
                       size="lg"
                       bordered
                       color="secondary"
+                      style={{ backgroundColor: '#1c1d2b', color: '#060c2c' }}
                     />
                     
-                    {/* Change Password Button */}
                     <button
                       type="button"
                       onClick={() => setShowChangePassword(!showChangePassword)}
-                      className="w-full bg-purple-600 text-white py-3 rounded-md hover:bg-purple-700 transition duration-300"
+                   className="font-primaryRegular w-full bg-gradient-to-r from-[#060c2c] to-[#6366f1] text-white py-3 px-4 rounded-md hover:from-[#312e81] hover:to-[#4f46e5] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:ring-opacity-50"
                     >
                       {showChangePassword ? "Cancel Change Password" : "Change Password"}
                     </button>
 
-                    {/* Change Password Form */}
                     {showChangePassword && (
                       <div className="space-y-4 mt-4">
                         <Input
@@ -243,6 +294,7 @@ const Profile = () => {
                           size="lg"
                           bordered
                           color="secondary"
+                          className="bg-[#1c1d2b] text-white"
                         />
                         <Input
                           label="New Password"
@@ -253,25 +305,26 @@ const Profile = () => {
                           size="lg"
                           bordered
                           color="secondary"
+                          className="bg-[#1c1d2b] text-white"
                         />
-                        <button
+                        <Button
                           type="button"
                           onClick={handleChangePassword}
-                          className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-4 rounded-md hover:from-blue-600 hover:to-purple-700 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+                          className="font-primaryRegular w-full bg-gradient-to-r from-[#060c2c] to-[#6366f1] text-white py-3 px-4 rounded-md hover:from-[#312e81] hover:to-[#4f46e5] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:ring-opacity-50"
                         >
                           Update Password
-                        </button>
+                        </Button>
                       </div>
                     )}
                     
                     <div className="flex items-center justify-center w-full">
                       <label
                         htmlFor="dropzone-file"
-                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-purple-300 border-dashed rounded-lg cursor-pointer bg-gray-700 hover:bg-gray-600 transition-all duration-300"
+                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-[#6366f1] border-dashed rounded-lg cursor-pointer bg-[#1c1d2b] hover:bg-[#2e3149] transition-all duration-300"
                       >
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
                           <svg
-                            className="w-8 h-8 mb-4 text-purple-400 animate-bounce"
+                            className="w-8 h-8 mb-4 text-[#6366f1] animate-bounce"
                             aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -285,10 +338,10 @@ const Profile = () => {
                               d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
                             />
                           </svg>
-                          <p className="mb-2 text-sm text-purple-300">
-                            <span className="font-semibold">Click to upload</span> or drag and drop
+                          <p className="mb-2 text-sm text-[#a5b4fc]">
+                            <span className="font-primaryRegular">Click to upload</span> or drag and drop
                           </p>
-                          <p className="text-xs text-purple-300">PNG, JPG or GIF (MAX. 800x400px)</p>
+                          <p className="text-xs text-[#a5b4fc]">PNG, JPG or GIF (MAX. 800x400px)</p>
                         </div>
                         <input
                           id="dropzone-file"
@@ -301,23 +354,64 @@ const Profile = () => {
                     </div>
                   </div>
                   <div className="mt-6">
-                    <button
+                    <Button
                       type="submit"
-                      className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-4 rounded-md hover:from-blue-600 hover:to-purple-700 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+                      className="font-primaryRegular w-full bg-gradient-to-r from-[#060c2c] to-[#6366f1] text-white py-3 px-4 rounded-md hover:from-[#312e81] hover:to-[#4f46e5] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:ring-opacity-50"
                     >
                       Level Up Profile
-                    </button>
+                    </Button>
                   </div>
+                  <Button
+        onClick={() => setDeleteModalOpen(true)} // Open delete modal
+        style={{ backgroundColor: '#e63946', color: '#fff' }} // Red delete button
+        auto
+        bordered
+        fullWidth
+        className="w-full mt-4 w-full bg-gradient-to-r from-[#d90429] to-[#ef233c] text-white py-3 px-4 rounded-md hover:from-[#b10619] hover:to-[#d90429] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#ef233c] focus:ring-opacity-50"
+      >
+        Delete Account
+      </Button>{/* Delete Confirmation Modal */}
+      <Modal isOpen={isDeleteModalOpen} onClose={() => setDeleteModalOpen(false)} className="text-black">
+        <ModalContent >
+          <ModalHeader>Delete Account</ModalHeader>
+          <ModalBody>
+            Are you sure you want to delete your account? This action cannot be undone.
+          </ModalBody>
+          <ModalFooter>
+          <Button
+        style={{ backgroundColor: '#6366f1', color: '#fff' }} // Blue cancel button
+        flat
+        onClick={() => setDeleteModalOpen(false)} // Close modal
+      >
+        Cancel
+      </Button>
+      <Button
+        style={{ backgroundColor: '#e63946', color: '#fff' }} // Red confirm button
+        onClick={handleDeleteAccount}
+      >
+        Confirm
+      </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+
+
                 </form>
               ) : (
                 <div className="flex justify-center items-center h-64">
-                  <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-purple-500"></div>
+                  <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-[#6366f1]"></div>
                 </div>
               )}
             </div>
           </div>
+          
         </div>
+        </BackgroundGradient>
+        <BackgroundBeams/>
+        
       </div>
+      
       <style jsx>{`
         @keyframes gridMove {
           0% {

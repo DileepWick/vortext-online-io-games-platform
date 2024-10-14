@@ -161,10 +161,9 @@ export const getNewRatings = async (req, res) => {
         path: "game", // This populates the 'game' field, which is referencing GameStock
         populate: {
           path: "AssignedGame", // This populates the 'AssignedGame' field from GameStock, which references Game
-          select: "title", // Select only the 'title' field from the Game model
         },
       })
-      .populate("user", "username"); // Also populate the 'user' field to get the username
+      .populate("user"); // Also populate the 'user' field to get the username
 
     if (!Array.isArray(ratings)) {
       console.error("Unexpected ratings data type:", typeof ratings);

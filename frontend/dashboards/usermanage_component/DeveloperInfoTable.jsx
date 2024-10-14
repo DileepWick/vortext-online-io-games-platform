@@ -146,9 +146,9 @@ const DeveloperInfoTable = () => {
           <TableColumn>ACTIONS</TableColumn>
         </TableHeader>
 
-        <TableBody className="text-black">
+        <TableBody className="text-black font-primaryRegular">
           {paginatedItems.map((developer) => (
-            <TableRow key={developer._id} className="text-black">
+            <TableRow key={developer._id} className="text-black font-primaryRegular">
               <TableCell>{`${developer.firstname || ''} ${developer.lastname || ''}`}</TableCell>
               <TableCell>{developer.username}</TableCell>
               <TableCell>

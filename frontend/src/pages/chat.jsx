@@ -3,12 +3,11 @@ import axios from 'axios';
 import { getToken } from '../utils/getToken';
 import { getUserIdFromToken } from '../utils/user_id_decoder';
 import Header from "../components/header";
-import { User, Input, Button, Card, Spacer } from "@nextui-org/react";
+import { User, Input, Button, Card, Spacer, Badge } from "@nextui-org/react";
 
 import { BackgroundBeams } from "../components/ui/BackgroundBeams";
 
 import useAuthCheck from "../utils/authCheck";
-
 
 const SendIcon = (props) => (
   <svg
@@ -28,7 +27,7 @@ const SendIcon = (props) => (
   </svg>
 );
 
-const UserListItem = ({ user, isSelected, onClick }) => (
+const UserListItem = ({ user, isSelected, onClick, unreadCount }) => (
   <div
     className={`p-3 rounded-lg mb-2 cursor-pointer transition-all duration-200 ${
       isSelected 
@@ -37,21 +36,30 @@ const UserListItem = ({ user, isSelected, onClick }) => (
     }`}
     onClick={() => onClick(user)}
   >
-    <div className="flex items-center">
-      <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center mr-3">
-        <span className="text-gray-600 font-semibold">
-          {(user.username || user.name).charAt(0).toUpperCase()}
-        </span>
+    <div className="flex items-center justify-between">
+      <div className="flex items-center">
+        <div className="w-8 h-8 rounded-full bg-yellow-300 flex items-center justify-center mr-3">
+          <span className="text-gray-600 font-semibold">
+            {(user.username || user.name).charAt(0).toUpperCase()}
+          </span>
+        </div>
+        <div>
+          <p className="font-medium text-gray-800">{user.username || user.name}</p>
+          {user.email && (
+            <p className="text-sm text-gray-500">{user.email}</p>
+          )}
+        </div>
       </div>
-      <div>
-        <p className="font-medium text-gray-800">{user.username || user.name}</p>
-        {user.email && (
-          <p className="text-sm text-gray-500">{user.email}</p>
-        )}
-      </div>
+      {unreadCount > 0 && (
+        <div className="bg-blue-200 text-blue-700 rounded-full w-6 h-6 flex items-center justify-center font-semibold">
+          {unreadCount}
+        </div>
+      )}
     </div>
   </div>
 );
+
+
 
 const Chat = () => {
   useAuthCheck();
@@ -62,6 +70,7 @@ const Chat = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [newMessage, setNewMessage] = useState('');
   const [recipientId, setRecipientId] = useState('');
+  const [unreadCounts, setUnreadCounts] = useState({});
   const token = getToken();
   const currentUserId = getUserIdFromToken(token);
   const messageContainerRef = useRef(null);
@@ -87,6 +96,21 @@ const Chat = () => {
     }
   }, [token, currentUserId]);
 
+  const fetchUnreadMessageCounts = useCallback(async () => {
+    try {
+      const response = await axios.get(`http://localhost:8098/api/messages/unread/${currentUserId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const counts = {};
+      response.data.forEach(item => {
+        counts[item._id] = item.count;
+      });
+      setUnreadCounts(counts);
+    } catch (error) {
+      console.error('Error fetching unread message counts:', error);
+    }
+  }, [currentUserId, token]);
+
   const handleSearch = (query) => {
     setSearchQuery(query);
     if (query.trim() === '') {
@@ -104,6 +128,8 @@ const Chat = () => {
     setNewMessage('');
     setSelectedUser(user);
     setRecipientId(user._id);
+    // Clear unread count for the selected user
+    setUnreadCounts(prev => ({ ...prev, [user._id]: 0 }));
   };
 
   const fetchMessages = useCallback(async () => {
@@ -122,7 +148,10 @@ const Chat = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [fetchUsers]);
+    fetchUnreadMessageCounts();
+    const interval = setInterval(fetchUnreadMessageCounts, 30000); // Poll every 30 seconds
+    return () => clearInterval(interval);
+  }, [fetchUsers, fetchUnreadMessageCounts]);
 
   useEffect(() => {
     if (recipientId) {
@@ -197,6 +226,7 @@ const Chat = () => {
                     user={user}
                     isSelected={selectedUser?._id === user._id}
                     onClick={handleUserSelect}
+                    unreadCount={unreadCounts[user._id] || 0}
                   />
                 ))
               ) : (
@@ -239,7 +269,7 @@ const Chat = () => {
                     </div>
                   ))}
                 </div>
-                
+
                 <div className="flex gap-2">
                   <Input
                     fullWidth

@@ -432,7 +432,7 @@ const GameDetails = () => {
           </div>
         </div>
 
-        <div className="mt-4 m-8 scale-90">
+        <div className="mt-4 m-8 scale-90 bg-customDark">
           <h2 className="mt-8 text-editionColor text-5xl">
             Ratings and Reviews
           </h2>

@@ -25,6 +25,7 @@ import Header from "../header";
 import Footer from "../footer";
 
 import useAuthCheck from "../../utils/authCheck";
+import { TextGenerateEffect } from "../ui/TextGenerateEffect";
 
 // Default Questions
 const defaultQuestions = [
@@ -183,7 +184,7 @@ const Hangman = () => {
       <img
         src={stages[wrongGuesses]}
         alt={`Hangman Stage ${wrongGuesses}`}
-        className="w-[500px] h-[500px] mx-auto opacity-100 transition-opacity duration-500 ease-in-out border-4 border-customPink shadow-lg rounded-lg"
+        className="w-[500px] h-[500px] mx-auto opacity-100 transition-opacity duration-500 ease-in-out border-4 border-red shadow-lg rounded-lg"
       />
     );
   };
@@ -199,8 +200,8 @@ const Hangman = () => {
 
   //Render Warning
   const renderWarning = () => (
-    <p
-      className={`font-primaryRegular  text-xl mb-6 text-customPink transition-opacity duration-500 ease-in-out ${
+    <p style={{color:'red'}}
+      className={`font-primaryRegular  text-xl mb-6 transition-opacity duration-500 ease-in-out ${
         warning ? "opacity-100" : "opacity-0"
       }`}
     >
@@ -211,7 +212,7 @@ const Hangman = () => {
   //Show correct answer if round lost
   const renderCorrectAnswer = () => (
     <>
-      <p className="font-primaryRegular text-customPink text-5xl mb-4 " style={{textAlign:'center'}}>
+      <p className="font-primaryRegular text-red text-5xl mb-4 " style={{textAlign:'center' ,color:'red'}}>
       Game Over... Bats Have Summoned . . .
       </p>
       <p className="text-black font-primaryRegular text-xl">
@@ -240,7 +241,7 @@ const Hangman = () => {
   const renderQuestionAndHint = () => (
     <div className="text-xl font-primaryRegular mb-4 text-black">
       <p className="mb-2 text-4xl">{currentQuestion.question}</p>
-      <p className="italic text-[15px]">Hint: {currentQuestion.hint}</p>
+      <p className="italic text-[18px] mt-8">Hint: {currentQuestion.hint}</p>
     </div>
   );
 
@@ -345,14 +346,14 @@ const Hangman = () => {
             ) : (
               <>
                 {/* Display selected edition name */}
-                <p className="text-5xl font-primaryRegular mb-8 text-customPink">
+                <p className="text-5xl font-primaryRegular mb-8 " style={{color:'red'}}>
                   {selectedEditionName || "Demo Edition"}
                 </p>
                 {renderQuestionAndHint()} {/* Display the question and hint */}
                 <div className="mb-4">{renderWord()}</div>
                 {renderWarning()}
                 <div className="grid grid-cols-8 gap-2">{renderAlphabet()}</div>
-                <p className="text-2xl font-primaryRegular text-customPink mb-4">
+                <p className="text-2xl font-primaryRegular mb-4" style={{color:'red'}}>
                   Wrong guesses: {wrongGuesses} / {maxWrongGuesses}
                 </p>
               </>
@@ -360,7 +361,7 @@ const Hangman = () => {
           </>
         ) : (
           <>
-            <h1 className="text-customPink text-5xl font-primaryRegular mb-8">
+            <h1 className=" text-5xl font-primaryRegular mb-8" style={{color:'red'}}>
             The Witch's Enigma
             </h1>
             <p className="mb-8 text-2xl text-black">
