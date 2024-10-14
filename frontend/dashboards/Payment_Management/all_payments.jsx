@@ -35,7 +35,6 @@ const AllPayments = () => {
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  // Fetch distributed payments from the server
   const fetchDistributedPayments = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/api/distributed-payments/all`);
@@ -50,7 +49,6 @@ const AllPayments = () => {
     }
   };
 
-  // Fetch table data
   const fetchTableData = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/orderItems`);
@@ -136,11 +134,8 @@ const AllPayments = () => {
         }
 
         await updateDeveloperIncome(developerId, saleAmount);
-
-        // Save distributed payment to the database
         await saveDistributedPayment(selectedItem._id, developerId, saleAmount);
 
-        // Update distributed payments state
         setDistributedPayments((prev) => ({
           ...prev,
           [selectedItem._id]: saleAmount,
@@ -198,7 +193,6 @@ const AllPayments = () => {
           <TableColumn key="DATE">DATE</TableColumn>
           <TableColumn key="DEVELOPER">DEVELOPER</TableColumn>
           <TableColumn key="DEVFUNDS">DevFUNDS (70%)</TableColumn>
-          <TableColumn key="STATUS">PAYMENT STATUS</TableColumn>
           <TableColumn key="ACTIONS">Actions</TableColumn>
         </TableHeader>
         <TableBody className="text-black">
@@ -237,11 +231,15 @@ const AllPayments = () => {
                   }}
                 />
               </TableCell>
-              <TableCell>Rs.{item.order?.paymentAmount ? (item.order?.paymentAmount * 0.7).toFixed(2) : "N/A"}</TableCell>
-              <TableCell>{item.paymentCompletion || "NA"}</TableCell>
+              <TableCell>
+                {distributedPayments[item._id] 
+                  ? <span style={{ color: '#00008B' }}>Rs.{distributedPayments[item._id].toFixed(2)}</span>
+                  : <span style={{ color: 'red' }}>Not Paid Yet</span>
+                }
+              </TableCell>
               <TableCell>
                 {distributedPayments[item._id] ? (
-                  <Tooltip content="Payment already distributed"className="text-yellow-500">
+                  <Tooltip content="Payment already distributed" className="text-yellow-500">
                     <span className="text-green-500">Done</span>
                   </Tooltip>
                 ) : (

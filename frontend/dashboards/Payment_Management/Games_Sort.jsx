@@ -75,6 +75,8 @@ const GamesSortChart = ({ data }) => {
       },
     },
     aspectRatio: 2.5, // Adjust the aspect ratio as needed
+    // Add this to set the background color to white
+    backgroundColor: 'white',
   };
 
   return <Bar data={chartData} options={options} />;

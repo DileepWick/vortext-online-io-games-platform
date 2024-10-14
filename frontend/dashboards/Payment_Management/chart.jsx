@@ -47,6 +47,17 @@ const Chart = ({ data }) => {
         },
       },
     },
+    // Add this section to set the background color
+    layout: {
+      padding: {
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0
+      }
+    },
+    // Set the chart background color to white
+    backgroundColor: 'white',
   };
 
   return <Bar data={chartData} options={options} />;

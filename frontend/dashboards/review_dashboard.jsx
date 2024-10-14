@@ -7,6 +7,9 @@ import axios from "axios";
 import Reporting from "./Review_Manager_Components/reporting";
 import Loader from "../src/components/Loader/loader";
 import '../src/style/print.css';
+import Footer from "../src/components/footer";
+
+
 
 
 
@@ -172,6 +175,7 @@ const Review_manager = () => {
           
         </Tabs>
       </div>
+      
       <div className="p-4 ">
 
         {activeTab === "tab1" && <ReviewTable/>}
@@ -180,7 +184,10 @@ const Review_manager = () => {
         
       </div>
     </div>
+    <Footer />
     </div>
+    
+
   );
 };
 

@@ -33,8 +33,10 @@ import { EditIcon } from "../src/assets/icons/EditIcon";
 import { PlusIcon } from "../src/assets/icons/PlusIcon";
 import RentedGamesSection from "./rentedGamesDash";
 import SessionAnalytics from "./sessionAnalytics";
+import useAuthCheck from "../src/utils/authCheck";
 
 const SessionManagerDash = () => {
+  useAuthCheck("Session_Manager");
   const [rentalTimes, setRentalTimes] = useState([]);
   const [pricePerMinute, setPricePerMinute] = useState(5);
   const [games, setGames] = useState([]);

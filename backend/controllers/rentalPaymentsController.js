@@ -59,3 +59,28 @@ export const getAllRentalPayments = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const getPaymentsByUserId = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const userPayments = await RentalPayment.find({ user: userId })
+      .populate('game', 'title price')
+      .populate('rental', 'time status')
+      .sort({ date: -1 });
+
+    if (userPayments.length === 0) {
+      return res.status(404).json({ message: 'No payments found for this user' });
+    }
+
+    const totalAmount = userPayments.reduce((sum, payment) => sum + payment.amount, 0);
+
+    res.status(200).json({
+      userPayments,
+      totalPayments: userPayments.length,
+      totalAmount
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

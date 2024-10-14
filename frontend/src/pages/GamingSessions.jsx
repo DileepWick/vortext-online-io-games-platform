@@ -6,19 +6,52 @@ import useAuthCheck from "../utils/authCheck";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
-import { Image, Card, CardBody, Chip, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, RadioGroup, Radio } from "@nextui-org/react";
+import {
+  Image,
+  Card,
+  CardBody,
+  Chip,
+  Button,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Input,
+  RadioGroup,
+  Radio,
+} from "@nextui-org/react";
 import { toast, Flip } from "react-toastify";
 
-
 const CreditCardIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
     <line x1="1" y1="10" x2="23" y2="10"></line>
   </svg>
 );
 
 const PayPalIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path d="M7 14c-1.66 0-3-1.34-3-3 0-1.31.84-2.41 2-2.83V3.65C2.5 4.18 0 6.6 0 9.5c0 3.03 2.47 5.5 5.5 5.5h3.07c-.07-.32-.07-.66 0-1H7z"></path>
     <path d="M17 9.5c0-2.9-2.5-5.32-5.5-5.85v4.52c1.16.42 2 1.52 2 2.83 0 1.66-1.34 3-3 3H7.07c.07.34.07.68 0 1H10.5c3.03 0 5.5-2.47 5.5-5.5z"></path>
   </svg>
@@ -37,8 +70,8 @@ const GamingSessions = () => {
   const [rentalOptions, setRentalOptions] = useState([]);
   const [selectedExtension, setSelectedExtension] = useState(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState('creditCard');
-  const [paypalEmail, setPaypalEmail] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState("creditCard");
+  const [paypalEmail, setPaypalEmail] = useState("");
   const [cardDetails, setCardDetails] = useState({
     cardNumber: "",
     expirationDate: "",
@@ -46,33 +79,43 @@ const GamingSessions = () => {
   });
 
   const handleCardNumberChange = (e) => {
-    const value = e.target.value.replace(/\D/g, '');
-    const formattedValue = value.replace(/(\d{4})(?=\d)/g, '$1-');
-    setCardDetails(prev => ({ ...prev, cardNumber: formattedValue.slice(0, 19) }));
+    const value = e.target.value.replace(/\D/g, "");
+    const formattedValue = value.replace(/(\d{4})(?=\d)/g, "$1-");
+    setCardDetails((prev) => ({
+      ...prev,
+      cardNumber: formattedValue.slice(0, 19),
+    }));
   };
 
   const handleExpirationDateChange = (e) => {
-    const value = e.target.value.replace(/\D/g, '');
+    const value = e.target.value.replace(/\D/g, "");
     if (value.length <= 2) {
-      setCardDetails(prev => ({ ...prev, expirationDate: value }));
+      setCardDetails((prev) => ({ ...prev, expirationDate: value }));
     } else {
       const month = value.slice(0, 2);
       const year = value.slice(2, 4);
       if (parseInt(month) > 12) {
-        setCardDetails(prev => ({ ...prev, expirationDate: `12/${year}` }));
+        setCardDetails((prev) => ({ ...prev, expirationDate: `12/${year}` }));
       } else {
-        setCardDetails(prev => ({ ...prev, expirationDate: `${month}/${year}` }));
+        setCardDetails((prev) => ({
+          ...prev,
+          expirationDate: `${month}/${year}`,
+        }));
       }
     }
   };
 
+  const handleRentHistoryClick = () => {
+    navigate("/RentHistory");
+  };
+
   const handleCvvChange = (e) => {
-    const value = e.target.value.replace(/\D/g, '');
-    setCardDetails(prev => ({ ...prev, cvv: value.slice(0, 3) }));
+    const value = e.target.value.replace(/\D/g, "");
+    setCardDetails((prev) => ({ ...prev, cvv: value.slice(0, 3) }));
   };
 
   const validateForm = () => {
-    if (cardDetails.cardNumber.replace(/-/g, '').length !== 16) {
+    if (cardDetails.cardNumber.replace(/-/g, "").length !== 16) {
       toast.error("Invalid card number");
       return false;
     }
@@ -80,7 +123,7 @@ const GamingSessions = () => {
       toast.error("Invalid expiration date");
       return false;
     }
-    const [month, year] = cardDetails.expirationDate.split('/');
+    const [month, year] = cardDetails.expirationDate.split("/");
     if (parseInt(month) < 1 || parseInt(month) > 12) {
       toast.error("Invalid month in expiration date");
       return false;
@@ -89,7 +132,10 @@ const GamingSessions = () => {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear() % 100;
     const currentMonth = currentDate.getMonth() + 1;
-    if (parseInt(year) < currentYear || (parseInt(year) === currentYear && parseInt(month) < currentMonth)) {
+    if (
+      parseInt(year) < currentYear ||
+      (parseInt(year) === currentYear && parseInt(month) < currentMonth)
+    ) {
       toast.error("Card has expired");
       return false;
     }
@@ -110,7 +156,10 @@ const GamingSessions = () => {
       );
       setRentals(response.data);
     } catch (err) {
-      console.error("Error fetching rentals:", err.response ? err.response.data : err.message);
+      console.error(
+        "Error fetching rentals:",
+        err.response ? err.response.data : err.message
+      );
       setError(err.response ? err.response.data.message : err.message);
     } finally {
       setLoading(false);
@@ -136,7 +185,13 @@ const GamingSessions = () => {
     if (currentGame) {
       const rentalTimeInSeconds = convertTimeToSeconds(currentGame.time);
       console.log("Rental time in seconds:", rentalTimeInSeconds);
-      navigate(`/RentalGamesEmbed/${encodeURIComponent(currentGame.game.PlayLink)}/${encodeURIComponent(currentGame.game.title)}/${encodeURIComponent(rentalTimeInSeconds || 14400)}/${currentGame._id}`);
+      navigate(
+        `/RentalGamesEmbed/${encodeURIComponent(
+          currentGame.game.PlayLink
+        )}/${encodeURIComponent(currentGame.game.title)}/${encodeURIComponent(
+          rentalTimeInSeconds || 14400
+        )}/${currentGame._id}`
+      );
     }
     closeModal();
   }, [currentGame, navigate, closeModal]);
@@ -145,22 +200,22 @@ const GamingSessions = () => {
     const hrs = Math.floor(seconds / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
-    
+
     let timeString = "";
     if (hrs > 0) {
-      timeString += `${hrs} hour${hrs > 1 ? 's' : ''} `;
+      timeString += `${hrs} hour${hrs > 1 ? "s" : ""} `;
     }
     if (mins > 0 || hrs > 0) {
-      timeString += `${mins} minute${mins !== 1 ? 's' : ''} `;
+      timeString += `${mins} minute${mins !== 1 ? "s" : ""} `;
     }
-    timeString += `${secs} second${secs !== 1 ? 's' : ''}`;
-    
+    timeString += `${secs} second${secs !== 1 ? "s" : ""}`;
+
     return timeString.trim();
   };
 
   const convertTimeToSeconds = (timeString) => {
     if (!timeString) return 14400;
-    
+
     console.log("Original time string:", timeString);
 
     if (!isNaN(timeString)) {
@@ -169,20 +224,20 @@ const GamingSessions = () => {
       return seconds;
     }
 
-    const [hours, minutes] = timeString.split(':').map(Number);
+    const [hours, minutes] = timeString.split(":").map(Number);
     if (!isNaN(hours) && !isNaN(minutes)) {
-      const seconds = (hours * 3600) + (minutes * 60);
+      const seconds = hours * 3600 + minutes * 60;
       console.log("Parsed as HH:MM format:", seconds);
       return seconds;
     }
-    
+
     const hourMatch = timeString.match(/(\d+)\s*hour/i);
     if (hourMatch) {
       const seconds = parseInt(hourMatch[1], 10) * 3600;
       console.log("Parsed as 'X hours' format:", seconds);
       return seconds;
     }
-    
+
     console.log("Could not parse time, defaulting to 4 hours");
     return 14400;
   };
@@ -216,7 +271,7 @@ const GamingSessions = () => {
   }, []);
 
   const handleExtensionSelection = useCallback((option) => {
-    setSelectedExtension(prevSelected =>
+    setSelectedExtension((prevSelected) =>
       prevSelected && prevSelected.time === option.time ? null : option
     );
   }, []);
@@ -249,7 +304,7 @@ const GamingSessions = () => {
 
   const handleCardInputChange = (e) => {
     const { name, value } = e.target;
-    setCardDetails(prev => ({ ...prev, [name]: value }));
+    setCardDetails((prev) => ({ ...prev, [name]: value }));
   };
 
   const validateCardDetails = () => {
@@ -268,10 +323,10 @@ const GamingSessions = () => {
   };
 
   const handlePayment = async () => {
-    if (paymentMethod === 'creditCard' && !validateForm()) {
+    if (paymentMethod === "creditCard" && !validateForm()) {
       return;
     }
-    if (paymentMethod === 'paypal' && !paypalEmail) {
+    if (paymentMethod === "paypal" && !paypalEmail) {
       toast.error("Please enter your PayPal email");
       return;
     }
@@ -290,9 +345,14 @@ const GamingSessions = () => {
         rental: currentGame._id,
         amount: parseFloat(selectedExtension.price),
         paymentMethod: paymentMethod,
-        paymentDetails: paymentMethod === 'creditCard' 
-          ? { cardNumber: cardDetails.cardNumber, expirationDate: cardDetails.expirationDate, cvv: cardDetails.cvv }
-          : { paypalEmail: paypalEmail }
+        paymentDetails:
+          paymentMethod === "creditCard"
+            ? {
+                cardNumber: cardDetails.cardNumber,
+                expirationDate: cardDetails.expirationDate,
+                cvv: cardDetails.cvv,
+              }
+            : { paypalEmail: paypalEmail },
       };
 
       console.log("Sending payment data:", paymentData);
@@ -313,9 +373,9 @@ const GamingSessions = () => {
         // Extend rental time
         const extendResponse = await axios.put(
           `http://localhost:8098/Rentals/extendRentalTime/${userId}/${currentGame.game._id}`,
-          { 
+          {
             additionalTime: parseInt(selectedExtension.time, 10),
-            additionalPrice: selectedExtension.price
+            additionalPrice: selectedExtension.price,
           },
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -363,7 +423,16 @@ const GamingSessions = () => {
       <Header />
       <div className="relative">
         <div className="container mx-auto p-6">
-          <div className="text-2xl font-primaryRegular mb-6">MY RENTED GAMES</div>
+          <div className="flex justify-between items-center mb-6">
+            <div className="text-2xl font-primaryRegular">MY RENTED GAMES</div>
+            <Button
+              color="primary"
+              onClick={handleRentHistoryClick}
+              className="font-primaryRegular"
+            >
+              Rent History
+            </Button>
+          </div>
           {rentals.length > 0 ? (
             <div className="flex flex-wrap gap-6">
               {rentals.map((rental) => (
@@ -382,28 +451,29 @@ const GamingSessions = () => {
                     <p className="mb-2 font-primaryRegular text-lg text-white">
                       {rental.game.title}
                     </p>
-                    
+
                     <p className="mb-2 text-sm text-gray-300">
                       Rental Time: {formatTime(rental.time)}
                     </p>
-                    
+
                     <div className="flex flex-wrap gap-2 mb-4 font-primaryRegular">
-                      {rental.game.Genre && rental.game.Genre.flatMap((genre) =>
-                        genre.includes(",") ? genre.split(",") : genre
-                      ).map((genre, index) => (
-                        <Chip
-                          key={index}
-                          color="primary"
-                          variant="flat"
-                          size="sm"
-                          className="text-white"
-                          radius="none"
-                        >
-                          {genre.trim()}
-                        </Chip>
-                      ))}
+                      {rental.game.Genre &&
+                        rental.game.Genre.flatMap((genre) =>
+                          genre.includes(",") ? genre.split(",") : genre
+                        ).map((genre, index) => (
+                          <Chip
+                            key={index}
+                            color="primary"
+                            variant="flat"
+                            size="sm"
+                            className="text-white"
+                            radius="none"
+                          >
+                            {genre.trim()}
+                          </Chip>
+                        ))}
                     </div>
-                    
+
                     <div className="flex flex-col gap-2">
                       <Button
                         onClick={() => openModal(rental)}
@@ -415,7 +485,7 @@ const GamingSessions = () => {
                       >
                         Start Session
                       </Button>
-  
+
                       <Button
                         onClick={() => openExtendModal(rental)}
                         color="secondary"
@@ -435,21 +505,24 @@ const GamingSessions = () => {
             <p>No Rentals found</p>
           )}
         </div>
-        
-        <Modal 
-          isOpen={isModalVisible} 
-          onClose={closeModal}
-          backdrop="blur"
-        >
+
+        <Modal isOpen={isModalVisible} onClose={closeModal} backdrop="blur">
           <ModalContent>
             {(onClose) => (
               <>
-                <ModalHeader className="flex flex-col gap-1"><span style={{ color: '#0072F5', fontWeight: 'bold'}}>Start Session</span></ModalHeader>
+                <ModalHeader className="flex flex-col gap-1">
+                  <span style={{ color: "#0072F5", fontWeight: "bold" }}>
+                    Start Session
+                  </span>
+                </ModalHeader>
                 <ModalBody>
                   {currentGame ? (
-                    <span style={{ color: '#0072F5'}}>
-                    <p>Are you sure you want to start a session for {currentGame.game.title}?</p>
-                    <p>Rental Time: {currentGame.time}</p>
+                    <span style={{ color: "#0072F5" }}>
+                      <p>
+                        Are you sure you want to start a session for{" "}
+                        {currentGame.game.title}?
+                      </p>
+                      <p>Rental Time: {currentGame.time}</p>
                     </span>
                   ) : (
                     <p>Loading game details...</p>
@@ -467,14 +540,22 @@ const GamingSessions = () => {
             )}
           </ModalContent>
         </Modal>
-  
-        <Modal isOpen={isExtendModalVisible} onClose={closeExtendModal} backdrop="blur">
+
+        <Modal
+          isOpen={isExtendModalVisible}
+          onClose={closeExtendModal}
+          backdrop="blur"
+        >
           <ModalContent>
             <ModalHeader className="flex flex-col gap-1">
-              <span style={{ color: '#0072F5', fontWeight: 'bold' }}>Extend Rental</span>
+              <span style={{ color: "#0072F5", fontWeight: "bold" }}>
+                Extend Rental
+              </span>
             </ModalHeader>
             <ModalBody>
-              <p className="text-black">Select an extension period for {currentGame?.game.title}:</p>
+              <p className="text-black">
+                Select an extension period for {currentGame?.game.title}:
+              </p>
               <div className="grid grid-cols-2 gap-4">
                 {rentalOptions.map((option) => (
                   <Card
@@ -489,7 +570,9 @@ const GamingSessions = () => {
                     }`}
                   >
                     <CardBody className="text-center">
-                    <p className="font-bold">{formatTime(parseInt(option.time, 10))}</p>
+                      <p className="font-bold">
+                        {formatTime(parseInt(option.time, 10))}
+                      </p>
                       <p>LKR {option.price}</p>
                     </CardBody>
                   </Card>
@@ -506,102 +589,128 @@ const GamingSessions = () => {
             </ModalFooter>
           </ModalContent>
         </Modal>
-  
+
         <Modal
-          isOpen={isPaymentModalOpen}
-          onClose={closePaymentModal}
-          size="2xl"
-          scrollBehavior="inside"
-        >
-          <ModalContent>
-            <ModalHeader className="font-primaryBold text-black">Checkout</ModalHeader>
-            <ModalBody>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-customCardDark p-4 rounded-lg">
-                  <h2 className="text-lg font-semibold mb-2 text-black">PAYMENT METHODS</h2>
-                  <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                    <div className="border border-gray-900 p-5 rounded mb-4 w-[550px]">
-                      <Radio value="creditCard">
-                        <div className="flex items-center">
-                          <CreditCardIcon />
-                          <span className="text-black ml-2 mr-4">Credit Card</span>
-                        </div>
-                      </Radio>
-                      {paymentMethod === 'creditCard' && (
-                        <div className="mt-4">
-                          <Input
-                            label="Card Number"
-                            placeholder="1111-1111-1111-1111"
-                            value={cardDetails.cardNumber}
-                            onChange={handleCardNumberChange}
-                            className="mb-5"
-                          />
-                          <div className="flex gap-4">
-                            <Input
-                              label="Expiration (MM/YY)"
-                              placeholder="MM/YY"
-                              value={cardDetails.expirationDate}
-                              onChange={handleExpirationDateChange}
-                              className="mb-5"
-                            />
-                            <Input
-                              label="CVV"
-                              placeholder="123"
-                              value={cardDetails.cvv}
-                              onChange={handleCvvChange}
-                            />
-                          </div>
-                        </div>
-                      )}
+  isOpen={isPaymentModalOpen}
+  onClose={closePaymentModal}
+  size="2xl"
+>
+  <ModalContent
+    style={{
+      backgroundColor: "#f9f9f9",  // Very light gray
+      boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.1)",  // Soft shadow
+      borderRadius: "12px",  // Rounded corners
+      padding: "20px",  // Spacing for the whole modal
+    }}
+  >
+    {(onClose) => (
+      <>
+        <ModalHeader className="font-bold text-2xl text-gray-900">Checkout</ModalHeader>
+        <ModalBody>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* PAYMENT METHOD SECTION */}
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h2 className="text-lg font-semibold mb-4 text-gray-800">Payment Method</h2>
+              <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+                <div className="border border-gray-300 p-5 rounded-lg mb-4">
+                  <Radio value="creditCard">
+                    <div className="flex items-center">
+                      <CreditCardIcon />
+                      <span className="text-gray-700 ml-2 mr-4">Credit Card</span>
                     </div>
-                    <div className="border border-gray-700 p-4 rounded">
-                      <Radio value="paypal">
-                        <div className="flex items-center">
-                          <PayPalIcon />
-                          <span className="text-black ml-2">PayPal</span>
-                        </div>
-                      </Radio>
-                      {paymentMethod === 'paypal' && (
+                  </Radio>
+                  {paymentMethod === 'creditCard' && (
+                    <div className="mt-4">
+                      <Input
+                        label="Card Number"
+                        placeholder="1111-1111-1111-1111"
+                        value={cardDetails.cardNumber}
+                        onChange={handleCardNumberChange}
+                        className="mb-5"
+                        style={{
+                          borderColor: "#e0e0e0",
+                          borderRadius: "8px",
+                          boxShadow: "0px 1px 4px rgba(0, 0, 0, 0.05)",
+                        }}
+                      />
+                      <div className="flex gap-4">
                         <Input
-                          label="PayPal Email"
-                          placeholder="your@email.com"
-                          value={paypalEmail}
-                          onChange={(e) => setPaypalEmail(e.target.value)}
-                          className="mt-2"
+                          label="Expiration (MM/YY)"
+                          placeholder="MM/YY"
+                          value={cardDetails.expirationDate}
+                          onChange={handleExpirationDateChange}
+                          className="mb-5"
+                          style={{
+                            borderColor: "#e0e0e0",
+                            borderRadius: "8px",
+                            boxShadow: "0px 1px 4px rgba(0, 0, 0, 0.05)",
+                          }}
                         />
-                      )}
+                        <Input
+                          label="CVV"
+                          placeholder="123"
+                          value={cardDetails.cvv}
+                          onChange={handleCvvChange}
+                          style={{
+                            borderColor: "#e0e0e0",
+                            borderRadius: "8px",
+                            boxShadow: "0px 1px 4px rgba(0, 0, 0, 0.05)",
+                          }}
+                        />
+                      </div>
                     </div>
-                  </RadioGroup>
+                  )}
                 </div>
-              </div>
-              <div className="mt-4 bg-customCardDark p-4 rounded-lg">
-                <h2 className="text-lg font-semibold mb-4 text-black">ORDER SUMMARY</h2>
-                <div className="flex mb-4">
-                  <img src={currentGame?.game.coverPhoto} alt={currentGame?.game.title} className="w-16 h-20 object-cover mr-4" />
-                  <div>
-                    <h3 className="font-semibold text-black">{currentGame?.game.title}</h3>
-                    <p className="text-black">Extension: {formatTime(parseInt(selectedExtension?.time, 10))}</p>
-                    <p className="text-black">Rs.{selectedExtension?.price.toFixed(2)}</p>
-                  </div>
-                </div>
-                <div className="border-t border-gray-700 pt-4 mt-4">
-                  <div className="flex justify-between text-black">
-                    <span>Total</span>
-                    <span>Rs.{selectedExtension?.price.toFixed(2)}</span>
-                  </div>
-                </div>
-              </div>
-            </ModalBody>
-            <ModalFooter>
-              <Button color="danger" variant="light" onPress={closePaymentModal}>
-                Cancel
-              </Button>
-              <Button color="primary" onPress={handlePayment}>
-                EXTEND RENTAL
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+              </RadioGroup>
+            </div>
+
+            {/* ORDER SUMMARY SECTION */}
+           <div className="bg-white p-6 rounded-lg shadow-md">
+  <h2 className="text-lg font-semibold mb-4 text-blue-800">Order Summary</h2>
+  <p className="text-blue-800">Selected Game: <span className="text-gray-900">{currentGame?.game.title}</span></p>
+  <p className="text-blue-800">Extension Time: <span className="text-gray-900">{formatTime(parseInt(selectedExtension?.time, 10) || 0)}</span></p>
+  <p className="text-blue-800">Total Amount:<span className="text-gray-900"> LKR {selectedExtension?.price}</span></p>
+</div>
+
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            color="danger"
+            variant="light"
+            onPress={onClose}
+            style={{
+              padding: "10px 20px",
+              borderRadius: "8px",
+              backgroundColor: "#ff6b6b",
+              color: "#fff",
+              fontWeight: "bold",
+              boxShadow: "0px 2px 10px rgba(255, 107, 107, 0.3)",
+            }}
+            className="mr-4"
+          >
+            Cancel
+          </Button>
+          <Button
+            color="primary"
+            onPress={handlePayment}
+            style={{
+              padding: "10px 20px",
+              borderRadius: "8px",
+              backgroundColor: "#4CAF50",
+              color: "#fff",
+              fontWeight: "bold",
+              boxShadow: "0px 2px 10px rgba(76, 175, 80, 0.3)",
+            }}
+            className="hover:bg-green-600 transition duration-300"
+          >
+            Confirm
+          </Button>
+        </ModalFooter>
+      </>
+    )}
+  </ModalContent>
+</Modal>
       </div>
       <Footer />
     </div>

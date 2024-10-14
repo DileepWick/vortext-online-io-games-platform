@@ -12,6 +12,11 @@ import AddNewStock from "./Games_Components/add_new_stock";
 import Footer from "../src/components/footer";
 import VideoPlayer from "../src/components/videoPlayer";
 
+import DevEarningsOfPurchased from './Payment_Management/DevEarningsOfPurchased';
+import DevRentalEarnings from './Payment_Management/DevRentalEarnings';
+import DeveloperEarningsAnalysis from './Payment_Management/DeveloperEarningsAnalysis';
+
+
 //Stock Components
 import StockTable from "./Stock_Components/stock_table";
 
@@ -222,17 +227,15 @@ const GameDeveloperDashboard= () => {
         >
           <Tab key="analytics" title="Analytics" />
           <Tab key="products" title="My Games" />
-          <Tab key="payments" title="Earnings" />
+          <Tab key="purchasedEarnings" title="My Purchased Earnings" />
+          <Tab key="DevRentalEarnings" title="My Rental Earnings" />
         </Tabs>
       </div>
       <div className="p-4">
-        {activeTab === "analytics" && (
-          <div className="bg-white flex flex-col min-h-screen">
-            <p className="text-center text-black font-primaryRegular text-5xl mt-[100px]">
-              <DeveloperIncomeTable/>
-            </p>
-          </div>
-        )}
+      {activeTab === "analytics" && <DeveloperEarningsAnalysis />}
+        {activeTab === "purchasedEarnings" && <DevEarningsOfPurchased />}
+        {activeTab === "DevRentalEarnings" && <DevRentalEarnings />}
+
         {/*PRODUCTS*/}
         {activeTab === "products" && (
           <>

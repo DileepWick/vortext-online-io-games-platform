@@ -49,13 +49,13 @@ const IndieDeveloperSection = () => {
           <motion.div variants={itemVariants} className="md:w-1/2 mb-8 md:mb-0">
             <motion.h2
               variants={itemVariants}
-              className="text-4xl font-bold text-white mb-4"
+              className="text-[50px] font-bold text-white mb-4"
             >
               Calling All Indie Developers
             </motion.h2>
             <motion.p
               variants={itemVariants}
-              className="text-xl text-gray-300 mb-6"
+              className="text-[30px] text-gray-300 mb-6"
             >
               Join our platform and showcase your games to a passionate
               community of gamers. We provide the tools and support you need to
@@ -63,7 +63,7 @@ const IndieDeveloperSection = () => {
             </motion.p>
             <motion.div variants={itemVariants}>
               <Button
-                color="success"
+                color="secondary"
                 size="lg"
                 onClick={() => handleClick("/login")}
               >
@@ -73,9 +73,9 @@ const IndieDeveloperSection = () => {
           </motion.div>
           <motion.div variants={itemVariants} className="md:w-1/2">
             <img
-              src="https://res.cloudinary.com/dhcawltsr/image/upload/v1728837460/Video_game_developer_qahcp2.gif"
+              src="https://res.cloudinary.com/dhcawltsr/image/upload/v1728889325/DALL_E_2024-10-14_12.31.58_-_Create_a_3D_cartoon-style_character_of_an_indie_game_developer_with_a_violet_theme._The_character_should_appear_creative_and_focused_with_a_computer_wouh8i.webp"
               alt="Indie Developer"
-              className="rounded-lg w-full"
+              className="rounded-[250px] w-[500px] ml-[100px]"
             />
           </motion.div>
         </div>

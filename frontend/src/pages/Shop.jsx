@@ -186,9 +186,8 @@ const Shop = () => {
   }, [searchTerm, selectedGenre, gameStocks]);
 
   // Collect unique genres for the dropdown
-  const uniqueGenres = [
-    ...new Set(gameStocks.flatMap((stock) => stock.AssignedGame.Genre)),
-  ];
+  const uniqueGenres = ["Action", "Adventure", "Strategy","Sport","Puzzle","Strategy","Fighting"];
+
 
   useEffect(() => {
     console.log("Ratings Data: ");
@@ -229,6 +228,7 @@ const Shop = () => {
           <video
             autoPlay
             loop
+            muted
             playsInline
             className="absolute top-0 left-0 w-full h-full object-cover z-0"
           >
@@ -375,6 +375,7 @@ const Shop = () => {
           <div className="mb-8 mt-8 text-customDark" ref={targetDivRef}>
             i
           </div>
+           {/*
           <button
             className="text-[white] font-primaryRegular px-16 pb-8 flex flex-row gap-2 items-center  text-left text-[22px] mt-8"
             onClick={() => {
@@ -388,7 +389,7 @@ const Shop = () => {
             }}
           >
             Show Top Rated This week <IoIosArrowForward />
-          </button>
+          </button>*/}
 
           {/* Search Bar */}
 

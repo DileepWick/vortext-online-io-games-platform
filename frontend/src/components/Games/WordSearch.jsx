@@ -1,39 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { TextGenerateEffect } from "../ui/TextGenerateEffect";
+import ScrollToTop from "../ScrollToTop";
+import Header from "../header";
+import Footer from "../footer";
 
+// Define constants for the game
 const GRID_SIZE = 15;
+
 const ALL_WORDS = {
   animals: ['DOG', 'CAT', 'ELEPHANT', 'GIRAFFE', 'LION', 'TIGER', 'ZEBRA', 'MONKEY', 'PANDA', 'KOALA'],
   vehicles: ['CAR', 'TRUCK', 'BUS', 'MOTORCYCLE', 'BICYCLE', 'TRAIN', 'AIRPLANE', 'BOAT', 'SCOOTER', 'HELICOPTER'],
-  Foods: ['RICE', 'WHEAT', 'CORN', 'BARLEY', 'OATS', 'MILLET', 'SORGHUM', 'QUINOA', 'AMARANTH', 'BUCKWHEAT'],
+  foods: ['RICE', 'WHEAT', 'CORN', 'BARLEY', 'OATS', 'MILLET', 'SORGHUM', 'QUINOA', 'AMARANTH', 'BUCKWHEAT'],
   computerParts: ['CPU', 'RAM', 'GPU', 'SSD', 'HDD', 'MOTHERBOARD', 'KEYBOARD', 'MOUSE', 'MONITOR', 'SPEAKER'],
   programmingLanguages: ['PYTHON', 'JAVA', 'JAVASCRIPT', 'CSHARP', 'RUBY', 'PHP', 'SWIFT', 'KOTLIN', 'RUST', 'GOLANG']
 };
 
+// Define difficulty levels with corresponding word lists and time limits
 const DIFFICULTY_LEVELS = {
-  1: { name: 'Animals', words: ALL_WORDS.animals, timeLimit: 600 },
-  2: { name: 'Vehicles', words: ALL_WORDS.vehicles, timeLimit: 440 },
-  3: { name: 'Foods', words: ALL_WORDS.Foods, timeLimit: 300 },
-  4: { name: 'Computer Parts', words: ALL_WORDS.computerParts, timeLimit: 200 },
+  1: { name: 'Animals', words: ALL_WORDS.animals, timeLimit: 1200 },
+  2: { name: 'Vehicles', words: ALL_WORDS.vehicles, timeLimit: 900 },
+  3: { name: 'Foods', words: ALL_WORDS.foods, timeLimit: 600 },
+  4: { name: 'Computer Parts', words: ALL_WORDS.computerParts, timeLimit: 300 },
   5: { name: 'Programming Languages', words: ALL_WORDS.programmingLanguages, timeLimit: 180 }
 };
 
 const MAX_WRONG_SELECTIONS = 10;
 
+// Function to generate the word search grid
 const generateGrid = (words) => {
   const grid = Array(GRID_SIZE).fill().map(() => Array(GRID_SIZE).fill(''));
   const directions = [
     [0, 1], [1, 0], [1, 1], [-1, -1], [-1, 0], [0, -1], [1, -1], [-1, 1]
   ];
 
+// Function to place a word on the grid
   const placeWord = (word) => {
     const [dx, dy] = directions[Math.floor(Math.random() * directions.length)];
     let row, col;
+
+// Find a valid starting position for the word
     do {
       row = Math.floor(Math.random() * GRID_SIZE);
       col = Math.floor(Math.random() * GRID_SIZE);
     } while (!canPlaceWord(word, row, col, dx, dy));
 
+// Place the word letter by letter in the chosen direction
     for (let i = 0; i < word.length; i++) {
       grid[row + i * dx][col + i * dy] = word[i];
     }
@@ -56,6 +68,7 @@ const generateGrid = (words) => {
 
   const placedWords = words.map(placeWord);
 
+// Fill remaining empty spaces with random letters
   for (let i = 0; i < GRID_SIZE; i++) {
     for (let j = 0; j < GRID_SIZE; j++) {
       if (grid[i][j] === '') {
@@ -82,6 +95,7 @@ const WordSearch = () => {
   const [message, setMessage] = useState('');
   const [wrongSelections, setWrongSelections] = useState(0);
 
+// Effect to initialize the game when a level is selected  
   useEffect(() => {
     if (level) {
       const words = DIFFICULTY_LEVELS[level].words;
@@ -101,6 +115,7 @@ const WordSearch = () => {
     }
   }, [level]);
 
+// Effect to handle the game timer  
   useEffect(() => {
     let timer;
     if (gameStarted && timeLeft > 0 && !gameOver) {
@@ -112,6 +127,7 @@ const WordSearch = () => {
     return () => clearTimeout(timer);
   }, [gameStarted, timeLeft, gameOver]);
 
+// Effect to check if all words are found  
   useEffect(() => {
     if (foundWords.length === gameWords.length && !gameOver) {
       setGameOver(true);
@@ -122,6 +138,7 @@ const WordSearch = () => {
     }
   }, [foundWords, gameWords, gameOver, score, timeLeft]);
 
+// Function to handle letter clicks  
   const handleLetterClick = (row, col) => {
     if (gameOver) return;
 
@@ -149,6 +166,7 @@ const WordSearch = () => {
     }
   };
 
+// Function to handle level selection  
   const handleLevelSelect = (selectedLevel) => {
     setLevel(selectedLevel);
   };
@@ -165,6 +183,7 @@ const WordSearch = () => {
     setWrongSelections(0);
   };
 
+// Function to handle hint usage  
   const handleHintClick = () => {
     if (hints > 0 && !gameOver) {
       const unFoundWords = gameWords.filter(word => !foundWords.includes(word));
@@ -178,31 +197,7 @@ const WordSearch = () => {
     }
   };
 
-  const renderHomeButton = () => (
-    <motion.button
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      onClick={handleHomeClick}
-      style={{
-        position: 'absolute',
-        top: '10px',
-        right: '10px',
-        padding: '5px 15px',
-        fontSize: '0.9em',
-        backgroundColor: '#3498db',
-        color: 'white',
-        border: 'none',
-        borderRadius: '15px',
-        cursor: 'pointer',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        transition: 'all 0.3s ease',
-        zIndex: 10
-      }}
-    >
-      Home
-    </motion.button>
-  );
-
+ // Function to check if a letter is part of a found word  
   const isLetterHighlighted = (row, col) => {
     return foundWords.some(word => {
       const placedWord = placedWords.find(pw => pw.word === word);
@@ -218,250 +213,208 @@ const WordSearch = () => {
     });
   };
 
+// Function to check if a letter is currently selected  
   const isLetterSelected = (row, col) => {
     return selectedLetters.some(pos => pos.row === row && pos.col === col);
   };
 
+// Function to render the home button  
+  const renderHomeButton = () => (
+    <motion.button
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      onClick={handleHomeClick}
+      className="absolute top-2 right-2 px-4 py-2 text-sm bg-purple-600 text-white border-none rounded-full cursor-pointer shadow-md transition-all duration-300 ease-in-out hover:bg-purple-700"
+    >
+      Home
+    </motion.button>
+  );
+
+// Render the level selection screen if the game hasn't started
   if (!gameStarted) {
     return (
-      <div style={{ 
-        fontFamily: 'Arial, sans-serif',
-        backgroundColor: '#f0f3f5',
-        minHeight: '100vh',
-        width: '100vw',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: '20px',
-        boxSizing: 'border-box'
-      }}>
-        <motion.h1 
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          style={{ 
-            color: '#2c3e50',
-            fontSize: '3em',
-            marginBottom: '20px',
-            textTransform: 'uppercase',
-            letterSpacing: '2px',
-            textAlign: 'center'
-          }}
-        >
-          Word Search Game
-        </motion.h1>
-        <motion.h2
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-          style={{ 
-            color: '#34495e', 
-            marginBottom: '20px',
-            fontSize: '1.5em',
-            textAlign: 'center'
-          }}
-        >
-          Select Level
-        </motion.h2>
-        <div style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'center',
-          maxWidth: '600px'
-        }}>
-          {Object.entries(DIFFICULTY_LEVELS).map(([key, value], index) => (
-            <motion.button
-              key={key}
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
-              whileHover={{ scale: 1.05, backgroundColor: '#2980b9' }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => handleLevelSelect(parseInt(key))}
-              style={{
-                margin: '8px',
-                padding: '12px 24px',
-                fontSize: '1em',
-                backgroundColor: '#3498db',
-                color: 'white',
-                border: 'none',
-                borderRadius: '20px',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-              }}
-            >
-              {`Level ${key}: ${value.name}`}
-            </motion.button>
-          ))}
+      <div className="bg-gradient-to-b from-purple-900 to-indigo-900 min-h-screen w-full flex flex-col">
+        <ScrollToTop />
+        <Header className="bg-transparent" />
+        <div className="flex-grow flex flex-col items-center justify-center py-12 px-4">
+          <div className="mb-8 text-center">
+            <h1 className="text-5xl sm:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-yellow-300 to-cyan-400 py-4">
+              Word Search Challenge
+            </h1>
+          </div>
+          <div className="flex items-center justify-center mb-8">
+            <div className="relative">
+              <div className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300 text-2xl sm:text-4xl font-bold text-center">
+                <TextGenerateEffect words="Unravel the Hidden Words!" />
+              </div>
+            </div>
+          </div>
+           {/* Level selection buttons */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+            {Object.entries(DIFFICULTY_LEVELS).map(([key, value]) => (
+              <motion.button
+                key={key}
+                className="relative overflow-hidden rounded-xl shadow-lg"
+                onClick={() => handleLevelSelect(parseInt(key))}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-400 via-pink-500 to-violet-600 opacity-75" />
+                <div className="relative px-6 py-4 bg-opacity-20 bg-black backdrop-filter backdrop-blur-sm">
+                  <h3 className="text-xl font-semibold text-white mb-1">{`Level ${key}`}</h3>
+                  <p className="text-yellow-200">{value.name}</p>
+                </div>
+              </motion.button>
+            ))}
+          </div>
         </div>
+        <Footer className="bg-transparent" />
       </div>
     );
   }
 
   return (
-    <div style={{ 
-      fontFamily: 'Arial, sans-serif',
-      backgroundColor: '#f0f3f5',
-      padding: '10px',
-      borderRadius: '10px',
-      width: '98%',
-      maxWidth: '1200px',
-      margin: '10px auto',
-      position: 'relative',
-      boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
-      display: 'flex',
-      flexDirection: 'column',
-      height: 'calc(100vh - 20px)'
-    }}>
-      {renderHomeButton()}
-      <motion.h1 
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        style={{ 
-          color: '#2c3e50',
-          fontSize: '1.5em',
-          marginBottom: '10px',
-          textAlign: 'center',
-          textTransform: 'uppercase',
-          letterSpacing: '2px'
-        }}
-      >
-        Word Search: {DIFFICULTY_LEVELS[level].name.toUpperCase()}
-      </motion.h1>
-      <div style={{ display: 'flex', justifyContent: 'space-between', flexGrow: 1, overflow: 'hidden' }}>
-        <motion.div 
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          style={{ 
-            width: '30%',
-            minWidth: '200px',
-            backgroundColor: 'white',
-            borderRadius: '10px',
-            padding: '10px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            marginRight: '10px',
-            overflowY: 'auto'
-          }}
+    <div className="font-sans bg-gradient-to-br from-purple-900 to-indigo-900 min-h-screen w-full flex flex-col">
+      <div className="flex-grow flex flex-col p-4">
+        {renderHomeButton()}
+        {/* Game title */}
+        <motion.h1 
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-3xl font-bold text-center text-pink-300 mb-4"
         >
-          <h3 style={{ color: '#2c3e50', marginBottom: '10px', fontSize: '1em' }}>Words to Find:</h3>
-          {gameWords.map((word, index) => (
-            <motion.div 
-              key={word}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              style={{
-                margin: '5px 0',
-                padding: '8px',
-                backgroundColor: foundWords.includes(word) ? '#e8f5e9' : '#fff9c4',
-                borderRadius: '5px',
-                textAlign: 'center',
-                fontWeight: 'bold',
-                color: foundWords.includes(word) ? '#4caf50' : '#ffa000',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                transition: 'all 0.3s ease',
-                fontSize: '0.9em'
-              }}
+          Word Search: {DIFFICULTY_LEVELS[level].name}
+        </motion.h1>
+        <div className="flex flex-col md:flex-row justify-between flex-grow overflow-hidden">
+           {/* Word list and game info */}
+          <motion.div 
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="w-full md:w-1/3 bg-gray-800 rounded-lg p-4 shadow-md mb-4 md:mb-0 md:mr-4 overflow-y-auto"
+          >
+            <h3 className="text-lg font-semibold text-cyan-300 mb-3">Words to Find:</h3>
+            {/* Render each word in the list */}
+            {gameWords.map((word, index) => (
+              <motion.div 
+                key={word}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className={`m-1 p-2 rounded-md text-center font-bold shadow-sm transition-all duration-300 text-sm ${
+                  foundWords.includes(word)
+                    ? 'bg-gradient-to-r from-green-600 to-green-700 text-green-100'
+                    : 'bg-gradient-to-r from-blue-600 to-purple-600 text-blue-100'
+                }`}
+              >
+                {word}
+              </motion.div>
+            ))}
+            {/* Game information */}
+            <div className="mt-6 text-sm">
+              <p className="font-semibold text-pink-300">Time Left: {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</p>
+              <p className="font-semibold text-pink-300">Score: {score}</p>
+              <p className="font-semibold text-pink-300">Hints Left: {hints}</p>
+              <p className="font-semibold text-pink-300">Wrong Selections: {wrongSelections} / {MAX_WRONG_SELECTIONS}</p>
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleHintClick}
+                disabled={hints === 0 || gameOver}
+                className={`px-4 py-2 mt-3 rounded-full text-white ${
+                  hints > 0 && !gameOver ? 'bg-violet-600 hover:bg-violet-700' : 'bg-gray-600 cursor-not-allowed'
+                } transition-all duration-300`}
+              >
+                Use Hint
+              </motion.button>
+            </div>
+            {message && (
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-4 p-3 bg-teal-800 rounded-md text-teal-200 shadow-sm text-sm"
+              >
+                {message}
+              </motion.div>
+            )}
+          </motion.div>
+          <motion.div 
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex-grow bg-gray-800 rounded-lg p-4 shadow-md flex justify-center items-center overflow-y-auto"
+          >
+            <div>
+              {grid.map((row, rowIndex) => (
+                <div key={rowIndex} className="flex justify-center">
+                  {row.map((cell, colIndex) => (
+                    <motion.div
+                      key={`${rowIndex}-${colIndex}`}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => handleLetterClick(rowIndex, colIndex)}
+                      className={`w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center border border-purple-500 m-px cursor-pointer font-bold text-xs rounded transition-all duration-300 ${
+                        isLetterHighlighted(rowIndex, colIndex) 
+                          ? 'bg-emerald-600 text-emerald-100' 
+                          : isLetterSelected(rowIndex, colIndex)
+                            ? 'bg-pink-600 text-pink-100'
+                            : 'bg-gray-700 text-gray-200'
+                      }`}
+                    >
+                      {cell}
+                    </motion.div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </div>
+      {/* Game over modal */}
+      {gameOver && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4"
+        >
+          <div className="bg-gray-800 rounded-lg p-8 max-w-md w-full text-white text-center">
+            {/* Victory or defeat message */}
+            <motion.h2 
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5, type: 'spring', stiffness: 120 }}
+              className="text-4xl sm:text-6xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-yellow-300 to-cyan-400"
             >
-              {word}
-            </motion.div>
-          ))}
-          <div style={{ marginTop: '20px', fontSize: '0.9em' }}>
-            <p style={{ color: '#34495e', fontWeight: 'bold' }}>Time Left: {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</p>
-            <p style={{ color: '#34495e', fontWeight: 'bold' }}>Score: {score}</p>
-            <p style={{ color: '#34495e', fontWeight: 'bold' }}>Hints Left: {hints}</p>
-            <p style={{ color: '#34495e', fontWeight: 'bold' }}>Wrong Selections: {wrongSelections} / {MAX_WRONG_SELECTIONS}</p>
-            <motion.button 
+              {foundWords.length === gameWords.length ? "VICTORY!" : "DEFEAT!"}
+            </motion.h2>
+            {/* Animated congratulatory or encouragement message */}
+            <TextGenerateEffect 
+              words={foundWords.length === gameWords.length 
+                ? "Congratulations! You've found all the words!" 
+                : "Better luck next time!"}
+              className="text-xl sm:text-2xl mb-6 text-gray-300"
+            />
+            <p className="mb-2 text-lg sm:text-xl">Your score: {score}</p>
+            <p className="mb-6 text-lg sm:text-xl">Words found: {foundWords.length} / {gameWords.length}</p>
+             {/* Play again button */}
+            <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={handleHintClick}
-              disabled={hints === 0 || gameOver}
-              style={{
-                padding: '8px 16px',
-                fontSize: '0.9em',
-                backgroundColor: hints > 0 && !gameOver ? '#f39c12' : '#bdc3c7',
-                color: 'white',
-                border: 'none',
-                borderRadius: '15px',
-                cursor: hints > 0 && !gameOver ? 'pointer' : 'not-allowed',
-                transition: 'all 0.3s ease',
-                marginTop: '10px'
-              }}
+              onClick={() => handleLevelSelect(level)}
+              className="w-full p-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition duration-200 mb-4 text-lg"
             >
-              Use Hint
+              Play Again
+            </motion.button>
+             {/* Change difficulty button */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleHomeClick}
+              className="w-full p-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition duration-200 text-lg"
+            >
+              Change Difficulty
             </motion.button>
           </div>
-          {message && (
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              style={{
-                marginTop: '15px',
-                padding: '10px',
-                backgroundColor: '#e8f5e9',
-                borderRadius: '5px',
-                color: '#4caf50',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                fontSize: '0.9em'
-              }}
-            >
-              {message}
-            </motion.div>
-          )}
         </motion.div>
-        <motion.div 
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          style={{ 
-            flex: 1,
-            backgroundColor: 'white',
-            borderRadius: '10px',
-            padding: '10px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            overflowY: 'auto'
-          }}
-        >
-          <div>
-            {grid.map((row, rowIndex) => (
-              <div key={rowIndex} style={{ display: 'flex', justifyContent: 'center' }}>
-                {row.map((cell, colIndex) => (
-                  <motion.div
-                    key={`${rowIndex}-${colIndex}`}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => handleLetterClick(rowIndex, colIndex)}
-                    style={{
-                      width: '28px',
-                      height: '28px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      border: '1px solid #3498db',
-                      margin: '1px',
-                      cursor: 'pointer',
-                      backgroundColor: isLetterHighlighted(rowIndex, colIndex) ? '#2ecc71' : 
-                                       isLetterSelected(rowIndex, colIndex) ? '#f39c12' : 'white',
-                      color: (isLetterHighlighted(rowIndex, colIndex) || isLetterSelected(rowIndex, colIndex)) ? 'white' : '#2c3e50',
-                      fontWeight: 'bold',
-                      transition: 'all 0.3s ease',
-                      fontSize: '0.8em',
-                      borderRadius: '4px',
-                      boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
-                    }}
-                  >
-                    {cell}
-                  </motion.div>
-                ))}
-              </div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
+      )}
     </div>
   );
 };

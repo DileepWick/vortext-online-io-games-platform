@@ -92,7 +92,7 @@ const TailoredGames = () => {
           {/* Game 5 */}
           <GameCard
             title="Word Search"
-            imageUrl="https://images5.alphacoders.com/127/1274050.jpg"
+            imageUrl="https://res.cloudinary.com/dhcawltsr/image/upload/v1728916343/ff44f388-43b3-4db1-bd69-4554bd1c9b8a_hcyq1v.jpg"
             link="/WordSearch"
             devName={"Wijekoon W.M.D.P"}
             devId={"IT22103772"}

@@ -35,13 +35,13 @@ const ModeratorsTable = () => {
 
   return (
     
-    <Table aria-label="Moderators table" className="text-black">
-      <TableHeader>
+    <Table aria-label="Moderators table" className="text-black font-primaryRegular">
+      <TableHeader className="font-primaryRegular">
         <TableColumn>USERNAME</TableColumn>
         <TableColumn>EMAIL</TableColumn>
         <TableColumn>ROLE</TableColumn>
       </TableHeader>
-      <TableBody className="text-black">
+      <TableBody className="text-black font-primaryRegular">
         {moderators.map((moderator) => (
           <TableRow key={moderator._id}>
             <TableCell>{moderator.username}</TableCell>
