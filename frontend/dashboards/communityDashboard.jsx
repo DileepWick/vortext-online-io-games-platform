@@ -28,6 +28,7 @@ import { SearchIcon } from "../src/assets/icons/SearchIcon";
 import { DeleteIcon } from "../src/assets/icons/DeleteIcon";
 import { Download } from "lucide-react";
 import { Bar } from 'react-chartjs-2';
+import useAuthCheck from "../src/utils/authCheck";
 import { 
   Chart as ChartJS, 
   CategoryScale, 
@@ -117,6 +118,7 @@ const AnalyticsTable = ({ data }) => {
 };
 
 const CommunityDashboard = () => {
+  useAuthCheck("Community Manager");
   const [articles, setArticles] = useState([]);
   const [reportedArticles, setReportedArticles] = useState([]);
   const [error, setError] = useState("");

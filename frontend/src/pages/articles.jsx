@@ -34,7 +34,7 @@ const LabelInputContainer = ({ children, className }) => {
   );
 };
 
-const CreatePost = ({ user, onSubmit }) => {
+const CreatePostModal = ({ isOpen, onClose, onSubmit, user }) => {
   const [heading, setHeading] = useState("");
   const [articleBody, setArticleBody] = useState("");
   const [image, setImage] = useState(null);
@@ -55,73 +55,78 @@ const CreatePost = ({ user, onSubmit }) => {
     setHeading("");
     setArticleBody("");
     setImage(null);
+    onClose();
   };
 
+  if (!isOpen) return null;
+
   return (
-    <div className="max-w-lg mx-auto bg-gray-400 dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6 text-transparent bg-gradient-to-r py-4 from-blue-400 via-pink-300 to-purple-400 [text-shadow:0_0_rgba(0,0,0,0.1)]">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
-        Create Post
-      </h2>
-      <form onSubmit={handleSubmit}>
-        <div className="flex items-center mb-4">
-          {user && (
-            <User
-              avatarProps={{
-                src: user.profilePic,
-                size: "sm",
-              }}
-              className="mr-3"
-            />
-          )}
-          <Input
-            type="text"
-            id="heading"
-            value={heading}
-            onChange={(e) => setHeading(e.target.value)}
-            placeholder="What's on your mind?"
-            className="w-full"
-          />
-        </div>
-        <div className="mb-4">
-          <Label htmlFor="articleBody" className="mb-2 block">
-            Write something...
-          </Label>
-          <textarea
-            id="articleBody"
-            value={articleBody}
-            onChange={(e) => setArticleBody(e.target.value)}
-            placeholder="Share your thoughts..."
-            className="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-lg p-2 min-h-[100px] focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition duration-200"
-            rows="4"
-          ></textarea>
-        </div>
-        <div className="mb-4">
-          <Label htmlFor="image" className="mb-2 block">
-            Add to your post
-          </Label>
-          <div className="relative">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="bg-gray-800 rounded-lg shadow-md p-6 w-full max-w-lg">
+        <h2 className="text-2xl font-bold mb-4 text-white">Create Post</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="flex items-center mb-4">
+            {user && (
+              <User
+                avatarProps={{
+                  src: user.profilePic,
+                  size: "sm",
+                }}
+                className="mr-3"
+              />
+            )}
             <Input
-              type="file"
-              id="image"
-              onChange={(e) => setImage(e.target.files[0])}
-              className="hidden"
+              type="text"
+              id="heading"
+              value={heading}
+              onChange={(e) => setHeading(e.target.value)}
+              placeholder="What's on your mind?"
+              className="w-full"
             />
-            <label
-              htmlFor="image"
-              className="flex items-center justify-center w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-200"
-            >
-              <FaImage className="mr-2" />
-              {image ? image.name : "Choose an image"}
-            </label>
           </div>
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200"
-        >
-          Post
-        </button>
-      </form>
+          <div className="mb-4">
+            <Label htmlFor="articleBody" className="mb-2 block text-white">
+              Write something...
+            </Label>
+            <textarea
+              id="articleBody"
+              value={articleBody}
+              onChange={(e) => setArticleBody(e.target.value)}
+              placeholder="Share your thoughts..."
+              className="w-full border border-gray-600 bg-gray-700 text-white rounded-lg p-2 min-h-[100px] focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-200"
+              rows="4"
+            ></textarea>
+          </div>
+          <div className="mb-4">
+            <Label htmlFor="image" className="mb-2 block text-white">
+              Add to your post
+            </Label>
+            <div className="relative">
+              <Input
+                type="file"
+                id="image"
+                onChange={(e) => setImage(e.target.files[0])}
+                className="hidden"
+              />
+              <label
+                htmlFor="image"
+                className="flex items-center justify-center w-full px-4 py-2 bg-gray-700 text-gray-200 rounded-lg cursor-pointer hover:bg-gray-600 transition duration-200"
+              >
+                <FaImage className="mr-2" />
+                {image ? image.name : "Choose an image"}
+              </label>
+            </div>
+          </div>
+          <div className="flex justify-end space-x-2">
+            <Button onClick={onClose} color="danger">
+              Cancel
+            </Button>
+            <Button type="submit" color="primary">
+              Post
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
@@ -141,6 +146,7 @@ const Articles = () => {
   const [reportingArticleId, setReportingArticleId] = useState(null);
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editedCommentText, setEditedCommentText] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const token = getToken();
   const userId = getUserIdFromToken(token);
@@ -446,7 +452,20 @@ const Articles = () => {
         <Header />
 
         <div className="container mx-auto p-4">
-          <CreatePost user={user} onSubmit={handleSubmit} />
+          <Button
+            onClick={() => setIsModalOpen(true)}
+            color="primary"
+            className="mb-6 font-primaryRegular"
+          >
+            Create New Post
+          </Button>
+
+          <CreatePostModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onSubmit={handleSubmit}
+            user={user}
+          />
 
           <h2 className="text-3xl font-primaryRegular mb-6">Posts</h2>
           {articles.length === 0 ? (
