@@ -1,18 +1,38 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Moon, Sun, Send, X, MessageSquare } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import botTrainingData from "../libs/botTrainigData.json"; // Import training data from JSON
+import { Link } from "react-router-dom"; // Import Link from react-router-dom
 
-const Chatbot = () => {
+const Chatbot = ({ isOpen, setIsOpen }) => {
   const [showChatbot, setShowChatbot] = useState(false);
   const [message, setMessage] = useState("");
+  const [conversationContext, setConversationContext] = useState([]);
+  const [userName, setUserName] = useState(""); // Store the user's name
+  const [awaitingName, setAwaitingName] = useState(false); // Check if we're waiting for a name
+  const [darkMode, setDarkMode] = useState(true);
+  const chatboxRef = useRef(null);
+
+  const getGreeting = () => {
+    const currentHour = new Date().getHours();
+
+    if (currentHour < 12) {
+      return "Good morning! I'm Vorty. How can I assist you today?";
+    } else if (currentHour < 18) {
+      return "Good afternoon! I'm Vorty. How can I assist you today?";
+    } else if (currentHour < 22) {
+      return "Good evening! I'm Vorty. How can I assist you today?";
+    } else {
+      return "Happy late night! I'm Vorty. How can I assist you today?";
+    }
+  };
+
   const [messages, setMessages] = useState([
     {
-      text: "Hello! How can I assist you with contact or support today?",
+      text: getGreeting(), // Dynamically set greeting based on time
       type: "incoming",
     },
   ]);
-  const [darkMode, setDarkMode] = useState(true); // Dark mode by default
-  const chatboxRef = useRef(null);
 
   // Scroll to bottom when new messages are added
   useEffect(() => {
@@ -21,15 +41,8 @@ const Chatbot = () => {
     }
   }, [messages]);
 
-  // Scroll to bottom when chatbot is opened
-  useEffect(() => {
-    if (showChatbot && chatboxRef.current) {
-      chatboxRef.current.scrollTop = chatboxRef.current.scrollHeight;
-    }
-  }, [showChatbot]);
-
   const toggleChatbot = () => {
-    setShowChatbot(!showChatbot);
+    setIsOpen(!isOpen);
   };
 
   const toggleDarkMode = () => {
@@ -38,55 +51,126 @@ const Chatbot = () => {
 
   const handleSend = () => {
     if (message.trim()) {
-      setMessages([...messages, { text: message, type: "outgoing" }]);
+      const outgoingMessage = { text: message, type: "outgoing" };
+
+      setMessages([...messages, outgoingMessage]);
+      setConversationContext([...conversationContext, outgoingMessage]);
+
+      // Clear input field
       setMessage("");
 
-      setTimeout(() => {
-        const botResponse = generateBotResponse(message);
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { text: botResponse, type: "incoming" },
-        ]);
-      }, 500);
+      // If we're waiting for the user's name
+      if (awaitingName) {
+        setUserName(message); // Save the user's name
+        setAwaitingName(false); // No longer waiting for a name
+        setTimeout(() => {
+          const botResponse = `Nice to meet you, ${message}! How can I assist you, ${message}?`;
+          const incomingMessage = { text: botResponse, type: "incoming" };
+
+          setMessages((prevMessages) => [...prevMessages, incomingMessage]);
+          setConversationContext((prevContext) => [
+            ...prevContext,
+            incomingMessage,
+          ]);
+        }, 500);
+      } else {
+        // Simulate bot response after a short delay
+        setTimeout(() => {
+          const botResponse = generateBotResponse(message, conversationContext);
+          const incomingMessage = { text: botResponse, type: "incoming" };
+
+          setMessages((prevMessages) => [...prevMessages, incomingMessage]);
+          setConversationContext((prevContext) => [
+            ...prevContext,
+            incomingMessage,
+          ]);
+        }, 500);
+      }
     }
   };
 
-  const generateBotResponse = (userMessage) => {
+  const generateBotResponse = (userMessage, conversationContext) => {
     const lowerCaseMessage = userMessage.toLowerCase();
 
-    const responses = {
-      hello: "Hi there! How can I assist you with contact or support today?",
-      hi: "Hi there! How can I assist you with contact or support today?",
-      name: "My name is Vorty. How can I assist you with contact or support today?",
-      contact:
-        "You can contact us via email at support@example.com or call us at 1-800-123-4567.",
-      phone:
-        "Our customer support phone number is 1-800-123-4567. We're available Monday to Friday, 9 AM to 5 PM EST.",
-      email:
-        "You can reach our support team at support@example.com. We typically respond within 24 hours.",
-      hours: "Our support hours are Monday to Friday, 9 AM to 5 PM EST.",
-      address:
-        "Our main office is located at 123 Business St., Suite 456, Techville, CA 90210.",
-      problem:
-        "I'm sorry to hear you're experiencing an issue. Can you please provide more details about the problem you're facing?",
-      refund:
-        "For refund requests, please email our billing department at billing@example.com with your order number and reason for the refund.",
-      shipment:
-        "To check the status of your shipment, please visit our tracking page at example.com/track and enter your order number.",
-      password:
-        "To reset your password, please visit example.com/reset-password and follow the instructions. If you continue to have issues, let me know.",
-      account:
-        "For account-related issues, please specify what kind of help you need. Do you need to update your information, change settings, or something else?",
-      help: "I'm here to help with contact and support-related questions. What specific information or assistance do you need?",
-    };
+    // If the bot is waiting for the user's name, don't process other responses
+    if (awaitingName) {
+      return "I'm waiting for your name!";
+    }
 
-    for (const [keyword, response] of Object.entries(responses)) {
-      if (lowerCaseMessage.includes(keyword)) {
-        return response;
+    // If the user has already provided their name, use it in responses
+    if (lowerCaseMessage.includes("my name") && userName) {
+      return `Your name is ${userName}. How can I assist you, ${userName}?`;
+    }
+
+    // Check if the user asked "What is my name?" without providing a name
+    const namePattern = /what is my name/i;
+    if (namePattern.test(lowerCaseMessage) && !userName) {
+      setAwaitingName(true); // Set awaiting name flag
+      return "You didn't mention your name. What is your name?";
+    }
+
+    // Handle predefined responses from botTrainingData
+    for (const { pattern, response } of botTrainingData) {
+      const regex = new RegExp(`\\b${pattern}\\b`, "i"); // Ensure word boundaries to avoid partial matches
+
+      if (regex.test(lowerCaseMessage)) {
+        // If the response contains a link, render a clickable link
+        if (typeof response === "object" && response.link) {
+          return (
+            <span>
+              {response.text}{" "}
+              <Link to={response.link} className="text-blue-500 underline">
+                Show me
+              </Link>
+            </span>
+          );
+        }
+
+        // If response is a string, return it directly (normal text)
+        if (typeof response === "string") {
+          return response;
+        }
+
+        // If response is an array (for multiple responses), use the multiple response logic
+        if (Array.isArray(response)) {
+          if (!conversationContext[pattern]) {
+            conversationContext[pattern] = {
+              usedResponses: [],
+              lastResponseIndex: -1,
+            };
+          }
+
+          let availableResponses = response.filter(
+            (res) =>
+              !conversationContext[pattern].usedResponses.includes(res.order)
+          );
+
+          // If all responses have been used, reset
+          if (availableResponses.length === 0) {
+            conversationContext[pattern].usedResponses = [];
+            availableResponses = response;
+          }
+
+          // Select the response based on the order or randomly if desired
+          const randomIndex = Math.floor(
+            Math.random() * availableResponses.length
+          );
+          const selectedResponse = availableResponses[randomIndex];
+
+          // Mark this response as used
+          conversationContext[pattern].usedResponses.push(
+            selectedResponse.order
+          );
+          conversationContext[pattern].lastResponseIndex =
+            selectedResponse.order;
+
+          return selectedResponse.text; // Return the selected response text
+        }
       }
     }
 
-    return "I'm sorry, but I can only assist with contact and support-related topics. Can you please provide more details about the problem you're facing?";
+    // Default response if no pattern is matched
+    return "I'm sorry, I can only assist with contact and support-related topics. Can you provide more details?";
   };
 
   return (
@@ -98,7 +182,7 @@ const Chatbot = () => {
         whileTap={{ scale: 0.9 }}
       >
         <AnimatePresence mode="wait" initial={false}>
-          {showChatbot ? (
+          {isOpen ? (
             <motion.div
               key="close"
               initial={{ opacity: 0, rotate: -180 }}
@@ -122,7 +206,7 @@ const Chatbot = () => {
         </AnimatePresence>
       </motion.button>
       <AnimatePresence>
-        {showChatbot && (
+        {isOpen && (
           <motion.div
             initial={{ opacity: 0, scale: 0.8, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
