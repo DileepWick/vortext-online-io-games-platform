@@ -121,7 +121,7 @@ const UserManagementTable = ({ users, setUsers }) => {
 
   return (
     <div>
-      <div className="flex items-center mb-4">
+      <div  className="flex items-center mb-4">
         <Input
           className="ml-2 font-primaryRegular w-48 sm:w-64"
           placeholder="Search by username..."
@@ -178,7 +178,7 @@ const UserManagementTable = ({ users, setUsers }) => {
           <TableColumn>Player Type</TableColumn>
           <TableColumn>Actions</TableColumn>
         </TableHeader>
-        <TableBody className="text-black">
+        <TableBody className="text-black font-primaryRegular">
           {items.map((user) => (
             <TableRow key={user._id} className="text-black">
               <TableCell>{user.firstname + " " + user.lastname}</TableCell>

@@ -109,9 +109,10 @@ const UserStats = ({ users }) => {
     };
 
   return (
-    <div style={{ position: "relative", paddingTop: "40px" }}>
+    <div style={{ position: "relative", paddingTop: "40px" ,}}>
       {/* Download Report Button */}
       <Button 
+      className=" font-primaryRegular"
         auto 
         color="primary" 
         icon={<Download size={20} />}
@@ -140,9 +141,10 @@ const UserStats = ({ users }) => {
           gap: "30px" 
         }}>
           <Card style={{ flex: "1", maxWidth: "20%" }}>
+            
             <div style={{ padding: "24px" }}>
-              <h4 style={{ textAlign: "center", fontSize: "20px" }}>Total Users</h4>
-              <p style={{ fontSize: "36px", textAlign: "center" }}>
+              <h4  className="font-primaryRegular" style={{ textAlign: "center", fontSize: "20px" }}>Total Users</h4>
+              <p className="font-primaryRegular" style={{ fontSize: "36px", textAlign: "center" }}>
                 {playerTypeCounts.totalUsers}
               </p>
             </div>
@@ -150,8 +152,8 @@ const UserStats = ({ users }) => {
 
           <Card style={{ flex: "1", maxWidth: "20%" }}>
             <div style={{ padding: "24px" }}>
-              <h4 style={{ textAlign: "center", fontSize: "20px" }}>Total Developers</h4>
-              <p style={{ fontSize: "36px", textAlign: "center" }}>
+              <h4 className="font-primaryRegular" style={{ textAlign: "center", fontSize: "20px" }}>Total Developers</h4>
+              <p className="font-primaryRegular" style={{ fontSize: "36px", textAlign: "center" }}>
                 {playerTypeCounts.totalDevelopers}
               </p>
             </div>
@@ -159,8 +161,8 @@ const UserStats = ({ users }) => {
 
           <Card style={{ flex: "1", maxWidth: "20%" }}>
             <div style={{ padding: "24px" }}>
-              <h4 style={{ textAlign: "center", fontSize: "20px" }}>Total Moderators</h4>
-              <p style={{ fontSize: "36px", textAlign: "center" }}>
+              <h4 className="font-primaryRegular" style={{ textAlign: "center", fontSize: "20px" }}>Total Moderators</h4>
+              <p className="font-primaryRegular" style={{ fontSize: "36px", textAlign: "center" }}>
                 {playerTypeCounts.totalModerators}
               </p>
             </div>
@@ -169,14 +171,15 @@ const UserStats = ({ users }) => {
 
         {/* Second row of cards */}
         <div style={{ 
+          
           display: "flex", 
           justifyContent: "center", 
           gap: "30px" 
         }}>
           <Card style={{ flex: "1", maxWidth: "20%" }}>
             <div style={{ padding: "24px" }}>
-              <h4 style={{ textAlign: "center", fontSize: "20px" }}>Number of Kids</h4>
-              <p style={{ fontSize: "36px", textAlign: "center" }}>
+              <h4 className="font-primaryRegular" style={{ textAlign: "center", fontSize: "20px" }}>Number of Kids</h4>
+              <p className="font-primaryRegular" style={{ fontSize: "36px", textAlign: "center" }}>
                 {playerTypeCounts.Kid}
               </p>
             </div>
@@ -184,8 +187,8 @@ const UserStats = ({ users }) => {
 
           <Card style={{ flex: "1", maxWidth: "20%" }}>
             <div style={{ padding: "24px" }}>
-              <h4 style={{ textAlign: "center", fontSize: "20px" }}>Number of Teenagers</h4>
-              <p style={{ fontSize: "36px", textAlign: "center" }}>
+              <h4 className="font-primaryRegular" style={{ textAlign: "center", fontSize: "20px" }}>Number of Teenagers</h4>
+              <p className="font-primaryRegular" style={{ fontSize: "36px", textAlign: "center" }}>
                 {playerTypeCounts.Teenager}
               </p>
             </div>
@@ -193,8 +196,8 @@ const UserStats = ({ users }) => {
 
           <Card style={{ flex: "1", maxWidth: "20%" }}>
             <div style={{ padding: "24px" }}>
-              <h4 style={{ textAlign: "center", fontSize: "20px" }}>Number of Adults</h4>
-              <p style={{ fontSize: "36px", textAlign: "center" }}>
+              <h4 className="font-primaryRegular" style={{ textAlign: "center", fontSize: "20px" }}>Number of Adults</h4>
+              <p className="font-primaryRegular" style={{ fontSize: "36px", textAlign: "center" }}>
                 {playerTypeCounts.Adult}
               </p>
             </div>
@@ -206,9 +209,9 @@ const UserStats = ({ users }) => {
       <div style={{ marginTop: "40px", display: "flex", justifyContent: "center", marginBottom: "60px" }}>
         <Card style={{ flex: "1", maxWidth: "900px" }}>
           <div style={{ padding: "24px", textAlign: "center" }}>
-            <h4 style={{ fontSize: "24px" }}>Player Types Distribution</h4>
+            <h4 className="font-primaryRegular" style={{ fontSize: "24px" }}>Player Types Distribution</h4>
             <div style={{ position: "relative", height: "600px" }}>
-            <Pie data={chartData} options={chartOptions} />
+            <Pie  data={chartData} options={chartOptions} />
             </div>
           </div>
         </Card>

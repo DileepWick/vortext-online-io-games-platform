@@ -121,7 +121,7 @@ const DeveloperDashboard = () => {
 
   return (
     <div>
-      <div className="flex items-center mb-4">
+      <div className="flex items-center mb-4" >
       <Input
         className="ml-2 font-primaryRegular w-full" // Use w-full to make it full width
         placeholder="Search by Developer..."
@@ -134,7 +134,7 @@ const DeveloperDashboard = () => {
       </div>
       
       <Table
-        className="text-black"
+        className="text-black font-primaryRegular"
         isHeaderSticky
         aria-label="Developer Requests Table with Pagination"
         bottomContent={
@@ -161,10 +161,10 @@ const DeveloperDashboard = () => {
           <TableColumn>ACTIONS</TableColumn>
         </TableHeader>
 
-        <TableBody>
+        <TableBody className="font-primaryRegular">
           {paginatedItems.map((developer) => (
-            <TableRow key={developer._id}>
-              <TableCell>{developer.firstname + " " + developer.lastname}</TableCell>
+            <TableRow  key={developer._id}>
+              <TableCell >{developer.firstname + " " + developer.lastname}</TableCell>
               <TableCell>{developer.username}</TableCell>
               <TableCell>
                 <a
