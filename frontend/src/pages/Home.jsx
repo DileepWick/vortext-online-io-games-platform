@@ -392,7 +392,7 @@ const Home = () => {
                         alt="Cover"
                         className="w-[400px] rounded-[40px]"
                       />
-                      <p className="text-white mb-4 mt-8 font-primaryRegular text-[25px]">
+                      <p className="text-white mb-4 mt-8 font-primaryRegular text-[20px]">
                         {rating.comment}
                       </p>
                       <div className="flex items-center justify-between">
