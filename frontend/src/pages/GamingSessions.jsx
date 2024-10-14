@@ -522,7 +522,7 @@ const GamingSessions = () => {
                         Are you sure you want to start a session for{" "}
                         {currentGame.game.title}?
                       </p>
-                      <p>Rental Time: {currentGame.time}</p>
+                      
                     </span>
                   ) : (
                     <p>Loading game details...</p>
