@@ -301,21 +301,21 @@ const handlePortfolioLinkChange = (e) => {
 
       {/* Right side - Login/Signup form */}
       <div className="w-full lg:w-1/2 bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center p-4">
-        <Card className="w-full max-w-sm">
-          <CardBody className="overflow-hidden p-4">
-            <h1 className="text-lg font-bold text-center mb-2">
+        <Card className="w-full max-w-md">
+          <CardBody className="overflow-hidden p-3">
+            <h1 className="text-xl font-bold text-center mb-3">
               Welcome to Vortex Gaming
             </h1>
             <Tabs
               fullWidth
-              size="sm"
+              size="md"
               aria-label="Login/Signup Tabs"
               selectedKey={selectedTab}
               onSelectionChange={setSelectedTab}
               className="mb-2"
             >
               <Tab key="login" title="Login">
-                <form className="space-y-2">
+                <form className="space-y-3">
                   <Input
                     isRequired
                     label="Username"
@@ -354,48 +354,48 @@ const handlePortfolioLinkChange = (e) => {
               <Tab key="sign-up" title="Sign up">
                 <Tabs
                   fullWidth
-                  size="sm"
+                  size="md"
                   aria-label="Signup Tabs"
                   selectedKey={selectedRole}
                   onSelectionChange={setSelectedRole}
                   className="mb-1"
                 >
                   <Tab key="user" title="User">
-                    <form className="space-y-1">
-                    <Tooltip
-                      content={<span style={{ color: 'black' }}>Firstname must contain only letters</span>}
-                      placement="bottom"
-                    >
-                      <Input
-                        isRequired
-                        label="First Name"
-                        placeholder="Enter your first name"
-                        name="firstname"
-                        value={formData.firstname}
-                        onChange={handleInputChange}
-                        color={validationErrors.firstname ? "error" : "default"}
-                        className="max-w-full text-sm"
-                            size="sm"
-                        
-                        
-                      />
-                      </Tooltip>
-                      <Tooltip
-                      content={<span style={{ color: 'black' }}>Lastname must contain only letters</span>}
-                      placement="bottom"
-                    >
-                      <Input
-                        isRequired
-                        label="Last Name"
-                        placeholder="Enter your last name"
-                        name="lastname"
-                        value={formData.lastname}
-                        onChange={handleInputChange}
-                        color={validationErrors.lastname ? "error" : "default"}
-                        className="max-w-full text-sm"
-                        size="sm"
-                      />
-                      </Tooltip>
+                    <form className="space-y-3">
+                    <div className="flex space-x-2">
+  <Tooltip
+    content={<span style={{ color: 'black' }}>Firstname must contain only letters</span>}
+    placement="bottom"
+  >
+    <Input
+      isRequired
+      label="First Name"
+      placeholder="Enter your first name"
+      name="firstname"
+      value={formData.firstname}
+      onChange={handleInputChange}
+      color={validationErrors.firstname ? "error" : "default"}
+      className="max-w-full  flex-1"
+    
+    />
+  </Tooltip>
+  <Tooltip
+    content={<span style={{ color: 'black' }}>Lastname must contain only letters</span>}
+    placement="bottom"
+  >
+    <Input
+      isRequired
+      label="Last Name"
+      placeholder="Enter your last name"
+      name="lastname"
+      value={formData.lastname}
+      onChange={handleInputChange}
+      color={validationErrors.lastname ? "error" : "default"}
+      className="max-w-full  flex-1"
+      
+    />
+  </Tooltip>
+</div>
                       <Input
                         isRequired
                         label="Username"
@@ -403,8 +403,8 @@ const handlePortfolioLinkChange = (e) => {
                         name="username"
                         value={formData.username}
                         onChange={handleInputChange}
-                        className="max-w-full text-sm"
-                        size="sm"
+                        className="max-w-full "
+                        
                       />
                       <Tooltip
                 content={<span style={{ color: 'black' }}>{validationErrors.email}</span>}
@@ -420,8 +420,8 @@ const handlePortfolioLinkChange = (e) => {
                         value={formData.email}
                         onChange={handleInputChange}
                         color={validationErrors.email ? "error" : "default"}
-                        className="max-w-full text-sm"
-                        size="sm"
+                        className="max-w-full "
+                        
                       />
                       </Tooltip>
                       <Input
@@ -433,8 +433,8 @@ const handlePortfolioLinkChange = (e) => {
                         value={formData.birthday}
                         onChange={handleInputChange}
                         max={maxDate}
-                        className="max-w-full text-sm"
-                        size="sm"
+                        className="max-w-full "
+                        
                       />
                        <Tooltip
                 content={<span style={{ color: 'black' }}>{validationErrors.password}</span>}
@@ -450,8 +450,8 @@ const handlePortfolioLinkChange = (e) => {
                         value={formData.password}
                         onChange={handleInputChange}
                         color={validationErrors.password ? "error" : "default"}
-                        className="max-w-full text-sm"
-                        size="sm"
+                        className="max-w-full "
+                        
                       />
                       </Tooltip>
                       <Button
@@ -465,39 +465,41 @@ const handlePortfolioLinkChange = (e) => {
                     </form>
                   </Tab>
                   <Tab key="developer" title="Developer">
-                    <form className="space-y-1">
-                    <Tooltip
-                      content={<span style={{ color: 'black' }}>Firstname must contain only letters</span>}
-                      placement="bottom"
-                    >
-                      <Input
-                        isRequired
-                        label="First Name"
-                        placeholder="Enter your first name"
-                        name="firstname"
-                        value={formData.firstname}
-                        onChange={handleInputChange}
-                        color={validationErrors.firstname ? "error" : "default"}
-                        className="max-w-full text-sm"
-                        size="sm"
-                      />
-                      </Tooltip>
-                      <Tooltip
-                      content={<span style={{ color: 'black' }}>Lastname must contain only letters</span>}
-                      placement="bottom"
-                    >
-                      <Input
-                        isRequired
-                        label="Last Name"
-                        placeholder="Enter your last name"
-                        name="lastname"
-                        value={formData.lastname}
-                        onChange={handleInputChange}
-                        color={validationErrors.lastname ? "error" : "default"}
-                        className="max-w-full text-sm"
-                        size="sm"
-                      />
-                      </Tooltip>
+                    <form className="space-y-3">
+                    <div className="flex space-x-2">
+  <Tooltip
+    content={<span style={{ color: 'black' }}>Firstname must contain only letters</span>}
+    placement="bottom"
+  >
+    <Input
+      isRequired
+      label="First Name"
+      placeholder="Enter your first name"
+      name="firstname"
+      value={formData.firstname}
+      onChange={handleInputChange}
+      color={validationErrors.firstname ? "error" : "default"}
+      className="max-w-full text-sm flex-1"
+      size="sm"
+    />
+  </Tooltip>
+  <Tooltip
+    content={<span style={{ color: 'black' }}>Lastname must contain only letters</span>}
+    placement="bottom"
+  >
+    <Input
+      isRequired
+      label="Last Name"
+      placeholder="Enter your last name"
+      name="lastname"
+      value={formData.lastname}
+      onChange={handleInputChange}
+      color={validationErrors.lastname ? "error" : "default"}
+      className="max-w-full text-sm flex-1"
+      size="sm"
+    />
+  </Tooltip>
+</div>
                       <Input
                         isRequired
                         label="Username"
@@ -505,8 +507,8 @@ const handlePortfolioLinkChange = (e) => {
                         name="username"
                         value={formData.username}
                         onChange={handleInputChange}
-                        className="max-w-full text-sm"
-                        size="sm"
+                        className="max-w-full "
+                        
                       />
                       <Tooltip
                 content={<span style={{ color: 'black' }}>{validationErrors.email}</span>}
@@ -522,8 +524,8 @@ const handlePortfolioLinkChange = (e) => {
                         value={formData.email}
                         onChange={handleInputChange}
                         color={validationErrors.email ? "error" : "default"}
-                        className="max-w-full text-sm"
-                        size="sm"
+                        className="max-w-full "
+                        
                       />
                       </Tooltip>
                       <Input
@@ -535,8 +537,8 @@ const handlePortfolioLinkChange = (e) => {
                         value={formData.birthday}
                         onChange={handleInputChange}
                         max={maxDate}
-                        className="max-w-full text-sm"
-                        size="sm"
+                        className="max-w-full "
+                        
                       />
                       <Tooltip
                 content={<span style={{ color: 'black' }}>{validationErrors.password}</span>}
@@ -552,8 +554,8 @@ const handlePortfolioLinkChange = (e) => {
                         value={formData.password}
                         onChange={handleInputChange}
                         color={validationErrors.password ? "error" : "default"}
-                        className="max-w-full text-sm"
-                        size="sm"
+                        className="max-w-full "
+                        
                       />
                       </Tooltip>
                       <Tooltip
@@ -566,8 +568,8 @@ const handlePortfolioLinkChange = (e) => {
   placeholder="Enter your LinkedIn URL (www.linkedin.com/)"
   value={portfolioLink}
   onChange={handlePortfolioLinkChange}
-  className="max-w-full text-sm"
-                        size="sm"
+  className="max-w-full "
+                       
 />
 </Tooltip>
                       <Button
