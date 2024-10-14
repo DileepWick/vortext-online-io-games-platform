@@ -23,6 +23,7 @@ import  {Input}  from "../components/ui/Input";
 import  {Label}  from "../components/ui/Lable";
 import { TracingBeam } from "../components/ui/TracingBeam";
 import { BackgroundBeams } from "../components/ui/BackgroundBeams";
+import { WobbleCard } from "../components/ui/wobble-card";
 
 const LabelInputContainer = ({
   children,
