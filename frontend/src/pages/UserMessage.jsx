@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import {
   Input,
@@ -16,11 +16,12 @@ import {
 import { getToken } from "../utils/getToken";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { motion } from "framer-motion";
-
+import useAuthCheck from "../utils/authCheck";
 import Header from "../components/header";
 import Footer from "../components/footer";
 
 const UserMessages = () => {
+  useAuthCheck();
   const [userTickets, setUserTickets] = useState([]);
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,11 +34,22 @@ const UserMessages = () => {
   const userId = getUserIdFromToken(token);
   const totalPages = Math.ceil(userTickets.length / TICKETS_PER_PAGE);
   const [scrollBehavior, setScrollBehavior] = React.useState("inside");
+  const messagesEndRef = useRef(null);
+  const [enlargedImage, setEnlargedImage] = useState(null); // State to manage the enlarged image
 
   const paginatedTickets = userTickets.slice(
     (currentPage - 1) * TICKETS_PER_PAGE,
     currentPage * TICKETS_PER_PAGE
   );
+  const handleImageClick = (imageUrl) => {
+    setEnlargedImage(imageUrl); // Set the clicked image URL in state
+  };
+
+  useEffect(() => {
+    if (isModalOpen && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" }); // Scroll to bottom smoothly
+    }
+  }, [isModalOpen, selectedTicket]); // Scroll when modal opens or new messages appear
 
   useEffect(() => {
     const fetchUserTickets = async () => {
@@ -58,7 +70,21 @@ const UserMessages = () => {
 
         let tickets = [];
         if (response.data && Array.isArray(response.data.contact)) {
-          tickets = response.data.contact;
+          tickets = response.data.contact.map((ticket) => {
+            // Calculate unread messages count
+            const unreadMessagesCount = ticket.messages.filter(
+              (message) => !message.read && message.sender !== "user" // Only count unread messages not sent by the user
+            ).length;
+
+            // Log the unread message count for each ticket
+            console.log(
+              `Ticket ID: ${ticket._id}, Unread Messages: ${unreadMessagesCount}`
+            );
+
+            // Attach unread count to each ticket
+            return { ...ticket, unreadMessagesCount };
+          });
+
           // Sort tickets: open tickets first, then by creation date (newest first)
           tickets.sort((a, b) => {
             if (a.status === "open" && b.status !== "open") return -1;
@@ -82,9 +108,33 @@ const UserMessages = () => {
     }
   }, [userId, token]);
 
-  const handleSelectTicket = (ticket) => {
-    setSelectedTicket(ticket);
-    setIsModalOpen(true);
+  const handleSelectTicket = async (ticket) => {
+    try {
+      // Mark the messages as read in the backend
+      await axios.put(
+        `http://localhost:8098/contacts/markMessagesAsRead/${ticket._id}`,
+
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // Update the state locally to mark messages as read
+      setUserTickets((prevTickets) =>
+        prevTickets.map((t) =>
+          t._id === ticket._id
+            ? { ...t, unreadMessagesCount: 0 } // Mark all messages as read
+            : t
+        )
+      );
+
+      // Open the modal and set the selected ticket
+      setSelectedTicket(ticket);
+      setIsModalOpen(true);
+    } catch (err) {
+      console.error("Failed to mark messages as read", err);
+    }
   };
 
   const handleReplyToAgent = async () => {
@@ -263,7 +313,7 @@ const UserMessages = () => {
                       isPressable
                       onPress={() => handleSelectTicket(ticket)}
                     >
-                      <CardBody className="p-4">
+                      <CardBody className="p-4 relative">
                         <motion.h2
                           className="text-lg font-semibold text-white"
                           initial={{ opacity: 0 }}
@@ -272,6 +322,7 @@ const UserMessages = () => {
                         >
                           Ticket: {ticket._id}
                         </motion.h2>
+
                         <motion.p
                           className={`text-sm ${
                             ticket.status === "open"
@@ -292,6 +343,15 @@ const UserMessages = () => {
                         >
                           Created: {new Date(ticket.createdAt).toLocaleString()}
                         </motion.p>
+
+                        {/* Display unread message count */}
+                        {ticket.unreadMessagesCount > 0 && (
+                          <div className="absolute top-2 right-2">
+                            <span className="flex items-center justify-center w-6 h-6 bg-red-500 text-white rounded-full text-xs font-bold">
+                              {ticket.unreadMessagesCount}
+                            </span>
+                          </div>
+                        )}
                       </CardBody>
                     </Card>
                   </motion.div>
@@ -351,42 +411,84 @@ const UserMessages = () => {
             {selectedTicket &&
             selectedTicket.messages &&
             selectedTicket.messages.length > 0 ? (
-              selectedTicket.messages.map((message, index) => {
-                const previousMessage = selectedTicket.messages[index - 1];
-                const showDate =
-                  !previousMessage ||
-                  !isSameDay(message.timestamp, previousMessage.timestamp);
+              <>
+                {selectedTicket.messages.map((message, index) => {
+                  const previousMessage = selectedTicket.messages[index - 1];
+                  const showDate =
+                    !previousMessage ||
+                    !isSameDay(message.timestamp, previousMessage.timestamp);
 
-                return (
-                  <div key={`${selectedTicket._id}-message-${index}`}>
-                    {showDate && (
-                      <div className="text-gray-500 text-center my-2">
-                        {formatDate(message.timestamp)}
-                      </div>
-                    )}
-                    <div
-                      className={`mb-4 flex ${
-                        message.sender === "user"
-                          ? "justify-end"
-                          : "justify-start"
-                      }`}
-                    >
-                      <div
-                        className={`max-w-xs sm:max-w-md rounded-lg p-3 ${
-                          message.sender === "user"
-                            ? "bg-green-600 text-white max-w-[70%] text-left"
-                            : "bg-blue-500 text-white max-w-[70%] text-left"
-                        }`}
-                      >
-                        <p className="mt-1">{message.content}</p>
-                        <p className="text-xs mt-1 opacity-75">
-                          {formatTime(message.timestamp)}
-                        </p>
-                      </div>
+                  return (
+                    <div key={`${selectedTicket._id}-message-${index}`}>
+                      {/* Display date if necessary */}
+                      {showDate && (
+                        <div className="text-gray-500 text-center my-2">
+                          {formatDate(message.timestamp)}
+                        </div>
+                      )}
+
+                      {/* Render the text message separately */}
+                      {message.content && (
+                        <div
+                          className={`mb-4 flex ${
+                            message.sender === "user"
+                              ? "justify-end"
+                              : "justify-start"
+                          }`}
+                        >
+                          <div
+                            className={`max-w-xs sm:max-w-md rounded-lg p-3 ${
+                              message.sender === "user"
+                                ? "bg-green-600 text-white max-w-[70%] text-left"
+                                : "bg-blue-500 text-white max-w-[70%] text-left"
+                            }`}
+                          >
+                            <p className="mt-1">{message.content}</p>
+                            <p className="text-xs mt-1 opacity-75">
+                              {formatTime(message.timestamp)}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Render the image message separately */}
+                      {message.image && (
+                        <div
+                          className={`mb-4 flex ${
+                            message.sender === "user"
+                              ? "justify-end"
+                              : "justify-start"
+                          }`}
+                        >
+                          <div
+                            className={`max-w-xs sm:max-w-md rounded-lg p-3 ${
+                              message.sender === "user"
+                                ? "bg-green-600 text-white max-w-[70%] text-left"
+                                : "bg-blue-500 text-white max-w-[70%] text-left"
+                            }`}
+                          >
+                            <img
+                              src={message.image}
+                              alt="User uploaded"
+                              className="rounded cursor-pointer"
+                              style={{
+                                width: "150px", // Fixed width
+                                height: "150px", // Fixed height
+                                objectFit: "cover", // Ensure aspect ratio is maintained
+                              }}
+                              onClick={() => handleImageClick(message.image)} // Optional: Enlarge image on click
+                            />
+                            <p className="text-xs mt-1 opacity-75">
+                              {formatTime(message.timestamp)}
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                );
-              })
+                  );
+                })}
+                <div ref={messagesEndRef} />
+              </>
             ) : (
               <div className="text-white text-center">
                 No messages in this ticket yet
@@ -406,11 +508,11 @@ const UserMessages = () => {
                 onChange={(e) => setReplyMessage(e.target.value)}
                 placeholder="Type your message..."
                 fullWidth
+                variant="underlined"
                 clearable
-                className="bg-gray-800 text-white"
+                className="text-white"
               />
             )}
-
             <div className="flex justify-end gap-2 mt-2">
               <Button
                 color="danger"
@@ -419,7 +521,6 @@ const UserMessages = () => {
               >
                 Close
               </Button>
-
               <Button
                 onPress={handleReplyToAgent}
                 color="primary"
@@ -430,6 +531,25 @@ const UserMessages = () => {
               </Button>
             </div>
           </ModalFooter>
+          {enlargedImage && (
+            <Modal
+              isOpen={!!enlargedImage}
+              onClose={() => setEnlargedImage(null)} // Close the modal
+              size="lg"
+            >
+              <ModalContent>
+                <img
+                  src={enlargedImage}
+                  alt="Enlarged view"
+                  style={{
+                    width: "100%", // Full width in modal
+                    height: "auto", // Maintain aspect ratio
+                    borderRadius: "8px", // Optional: Rounded corners
+                  }}
+                />
+              </ModalContent>
+            </Modal>
+          )}
         </ModalContent>
       </Modal>
 

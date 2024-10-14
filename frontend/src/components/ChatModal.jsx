@@ -19,6 +19,7 @@ const ChatModal = ({ isOpen, onOpenChange, contactId }) => {
   const messagesEndRef = useRef(null);
   const [status, setStatus] = useState("open");
   const [replyingTo, setReplyingTo] = useState(null);
+  const [enlargedImage, setEnlargedImage] = useState(null); // To store the image for the modal
 
   useEffect(() => {
     if (isOpen && contactId) {
@@ -35,6 +36,13 @@ const ChatModal = ({ isOpen, onOpenChange, contactId }) => {
     scrollToBottom();
   }, [messages]);
 
+  const handleImageClick = (imageUrl) => {
+    setEnlargedImage(imageUrl); // Set the image to be enlarged in the modal
+  };
+
+  const closeImageModal = () => {
+    setEnlargedImage(null); // Close the modal by setting the image to null
+  };
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -48,6 +56,7 @@ const ChatModal = ({ isOpen, onOpenChange, contactId }) => {
       const formattedMessages = data.contact.messages.map((msg) => ({
         ...msg,
         timestamp: msg.timestamp || new Date().toISOString(),
+        image: msg.image || null, // Include image field if it exists
       }));
 
       // Update state only if new messages are fetched
@@ -89,13 +98,11 @@ const ChatModal = ({ isOpen, onOpenChange, contactId }) => {
       console.error("Error sending reply:", error);
     }
   };
-
   const formatTimestamp = (timestamp) => {
     const date = new Date(timestamp);
-    return `${date.getHours()}:${date
-      .getMinutes()
-      .toString()
-      .padStart(2, "0")}`; // Format as HH:MM
+    const hours = date.getHours().toString().padStart(2, "0"); // Pad with leading zero
+    const minutes = date.getMinutes().toString().padStart(2, "0"); // Pad with leading zero
+    return `${hours}:${minutes}`; // Return formatted time
   };
 
   return (
@@ -107,39 +114,11 @@ const ChatModal = ({ isOpen, onOpenChange, contactId }) => {
       backdrop="blur"
       isDismissable={false}
       isKeyboardDismissDisabled={false}
-      motionProps={{
-        variants: {
-          enter: {
-            y: 0,
-            opacity: 1,
-            transition: {
-              duration: 0.3,
-              ease: "easeOut",
-            },
-          },
-          exit: {
-            y: -20,
-            opacity: 0,
-            transition: {
-              duration: 0.2,
-              ease: "easeIn",
-            },
-          },
-        },
-      }}
     >
       <ModalContent>
         {(onClose) => (
           <>
-            <ModalHeader className="flex flex-col gap-1">
-              <div className="text-small mb-21">Chat with {userName}</div>
-              <div className="text-small mb-21">
-                Raised at {new Date(createdAt).toLocaleString()}
-              </div>
-              <div className="text-small mb-21">
-                Status: {status.charAt(0).toUpperCase() + status.slice(1)}
-              </div>
-            </ModalHeader>
+            <ModalHeader className="flex flex-col gap-1">Chat</ModalHeader>
             <Divider className="my-4" />
             <ModalBody className="flex flex-col">
               <div
@@ -153,27 +132,59 @@ const ChatModal = ({ isOpen, onOpenChange, contactId }) => {
                       message.sender === "agent" ? "text-right" : "text-left"
                     }`}
                   >
-                    <span
-                      className={`inline-block p-2 rounded ${
-                        message.sender === "user"
-                          ? "bg-blue-500 text-white max-w-[70%] text-left"
-                          : "bg-green-600 text-white max-w-[70%] text-left"
-                      }`}
-                      style={{
-                        wordWrap: "break-word",
-                      }}
-                    >
-                      {message.content}
-                      <div
-                        className="text-xs text-white-400"
-                        style={{ textAlign: "right" }} // Align timestamp to the right
+                    {/* Render text message if present */}
+                    {message.content && (
+                      <span
+                        className={`inline-block p-2 rounded ${
+                          message.sender === "user"
+                            ? "bg-blue-500 text-white max-w-[70%] text-left"
+                            : "bg-green-600 text-white max-w-[70%] text-left"
+                        }`}
+                        style={{ wordWrap: "break-word" }}
                       >
-                        {formatTimestamp(message.timestamp)}{" "}
+                        {message.content}
+                        <div
+                          className="text-xs text-white-400"
+                          style={{ textAlign: "right" }}
+                        >
+                          {formatTimestamp(message.timestamp)}{" "}
+                          {/* Use the updated formatTimestamp */}
+                        </div>
+                      </span>
+                    )}
+                    {message.image && (
+                      <div className="mt-2">
+                        {/* Render the image */}
+                        <img
+                          src={message.image}
+                          alt="User uploaded"
+                          className={`cursor-pointer rounded ${
+                            message.sender === "user"
+                              ? "text-left"
+                              : "text-right"
+                          }`}
+                          style={{
+                            width: "150px", // Fixed width
+                            height: "150px", // Fixed height
+                            objectFit: "cover", // Cover to maintain aspect ratio
+                            borderRadius: "8px",
+                          }}
+                          onClick={() => handleImageClick(message.image)} // Handle click to enlarge
+                        />
+
+                        {/* Display the timestamp below the image */}
+                        <div
+                          className="text-xs text-white-400"
+                          style={{ textAlign: "right", marginTop: "5px" }} // Margin to separate the time from the image
+                        ></div>
+                        <div className="text-xs text-white-400">
+                          {formatTimestamp(message.timestamp)}{" "}
+                          {/* Use formatTimestamp to show time */}
+                        </div>
                       </div>
-                    </span>
+                    )}
                   </div>
                 ))}
-                <div ref={messagesEndRef} /> {/* Scroll anchor */}
               </div>
               <div className="mt-4">
                 <Input
@@ -197,6 +208,26 @@ const ChatModal = ({ isOpen, onOpenChange, contactId }) => {
                 Send
               </Button>
             </ModalFooter>
+
+            {/* Modal to show enlarged image */}
+            {enlargedImage && (
+              <Modal
+                isOpen={!!enlargedImage}
+                onClose={closeImageModal}
+                size="lg"
+              >
+                <ModalContent>
+                  <img
+                    src={enlargedImage}
+                    alt="Enlarged view"
+                    style={{
+                      width: "100%", // Full width in modal
+                      height: "auto", // Maintain aspect ratio
+                    }}
+                  />
+                </ModalContent>
+              </Modal>
+            )}
           </>
         )}
       </ModalContent>

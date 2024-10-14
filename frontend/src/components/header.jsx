@@ -54,7 +54,9 @@ const Header = forwardRef((props, ref) => {
   return (
     <div className="bg-customDark">
       <Navbar className="font-primaryRegular bg-customDark text-white py-2 px-4">
+
         <NavbarContent className="hidden sm:flex justify-start items-center w-full" justify="start">
+    
           <NavbarItem className="mr-4">
             <Link
               color={location.pathname === "/" ? "blue" : "foreground"}
@@ -82,10 +84,12 @@ const Header = forwardRef((props, ref) => {
               color={location.pathname === "/articles" ? "blue" : "foreground"}
               href="/articles"
               className={`${
+
                 location.pathname === "/articles" ? "text-blue-500" : "text-white"
               } hover:text-blue-300 transition-colors duration-200`}
             >
              COMMUNITY
+
             </Link>
           </NavbarItem>
           <NavbarItem className="mr-4">
@@ -101,10 +105,13 @@ const Header = forwardRef((props, ref) => {
           </NavbarItem>
           <NavbarItem className="mr-4">
             <Link
+
+
               color={location.pathname === "/TailoredGames" ? "blue" : "foreground"}
               href="/TailoredGames"
               className={`${
                 location.pathname === "/TailoredGames" ? "text-blue-500" : "text-white"
+
               } hover:text-blue-300 transition-colors duration-200`}
             >
               OUR GAMES
@@ -112,6 +119,7 @@ const Header = forwardRef((props, ref) => {
           </NavbarItem>
           <Dropdown placement="bottom-start" className="bg-gray-800 text-white">
             <DropdownTrigger>
+
               <NavbarItem className="cursor-pointer hover:text-blue-300 transition-colors duration-200 mr-4">SUPPORT</NavbarItem>
             </DropdownTrigger>
             <DropdownMenu aria-label="Profile Actions" variant="flat" className="font-primaryRegular bg-gray-800 text-white">
@@ -125,6 +133,7 @@ const Header = forwardRef((props, ref) => {
                 Privacy Policy
               </DropdownItem>
               <DropdownItem key="about" onClick={() => navigate("/about")} className="hover:bg-gray-700">
+
                 About Vortex
               </DropdownItem>
             </DropdownMenu>
@@ -133,6 +142,7 @@ const Header = forwardRef((props, ref) => {
             <DropdownTrigger>
               <NavbarItem className="cursor-pointer flex items-center hover:text-blue-300 transition-colors duration-200">
                 <NotificationIcon style={{ marginRight: "8px" }} />
+
                 <span className={`${location.pathname === "/Notification" ? "text-blue-500" : ""}`}> </span>
               </NavbarItem>
             </DropdownTrigger>
@@ -141,6 +151,7 @@ const Header = forwardRef((props, ref) => {
                 View All Notifications
               </DropdownItem>
               <DropdownItem onClick={() => navigate("/UserMessage")} className="hover:bg-gray-700">
+
                 View All Messages
               </DropdownItem>
             </DropdownMenu>
@@ -244,7 +255,9 @@ const Header = forwardRef((props, ref) => {
               </DropdownMenu>
             </Dropdown>
           ) : (
+
             <Link className="text-white hover:text-blue-300 transition-colors duration-200" href="/login">
+
               LOGIN
             </Link>
           )}
