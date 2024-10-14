@@ -423,7 +423,7 @@ const CartPage = () => {
                   <ModalBody>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="bg-customCardDark p-4 rounded-lg">
-                        <h2 className="text-lg font-semibold mb-2 text-black"> PAYMENT METHODS</h2>
+                        <h2 className="text-lg font-semibold mb-2 text-black"> PAYMENT METHOD</h2>
                         <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
                           <div className="border border-gray-900 p-5 rounded mb-4 w-[550px]">
                             <Radio value="creditCard">
@@ -460,7 +460,7 @@ const CartPage = () => {
                               </div>
                             )}
                           </div>
-                          <div className="border border-gray-700 p-4 rounded">
+                          {/*<div className="border border-gray-700 p-4 rounded">
                             <Radio value="paypal">
                               <div className="flex items-center">
                                 <PayPalIcon />
@@ -476,7 +476,7 @@ const CartPage = () => {
                                 className="mt-2"
                               />
                             )}
-                          </div>
+                          </div>*/}
                         </RadioGroup>
                         {/*<Checkbox
                           isSelected={savePaymentMethod}
@@ -487,7 +487,7 @@ const CartPage = () => {
                         </Checkbox>*/}
                       </div>
                     </div>
-                    <div className="mt-4 bg-customCardDark p-4 rounded-lg">
+                    <div className="mt-0 bg-customCardDark p-0 rounded-lg">
                       <h2 className="text-lg font-semibold mb-4 text-black">ORDER SUMMARY</h2>
                       {cartItems.map((item) => (
                         <div key={item._id} className="flex mb-4">
@@ -528,7 +528,7 @@ const CartPage = () => {
                       Cancel
                     </Button>
                     <Button color="primary" onPress={handlePlaceOrder}>
-                      PLACE ORDER
+                      CONFIRM
                     </Button>
                   </ModalFooter>
                 </>

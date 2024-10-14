@@ -82,8 +82,26 @@ const RentalGamesEmbed = () => {
       });
     }, 1000);
 
-    return () => clearInterval(timer); // Clean up the timer on component unmount
-  }, [navigate, initialTimeSeconds, rentalId]);
+    // Clean up function
+    return () => {
+      clearInterval(timer);
+      updateRentalTime(timeLeft); // Save the remaining time when component unmounts
+    };
+  }, [navigate, initialTimeSeconds, rentalId, timeLeft]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      event.preventDefault();
+      updateRentalTime(timeLeft);
+      event.returnValue = '';
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [timeLeft]);
 
   useEffect(() => {
     const handleFullScreenChange = () => {

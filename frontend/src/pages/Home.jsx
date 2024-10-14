@@ -1,386 +1,474 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion, useInView, inView } from "framer-motion";
+import { Helmet } from "react-helmet-async";
+import { Link } from "react-router-dom";
+import axios from "axios";
 import Header from "../components/header";
 import Footer from "../components/footer";
-import { toast, Flip } from "react-toastify";
-import axios from "axios";
-import { Link } from "react-router-dom";
-import "../style/Slider.css";
-import Hangman from "../components/Games/Hangaman";
-import Chatbot from "../components/chatbox";
-import { Helmet } from "react-helmet-async";
-import { motion } from "framer-motion";
-import { LampContainer } from "../components/ui/lamp";
-import { SparklesCore } from "../components/ui/sparkles";
+import { LampContainer } from "../components/ui/Lamp";
+import { FlipWords } from "../components/ui/FlipWords";
+import { TypewriterEffectSmooth } from "../components/ui/Typewriter";
+import { TracingBeam } from "../components/ui/TracingBeam";
+import { BackgroundGradient } from "../components/ui/BackgroundGradient";
+import { BackgroundBeams } from "../components/ui/BackgroundBeams";
+import { Button } from "@nextui-org/react";
+import AIAssistantSection from "../components/ui/AIAssistantSection";
+import IndieDeveloperSection from "../components/ui/DeveloperSection";
+import { TypewriterEffectOneWordSmooth } from "../components/ui/TypeWriterOneWord";
 
+const AnimatedSection = ({ children }) => {
+  const ref = React.useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.2 });
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 50 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+    >
+      {children}
+    </motion.div>
+  );
+};
 const Home = () => {
-  const [gameStocks, setGameStocks] = useState([]);
-  const [filteredStocks, setFilteredStocks] = useState([]);
-  const [ratingsData, setRatingsData] = useState([]);
+  const [featuredGames, setFeaturedGames] = useState([]);
+  const [latestRatings, setLatestRatings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const notify = () => {
-    toast.success("🦄 Wow so easy!", {
-      position: "top-right",
-      autoClose: 2000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
-      transition: Flip,
-      progressBarClassName: "bg-gray-800",
-      style: { fontFamily: "Rubik" },
-    });
-  };
-
-  const propFunction = () => {
-    alert("Hello");
-  };
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const shopSectionRef = useRef(null);
+  const sliderRef = useRef(null);
+  const navigate = useNavigate();
+  const sectionRef = useRef(null); // Reference for the section
+  const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
+  const [hoverDirection, setHoverDirection] = useState("");
 
   useEffect(() => {
-    const fetchGameStocks = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8098/gameStocks/allGameStock"
-        );
-        setGameStocks(response.data.allGameStocks);
-        setFilteredStocks(response.data.allGameStocks);
-      } catch (err) {
-        setError(err.message);
+        const [gamesResponse, ratingsResponse] = await Promise.all([
+          axios.get("http://localhost:8098/gameStocks/allGameStock"),
+          axios.get("http://localhost:8098/ratings/getnewratings"),
+        ]);
+        setFeaturedGames(gamesResponse.data.allGameStocks.slice(0, 5));
+        setLatestRatings(ratingsResponse.data.slice(0, 3));
+      } catch (error) {
+        console.error("Error fetching data:", error);
       } finally {
-        // Delay the end of loading to ensure the Loader is visible for at least 2 seconds
-        const minLoadingTime = 1000; // 2 seconds
-        const actualLoadingTime = Date.now() - startLoadingTime;
-        const delay = Math.max(minLoadingTime - actualLoadingTime, 0);
-
-        setTimeout(() => {
-          setLoading(false);
-        }, delay);
+        setLoading(false);
       }
     };
 
-    const startLoadingTime = Date.now();
-    fetchGameStocks();
+    fetchData();
   }, []);
 
-  const fetchRatings = async (id) => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8098/ratings/game/${id}`
-      );
-      const ratings = response.data;
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      nextSlide();
+    }, 5000);
 
-      // Calculate average rating
-      const avg =
-        ratings.length > 0
-          ? ratings.reduce((sum, rating) => sum + rating.rating, 0) /
-            ratings.length
-          : undefined;
+    return () => clearInterval(intervalId);
+  }, [currentSlide, featuredGames.length]);
 
-      // Check if avg is defined
-      if (avg !== undefined) {
-        // Create a new entry with gameId and averageRating
-        const newRatingData = { gameId: id, averageRating: avg };
-
-        // Update the state with the new entry
-        setRatingsData((prevData) => {
-          const updatedData = [...prevData, newRatingData];
-
-          // Filter out entries where averageRating is undefined
-          const filteredData = updatedData.filter(
-            (data) => data.averageRating !== undefined
-          );
-
-          // Sort by averageRating in descending order
-          const sortedData = filteredData.sort(
-            (a, b) => b.averageRating - a.averageRating
-          );
-
-          return sortedData;
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching ratings:", error);
-    }
+  const nextSlide = () => {
+    setCurrentSlide((prevSlide) => (prevSlide + 1) % featuredGames.length);
   };
 
-  useEffect(() => {
-    gameStocks.forEach((game) => {
-      console.log(game._id);
-      fetchRatings(game._id);
-    });
-  }, [gameStocks, setGameStocks]);
-
-  useEffect(() => {
-    const top5Ratings = ratingsData.slice(0, 3); // Get top 5 based on averageRating
-    const orderedFilteredStocks = top5Ratings
-      .map((rating) => gameStocks.find((stock) => stock._id === rating.gameId))
-      .filter((stock) => stock !== undefined);
-
-    setFilteredStocks(orderedFilteredStocks);
-    console.log("Filtered Stocks: ");
-    filteredStocks.map((stock) => {
-      console.log(stock);
-    });
-  }, [ratingsData, gameStocks]);
-
-  const [activeIndex, setActiveIndex] = useState(0);
-  const carouselRef = useRef(null);
-  const listRef = useRef(null);
-  const thumbnailRef = useRef(null);
-  const timeRef = useRef(null);
-  const nextRef = useRef(null);
-  const prevRef = useRef(null);
-
-  const timeRunning = 3000; // Time for animation
-  const timeAutoNext = 4000; // Time between slides
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      handleNext();
-    }, timeAutoNext);
-
-    return () => clearInterval(interval); // Cleanup on unmount
-  }, [activeIndex]);
-
-  const handleNext = () => {
-    showSlider("next");
+  const prevSlide = () => {
+    setCurrentSlide(
+      (prevSlide) =>
+        (prevSlide - 1 + featuredGames.length) % featuredGames.length
+    );
+  };
+  const handleClick = (path) => {
+    navigate(path);
+  };
+  const variants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0 },
   };
 
-  const handlePrev = () => {
-    showSlider("prev");
+  const handleScrollToShopSection = () => {
+    shopSectionRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const showSlider = (type) => {
-    const sliderItems = listRef.current.children;
-    const thumbnailItems = thumbnailRef.current.children;
+  const handleMouseEnter = (e) => {
+    const { top, left, width, height } = e.target.getBoundingClientRect();
+    const x = e.clientX - left - width / 2;
+    const y = e.clientY - top - height / 2;
+    const angle = Math.atan2(y, x) * (180 / Math.PI);
 
-    if (type === "next") {
-      listRef.current.appendChild(sliderItems[0]);
-      thumbnailRef.current.appendChild(thumbnailItems[0]);
-      carouselRef.current.classList.add("next");
+    if (angle >= -45 && angle <= 45) {
+      setHoverDirection("left");
+    } else if (angle > 45 && angle <= 135) {
+      setHoverDirection("up");
+    } else if (angle > -135 && angle <= -45) {
+      setHoverDirection("down");
     } else {
-      listRef.current.prepend(sliderItems[sliderItems.length - 1]);
-      thumbnailRef.current.prepend(thumbnailItems[thumbnailItems.length - 1]);
-      carouselRef.current.classList.add("prev");
+      setHoverDirection("right");
     }
-
-    setTimeout(() => {
-      carouselRef.current.classList.remove("next");
-      carouselRef.current.classList.remove("prev");
-    }, timeRunning);
   };
 
+  const handleMouseLeave = () => {
+    setHoverDirection("");
+  };
+  const hoverVariants = {
+    up: { y: -10 },
+    down: { y: 10 },
+    left: { x: -10 },
+    right: { x: 10 },
+    initial: { x: 0, y: 0 },
+  };
   return (
     <div className="font-primaryRegular bg-customDark flex flex-col min-h-screen">
+      {" "}
       <Helmet>
-        <title>Welcome to Vortex</title>
+        <title>Welcome to Vortex Gaming</title>
       </Helmet>
       <Header />
-      <div className="h-[40rem] w-full bg-black flex flex-col items-center justify-center overflow-hidden rounded-md">
-      <h1 className="md:text-7xl text-3xl lg:text-9xl  text-center text-white relative z-20">
-        Vortex
-      </h1>
-      <div className="w-[40rem] h-40 relative">
-        {/* Gradients */}
-        <div className="absolute inset-x-20 top-0 bg-gradient-to-r from-transparent via-indigo-500 to-transparent h-[2px] w-3/4 blur-sm" />
-        <div className="absolute inset-x-20 top-0 bg-gradient-to-r from-transparent via-indigo-500 to-transparent h-px w-3/4" />
-        <div className="absolute inset-x-60 top-0 bg-gradient-to-r from-transparent via-sky-500 to-transparent h-[5px] w-1/4 blur-sm" />
-        <div className="absolute inset-x-60 top-0 bg-gradient-to-r from-transparent via-sky-500 to-transparent h-px w-1/4" />
- 
-        {/* Core component */}
-        <SparklesCore
-          background="transparent"
-          minSize={0.4}
-          maxSize={1}
-          particleDensity={1200}
-          className="w-full h-full"
-          particleColor="#FFFFFF"
-        />
- 
-        {/* Radial Gradient to prevent sharp edges */}
-        <div className="absolute inset-0 w-full h-full bg-black [mask-image:radial-gradient(350px_200px_at_top,transparent_20%,white)]"></div>
-      </div>
-    </div>
-      <div className="m-auto  mt-[80px] mb-[40px]">
-        <div className="carousel" ref={carouselRef}>
-          <div className="list" ref={listRef}>
-            {filteredStocks[0] && (
-              <div className="item">
-                <img src={filteredStocks[0].AssignedGame.coverPhoto} />
-                <div
-                  className="darklayer absolute -z-0 top-0 w-[100%] h-[100%] "
-                  ref={timeRef}
-                ></div>
-                <div className="content">
-                  <div className="title">
-                    {filteredStocks[0].AssignedGame.title}
-                  </div>
-                  <div className="topic">
-                    -{filteredStocks[0].discount}% off
-                  </div>
-                  <div className="des">
-                    {filteredStocks[0].AssignedGame.Description}
-                  </div>
-
-                  <div className="author">
-                    <span className="line-through mr-1 text-editionColor">
-                      LKR.{filteredStocks[0].UnitPrice}
-                    </span>
-                    <span className="discprice">
-                      LKR.
-                      {filteredStocks[0].discount > 0
-                        ? filteredStocks[0].UnitPrice -
-                          (filteredStocks[0].UnitPrice *
-                            filteredStocks[0].discount) /
-                            100
-                        : filteredStocks[0].UnitPrice}
-                    </span>
-                  </div>
-                  <div className="buttons">
-                    <Link to={`/game/${filteredStocks[0]._id}`}>
-                      {" "}
-                      <button className="border-none bg-[#f1683a] tracking-widest font-poppins font-medium p-[10px] rounded-[5px]">
-                        SEE MORE{" "}
-                      </button>
-                    </Link>
-                  </div>
-                </div>
+      {/* Hero Section */}
+      <LampContainer>
+        <motion.h1
+          initial={{ opacity: 0.5, y: 100 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.8, ease: "easeInOut" }}
+          className="mt-8 bg-gradient-to-br from-slate-300 to-slate-500 py-4 bg-clip-text text-center text-4xl font-medium tracking-tight text-transparent md:text-7xl"
+        >
+          <TypewriterEffectOneWordSmooth
+            words={[
+              { text: "Discover" },
+              { text: "Play" },
+              { text: "Connect" },
+              { text: "Shop" },
+            ]}
+          />
+        </motion.h1>
+        <p className="text-white text-4xl mt-4 text-center">
+          Your one-stop destination for all things gaming
+        </p>
+        <motion.button
+          initial="initial"
+          animate={hoverDirection || "initial"}
+          variants={hoverVariants}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          onClick={handleScrollToShopSection}
+          className="mt-8 px-16 py-8 bg-transparent border-2 border-white rounded-full text-white text-2xl font-bold hover:bg-white hover:text-black"
+        >
+          Explore
+        </motion.button>
+      </LampContainer>
+      <TracingBeam>
+        {/* Game Shop Highlight */}
+        <section
+          className="py-16 relative overflow-hidden"
+          ref={shopSectionRef}
+        >
+          <BackgroundBeams />
+          <div className="container mx-auto px-4 relative z-10">
+            <AnimatedSection>
+              <h2 className="text-4xl font-bold text-white mb-8 text-center">
+                Vortex Game Shop
+              </h2>
+            </AnimatedSection>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {[
+                "Latest Releases",
+                "Top Sellers",
+                "Indie Games",
+                "Special Offers",
+              ].map((category, index) => (
+                <AnimatedSection key={index}>
+                  <BackgroundGradient className="rounded-xl p-1">
+                    <div className="bg-gray-800 rounded-lg p-6 h-full flex flex-col justify-between">
+                      <h3 className="text-2xl font-bold text-white mb-4">
+                        {category}
+                      </h3>
+                      <p className="text-gray-300 mb-4">
+                        Discover amazing games in our {category.toLowerCase()}{" "}
+                        collection.
+                      </p>
+                      <Button color="primary" size="sm">
+                        Browse {category}
+                      </Button>
+                    </div>
+                  </BackgroundGradient>
+                </AnimatedSection>
+              ))}
+            </div>
+            <AnimatedSection>
+              <div className="text-center mt-12">
+                <Button
+                  color="secondary"
+                  size="lg"
+                  onClick={() => handleClick("/shop")}
+                >
+                  Visit Full Shop
+                </Button>
               </div>
-            )}
-
-            {filteredStocks[1] && (
-              <div className="item">
-                <img src={filteredStocks[1].AssignedGame.coverPhoto} />
-                <div
-                  className="darklayer absolute -z-0 top-0 w-[100%] h-[100%] "
-                  ref={timeRef}
-                ></div>
-                <div className="content">
-                  <div className="title">
-                    {filteredStocks[1].AssignedGame.title}
-                  </div>
-                  <div className="topic">
-                    -{filteredStocks[1].discount}% off
-                  </div>
-                  <div className="des">
-                    {filteredStocks[1].AssignedGame.Description}
-                  </div>
-
-                  <div className="author">
-                    <span className="line-through mr-1 text-editionColor">
-                      LKR.{filteredStocks[1].UnitPrice}
-                    </span>
-                    <span className="discprice">
-                      LKR.
-                      {filteredStocks[1].discount > 0
-                        ? filteredStocks[1].UnitPrice -
-                          (filteredStocks[1].UnitPrice *
-                            filteredStocks[1].discount) /
-                            100
-                        : filteredStocks[1].UnitPrice}
-                    </span>
-                  </div>
-                  <div className="buttons">
-                    <Link to={`/game/${filteredStocks[1]._id}`}>
-                      {" "}
-                      <button className="border-none bg-[#f1683a] tracking-widest font-poppins font-medium p-[10px] rounded-[5px]">
-                        SEE MORE{" "}
-                      </button>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            )}
-            {filteredStocks[2] && (
-              <div className="item">
-                <img src={filteredStocks[2].AssignedGame.coverPhoto} />
-                <div
-                  className="darklayer absolute -z-0 top-0 w-[100%] h-[100%] "
-                  ref={timeRef}
-                ></div>
-                <div className="content">
-                  <div className="title">
-                    {filteredStocks[2].AssignedGame.title}
-                  </div>
-                  <div className="topic">
-                    -{filteredStocks[2].discount}% off
-                  </div>
-                  <div className="des">
-                    {filteredStocks[2].AssignedGame.Description}
-                  </div>
-
-                  <div className="author">
-                    <span className="line-through mr-1 text-editionColor">
-                      LKR.{filteredStocks[2].UnitPrice}
-                    </span>
-                    <span className="discprice">
-                      LKR.
-                      {filteredStocks[2].discount > 0
-                        ? filteredStocks[2].UnitPrice -
-                          (filteredStocks[2].UnitPrice *
-                            filteredStocks[2].discount) /
-                            100
-                        : filteredStocks[2].UnitPrice}
-                    </span>
-                  </div>
-                  <div className="buttons">
-                    <Link to={`/game/${filteredStocks[2]._id}`}>
-                      {" "}
-                      <button className="border-none bg-[#f1683a] tracking-widest font-poppins font-medium p-[10px] rounded-[5px]">
-                        SEE MORE{" "}
-                      </button>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            )}
+            </AnimatedSection>
           </div>
+        </section>
 
-          <div className="thumbnail " ref={thumbnailRef}>
-            {filteredStocks[0] && (
-              <div className="item">
-                <img src={filteredStocks[0].AssignedGame.coverPhoto} />
-                <div className="content">
-                  {/* <div className="title">{image.title}</div> */}
-                  {/* <div className="description">{image.description}</div> */}
+        {/* Featured Games Slider */}
+        <motion.section
+          ref={sectionRef}
+          initial={{ opacity: 0, x: 100 }}
+          animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 100 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="py-16 relative overflow-hidden"
+        >
+          <BackgroundBeams />
+          <div className="container mx-auto px-4 relative z-10">
+            <h2 className="text-4xl font-bold text-white mb-8">
+              Featured Games
+            </h2>
+            <div className="relative">
+              <div className="overflow-hidden rounded-xl">
+                <div
+                  className="flex transition-transform duration-500 ease-in-out"
+                  style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                >
+                  {featuredGames.map((game, index) => (
+                    <div key={game._id} className="w-full flex-shrink-0">
+                      <div className="relative h-96">
+                        <img
+                          src={game.AssignedGame.coverPhoto}
+                          alt={game.AssignedGame.title}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6">
+                          <h3 className="text-3xl font-bold text-white mb-2">
+                            {game.AssignedGame.title}
+                          </h3>
+                          <p className="text-gray-300 mb-4">
+                            {game.AssignedGame.Description.substring(0, 150)}...
+                          </p>
+                          <div className="flex justify-between items-center">
+                            <span className="text-2xl font-bold text-green-400">
+                              $
+                              {(
+                                game.UnitPrice -
+                                (game.UnitPrice * game.discount) / 100
+                              ).toFixed(2)}
+                            </span>
+                            <Link to={`/game/${game._id}`}>
+                              <Button color="primary" size="lg">
+                                View Game
+                              </Button>
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            )}
-            {filteredStocks[1] && (
-              <div className="item">
-                <img src={filteredStocks[1].AssignedGame.coverPhoto} />
-                <div className="content">
-                  {/* <div className="title">{image.title}</div> */}
-                  {/* <div className="description">{image.description}</div> */}
-                </div>
-              </div>
-            )}
-            {filteredStocks[2] && (
-              <div className="item">
-                <img src={filteredStocks[2].AssignedGame.coverPhoto} />
-                <div className="content">
-                  {/* <div className="title">{image.title}</div> */}
-                  {/* <div className="description">{image.description}</div> */}
-                </div>
-              </div>
-            )}
+              <button
+                onClick={prevSlide}
+                className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
+              >
+                &#10094;
+              </button>
+              <button
+                onClick={nextSlide}
+                className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
+              >
+                &#10095;
+              </button>
+            </div>
           </div>
-          <div className="arrows hidden">
-            <button id="prev" ref={prevRef} onClick={handlePrev}>
-              &lt;
-            </button>
-            <button id="next" ref={nextRef} onClick={handleNext}>
-              &gt;
-            </button>
+        </motion.section>
+        
+        <AIAssistantSection />
+        <IndieDeveloperSection />
+
+        {/* Gaming Community Section */}
+        <section className="py-16 relative overflow-hidden">
+          <BackgroundBeams />
+          <div className="container mx-auto px-4 text-center relative z-10">
+            <AnimatedSection>
+              <h2 className="text-4xl font-bold text-white mb-8">
+                Join Our Thriving Gaming Community
+              </h2>
+            </AnimatedSection>
+            <AnimatedSection>
+              <p className="text-xl text-gray-300 mb-8">
+                Connect with fellow gamers, share experiences, participate in
+                events, and level up together!
+              </p>
+            </AnimatedSection>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+              {[
+                {
+                  title: "Forums",
+                  description:
+                    "Discuss strategies, share tips, and make new friends.",
+                  buttonText: "Visit Forums",
+                },
+                {
+                  title: "Events",
+                  description:
+                    "Join tournaments, watch live streams, and attend virtual meetups.",
+                  buttonText: "See Events",
+                },
+                {
+                  title: "Groups",
+                  description:
+                    "Find like-minded gamers and form your own gaming clans.",
+                  buttonText: "Explore Groups",
+                },
+              ].map((item, index) => (
+                <AnimatedSection key={index}>
+                  <BackgroundGradient className="rounded-xl p-1">
+                    <div className="bg-gray-800 rounded-lg p-6 h-full">
+                      <h3 className="text-2xl font-bold text-white mb-4">
+                        {item.title}
+                      </h3>
+                      <p className="text-gray-300 mb-4">{item.description}</p>
+                      <Button color="primary" size="sm">
+                        {item.buttonText}
+                      </Button>
+                    </div>
+                  </BackgroundGradient>
+                </AnimatedSection>
+              ))}
+            </div>
+            <AnimatedSection>
+              <Button
+                color="secondary"
+                size="lg"
+                onClick={() => handleClick("/articles")}
+              >
+                Join Community
+              </Button>
+            </AnimatedSection>
           </div>
-          <div className="time" ref={timeRef}></div>
-        </div>
-      </div>
-      <Footer />
-      <script src="../components/Slider.jsx"></script>
+        </section>
+
+        {/* Support Unit Section */}
+        <section className="py-16 relative overflow-hidden">
+          <BackgroundBeams />
+          <div className="container mx-auto px-4 relative z-10">
+            <AnimatedSection>
+              <h2 className="text-4xl font-bold text-white mb-8 text-center">
+                World-Class Support at Your Service
+              </h2>
+            </AnimatedSection>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                {
+                  title: "24/7 Assistance",
+                  description:
+                    "Our support team is always ready to help, any time of day or night.",
+                  buttonText: "Contact Support",
+                  buttonAction: () => handleClick("/support#contactForm"),
+                },
+                {
+                  title: "Knowledge Base",
+                  description:
+                    "Find answers to common questions in our comprehensive guide.",
+                  buttonText: "Browse FAQs",
+                  buttonAction: () => console.log("Browsing FAQs"), // You can update this with your navigation logic
+                },
+                {
+                  title: "Community Support",
+                  description:
+                    "Get help from our community of experienced gamers and developers.",
+                  buttonText: "Visit Forum",
+                  buttonAction: () => console.log("Visiting Forum"), // You can update this with your navigation logic
+                },
+              ].map((item, index) => (
+                <AnimatedSection key={index}>
+                  <BackgroundGradient className="rounded-xl p-1">
+                    <div className="bg-gray-800 rounded-lg p-6 h-full">
+                      <h3 className="text-2xl font-bold text-white mb-4">
+                        {item.title}
+                      </h3>
+                      <p className="text-gray-300 mb-4">{item.description}</p>
+                      <Button
+                        color="primary"
+                        size="sm"
+                        onClick={item.buttonAction}
+                      >
+                        {item.buttonText}
+                      </Button>
+                    </div>
+                  </BackgroundGradient>
+                </AnimatedSection>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Latest Reviews */}
+        <section className="py-16 relative overflow-hidden">
+          <BackgroundBeams />
+          <div className="container mx-auto px-4 relative z-10">
+            <AnimatedSection>
+              <h2 className="text-4xl font-bold text-white mb-8 text-center">
+                Latest Reviews
+              </h2>
+            </AnimatedSection>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {latestRatings.map((rating, index) => (
+                <AnimatedSection key={index}>
+                  <BackgroundGradient className="rounded-xl p-1">
+                    <div className="bg-gray-800 rounded-lg p-6 h-full">
+                      <p className="text-gray-300 mb-4">{rating.comment}</p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-white font-semibold">
+                          {rating.user?.username || "Anonymous"}
+                        </span>
+                        <span className="text-yellow-400">
+                          {rating.rating}/5
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-400 mt-2">
+                        {rating.game?.AssignedGame?.title || "Unknown Game"}
+                      </p>
+                    </div>
+                  </BackgroundGradient>
+                </AnimatedSection>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Newsletter Signup */}
+        <section className="py-16 relative overflow-hidden">
+          <BackgroundBeams />
+          <div className="container mx-auto px-4 text-center relative z-10">
+            <AnimatedSection>
+              <h2 className="text-4xl font-bold text-white mb-8">
+                Stay in the Loop
+              </h2>
+            </AnimatedSection>
+            <AnimatedSection>
+              <p className="text-xl text-gray-300 mb-8">
+                Subscribe to our newsletter for the latest game releases and
+                exclusive offers.
+              </p>
+            </AnimatedSection>
+            <AnimatedSection>
+              <div className="max-w-md mx-auto">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:outline-none focus:border-primary mb-4"
+                />
+                <Button color="primary" size="lg" className="w-full">
+                  Subscribe
+                </Button>
+              </div>
+            </AnimatedSection>
+          </div>
+        </section>
+
+        <Footer />
+      </TracingBeam>
     </div>
   );
 };

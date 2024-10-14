@@ -9,6 +9,7 @@ import fs from "fs";
 import cloudinary from "../utils/cloudinary.js";
 import upload from "../middleware/multer.js";
 
+
 // Router
 const userRouter = express.Router();
 
@@ -607,5 +608,6 @@ userRouter.get("/moderators", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
 
 export default userRouter;

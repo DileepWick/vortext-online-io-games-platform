@@ -39,7 +39,13 @@ export const getAllRentalPayments = async (req, res) => {
   try {
     const rentalPayments = await RentalPayment.find()
       .populate('user', 'username email')
-      .populate('game', 'title')
+      .populate({
+        path: 'game',
+        populate: {
+          path: 'developer'
+          // Removing the 'select' option will populate all fields
+        }
+      })
       .populate('rental', 'time status')
       .sort({ date: -1 });
 

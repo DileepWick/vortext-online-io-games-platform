@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../src/components/header";
 import Footer from "../src/components/footer";
+
 
 const GRID_SIZE = 30;
 const CELL_SIZE = 20;
@@ -55,6 +57,7 @@ const generateAnswerOptions = (correctAnswer) => {
 };
 
 const Snake = () => {
+  const [gameMode, setGameMode] = useState(null);
   const [snake, setSnake] = useState(INITIAL_SNAKE);
   const [direction, setDirection] = useState(INITIAL_DIRECTION);
   const [mathQuestion, setMathQuestion] = useState(generateMathQuestion());
@@ -62,6 +65,9 @@ const Snake = () => {
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
+  const gameContainerRef = useRef(null);
+  const directionQueue = useRef([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setAnswerOptions(generateAnswerOptions(mathQuestion.answer));
@@ -70,10 +76,15 @@ const Snake = () => {
   const moveSnake = useCallback(() => {
     if (gameOver) return;
 
+    let newDirection = direction;
+    if (directionQueue.current.length > 0) {
+      newDirection = directionQueue.current.shift();
+    }
+
     const newSnake = [...snake];
     const head = { ...newSnake[0] };
-    head.x += direction.x;
-    head.y += direction.y;
+    head.x += newDirection.x;
+    head.y += newDirection.y;
 
     if (
       head.x < 0 ||
@@ -118,6 +129,7 @@ const Snake = () => {
     }
 
     setSnake(newSnake);
+    setDirection(newDirection);
   }, [snake, direction, mathQuestion, answerOptions, gameOver]);
 
   useEffect(() => {
@@ -147,8 +159,18 @@ const Snake = () => {
           return;
       }
 
-      if (newDirection.x !== -direction.x || newDirection.y !== -direction.y) {
-        setDirection(newDirection);
+      const lastDirection = directionQueue.current.length > 0
+        ? directionQueue.current[directionQueue.current.length - 1]
+        : direction;
+
+      if (
+        (newDirection.x !== -lastDirection.x || newDirection.y !== -lastDirection.y) &&
+        (newDirection.x !== lastDirection.x || newDirection.y !== lastDirection.y)
+      ) {
+        directionQueue.current.push(newDirection);
+        if (directionQueue.current.length > 3) {
+          directionQueue.current.shift();
+        }
       }
     };
 
@@ -168,7 +190,66 @@ const Snake = () => {
     setMathQuestion(generateMathQuestion());
     setGameOver(false);
     setScore(0);
+    directionQueue.current = [];
   };
+
+  const toggleFullScreen = () => {
+    const elem = gameContainerRef.current;
+
+    if (!document.fullscreenElement) {
+      elem.requestFullscreen().catch((err) => {
+        alert(`Error attempting to enable full-screen mode: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
+  const selectGameMode = (mode) => {
+    if (mode === '1player') {
+      setGameMode('1player');
+      restartGame();
+    } else if (mode === '2player') {
+      navigate("/Snakegame2player");
+    }
+  };
+
+  const backToMenu = () => {
+    setGameMode(null);
+    setGameOver(false);
+    setScore(0);
+    directionQueue.current = [];
+  };
+
+  if (!gameMode) {
+    return (
+      <div>
+        <Header />
+        <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center" style={{ backgroundColor: "#1a202c" }}>
+          <div className="bg-gray-800 rounded-lg shadow-lg text-white p-8" style={{ backgroundColor: "#2d3748" }}>
+            <h2 className="text-3xl font-bold mb-6 text-center">Select Game Mode</h2>
+            <div className="flex justify-center space-x-4">
+              <button
+                onClick={() => selectGameMode('1player')}
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded text-lg"
+                style={{ backgroundColor: "#4299e1", color: "#ffffff" }}
+              >
+                1 Player
+              </button>
+              <button
+                onClick={() => selectGameMode('2player')}
+                className="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-6 rounded text-lg"
+                style={{ backgroundColor: "#48bb78", color: "#ffffff" }}
+              >
+                2 Players
+              </button>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -178,17 +259,33 @@ const Snake = () => {
         style={{ backgroundColor: "#1a202c" }}
       >
         <div
+          ref={gameContainerRef}
           className="bg-gray-800 rounded-lg shadow-lg text-white p-4"
           style={{ backgroundColor: "#2d3748" }}
         >
-          <h3
-            className="text-center mb-4 text-xl font-bold"
-            style={{ color: "#ffffff" }}
-          >
-            Score: {score} | High Score: {highScore}
-          </h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-bold" style={{ color: "#ffffff" }}>
+              Score: {score} | High Score: {highScore}
+            </h3>
+            <button
+              onClick={backToMenu}
+              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+              style={{ backgroundColor: "#f56565", color: "#ffffff" }}
+            >
+              Back to Menu
+            </button>
+          </div>
 
-          {/* New Question Display Area */}
+          <div className="text-center mb-4">
+            <button
+              onClick={toggleFullScreen}
+              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+              style={{ backgroundColor: "#48bb78", color: "#ffffff" }}
+            >
+              Toggle Full Screen
+            </button>
+          </div>
+
           <div
             className="text-center mb-4 p-2 bg-blue-500 rounded"
             style={{ backgroundColor: "#4299e1" }}
@@ -213,7 +310,6 @@ const Snake = () => {
               const isSnake = snake.some(
                 (segment) => segment.x === x && segment.y === y
               );
-              const isSnakeHead = snake[0].x === x && snake[0].y === y;
               const answerOption = answerOptions.find(
                 (option) => option.x === x && option.y === y
               );
@@ -251,11 +347,18 @@ const Snake = () => {
                 Game Over!
               </h4>
               <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
                 onClick={restartGame}
                 style={{ backgroundColor: "#4299e1", color: "#ffffff" }}
               >
                 Restart Game
+              </button>
+              <button
+                className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"
+                onClick={backToMenu}
+                style={{ backgroundColor: "#ecc94b", color: "#ffffff" }}
+              >
+                Back to Menu
               </button>
             </div>
           )}

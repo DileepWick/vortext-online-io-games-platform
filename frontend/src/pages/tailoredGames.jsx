@@ -66,7 +66,7 @@ const TailoredGames = () => {
           {/* Game 2 */}
           <GameCard
             title="Rock Paper scissors"
-            imageUrl="https://res.cloudinary.com/dhcawltsr/image/upload/v1728732978/882363a6-0b96-4cd7-b7e1-6dca080a3b24_ygxdix.jpg"
+            imageUrl="https://res.cloudinary.com/dhcawltsr/image/upload/v1728819820/4ddb1bdf-67b6-427a-ac22-e8e5fe180d80_mwmmq4.jpg"
             link="/rock-paper-scissors"
             devName={"Ranasinghe G.M.N.T.B"}
             devId={"IT22201928"}
@@ -91,16 +91,16 @@ const TailoredGames = () => {
           />
           {/* Game 5 */}
           <GameCard
-            title="Member 5 Game"
+            title="Word Search"
             imageUrl="https://images5.alphacoders.com/127/1274050.jpg"
-            link="/games/tictactoe"
+            link="/WordSearch"
             devName={"Wijekoon W.M.D.P"}
             devId={"IT22103772"}
           />
           {/* Game 6 */}
           <GameCard
             title="Color Guessing"
-            imageUrl="https://images5.alphacoders.com/127/1274050.jpg"
+            imageUrl="https://res.cloudinary.com/dhcawltsr/image/upload/v1728821392/99044073-3297-4294-ab60-58fdf017b121_o80kq4.jpg"
             link="/ColorGuessingGame"
             devName={"Dissanayaka D.M.K.L.K"}
             devId={"IT22120748"}

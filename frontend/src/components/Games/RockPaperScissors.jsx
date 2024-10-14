@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
+import useAuthCheck from "../../utils/authCheck";
 
 const AdvancedEducationalRockPaperScissors = () => {
+  useAuthCheck();
   const [playerChoice, setPlayerChoice] = useState(null);
   const [computerChoice, setComputerChoice] = useState(null);
   const [result, setResult] = useState('');
@@ -12,20 +14,23 @@ const AdvancedEducationalRockPaperScissors = () => {
   const [thinking, setThinking] = useState(false);
   const [difficulty, setDifficulty] = useState('medium');
   const [powerUp, setPowerUp] = useState(null);
-  const [theme, setTheme] = useState('default');
+  const [theme, setTheme] = useState('dark');
   const [isLoading, setIsLoading] = useState(true);
   const [chatMessages, setChatMessages] = useState([]);
   const [userInput, setUserInput] = useState('');
   const [wordGuess, setWordGuess] = useState('');
   const chatBoxRef = useRef(null);
 
-  // Enhanced educational game states
   const [hiddenWord, setHiddenWord] = useState('');
   const [revealedLetters, setRevealedLetters] = useState([]);
   const [hint, setHint] = useState('');
   const [hintUsed, setHintUsed] = useState(false);
   const [consecutiveWins, setConsecutiveWins] = useState(0);
   const [celebrationMessage, setCelebrationMessage] = useState('');
+
+  const [funFact, setFunFact] = useState('');
+  const [miniGame, setMiniGame] = useState({ active: false, question: '', answer: '', userAnswer: '' });
+  const [streakBonus, setStreakBonus] = useState(0);
 
   const [wordList, setWordList] = useState([
     { word: 'SCIENCE', hint: 'The study of the natural world through observation and experimentation' },
@@ -69,24 +74,41 @@ const AdvancedEducationalRockPaperScissors = () => {
     }
   };
 
+  const funFacts = [
+    "Did you know that the earliest known mention of Rock Paper Scissors was in China around 1600?",
+    "In some versions of the game, there are additional moves like 'Spock' and 'Lizard'!",
+    "The game is called 'Jan-ken-pon' in Japan and is widely popular.",
+    "There's a World Rock Paper Scissors Association that organizes championships!",
+    "Some people use Rock Paper Scissors to make important decisions in their lives.",
+    "In South Korea, the game is called 'Kai Bai Bo'.",
+    "The first known RPS international tournament was held in Toronto, Canada in 2002.",
+    "Some cultures use different hand symbols for the game, like 'Snake, Water, Gun' in India.",
+    "RPS is sometimes used as a fair choosing method in courts in the USA.",
+    "There's a version of RPS with 101 different gestures, created by artists in 2006.",
+  ];
+
+  const miniGames = [
+    { question: "What's 7 x 8?", answer: "56" },
+    { question: "What's the capital of France?", answer: "Paris" },
+    { question: "How many planets are in our solar system?", answer: "8" },
+    { question: "What's the chemical symbol for water?", answer: "H2O" },
+    { question: "Who wrote 'Romeo and Juliet'?", answer: "Shakespeare" },
+  ];
+
   useEffect(() => {
     setTimeout(() => {
       setIsLoading(false);
       addMessage('computer', "Welcome to the Advanced Educational Rock Paper Scissors! Type 'help' for information. Let's learn while we play!");
       selectNewWord();
+      getRandomFunFact();
     }, 3000);
   }, []);
 
   useEffect(() => {
     if (result === 'You win!') {
-      setShowFireworks(true);
-      setCelebrationMessage('Congratulations! You won!');
-      setTimeout(() => {
-        setShowFireworks(false);
-        setCelebrationMessage('');
-      }, 3000);
       revealLetter();
       setConsecutiveWins(prev => prev + 1);
+      getRandomFunFact();
       if (consecutiveWins + 1 >= 3) {
         addMessage('computer', "Wow! You're on fire! 🔥 Here's a bonus hint: " + hint);
         setConsecutiveWins(0);
@@ -202,7 +224,9 @@ const AdvancedEducationalRockPaperScissors = () => {
     setShowFireworks(false);
     setPowerUp(null);
     setConsecutiveWins(0);
+    setStreakBonus(0);
     selectNewWord();
+    getRandomFunFact();
     addMessage('computer', "Game reset! Let's start fresh with a new word. Good luck and happy learning!");
   };
 
@@ -266,6 +290,27 @@ const AdvancedEducationalRockPaperScissors = () => {
     setWordGuess('');
   };
 
+  const getRandomFunFact = () => {
+    const randomIndex = Math.floor(Math.random() * funFacts.length);
+    setFunFact(funFacts[randomIndex]);
+  };
+
+  const startMiniGame = () => {
+    const randomGame = miniGames[Math.floor(Math.random() * miniGames.length)];
+    setMiniGame({ active: true, question: randomGame.question, answer: randomGame.answer, userAnswer: '' });
+  };
+
+  const handleMiniGameAnswer = () => {
+    if (miniGame.userAnswer.toLowerCase() === miniGame.answer.toLowerCase()) {
+      setStreakBonus(prev => prev + 1);
+      addMessage('computer', `Correct! You've earned a streak bonus. Current bonus: ${streakBonus + 1}`);
+    } else {
+      setStreakBonus(0);
+      addMessage('computer', `Sorry, that's incorrect. The correct answer was ${miniGame.answer}. Streak bonus reset.`);
+    }
+    setMiniGame({ active: false, question: '', answer: '', userAnswer: '' });
+  };
+
   const containerStyle = {
     display: 'flex',
     height: '100vh',
@@ -280,9 +325,10 @@ const AdvancedEducationalRockPaperScissors = () => {
     padding: '20px',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     alignItems: 'center',
     background: 'rgba(255, 255, 255, 0.1)',
+    height: '100vh',
   };
 
   const gameAreaStyle = {
@@ -291,6 +337,13 @@ const AdvancedEducationalRockPaperScissors = () => {
     flexDirection: 'column',
     padding: '20px',
     overflowY: 'auto',
+  };
+
+  const leftPanelTopStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    width: '100%',
   };
 
   const chatAreaStyle = {
@@ -472,19 +525,57 @@ const AdvancedEducationalRockPaperScissors = () => {
   };
 
   const celebrationMessageStyle = {
-    position: 'fixed',
-    bottom: '20px',
-    left: '20px',
-    fontSize: '24px',
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    fontSize: '32px',
     fontWeight: 'bold',
     color: '#FFD700',
     textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
     zIndex: 1000,
-    animation: 'bounce 0.5s infinite alternate',
-    padding: '10px',
-    background: 'rgba(0, 0, 0, 0.5)',
-    borderRadius: '10px',
+    padding: '20px',
+    background: 'rgba(0, 0, 0, 0.8)',
+    borderRadius: '15px',
+    boxShadow: '0 0 20px #FFD700',
+    textAlign: 'center',
+    animation: 'celebrationPulse 1.5s infinite',
   };
+
+  const choiceButtonStyle = (choice) => ({
+    ...buttonStyle,
+    width: '100px',
+    height: '100px',
+    borderRadius: '50%',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontSize: '16px',
+    background: themes[theme].choiceButtonColor,
+    border: `3px solid ${themes[theme].textColor}`,
+    transition: 'all 0.3s ease',
+  });
+
+  const funFactStyle = {
+    background: 'rgba(255, 255, 255, 0.1)',
+    padding: '10px',
+    borderRadius: '10px',
+    marginTop: '20px',
+    fontSize: '14px',
+    textAlign: 'center',
+  };
+
+  const miniGameStyle = {
+    background: 'rgba(255, 255, 255, 0.1)',
+    padding: '10px',
+    borderRadius: '10px',
+    marginTop: '20px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  };
+
   if (isLoading) {
     return (
       <div style={loadingStyle}>
@@ -508,21 +599,6 @@ const AdvancedEducationalRockPaperScissors = () => {
     );
   }
 
-  const choiceButtonStyle = (choice) => ({
-    ...buttonStyle,
-    width: '100px',
-    height: '100px',
-    borderRadius: '50%',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    fontSize: '16px',
-    background: themes[theme].choiceButtonColor,
-    border: `3px solid ${themes[theme].textColor}`,
-    transition: 'all 0.3s ease',
-  });
-
   return (
     <div style={containerStyle}>
       <style>
@@ -536,45 +612,22 @@ const AdvancedEducationalRockPaperScissors = () => {
             25% { transform: translateX(-10px); }
             75% { transform: translateX(10px); }
           }
-          @keyframes firework {
-            0% { transform: translate(var(--x), var(--initialY)); width: var(--initialSize); opacity: 1; }
-            50% { width: 0.5vmin; opacity: 1; }
-            100% { width: var(--finalSize); opacity: 0; }
+          @keyframes celebrationPulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+          }
+          @keyframes fireworks {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-100px); opacity: 0; }
           }
           .firework {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-          }
-          .firework::before, .firework::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 0.5vmin;
-            aspect-ratio: 1;
-            background:
-              radial-gradient(circle, #ff0 0.2vmin, #0000 0) 50% 00%,
-              radial-gradient(circle, #ff0 0.3vmin, #0000 0) 00% 50%,
-              radial-gradient(circle, #ff0 0.5vmin, #0000 0) 50% 99%,
-              radial-gradient(circle, #ff0 0.2vmin, #0000 0) 99% 50%,
-              radial-gradient(circle, #ff0 0.3vmin, #0000 0) 80% 90%,
-              radial-gradient(circle, #ff0 0.5vmin, #0000 0) 95% 90%,
-              radial-gradient(circle, #ff0 0.5vmin, #0000 0) 10% 60%,
-              radial-gradient(circle, #ff0 0.2vmin, #0000 0) 31% 80%,
-              radial-gradient(circle, #ff0 0.3vmin, #0000 0) 80% 10%,
-              radial-gradient(circle, #ff0 0.2vmin, #0000 0) 90% 23%,
-              radial-gradient(circle, #ff0 0.3vmin, #0000 0) 45% 20%,
-              radial-gradient(circle, #ff0 0.5vmin, #0000 0) 13% 24%;
-            background-size: 0.5vmin 0.5vmin;
-            background-repeat: no-repeat;
-            animation: firework 2s infinite;
-          }
-          .firework::after {
-            transform: translate(-50%, -50%) rotate(25deg);
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            animation: fireworks 1s ease-out;
+            animation-iteration-count: infinite;
           }
           button:hover, select:hover {
             transform: translateY(-5px);
@@ -599,22 +652,56 @@ const AdvancedEducationalRockPaperScissors = () => {
         `}
       </style>
       <div style={leftPanelStyle}>
-        <div style={hintDisplayStyle}>
-          <p>Hint:</p>
-          <p>{hintUsed ? hint : "Use the 'Use Hint' button to reveal"}</p>
+        <div style={leftPanelTopStyle}>
+          <div style={hintDisplayStyle}>
+            <p>Hint:</p>
+            <p>{hintUsed ? hint : "Use the 'Use Hint' button to reveal"}</p>
+          </div>
+          <input
+            type="text"
+            value={wordGuess}
+            onChange={(e) => setWordGuess(e.target.value)}
+            placeholder="Guess the word..."
+            style={wordGuessInputStyle}
+          />
+          <button onClick={handleWordGuess} style={buttonStyle}>
+            Submit Guess
+          </button>
+          <button onClick={useHint} style={{...buttonStyle, opacity: hintUsed ? 0.6 : 1, marginTop: '10px'}} disabled={hintUsed}>
+            Use Hint
+          </button>
+          
+          <div style={funFactStyle}>
+            <p>{funFact || "Win a round to see a fun fact!"}</p>
+          </div>
+          
+          <div style={miniGameStyle}>
+            {miniGame.active ? (
+              <>
+                <p>{miniGame.question}</p>
+                <input
+                  type="text"
+                  value={miniGame.userAnswer}
+                  onChange={(e) => setMiniGame({...miniGame, userAnswer: e.target.value})}
+                  style={{...wordGuessInputStyle, width: '80%', marginTop: '5px'}}
+                />
+          <button onClick={handleMiniGameAnswer} style={{...buttonStyle, fontSize: '12px', padding: '5px 10px', marginTop: '5px'}}>
+                  Submit Answer
+                </button>
+              </>
+            ) : (
+              <button onClick={startMiniGame} style={{...buttonStyle, fontSize: '14px', padding: '8px 15px'}}>
+                Start Mini-Game
+              </button>
+            )}
+          </div>
+          
+          <div style={{marginTop: '10px', textAlign: 'center'}}>
+            <p>Streak Bonus: {streakBonus}</p>
+          </div>
         </div>
-        <input
-          type="text"
-          value={wordGuess}
-          onChange={(e) => setWordGuess(e.target.value)}
-          placeholder="Guess the word..."
-          style={wordGuessInputStyle}
-        />
-        <button onClick={handleWordGuess} style={buttonStyle}>
-          Submit Guess
-        </button>
-        <button onClick={useHint} style={{...buttonStyle, opacity: hintUsed ? 0.6 : 1, marginTop: '10px'}} disabled={hintUsed}>
-          Use Hint
+        <button onClick={resetGame} style={{...buttonStyle, background: 'linear-gradient(45deg, #e74c3c, #c0392b)', marginTop: 'auto'}}>
+          Reset Game
         </button>
       </div>
       <div style={gameAreaStyle}>
@@ -634,7 +721,6 @@ const AdvancedEducationalRockPaperScissors = () => {
             <option value="medium">Medium</option>
             <option value="hard">Hard</option>
           </select>
-          <button onClick={resetGame} style={{...buttonStyle, background: 'linear-gradient(45deg, #e74c3c, #c0392b)'}}>Reset Game</button>
           <button onClick={() => setPowerUp('doublePoints')} style={powerUp === 'doublePoints' ? {...buttonStyle, background: 'gold', color: 'black'} : buttonStyle} disabled={powerUp !== null}>
             Double Points
           </button>
@@ -647,7 +733,7 @@ const AdvancedEducationalRockPaperScissors = () => {
             <option value="dark">Dark Theme</option>
             <option value="light">Light Theme</option>
           </select>
-          </div>
+        </div>
         <div style={gameDisplayStyle}>
           <h1 className="game-title" style={{ fontSize: '36px', margin: '10px 0', textShadow: '2px 2px 4px rgba(0,0,0,0.3)' }}>Advanced Educational Rock Paper Scissors</h1>
           <div style={choiceDisplayStyle}>
@@ -688,12 +774,21 @@ const AdvancedEducationalRockPaperScissors = () => {
           </div>
           {showFireworks && (
             <>
-              <div className="firework" style={{'--x': '-30vmin', '--initialY': '60vmin'}}></div>
-              <div className="firework" style={{'--x': '30vmin', '--initialY': '60vmin'}}></div>
-              <div className="firework" style={{'--x': '0vmin', '--initialY': '80vmin'}}></div>
-              <div className="firework" style={{'--x': '-20vmin', '--initialY': '40vmin'}}></div>
-              <div className="firework" style={{'--x': '20vmin', '--initialY': '40vmin'}}></div>
+              {[...Array(20)].map((_, i) => (
+                <div key={i} className="firework" style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  background: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                  animationDuration: `${0.5 + Math.random() * 0.5}s`,
+                  animationDelay: `${Math.random() * 0.2}s`
+                }} />
+              ))}
             </>
+          )}
+          {celebrationMessage && (
+            <div style={celebrationMessageStyle}>
+              {celebrationMessage}
+            </div>
           )}
         </div>
       </div>

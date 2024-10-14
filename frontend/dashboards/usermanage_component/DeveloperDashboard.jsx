@@ -121,14 +121,18 @@ const DeveloperDashboard = () => {
 
   return (
     <div>
+      <div className="flex items-center mb-4">
       <Input
-        className="ml-2 font-primaryRegular w-48 sm:w-64"
+        className="ml-2 font-primaryRegular w-full" // Use w-full to make it full width
         placeholder="Search by Developer..."
         startContent={<SearchIcon />}
         value={searchQuery}
         onChange={handleSearchChange}
         onClear={() => handleSearchChange({ target: { value: "" } })}
+        style={{ maxWidth: "600px" }} // Optional: Set a maximum width
       />
+      </div>
+      
       <Table
         className="text-black"
         isHeaderSticky

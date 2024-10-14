@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Tabs, Tab } from "@nextui-org/react";
 import Header from "../src/components/header";
-import footer from "../src/components/footer";
+import Footer from "../src/components/footer";
 import UserManagementTable from "./usermanage_component/UserManagementTable";
 import UserStats from "./usermanage_component/Userstats";
 import DeveloperDashboard from "./usermanage_component/DeveloperDashboard";
@@ -57,7 +57,7 @@ useAuthCheck();
   }, []);
 
   return (
-    <div className="flex w-full flex-col">
+    <div className="flex w-full flex-col" style={{ backgroundColor: '#d4ebf2' }}>
       <Header />
       
       <div className="flex items-center p-4 font-primaryRegular">
@@ -74,7 +74,7 @@ useAuthCheck();
           <Tab key="tab2" title="Manage Users" style={{ padding: '20px 30px', fontSize: '1.1rem' }}/>
           <Tab key="tab3" title="pending Developers" style={{ padding: '20px 30px', fontSize: '1.1rem' }}/>
           <Tab key="tab4" title="Manage Developers" style={{ padding: '20px 30px', fontSize: '1.1rem' }}/>
-          <Tab key="tab5" title="Manage Moderators" style={{ padding: '20px 30px', fontSize: '1.1rem' }} />
+          <Tab key="tab5" title=" Moderators" style={{ padding: '20px 30px', fontSize: '1.1rem' }} />
           
           
         </Tabs>
@@ -88,7 +88,7 @@ useAuthCheck();
 
         {activeTab === "tab2" && (
           <div>
-            <h2>Users</h2>
+            <h2></h2>
             <UserManagementTable
               users={users}
               setUsers={setUsers}
@@ -101,25 +101,25 @@ useAuthCheck();
 
         {activeTab === "tab3" && (
           <div>
-            <h2>pending Developers</h2>
+            <h2></h2>
             <DeveloperDashboard developers={developers} />
           </div>
         )}
         {activeTab === "tab4" && (
           <div>
-            <h2>manage Developers</h2>
+            <h2></h2>
             <DeveloperInfoTable developers={developers} />
           </div>
         )}
         {activeTab === "tab5" && (
             <div>
-              <h2>Manage Moderators</h2>
+              <h2></h2>
               <ModeratorsTable moderators={moderators} />
             </div>
           )}
         
       </div>
-      <footer/>
+      <Footer/>
     </div>
   );
 };
