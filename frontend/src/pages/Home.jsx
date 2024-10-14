@@ -248,75 +248,6 @@ const Home = () => {
           </div>
         </section>
 
-        {/* Featured Games Slider */}
-        <motion.section
-          ref={sectionRef}
-          initial={{ opacity: 0, x: 100 }}
-          animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 100 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="py-16 relative overflow-hidden"
-        >
-          <BackgroundBeams />
-          <div className="container mx-auto px-4 relative z-10">
-            <h2 className="text-4xl font-bold text-white mb-8">
-              Featured Games
-            </h2>
-            <div className="relative">
-              <div className="overflow-hidden rounded-xl">
-                <div
-                  className="flex transition-transform duration-500 ease-in-out"
-                  style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-                >
-                  {featuredGames.map((game, index) => (
-                    <div key={game._id} className="w-full flex-shrink-0">
-                      <div className="relative h-96">
-                        <img
-                          src={game.AssignedGame.coverPhoto}
-                          alt={game.AssignedGame.title}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6">
-                          <h3 className="text-3xl font-bold text-white mb-2">
-                            {game.AssignedGame.title}
-                          </h3>
-                          <p className="text-gray-300 mb-4">
-                            {game.AssignedGame.Description.substring(0, 150)}...
-                          </p>
-                          <div className="flex justify-between items-center">
-                            <span className="text-2xl font-bold text-green-400">
-                              $
-                              {(
-                                game.UnitPrice -
-                                (game.UnitPrice * game.discount) / 100
-                              ).toFixed(2)}
-                            </span>
-                            <Link to={`/game/${game._id}`}>
-                              <Button color="primary" size="lg">
-                                View Game
-                              </Button>
-                            </Link>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <button
-                onClick={prevSlide}
-                className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
-              >
-                &#10094;
-              </button>
-              <button
-                onClick={nextSlide}
-                className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
-              >
-                &#10095;
-              </button>
-            </div>
-          </div>
-        </motion.section>
 
         <AIAssistantSection />
         <IndieDeveloperSection />
@@ -326,7 +257,7 @@ const Home = () => {
           <BackgroundBeams />
           <div className="container mx-auto px-4 text-center relative z-10">
             <AnimatedSection>
-              <h2 className="text-4xl font-bold text-white mb-8">
+              <h2 className="text-4xl font-primaryRegular text-white mb-8">
                 Join Our Thriving Gaming Community
               </h2>
             </AnimatedSection>

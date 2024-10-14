@@ -5,6 +5,7 @@ import Footer from "../components/footer";
 import { getToken } from "../utils/getToken";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { User } from "@nextui-org/react";
+import { Button } from "@nextui-org/react";
 import {
   FaHeart,
   FaRegHeart,
@@ -18,21 +19,18 @@ import { toast, Flip } from "react-toastify";
 import Loader from "../components/Loader/loader";
 import "react-toastify/dist/ReactToastify.css";
 import useAuthCheck from "../utils/authCheck";
-import {cn} from "../libs/util";
-import  {Input}  from "../components/ui/Input";
-import  {Label}  from "../components/ui/Lable";
+import { cn } from "../libs/util";
+import { Input } from "../components/ui/Input";
+import { Label } from "../components/ui/Lable";
 import { TracingBeam } from "../components/ui/TracingBeam";
 import { BackgroundBeams } from "../components/ui/BackgroundBeams";
 import { WobbleCard } from "../components/ui/wobble-card";
 
-const LabelInputContainer = ({
-  children,
-  className
-}) => {
+const LabelInputContainer = ({ children, className }) => {
   return (
-    (<div className={cn("flex flex-col space-y-2 w-full", className)}>
+    <div className={cn("flex flex-col space-y-2 w-full", className)}>
       {children}
-    </div>)
+    </div>
   );
 };
 
@@ -43,7 +41,7 @@ const CreatePost = ({ user, onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!heading.trim() || !articleBody.trim() || !image) {
       toast.error("Please fill all fields and select an image", {
         theme: "dark",
@@ -52,7 +50,7 @@ const CreatePost = ({ user, onSubmit }) => {
       });
       return;
     }
-    
+
     onSubmit({ heading, articleBody, image });
     setHeading("");
     setArticleBody("");
@@ -61,7 +59,9 @@ const CreatePost = ({ user, onSubmit }) => {
 
   return (
     <div className="max-w-lg mx-auto bg-gray-400 dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6 text-transparent bg-gradient-to-r py-4 from-blue-400 via-pink-300 to-purple-400 [text-shadow:0_0_rgba(0,0,0,0.1)]">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Create Post</h2>
+      <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
+        Create Post
+      </h2>
       <form onSubmit={handleSubmit}>
         <div className="flex items-center mb-4">
           {user && (
@@ -443,229 +443,242 @@ const Articles = () => {
     <div className="bg-customDark min-h-screen text-white font-sans">
       <BackgroundBeams />
       <TracingBeam>
-      <Header />
+        <Header />
 
-      <div className="container mx-auto p-4">
-        <CreatePost user={user} onSubmit={handleSubmit} />
+        <div className="container mx-auto p-4">
+          <CreatePost user={user} onSubmit={handleSubmit} />
 
-        <h2 className="text-3xl font-bold mb-6">Posts</h2>
-        {articles.length === 0 ? (
-          <div className="text-center mt-10">No articles found.</div>
-        ) : (
-          <div className="space-y-6">
-            {articles.map((article) => (
-              <div
-                key={article._id}
-                className="bg-gradient-to-r py-4 from-gray-600 via-gray-700 to-gray-800 [text-shadow:0_0_rgba(0,0,0,0.1)] rounded-lg shadow-md p-4 relative"
-              >
-                {article.uploader._id === userId && (
-                  <button
-                  className="absolute top-2 right-2 flex items-center justify-center space-x-1 text-red-500 hover:text-red-400"
-                    onClick={() => handleDeleteArticle(article._id)}
-                    disabled={deletingArticleId === article._id}
-                  >
-                    {deletingArticleId === article._id ? (
-                      <span className="text-sm">Deleting...</span>
-                    ) : (
-                      <>
-                       <FaTrash className="inline-block" size={16} />
-                      <span>Delete</span>
-                        </>
-                    )}
-                  </button>
-                )}
-
-                {article.uploader._id !== userId && (
-                  <button
-                    className="absolute top-2 right-2 flex items-center justify-center space-x-1 text-yellow-500 hover:text-yellow-400"
-                    onClick={() => handleReportArticle(article._id)}
-                    disabled={reportingArticleId === article._id}
-                  >
-                    {reportingArticleId === article._id ? (
-                      <span className="text-sm">Reporting...</span>
-                    ) : (
-                      <>
-                      <FaFlag  className="inline-block" size={16} />
-                     <span>Report</span>
-                       </>
-                    )}
-                  </button>
-                )}
-
-                <div className="flex mb-4">
-                  <div className="flex-shrink-0 w-1/3 pr-4">
-                    <img
-                      src={article.image}
-                      alt={article.heading}
-                      className="w-full h-full object-cover rounded"
-                    />
-                  </div>
-                  <div className="flex-grow">
-                    <h3 className="text-xl font-semibold mb-2">
-                      {article.heading}
-                    </h3>
-                    <p className="text-gray-400">{article.articleBody}</p>
-                    <p className="text-sm text-gray-500 mt-2">
-                      Posted by: {article.uploader.username}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center mt-4">
-  <div className="flex items-center">
-    <button onClick={() => handleLikeToggle(article._id)}>
-      {likedArticles[article._id] ? (
-        <FaHeart className="text-red-500 mr-2 text-2xl" />
-      ) : (
-        <FaRegHeart className="text-white mr-2 text-2xl" />
-      )}
-    </button>
-    <span>{article.likes} likes</span>
-  </div>
-                  <button
-                    onClick={() => toggleComments(article._id)}
-                    className="flex items-center text-gray-400 hover:text-white"
-                  >
-                    <FaComments className="mr-2" />
-                    <span>{article.comments.length} comments</span>
-                  </button>
-                </div>
-
-                {expandedComments[article._id] && (
-                  <div className="mt-4">
-                    <form
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        handleCommentSubmit(article._id);
-                      }}
+          <h2 className="text-3xl font-primaryRegular mb-6">Posts</h2>
+          {articles.length === 0 ? (
+            <div className="text-center mt-10">No articles found.</div>
+          ) : (
+            <div className="space-y-6">
+              {articles.map((article) => (
+                <div
+                  key={article._id}
+                  className="bg-black rounded-lg shadow-md p-4 relative"
+                >
+                  {article.uploader._id === userId && (
+                    <button
+                      className="absolute top-2 right-2 flex items-center justify-center space-x-1 text-red-500 hover:text-red-400"
+                      onClick={() => handleDeleteArticle(article._id)}
+                      disabled={deletingArticleId === article._id}
                     >
-                      <Input
-                        type="text"
-                        value={commentTexts[article._id] || ""}
-                        onChange={(e) =>
-                          handleCommentChange(article._id, e.target.value)
-                        }
-                        placeholder="Add a comment..."
-                        className="w-full mb-2"
-                      />
-                      <button
-                        type="submit"
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded"
-                        disabled={
-                          !commentTexts[article._id] ||
-                          commentTexts[article._id].trim() === ""
-                        }
-                      >
-                        Comment
-                      </button>
-                    </form>
+                      {deletingArticleId === article._id ? (
+                        <span className="text-sm">Deleting...</span>
+                      ) : (
+                        <>
+                          <FaTrash className="inline-block" size={16} />
+                          <span>Delete</span>
+                        </>
+                      )}
+                    </button>
+                  )}
 
-                    <div className="mt-4 space-y-2">
-                      {article.comments.map((comment) => (
-                        <div
-                          key={comment._id}
-                          className="bg-gray-900 p-2 rounded-lg flex justify-between items-start"
-                        >
-                          <div className="w-full">
-                            <div className="flex items-center mb-1">
-                              {comment.user && (
-                                <User
-                                  avatarProps={{
-                                    src: comment.user.profilePic,
-                                    size: "sm",
-                                  }}
-                                  name={comment.user.name}
-                                  className="mr-2"
-                                />
-                              )}
-                              <p className="text-xs text-gray-500">
-                                {new Date(comment.createdAt).toLocaleString()}
-                              </p>
-                            </div>
-                            {editingCommentId === comment._id ? (
-                              <form
-                                onSubmit={(e) => {
-                                  e.preventDefault();
-                                  handleEditComment(
-                                    article._id,
-                                    comment._id,
-                                    editedCommentText
-                                  );
-                                }}
-                              >
-                                <Input
-                                  type="text"
-                                  value={editedCommentText}
-                                  onChange={(e) =>
-                                    setEditedCommentText(e.target.value)
-                                  }
-                                  className="w-full mb-2"
-                                />
-                                <div>
-                                  <button
-                                    type="submit"
-                                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded mr-2"
-                                  >
-                                    Save
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setEditingCommentId(null);
-                                      setEditedCommentText("");
-                                    }}
-                                    className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1 px-3 rounded"
-                                  >
-                                    Cancel
-                                  </button>
-                                </div>
-                              </form>
-                            ) : (
-                              <p className="text-sm">{comment.text}</p>
-                            )}
-                            {comment.editedAt && (
-                              <p className="text-xs text-gray-500 mt-1">
-                                (Edited:{" "}
-                                {new Date(comment.editedAt).toLocaleString()})
-                              </p>
-                            )}
-                          </div>
-                          {comment.user && comment.user._id === userId && (
-                            <div className="flex">
-                              <button
-                                className="text-blue-500 hover:text-blue-400 text-xs mr-2"
-                                onClick={() => {
-                                  setEditingCommentId(comment._id);
-                                  setEditedCommentText(comment.text);
-                                }}
-                              >
-                                <FaEdit />
-                              </button>
-                              <button
-                                className="text-red-600 hover:text-red-400 text-xs"
-                                onClick={() =>
-                                  handleDeleteComment(article._id, comment._id)
-                                }
-                                disabled={deletingCommentId === comment._id}
-                              >
-                                {deletingCommentId === comment._id ? (
-                                  "Deleting..."
-                                ) : (
-                                  <FaTrash />
-                                )}
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                  {article.uploader._id !== userId && (
+                    <Button
+                      className="absolute top-2 right-2 flex items-center justify-center space-x-1 "
+                      onClick={() => handleReportArticle(article._id)}
+                      disabled={reportingArticleId === article._id}
+                    >
+                      {reportingArticleId === article._id ? (
+                        <span className="font-primaryRegular text-[20px]">Reporting...</span>
+                      ) : (
+                        <>
+                          <FaFlag className="inline-block text-[40px]" size={16} />
+                          <span className="font-primaryRegular text-[20px]">Report</span>
+                        </>
+                      )}
+                    </Button>
+                  )}
+
+                  <div className="flex mb-4">
+                    <div className="flex-shrink-0 w-1/3 pr-4">
+                      <img
+                        src={article.image}
+                        alt={article.heading}
+                        className="w-full h-full object-cover rounded"
+                      />
+                    </div>
+                    <div className="flex-grow">
+                      <h3 className="text-[30px] font-primaryRegular mb-8">
+                        {article.heading}
+                      </h3>
+                      <p className="text-white font-primaryRegular">
+                        {article.articleBody}
+                      </p>
+                      <User
+                        avatarProps={{
+                          src: article.uploader.profilePic,
+                          size: "lg",
+                        }}
+                        name={article.uploader.username}
+                        description={article.uploader.role}
+                        className="mr-3 mt-8 scale-120 font-primaryRegular text-[20px]"
+                      />
                     </div>
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+
+                  <div className="flex justify-between items-center mt-4">
+                    <div className="flex items-center">
+                      <Button onClick={() => handleLikeToggle(article._id)} color="danger" size="md">
+                        {likedArticles[article._id] ? (
+                         <FaHeart className="text-red-500 mr-2 text-[40px]" fill="white" stroke="currentColor" strokeWidth="30" />
+                        ) : (
+                          <FaRegHeart className="text-white mr-2 text-[40px]" />
+                        )}
+                      </Button>
+                      <span className="font-primaryRegular text-[20px] ml-4">{article.likes} Likes</span>
+                    </div>
+                    <Button
+                      onClick={() => toggleComments(article._id)} 
+                      variant="ghost"
+                      color="primary"
+                      className="flex items-center"
+                    >
+                      <FaComments className="mr-2 text-[40px]" />
+                      <span className="font-primaryRegular text-[20px]">{article.comments.length} Comments</span>
+                    </Button>
+                  </div>
+
+                  {expandedComments[article._id] && (
+                    <div className="mt-4">
+                      <form
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          handleCommentSubmit(article._id);
+                        }}
+                      >
+                        <Input
+                          type="text"
+                          value={commentTexts[article._id] || ""}
+                          onChange={(e) =>
+                            handleCommentChange(article._id, e.target.value)
+                          }
+                          placeholder="Add a comment..."
+                          className="w-full mb-2"
+                        />
+                        <button
+                          type="submit"
+                          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded"
+                          disabled={
+                            !commentTexts[article._id] ||
+                            commentTexts[article._id].trim() === ""
+                          }
+                        >
+                          Comment
+                        </button>
+                      </form>
+
+                      <div className="mt-4 space-y-2">
+                        {article.comments.map((comment) => (
+                          <div
+                            key={comment._id}
+                            className="bg-gray-900 p-2 rounded-lg flex justify-between items-start"
+                          >
+                            <div className="w-full">
+                              <div className="flex items-center mb-1">
+                                {comment.user && (
+                                  <User
+                                    avatarProps={{
+                                      src: comment.user.profilePic,
+                                      size: "sm",
+                                    }}
+                                    name={comment.user.name}
+                                    className="mr-2"
+                                  />
+                                )}
+                                <p className="text-xs text-gray-500">
+                                  {new Date(comment.createdAt).toLocaleString()}
+                                </p>
+                              </div>
+                              {editingCommentId === comment._id ? (
+                                <form
+                                  onSubmit={(e) => {
+                                    e.preventDefault();
+                                    handleEditComment(
+                                      article._id,
+                                      comment._id,
+                                      editedCommentText
+                                    );
+                                  }}
+                                >
+                                  <Input
+                                    type="text"
+                                    value={editedCommentText}
+                                    onChange={(e) =>
+                                      setEditedCommentText(e.target.value)
+                                    }
+                                    className="w-full mb-2"
+                                  />
+                                  <div>
+                                    <button
+                                      type="submit"
+                                      className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded mr-2"
+                                    >
+                                      Save
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setEditingCommentId(null);
+                                        setEditedCommentText("");
+                                      }}
+                                      className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1 px-3 rounded"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </form>
+                              ) : (
+                                <p className="text-sm">{comment.text}</p>
+                              )}
+                              {comment.editedAt && (
+                                <p className="text-xs text-gray-500 mt-1">
+                                  (Edited:{" "}
+                                  {new Date(comment.editedAt).toLocaleString()})
+                                </p>
+                              )}
+                            </div>
+                            {comment.user && comment.user._id === userId && (
+                              <div className="flex">
+                                <button
+                                  className="text-blue-500 hover:text-blue-400 text-xs mr-2"
+                                  onClick={() => {
+                                    setEditingCommentId(comment._id);
+                                    setEditedCommentText(comment.text);
+                                  }}
+                                >
+                                  <FaEdit />
+                                </button>
+                                <button
+                                  className="text-red-600 hover:text-red-400 text-xs"
+                                  onClick={() =>
+                                    handleDeleteComment(
+                                      article._id,
+                                      comment._id
+                                    )
+                                  }
+                                  disabled={deletingCommentId === comment._id}
+                                >
+                                  {deletingCommentId === comment._id ? (
+                                    "Deleting..."
+                                  ) : (
+                                    <FaTrash />
+                                  )}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </TracingBeam>
       <Footer />
     </div>
@@ -673,4 +686,3 @@ const Articles = () => {
 };
 
 export default Articles;
-                    
