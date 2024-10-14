@@ -41,17 +41,13 @@ const Home = () => {
   const [featuredGames, setFeaturedGames] = useState([]);
   const [latestRatings, setLatestRatings] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const [currentSlide, setCurrentSlide] = useState(0);
   const shopSectionRef = useRef(null);
   const sliderRef = useRef(null);
   const navigate = useNavigate();
   const sectionRef = useRef(null); // Reference for the section
   const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
   const [hoverDirection, setHoverDirection] = useState("");
-
-  const [currentSlide, setCurrentSlide] = useState(1);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-const totalSlides = featuredGames.length;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -72,41 +68,27 @@ const totalSlides = featuredGames.length;
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      nextSlide();
+    }, 5000);
 
+    return () => clearInterval(intervalId);
+  }, [currentSlide, featuredGames.length]);
 
-useEffect(() => {
-  const intervalId = setInterval(() => {
-    nextSlide();
-  }, 3000);
+  const nextSlide = () => {
+    setCurrentSlide((prevSlide) => (prevSlide + 1) % featuredGames.length);
+  };
 
-  return () => clearInterval(intervalId);
-}, [currentSlide]);
-
-useEffect(() => {
-  if (isTransitioning) {
-    const timeoutId = setTimeout(() => {
-      setIsTransitioning(false);
-      if (currentSlide > totalSlides) {
-        setCurrentSlide(1);
-      } else if (currentSlide < 1) {
-        setCurrentSlide(totalSlides);
-      }
-    }, 500);
-
-    return () => clearTimeout(timeoutId);
-  }
-}, [currentSlide, isTransitioning, totalSlides]);
-
-const nextSlide = () => {
-  setIsTransitioning(true);
-  setCurrentSlide(prevSlide => prevSlide + 1);
-};
-
-const prevSlide = () => {
-  setIsTransitioning(true);
-  setCurrentSlide(prevSlide => prevSlide - 1);
-};
-
+  const prevSlide = () => {
+    setCurrentSlide(
+      (prevSlide) =>
+        (prevSlide - 1 + featuredGames.length) % featuredGames.length
+    );
+  };
+  const handleClick = (path) => {
+    navigate(path);
+  };
   const variants = {
     hidden: { opacity: 0, y: 50 },
     visible: { opacity: 1, y: 0 },
@@ -266,77 +248,76 @@ const prevSlide = () => {
           </div>
         </section>
 
-{/* Featured Games Slider */}
-<section className="py-16 relative overflow-hidden bg-customDark">
-  <BackgroundBeams />
-  <div className="container mx-auto px-4 relative z-10">
-    <h2 className="text-4xl font-bold text-white mb-8">Featured Games</h2>
-    <div className="relative overflow-hidden">
-      <div 
-        className="flex transition-transform duration-500 ease-in-out"
-        style={{ transform: `translateX(-${(currentSlide - 1) * 33.33}%)` }}
-      >
-        {[...featuredGames.slice(-1), ...featuredGames, ...featuredGames.slice(0, 1)].map((game, index) => (
-          <div key={`${game._id}-${index}`} className="w-1/3 flex-shrink-0 px-2">
-            <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg">
-              <img
-                src={game.AssignedGame.coverPhoto}
-                alt={game.AssignedGame.title}
-                className="w-full h-80 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="text-xl font-bold text-white mb-2">
-                  {game.AssignedGame.title}
-                </h3>
-                <p className="text-gray-300 mb-4 text-sm h-12 overflow-hidden">
-                  {game.AssignedGame.Description.substring(0, 80)}...
-                </p>
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-bold text-blue-100">
-                    ${(game.UnitPrice - (game.UnitPrice * game.discount) / 100).toFixed(2)}
-                  </span>
-                  <Link to={`/game/${game._id}`}>
-                 <Button 
-                  color="primary" 
-                  size="sm" 
-                  style={{
-                  backgroundColor: '#8E44AD', // Vibrant Purple for a striking effect
-                  borderRadius: '8px',
-                  padding: '10px 20px',
-                  fontWeight: 'bold'
-           }}
->
-            View Game
-</Button>
-  </Link>
+        {/* Featured Games Slider */}
+        <motion.section
+          ref={sectionRef}
+          initial={{ opacity: 0, x: 100 }}
+          animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 100 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="py-16 relative overflow-hidden"
+        >
+          <BackgroundBeams />
+          <div className="container mx-auto px-4 relative z-10">
+            <h2 className="text-4xl font-bold text-white mb-8">
+              Featured Games
+            </h2>
+            <div className="relative">
+              <div className="overflow-hidden rounded-xl">
+                <div
+                  className="flex transition-transform duration-500 ease-in-out"
+                  style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                >
+                  {featuredGames.map((game, index) => (
+                    <div key={game._id} className="w-full flex-shrink-0">
+                      <div className="relative h-96">
+                        <img
+                          src={game.AssignedGame.coverPhoto}
+                          alt={game.AssignedGame.title}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6">
+                          <h3 className="text-3xl font-bold text-white mb-2">
+                            {game.AssignedGame.title}
+                          </h3>
+                          <p className="text-gray-300 mb-4">
+                            {game.AssignedGame.Description.substring(0, 150)}...
+                          </p>
+                          <div className="flex justify-between items-center">
+                            <span className="text-2xl font-bold text-green-400">
+                              $
+                              {(
+                                game.UnitPrice -
+                                (game.UnitPrice * game.discount) / 100
+                              ).toFixed(2)}
+                            </span>
+                            <Link to={`/game/${game._id}`}>
+                              <Button color="primary" size="lg">
+                                View Game
+                              </Button>
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
+              <button
+                onClick={prevSlide}
+                className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
+              >
+                &#10094;
+              </button>
+              <button
+                onClick={nextSlide}
+                className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
+              >
+                &#10095;
+              </button>
             </div>
           </div>
-        ))}
-      </div>
-    </div>
-    <button
-      onClick={prevSlide}
-      className="absolute top-1/2 left-0 transform -translate-y-1/2 bg-white text-black w-12 h-12 flex items-center justify-center rounded-full hover:bg-gray-200 transition-all z-20"
-      style={{ marginLeft: "-3rem" }}
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-      </svg>
-    </button>
-    <button
-      onClick={nextSlide}
-      className="absolute top-1/2 right-0 transform -translate-y-1/2 bg-white text-black w-12 h-12 flex items-center justify-center rounded-full hover:bg-gray-200 transition-all z-20"
-      style={{ marginRight: "-3rem" }}
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-      </svg>
-    </button>
-  </div>
-</section>
         </motion.section>
+
         <AIAssistantSection />
         <IndieDeveloperSection />
 
