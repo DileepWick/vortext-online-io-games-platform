@@ -459,28 +459,34 @@ const Articles = () => {
               >
                 {article.uploader._id === userId && (
                   <button
-                  className="absolute top-2 right-2 text-red-500 hover:text-red-400"
+                  className="absolute top-2 right-2 flex items-center justify-center space-x-1 text-red-500 hover:text-red-400"
                     onClick={() => handleDeleteArticle(article._id)}
                     disabled={deletingArticleId === article._id}
                   >
                     {deletingArticleId === article._id ? (
                       <span className="text-sm">Deleting...</span>
                     ) : (
-                      <FaTrash size={16} />
+                      <>
+                       <FaTrash className="inline-block" size={16} />
+                      <span>Delete</span>
+                        </>
                     )}
                   </button>
                 )}
 
                 {article.uploader._id !== userId && (
                   <button
-                    className="absolute top-2 right-2 text-yellow-500 hover:text-yellow-400"
+                    className="absolute top-2 right-2 flex items-center justify-center space-x-1 text-yellow-500 hover:text-yellow-400"
                     onClick={() => handleReportArticle(article._id)}
                     disabled={reportingArticleId === article._id}
                   >
                     {reportingArticleId === article._id ? (
                       <span className="text-sm">Reporting...</span>
                     ) : (
-                      <FaFlag size={16} />
+                      <>
+                      <FaFlag  className="inline-block" size={16} />
+                     <span>Report</span>
+                       </>
                     )}
                   </button>
                 )}
@@ -505,16 +511,16 @@ const Articles = () => {
                 </div>
 
                 <div className="flex justify-between items-center mt-4">
-                  <div className="flex items-center">
-                    <button onClick={() => handleLikeToggle(article._id)}>
-                      {likedArticles[article._id] ? (
-                        <FaHeart className="text-red-500 mr-2" />
-                      ) : (
-                        <FaRegHeart className="text-white mr-2" />
-                      )}
-                    </button>
-                    <span>{article.likes} likes</span>
-                  </div>
+  <div className="flex items-center">
+    <button onClick={() => handleLikeToggle(article._id)}>
+      {likedArticles[article._id] ? (
+        <FaHeart className="text-red-500 mr-2 text-2xl" />
+      ) : (
+        <FaRegHeart className="text-white mr-2 text-2xl" />
+      )}
+    </button>
+    <span>{article.likes} likes</span>
+  </div>
                   <button
                     onClick={() => toggleComments(article._id)}
                     className="flex items-center text-gray-400 hover:text-white"
