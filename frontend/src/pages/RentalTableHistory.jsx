@@ -9,6 +9,8 @@ import {
   TableCell,
   Pagination,
   Input,
+  Card,
+  CardBody
 } from "@nextui-org/react";
 import { SearchIcon } from "lucide-react";
 
@@ -56,60 +58,66 @@ const RentalTableHistory = ({ userId }) => {
   };
 
   return (
-    <div className="text-black">
+    <div className="text-white">
       <Input
-        className="ml-2 font-primaryRegular w-48 sm:w-64 mb-4 text-black"
+        className="mb-6 w-full max-w-md mx-auto"
         placeholder="Search by game title..."
-        startContent={<SearchIcon size={18} />}
+        startContent={<SearchIcon className="text-gray-400" />}
         value={searchQuery}
         onChange={handleSearchChange}
         onClear={handleClearSearch}
+        size="lg"
       />
-      <Table
-        aria-label="Rental table with pagination"
-        bottomContent={
-          <div className="flex w-full justify-center">
-            <Pagination
-              isCompact
-              showControls
-              showShadow
-              color="primary"
-              page={page}
-              total={Math.ceil(filteredItems.length / rowsPerPage)}
-              onChange={(page) => setPage(page)}
-            />
-          </div>
-        }
-        classNames={{
-          wrapper: "min-h-[222px]",
-        }}
-      >
-        <TableHeader>
-          <TableColumn className="text-black" key="COVER">COVER</TableColumn>
-          <TableColumn className="text-black" key="GAME">GAME</TableColumn>         
-          <TableColumn className="text-black" key="TIME">TIME (Seconds)</TableColumn>
-          <TableColumn className="text-black" key="PRICE">PRICE</TableColumn>
-          <TableColumn className="text-black" key="DATE">RENTAL DATE</TableColumn>
-        </TableHeader>
-        <TableBody>
-          {items.map((rental) => (
-            <TableRow key={rental._id} className="text-black">
-            <TableCell>
-                <img 
-                  src={rental.game.coverPhoto} 
-                  alt={rental.game.title}
-                  style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+      <Card className="bg-gray-900 shadow-xl">
+        <CardBody>
+          <Table
+            aria-label="Rental table with pagination"
+            bottomContent={
+              <div className="flex w-full justify-center">
+                <Pagination
+                  isCompact
+                  showControls
+                  showShadow
+                  color="secondary"
+                  page={page}
+                  total={Math.ceil(filteredItems.length / rowsPerPage)}
+                  onChange={(page) => setPage(page)}
                 />
-              </TableCell>
-            <TableCell>{rental.game.title}</TableCell>
-              
-              <TableCell>{rental.time}</TableCell>
-              <TableCell>Rs.{rental.price}</TableCell>
-              <TableCell>{new Date(rental.insertDate).toLocaleDateString()}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+              </div>
+            }
+            classNames={{
+              wrapper: "min-h-[222px]",
+              th: "text-black font-bold",  
+              td: "text-black",
+            }}
+          >
+            <TableHeader>
+              <TableColumn key="COVER">COVER</TableColumn>
+              <TableColumn key="GAME">GAME</TableColumn>         
+              <TableColumn key="TIME">TIME (Seconds)</TableColumn>
+              <TableColumn key="PRICE">PRICE</TableColumn>
+              <TableColumn key="DATE">RENTAL DATE</TableColumn>
+            </TableHeader>
+            <TableBody>
+              {items.map((rental) => (
+                <TableRow key={rental._id} className="hover:bg-purple-900/30 transition-colors">
+                  <TableCell>
+                    <img 
+                      src={rental.game.coverPhoto} 
+                      alt={rental.game.title}
+                      className="w-16 h-16 object-cover rounded-lg shadow-md hover:scale-110 transition-transform duration-200"
+                    />
+                  </TableCell>
+                  <TableCell className="font-semibold">{rental.game.title}</TableCell>
+                  <TableCell>{rental.time}</TableCell>
+                  <TableCell className="text-red-500 font-bold">Rs.{rental.price}</TableCell>
+                  <TableCell>{new Date(rental.insertDate).toLocaleDateString()}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardBody>
+      </Card>
     </div>
   );
 };

@@ -120,6 +120,7 @@ const Payment_Manager = () => {
           {activeTab === "tab6" && <IncomeExpenseAnalysis />}
         </div>
       </div>
+      <Footer />
     </div>
   );
 };
