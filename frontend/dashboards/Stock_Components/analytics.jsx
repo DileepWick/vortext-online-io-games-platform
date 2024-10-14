@@ -110,7 +110,8 @@ const Analytics = () => {
 
   // Sales Analytics
   const salesByGame = sales.reduce((acc, sale) => {
-    const gameTitle = sale.stockid.AssignedGame.title;
+    const gameTitle = sale.stockid.AssignedGame?.title ? sale.stockid.AssignedGame.title : "NA";
+
     acc[gameTitle] = (acc[gameTitle] || 0) + sale.price;
     return acc;
   }, {});
