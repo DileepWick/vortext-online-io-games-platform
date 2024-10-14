@@ -307,9 +307,6 @@ const HandleRentals = () => {
           <h1 className="text-5xl text-white mb-4">
             {game.title}
             <br />
-            <Chip color="primary" radius="none" className="mt-2">
-              {game.RatingPoints} Rating Points ⭐
-            </Chip>
           </h1>
           <div className="flex flex-col lg:flex-row gap-8 mb-8">
             <div className="flex-1">
@@ -417,7 +414,7 @@ const HandleRentals = () => {
                   ))}
                 </div>
                 <Button
-                  color="success"
+                  color="primary"
                   onPress={handleRentClick}
                   className="w-full"
                   disabled={!selectedRental}
