@@ -59,7 +59,7 @@ const CreatePost = ({ user, onSubmit }) => {
   };
 
   return (
-    <div className="max-w-lg mx-auto bg-gray-400 dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+    <div className="max-w-lg mx-auto bg-gray-400 dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6 text-transparent bg-gradient-to-r py-4 from-blue-400 via-pink-300 to-purple-400 [text-shadow:0_0_rgba(0,0,0,0.1)]">
       <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Create Post</h2>
       <form onSubmit={handleSubmit}>
         <div className="flex items-center mb-4">
@@ -440,6 +440,7 @@ const Articles = () => {
 
   return (
     <div className="bg-customDark min-h-screen text-white font-sans">
+      <BackgroundBeams />
       <TracingBeam>
       <Header />
 
@@ -454,7 +455,7 @@ const Articles = () => {
             {articles.map((article) => (
               <div
                 key={article._id}
-                className="bg-gray-800 rounded-lg shadow-md p-4 relative"
+                className="bg-gradient-to-r py-4 from-gray-600 via-gray-700 to-gray-800 [text-shadow:0_0_rgba(0,0,0,0.1)] rounded-lg shadow-md p-4 relative"
               >
                 {article.uploader._id === userId && (
                   <button
