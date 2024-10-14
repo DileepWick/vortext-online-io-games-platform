@@ -4,7 +4,7 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import { getToken } from "../utils/getToken";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
-import { User } from "@nextui-org/react";
+import { Textarea, User } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
 import {
   FaHeart,
@@ -497,7 +497,7 @@ const Articles = () => {
                       <img
                         src={article.image}
                         alt={article.heading}
-                        className="w-full h-full object-cover rounded"
+                        className="w-[500px] h-[300px] object-cover rounded"
                       />
                     </div>
                     <div className="flex-grow">
@@ -549,48 +549,47 @@ const Articles = () => {
                           handleCommentSubmit(article._id);
                         }}
                       >
-                        <Input
+                        <Textarea
                           type="text"
                           value={commentTexts[article._id] || ""}
                           onChange={(e) =>
                             handleCommentChange(article._id, e.target.value)
                           }
                           placeholder="Add a comment..."
-                          className="w-full mb-2"
+                          className="w-full mb-2 font-primaryRegular"
                         />
-                        <button
+                        <Button
                           type="submit"
-                          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded"
+                          color="primary"
+                          className=" font-primaryRegular"
                           disabled={
                             !commentTexts[article._id] ||
                             commentTexts[article._id].trim() === ""
                           }
                         >
                           Comment
-                        </button>
+                        </Button>
                       </form>
 
-                      <div className="mt-4 space-y-2">
+                      <div className="mt-4 space-y-2 flex flex-wrap gap-[20px]">
                         {article.comments.map((comment) => (
                           <div
                             key={comment._id}
-                            className="bg-gray-900 p-2 rounded-lg flex justify-between items-start"
+                            className="bg-gray-900 p-2 rounded-lg flex justify-between items-start "
                           >
                             <div className="w-full">
-                              <div className="flex items-center mb-1">
+                              <div className="flex items-center mb-1 font-primaryRegular">
                                 {comment.user && (
                                   <User
                                     avatarProps={{
                                       src: comment.user.profilePic,
-                                      size: "sm",
+                                      size: "lg",
                                     }}
-                                    name={comment.user.name}
+                                    name={comment.user.username}
                                     className="mr-2"
+                                    description={comment.user.role}
                                   />
                                 )}
-                                <p className="text-xs text-gray-500">
-                                  {new Date(comment.createdAt).toLocaleString()}
-                                </p>
                               </div>
                               {editingCommentId === comment._id ? (
                                 <form
@@ -603,38 +602,40 @@ const Articles = () => {
                                     );
                                   }}
                                 >
-                                  <Input
+                                  <Textarea
                                     type="text"
                                     value={editedCommentText}
                                     onChange={(e) =>
                                       setEditedCommentText(e.target.value)
                                     }
-                                    className="w-full mb-2"
+                                    className="w-full mb-2 font-primaryRegular"
                                   />
                                   <div>
-                                    <button
+                                    <Button
                                       type="submit"
-                                      className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded mr-2"
+                                      color="primary"
+                                      className="text-white font-primaryRegular mr-2"
                                     >
-                                      Save
-                                    </button>
-                                    <button
+                                      Update
+                                    </Button>
+                                    <Button
                                       type="button"
                                       onClick={() => {
                                         setEditingCommentId(null);
                                         setEditedCommentText("");
                                       }}
-                                      className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1 px-3 rounded"
+                                      color="danger"
+                                      className=" text-white font-primaryRegular"
                                     >
                                       Cancel
-                                    </button>
+                                    </Button>
                                   </div>
                                 </form>
                               ) : (
-                                <p className="text-sm">{comment.text}</p>
+                                <p className="text-md font-primaryRegular">{comment.text}</p>
                               )}
                               {comment.editedAt && (
-                                <p className="text-xs text-gray-500 mt-1">
+                                <p className="text-xs text-gray-500 mt-1 font-primaryRegular">
                                   (Edited:{" "}
                                   {new Date(comment.editedAt).toLocaleString()})
                                 </p>
@@ -649,7 +650,7 @@ const Articles = () => {
                                     setEditedCommentText(comment.text);
                                   }}
                                 >
-                                  <FaEdit />
+                                  <FaEdit className="text-[20px]"/>
                                 </button>
                                 <button
                                   className="text-red-600 hover:text-red-400 text-xs"
@@ -664,7 +665,7 @@ const Articles = () => {
                                   {deletingCommentId === comment._id ? (
                                     "Deleting..."
                                   ) : (
-                                    <FaTrash />
+                                    <FaTrash  className="text-[20px] ml-4"/>
                                   )}
                                 </button>
                               </div>
