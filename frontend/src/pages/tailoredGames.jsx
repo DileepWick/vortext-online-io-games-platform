@@ -66,7 +66,7 @@ const TailoredGames = () => {
           {/* Game 2 */}
           <GameCard
             title="Rock Paper scissors"
-            imageUrl="https://res.cloudinary.com/dhcawltsr/image/upload/v1728732978/882363a6-0b96-4cd7-b7e1-6dca080a3b24_ygxdix.jpg"
+            imageUrl="https://res.cloudinary.com/dhcawltsr/image/upload/v1728819820/4ddb1bdf-67b6-427a-ac22-e8e5fe180d80_mwmmq4.jpg"
             link="/rock-paper-scissors"
             devName={"Ranasinghe G.M.N.T.B"}
             devId={"IT22201928"}
