@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
-import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { motion, useInView, inView } from "framer-motion";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -12,13 +13,36 @@ import { TracingBeam } from "../components/ui/TracingBeam";
 import { BackgroundGradient } from "../components/ui/BackgroundGradient";
 import { BackgroundBeams } from "../components/ui/BackgroundBeams";
 import { Button } from "@nextui-org/react";
+import AIAssistantSection from "../components/ui/AIAssistantSection";
+import IndieDeveloperSection from "../components/ui/DeveloperSection";
+import { TypewriterEffectOneWordSmooth } from "../components/ui/TypeWriterOneWord";
 
+const AnimatedSection = ({ children }) => {
+  const ref = React.useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.2 });
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 50 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+    >
+      {children}
+    </motion.div>
+  );
+};
 const Home = () => {
   const [featuredGames, setFeaturedGames] = useState([]);
   const [latestRatings, setLatestRatings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const shopSectionRef = useRef(null);
   const sliderRef = useRef(null);
+  const navigate = useNavigate();
+  const sectionRef = useRef(null); // Reference for the section
+  const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
+  const [hoverDirection, setHoverDirection] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -57,81 +81,151 @@ const Home = () => {
         (prevSlide - 1 + featuredGames.length) % featuredGames.length
     );
   };
+  const handleClick = (path) => {
+    navigate(path);
+  };
+  const variants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0 },
+  };
 
+  const handleScrollToShopSection = () => {
+    shopSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleMouseEnter = (e) => {
+    const { top, left, width, height } = e.target.getBoundingClientRect();
+    const x = e.clientX - left - width / 2;
+    const y = e.clientY - top - height / 2;
+    const angle = Math.atan2(y, x) * (180 / Math.PI);
+
+    if (angle >= -45 && angle <= 45) {
+      setHoverDirection("left");
+    } else if (angle > 45 && angle <= 135) {
+      setHoverDirection("up");
+    } else if (angle > -135 && angle <= -45) {
+      setHoverDirection("down");
+    } else {
+      setHoverDirection("right");
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setHoverDirection("");
+  };
+  const hoverVariants = {
+    up: { y: -10 },
+    down: { y: 10 },
+    left: { x: -10 },
+    right: { x: 10 },
+    initial: { x: 0, y: 0 },
+  };
   return (
     <div className="font-primaryRegular bg-customDark flex flex-col min-h-screen">
       {" "}
+      <Helmet>
+        <title>Welcome to Vortex Gaming</title>
+      </Helmet>
+      <Header />
+      {/* Hero Section */}
+      <LampContainer>
+        <motion.h1
+          initial={{ opacity: 0.5, y: 100 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.8, ease: "easeInOut" }}
+          className="mt-8 bg-gradient-to-br from-slate-300 to-slate-500 py-4 bg-clip-text text-center text-4xl font-medium tracking-tight text-transparent md:text-7xl"
+        >
+          <TypewriterEffectOneWordSmooth
+            words={[
+              { text: "Discover" },
+              { text: "Play" },
+              { text: "Connect" },
+              { text: "Shop" },
+            ]}
+          />
+        </motion.h1>
+        <p className="text-white text-4xl mt-4 text-center">
+          Your one-stop destination for all things gaming
+        </p>
+        <motion.button
+          initial="initial"
+          animate={hoverDirection || "initial"}
+          variants={hoverVariants}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          onClick={handleScrollToShopSection}
+          className="mt-8 px-16 py-8 bg-transparent border-2 border-white rounded-full text-white text-2xl font-bold hover:bg-white hover:text-black"
+        >
+          Explore
+        </motion.button>
+      </LampContainer>
       <TracingBeam>
-        <Helmet>
-          <title>Welcome to Vortex Gaming</title>
-        </Helmet>
-        <Header />
-
-        {/* Hero Section */}
-
-        <LampContainer>
-          <motion.h1
-            initial={{ opacity: 0.5, y: 100 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.8, ease: "easeInOut" }}
-            className="mt-8 bg-gradient-to-br from-slate-300 to-slate-500 py-4 bg-clip-text text-center text-4xl font-medium tracking-tight text-transparent md:text-7xl"
-          >
-            <FlipWords words={["Discover", "Play", "Connect", "Shop"]} />
-          </motion.h1>
-          <p className="text-white text-xl mt-4 text-center">
-            Your one-stop destination for all things gaming
-          </p>
-          <Button color="primary" variant="shadow" size="lg" className="mt-8">
-            Explore Our Shop
-          </Button>
-        </LampContainer>
-
         {/* Game Shop Highlight */}
-        <section className="py-16 relative overflow-hidden">
+        <section
+          className="py-16 relative overflow-hidden"
+          ref={shopSectionRef}
+        >
           <BackgroundBeams />
           <div className="container mx-auto px-4 relative z-10">
-            <h2 className="text-4xl font-bold text-white mb-8 text-center">
-              Vortex Game Shop
-            </h2>
+            <AnimatedSection>
+              <h2 className="text-4xl font-bold text-white mb-8 text-center">
+                Vortex Game Shop
+              </h2>
+            </AnimatedSection>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {[
                 "Latest Releases",
                 "Top Sellers",
-                "Indie Gems",
+                "Indie Games",
                 "Special Offers",
               ].map((category, index) => (
-                <BackgroundGradient key={index} className="rounded-xl p-1">
-                  <div className="bg-gray-800 rounded-lg p-6 h-full flex flex-col justify-between">
-                    <h3 className="text-2xl font-bold text-white mb-4">
-                      {category}
-                    </h3>
-                    <p className="text-gray-300 mb-4">
-                      Discover amazing games in our {category.toLowerCase()}{" "}
-                      collection.
-                    </p>
-                    <Button color="primary" size="sm">
-                      Browse {category}
-                    </Button>
-                  </div>
-                </BackgroundGradient>
+                <AnimatedSection key={index}>
+                  <BackgroundGradient className="rounded-xl p-1">
+                    <div className="bg-gray-800 rounded-lg p-6 h-full flex flex-col justify-between">
+                      <h3 className="text-2xl font-bold text-white mb-4">
+                        {category}
+                      </h3>
+                      <p className="text-gray-300 mb-4">
+                        Discover amazing games in our {category.toLowerCase()}{" "}
+                        collection.
+                      </p>
+                      <Button color="primary" size="sm">
+                        Browse {category}
+                      </Button>
+                    </div>
+                  </BackgroundGradient>
+                </AnimatedSection>
               ))}
             </div>
-            <div className="text-center mt-12">
-              <Button color="secondary" size="lg">
-                Visit Full Shop
-              </Button>
-            </div>
+            <AnimatedSection>
+              <div className="text-center mt-12">
+                <Button
+                  color="secondary"
+                  size="lg"
+                  onClick={() => handleClick("/shop")}
+                >
+                  Visit Full Shop
+                </Button>
+              </div>
+            </AnimatedSection>
           </div>
         </section>
 
         {/* Featured Games Slider */}
-        <section className="py-16 relative overflow-hidden">
+        <motion.section
+          ref={sectionRef}
+          initial={{ opacity: 0, x: 100 }}
+          animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 100 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="py-16 relative overflow-hidden"
+        >
           <BackgroundBeams />
           <div className="container mx-auto px-4 relative z-10">
             <h2 className="text-4xl font-bold text-white mb-8">
               Featured Games
             </h2>
-            <div className="relative" ref={sliderRef}>
+            <div className="relative">
               <div className="overflow-hidden rounded-xl">
                 <div
                   className="flex transition-transform duration-500 ease-in-out"
@@ -186,8 +280,8 @@ const Home = () => {
               </button>
             </div>
           </div>
+        </motion.section>
         </section>
-
         {/* AI Assistant Feature */}
         <section className="py-16 relative overflow-hidden">
           <BackgroundBeams />
@@ -217,86 +311,69 @@ const Home = () => {
             </div>
           </div>
         </section>
-
-        {/* Indie Developers Section */}
-        <section className="py-16 relative overflow-hidden">
-          <BackgroundBeams />
-          <div className="container mx-auto px-4 relative z-10">
-            <div className="flex flex-col md:flex-row items-center justify-between">
-              <div className="md:w-1/2 mb-8 md:mb-0">
-                <h2 className="text-4xl font-bold text-white mb-4">
-                  Calling All Indie Developers
-                </h2>
-                <p className="text-xl text-gray-300 mb-6">
-                  Join our platform and showcase your games to a passionate
-                  community of gamers. We provide the tools and support you need
-                  to succeed.
-                </p>
-                <Button color="success" size="lg">
-                  Join as a Developer
-                </Button>
-              </div>
-              <div className="md:w-1/2">
-                <img
-                  src="https://res.cloudinary.com/dhcawltsr/image/upload/v1728837460/Video_game_developer_qahcp2.gif"
-                  alt="Indie Developer"
-                  className="rounded-lg w-full"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
+        <AIAssistantSection />
+        <IndieDeveloperSection />
 
         {/* Gaming Community Section */}
         <section className="py-16 relative overflow-hidden">
           <BackgroundBeams />
           <div className="container mx-auto px-4 text-center relative z-10">
-            <h2 className="text-4xl font-bold text-white mb-8">
-              Join Our Thriving Gaming Community
-            </h2>
-            <p className="text-xl text-gray-300 mb-8">
-              Connect with fellow gamers, share experiences, participate in
-              events, and level up together!
-            </p>
+            <AnimatedSection>
+              <h2 className="text-4xl font-bold text-white mb-8">
+                Join Our Thriving Gaming Community
+              </h2>
+            </AnimatedSection>
+            <AnimatedSection>
+              <p className="text-xl text-gray-300 mb-8">
+                Connect with fellow gamers, share experiences, participate in
+                events, and level up together!
+              </p>
+            </AnimatedSection>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-              <BackgroundGradient className="rounded-xl p-1">
-                <div className="bg-gray-800 rounded-lg p-6 h-full">
-                  <h3 className="text-2xl font-bold text-white mb-4">Forums</h3>
-                  <p className="text-gray-300 mb-4">
-                    Discuss strategies, share tips, and make new friends.
-                  </p>
-                  <Button color="primary" size="sm">
-                    Visit Forums
-                  </Button>
-                </div>
-              </BackgroundGradient>
-              <BackgroundGradient className="rounded-xl p-1">
-                <div className="bg-gray-800 rounded-lg p-6 h-full">
-                  <h3 className="text-2xl font-bold text-white mb-4">Events</h3>
-                  <p className="text-gray-300 mb-4">
-                    Join tournaments, watch live streams, and attend virtual
-                    meetups.
-                  </p>
-                  <Button color="primary" size="sm">
-                    See Events
-                  </Button>
-                </div>
-              </BackgroundGradient>
-              <BackgroundGradient className="rounded-xl p-1">
-                <div className="bg-gray-800 rounded-lg p-6 h-full">
-                  <h3 className="text-2xl font-bold text-white mb-4">Groups</h3>
-                  <p className="text-gray-300 mb-4">
-                    Find like-minded gamers and form your own gaming clans.
-                  </p>
-                  <Button color="primary" size="sm">
-                    Explore Groups
-                  </Button>
-                </div>
-              </BackgroundGradient>
+              {[
+                {
+                  title: "Forums",
+                  description:
+                    "Discuss strategies, share tips, and make new friends.",
+                  buttonText: "Visit Forums",
+                },
+                {
+                  title: "Events",
+                  description:
+                    "Join tournaments, watch live streams, and attend virtual meetups.",
+                  buttonText: "See Events",
+                },
+                {
+                  title: "Groups",
+                  description:
+                    "Find like-minded gamers and form your own gaming clans.",
+                  buttonText: "Explore Groups",
+                },
+              ].map((item, index) => (
+                <AnimatedSection key={index}>
+                  <BackgroundGradient className="rounded-xl p-1">
+                    <div className="bg-gray-800 rounded-lg p-6 h-full">
+                      <h3 className="text-2xl font-bold text-white mb-4">
+                        {item.title}
+                      </h3>
+                      <p className="text-gray-300 mb-4">{item.description}</p>
+                      <Button color="primary" size="sm">
+                        {item.buttonText}
+                      </Button>
+                    </div>
+                  </BackgroundGradient>
+                </AnimatedSection>
+              ))}
             </div>
-            <Button color="secondary" size="lg">
-              Join Community
-            </Button>
+            <AnimatedSection>
+              <Button
+                color="secondary"
+                size="lg"
+                onClick={() => handleClick("/articles")}
+              >
+                Join Community
+              </Button>
+            </AnimatedSection>
           </div>
         </section>
 
@@ -304,51 +381,53 @@ const Home = () => {
         <section className="py-16 relative overflow-hidden">
           <BackgroundBeams />
           <div className="container mx-auto px-4 relative z-10">
-            <h2 className="text-4xl font-bold text-white mb-8 text-center">
-              World-Class Support at Your Service
-            </h2>
+            <AnimatedSection>
+              <h2 className="text-4xl font-bold text-white mb-8 text-center">
+                World-Class Support at Your Service
+              </h2>
+            </AnimatedSection>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <BackgroundGradient className="rounded-xl p-1">
-                <div className="bg-gray-800 rounded-lg p-6 h-full">
-                  <h3 className="text-2xl font-bold text-white mb-4">
-                    24/7 Assistance
-                  </h3>
-                  <p className="text-gray-300 mb-4">
-                    Our support team is always ready to help, any time of day or
-                    night.
-                  </p>
-                  <Button color="primary" size="sm">
-                    Contact Support
-                  </Button>
-                </div>
-              </BackgroundGradient>
-              <BackgroundGradient className="rounded-xl p-1">
-                <div className="bg-gray-800 rounded-lg p-6 h-full">
-                  <h3 className="text-2xl font-bold text-white mb-4">
-                    Knowledge Base
-                  </h3>
-                  <p className="text-gray-300 mb-4">
-                    Find answers to common questions in our comprehensive guide.
-                  </p>
-                  <Button color="primary" size="sm">
-                    Browse FAQs
-                  </Button>
-                </div>
-              </BackgroundGradient>
-              <BackgroundGradient className="rounded-xl p-1">
-                <div className="bg-gray-800 rounded-lg p-6 h-full">
-                  <h3 className="text-2xl font-bold text-white mb-4">
-                    Community Support
-                  </h3>
-                  <p className="text-gray-300 mb-4">
-                    Get help from our community of experienced gamers and
-                    developers.
-                  </p>
-                  <Button color="primary" size="sm">
-                    Visit Forum
-                  </Button>
-                </div>
-              </BackgroundGradient>
+              {[
+                {
+                  title: "24/7 Assistance",
+                  description:
+                    "Our support team is always ready to help, any time of day or night.",
+                  buttonText: "Contact Support",
+                  buttonAction: () => handleClick("/support#contactForm"),
+                },
+                {
+                  title: "Knowledge Base",
+                  description:
+                    "Find answers to common questions in our comprehensive guide.",
+                  buttonText: "Browse FAQs",
+                  buttonAction: () => console.log("Browsing FAQs"), // You can update this with your navigation logic
+                },
+                {
+                  title: "Community Support",
+                  description:
+                    "Get help from our community of experienced gamers and developers.",
+                  buttonText: "Visit Forum",
+                  buttonAction: () => console.log("Visiting Forum"), // You can update this with your navigation logic
+                },
+              ].map((item, index) => (
+                <AnimatedSection key={index}>
+                  <BackgroundGradient className="rounded-xl p-1">
+                    <div className="bg-gray-800 rounded-lg p-6 h-full">
+                      <h3 className="text-2xl font-bold text-white mb-4">
+                        {item.title}
+                      </h3>
+                      <p className="text-gray-300 mb-4">{item.description}</p>
+                      <Button
+                        color="primary"
+                        size="sm"
+                        onClick={item.buttonAction}
+                      >
+                        {item.buttonText}
+                      </Button>
+                    </div>
+                  </BackgroundGradient>
+                </AnimatedSection>
+              ))}
             </div>
           </div>
         </section>
@@ -357,25 +436,31 @@ const Home = () => {
         <section className="py-16 relative overflow-hidden">
           <BackgroundBeams />
           <div className="container mx-auto px-4 relative z-10">
-            <h2 className="text-4xl font-bold text-white mb-8 text-center">
-              Latest Reviews
-            </h2>
+            <AnimatedSection>
+              <h2 className="text-4xl font-bold text-white mb-8 text-center">
+                Latest Reviews
+              </h2>
+            </AnimatedSection>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {latestRatings.map((rating, index) => (
-                <BackgroundGradient key={index} className="rounded-xl p-1">
-                  <div className="bg-gray-800 rounded-lg p-6 h-full">
-                    <p className="text-gray-300 mb-4">{rating.comment}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-white font-semibold">
-                        {rating.user?.username || "Anonymous"}
-                      </span>
-                      <span className="text-yellow-400">{rating.rating}/5</span>
+                <AnimatedSection key={index}>
+                  <BackgroundGradient className="rounded-xl p-1">
+                    <div className="bg-gray-800 rounded-lg p-6 h-full">
+                      <p className="text-gray-300 mb-4">{rating.comment}</p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-white font-semibold">
+                          {rating.user?.username || "Anonymous"}
+                        </span>
+                        <span className="text-yellow-400">
+                          {rating.rating}/5
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-400 mt-2">
+                        {rating.game?.AssignedGame?.title || "Unknown Game"}
+                      </p>
                     </div>
-                    <p className="text-sm text-gray-400 mt-2">
-                      {rating.game?.AssignedGame?.title || "Unknown Game"}
-                    </p>
-                  </div>
-                </BackgroundGradient>
+                  </BackgroundGradient>
+                </AnimatedSection>
               ))}
             </div>
           </div>
@@ -385,23 +470,29 @@ const Home = () => {
         <section className="py-16 relative overflow-hidden">
           <BackgroundBeams />
           <div className="container mx-auto px-4 text-center relative z-10">
-            <h2 className="text-4xl font-bold text-white mb-8">
-              Stay in the Loop
-            </h2>
-            <p className="text-xl text-gray-300 mb-8">
-              Subscribe to our newsletter for the latest game releases and
-              exclusive offers.
-            </p>
-            <div className="max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:outline-none focus:border-primary mb-4"
-              />
-              <Button color="primary" size="lg" className="w-full">
-                Subscribe
-              </Button>
-            </div>
+            <AnimatedSection>
+              <h2 className="text-4xl font-bold text-white mb-8">
+                Stay in the Loop
+              </h2>
+            </AnimatedSection>
+            <AnimatedSection>
+              <p className="text-xl text-gray-300 mb-8">
+                Subscribe to our newsletter for the latest game releases and
+                exclusive offers.
+              </p>
+            </AnimatedSection>
+            <AnimatedSection>
+              <div className="max-w-md mx-auto">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:outline-none focus:border-primary mb-4"
+                />
+                <Button color="primary" size="lg" className="w-full">
+                  Subscribe
+                </Button>
+              </div>
+            </AnimatedSection>
           </div>
         </section>
 

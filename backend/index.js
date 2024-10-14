@@ -30,6 +30,7 @@ import messageRoutes from "./routes/messageRoutes.js";
 import DirectContactUsRoute from "./routes/direct_contact_us_route.js";
 import { RentalDurationRouter } from "./routes/rentalDurationRoutes.js";
 import distributedPaymentRoutes from "./routes/distributedPayment_routes.js";
+
 import rockPaperScissorsRouter from "./routes/rock_paper_scissors_routes.js";
 
 //Create the app
@@ -106,5 +107,6 @@ app.use("/api", GPTRouter);
 app.use("/api", GPTRouter);
 app.use("/contacts", contactRouter);
 app.use("/api/messages", messageRoutes); // Changed the path to "/api/messages"
+
 app.use("/api/distributed-payments", distributedPaymentRoutes);
 app.use("/api/rock-paper-scissors", rockPaperScissorsRouter);
