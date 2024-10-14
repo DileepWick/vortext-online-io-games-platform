@@ -300,7 +300,9 @@ const handlePortfolioLinkChange = (e) => {
       </div>
 
       {/* Right side - Login/Signup form */}
-      <div className="w-full lg:w-1/2 bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center p-4">
+      <div className="font-primaryRegular w-full lg:w-1/2 bg-gradient-to-r from-[#060c2c] to-[#7F60D9] flex items-center justify-center p-4">
+
+
         <Card className="w-full max-w-md">
           <CardBody className="overflow-hidden p-3">
             <h1 className="text-xl font-bold text-center mb-3">
@@ -345,7 +347,7 @@ const handlePortfolioLinkChange = (e) => {
                     fullWidth
                     color="primary"
                     onClick={handleLogin}
-                    className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                    className="font-primaryRegular w-full bg-gradient-to-r from-[#060c2c] to-[#6366f1] text-white py-3 px-4 rounded-md hover:from-[#312e81] hover:to-[#4f46e5] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:ring-opacity-50"
                   >
                     Login
                   </Button>
@@ -458,7 +460,7 @@ const handlePortfolioLinkChange = (e) => {
                         fullWidth
                         color="primary"
                         onClick={handleSignUp}
-                        className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600"
+                        className="font-primaryRegular w-full bg-gradient-to-r from-[#060c2c] to-[#6366f1] text-white py-3 px-4 rounded-md hover:from-[#312e81] hover:to-[#4f46e5] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:ring-opacity-50"
                       >
                         Sign up as User
                       </Button>
@@ -576,7 +578,7 @@ const handlePortfolioLinkChange = (e) => {
                         fullWidth
                         color="secondary"
                         onClick={handleSignUp}
-                        className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                        className="font-primaryRegular w-full bg-gradient-to-r from-[#6366f1] to-[#060c2c] text-white py-3 px-4 rounded-md hover:from-[#312e81] hover:to-[#4f46e5] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:ring-opacity-50"
                       >
                         Sign up as Developer
                       </Button>

@@ -307,9 +307,6 @@ const HandleRentals = () => {
           <h1 className="text-5xl text-white mb-4">
             {game.title}
             <br />
-            <Chip color="primary" radius="none" className="mt-2">
-              {game.RatingPoints} Rating Points ⭐
-            </Chip>
           </h1>
           <div className="flex flex-col lg:flex-row gap-8 mb-8">
             <div className="flex-1">
@@ -417,7 +414,7 @@ const HandleRentals = () => {
                   ))}
                 </div>
                 <Button
-                  color="success"
+                  color="primary"
                   onPress={handleRentClick}
                   className="w-full"
                   disabled={!selectedRental}
@@ -442,97 +439,97 @@ const HandleRentals = () => {
       
       {/* New Checkout Modal */}
       <Modal
-        isOpen={isOpen}
-        onOpenChange={onClose}
-        placement="center"
-        size="2xl"
-        scrollBehavior="inside"
-      >
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="font-primaryBold text-black">Checkout</ModalHeader>
-              <ModalBody>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-customCardDark p-4 rounded-lg">
-                    <h2 className="text-lg font-semibold mb-2 text-black">PAYMENT METHOD</h2>
-                    <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                      <div className="border border-gray-900 p-5 rounded mb-4 w-[550px]">
-                        <Radio value="creditCard">
-                          <div className="flex items-center">
-                            <CreditCardIcon />
-                            <span className="text-black ml-2 mr-4">Credit Card</span>
-                          </div>
-                        </Radio>
-                        {paymentMethod === 'creditCard' && (
-                          <div className="mt-4">
-                            <Input
-                              label="Card Number"
-                              placeholder="1111-1111-1111-1111"
-                              value={cardNumber}
-                              onChange={handleCardNumberChange}
-                              className="mb-5"
-                            />
-                            <div className="flex gap-4">
-                              <Input
-                                label="Expiration (MM/YY)"
-                                placeholder="MM/YY"
-                                value={expirationDate}
-                                onChange={handleExpirationDateChange}
-                                className="mb-5"
-                              />
-                              <Input
-                                label="CVV"
-                                placeholder="123"
-                                value={cvv}
-                                onChange={handleCvvChange}
-                              />
-                            </div>
-                          </div>
-                        )}
+  isOpen={isOpen}
+  onOpenChange={onClose}
+  placement="center"
+  size="2xl"
+>
+  <ModalContent
+    style={{
+      backgroundColor: "#f9f9f9",  // Very light gray
+      boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.1)",  // Soft shadow
+      borderRadius: "12px",  // Rounded corners
+      padding: "20px",  // Spacing for the whole modal
+    }}
+  >
+    {(onClose) => (
+      <>
+        <ModalHeader className="font-bold text-2xl text-black">Checkout</ModalHeader>
+        <ModalBody>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* PAYMENT METHOD SECTION */}
+            <div className="bg-customCardDark p-6 rounded-lg shadow-md">
+              <h2 className="text-lg font-semibold mb-4 text-black">Payment Method</h2>
+              <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+                <div className="border border-gray-900 p-5 rounded-lg mb-4">
+                  <Radio value="creditCard">
+                    <div className="flex items-center">
+                      <CreditCardIcon />
+                      <span className="text-black ml-2 mr-4">Credit Card</span>
+                    </div>
+                  </Radio>
+                  {paymentMethod === 'creditCard' && (
+                    <div className="mt-4">
+                      <Input
+                        label="Card Number"
+                        placeholder="1111-1111-1111-1111"
+                        value={cardNumber}
+                        onChange={handleCardNumberChange}
+                        className="mb-5"
+                      />
+                      <div className="flex gap-4">
+                        <Input
+                          label="Expiration (MM/YY)"
+                          placeholder="MM/YY"
+                          value={expirationDate}
+                          onChange={handleExpirationDateChange}
+                          className="mb-5"
+                        />
+                        <Input
+                          label="CVV"
+                          placeholder="123"
+                          value={cvv}
+                          onChange={handleCvvChange}
+                        />
                       </div>
-                    </RadioGroup>
-                  </div>
+                    </div>
+                  )}
                 </div>
-                <div className="mt-0 bg-customCardDark p-0 rounded-lg">
-                  <h2 className="text-lg font-semibold mb-4 text-black">ORDER SUMMARY</h2>
-                  <div className="flex mb-4">
-                    <img src={game?.coverPhoto} alt={game?.title} className="w-16 h-20 object-cover mr-4" />
-                    <div>
-                      <h3 className="font-semibold text-black">{game?.title}</h3>
-                      <p className="text-black">Rs.{selectedRental?.price.toFixed(2)}</p>
-                    </div>
-                  </div>
-                  <div className="border-t border-gray-700 pt-4 mt-4">
-                    <div className="flex justify-between text-black">
-                      <span>Total</span>
-                      <span>Rs.{selectedRental?.price.toFixed(2)}</span>
-                    </div>
-                    <div className="bg-yellow-900 text-yellow-200 p-2 rounded mt-2 text-sm">
-                      Get some rewards with this purchase.
-                    </div>
-                  </div>
-                  <Checkbox
-                    isSelected={agreeToShare}
-                    onValueChange={setAgreeToShare}
-                    className="mt-4"
-                  >
-                    Agree to share your email for marketing purposes
-                  </Checkbox>
+              </RadioGroup>
+            </div>
+
+            {/* ORDER SUMMARY SECTION */}
+            <div className="bg-customCardDark p-6 rounded-lg shadow-md">
+              <h2 className="text-lg font-semibold mb-4 text-blue-900">Order Summary</h2>
+              <div className="flex mb-4">
+                <img src={game?.coverPhoto} alt={game?.title} className="w-16 h-20 object-cover mr-4 rounded-lg" />
+                <div>
+                  <h3 className="font text-blue-900">{game?.title}</h3>
+                  <p className="text-black">Rs.{selectedRental?.price.toFixed(2)}</p>
                 </div>
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Cancel
-                </Button>
-                <Button color="primary" onPress={handlePlaceOrder}>
-                  CONFIRM
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+              </div>
+              <div className="border-t border-gray-700 pt-4 mt-4">
+                <div className="flex justify-between text-black">
+                  <span>Total</span>
+                  <span>Rs.{selectedRental?.price.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          <Button color="danger" variant="light" onPress={onClose}>
+            Cancel
+          </Button>
+          <Button color="primary" onPress={handlePlaceOrder}>
+            Confirm
+          </Button>
+        </ModalFooter>
+      </>
+    )}
+  </ModalContent>
+</Modal>
+
 
       <Footer />
     </div>

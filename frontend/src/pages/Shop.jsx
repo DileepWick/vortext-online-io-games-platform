@@ -186,9 +186,8 @@ const Shop = () => {
   }, [searchTerm, selectedGenre, gameStocks]);
 
   // Collect unique genres for the dropdown
-  const uniqueGenres = [
-    ...new Set(gameStocks.flatMap((stock) => stock.AssignedGame.Genre)),
-  ];
+  const uniqueGenres = ["Action", "Adventure", "Strategy","Sport","Puzzle","Strategy","Fighting"];
+
 
   useEffect(() => {
     console.log("Ratings Data: ");

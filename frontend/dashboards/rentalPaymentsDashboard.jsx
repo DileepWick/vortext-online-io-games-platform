@@ -134,11 +134,8 @@ const RentalPaymentsDash = () => {
         }
 
         await updateDeveloperIncome(developerId, saleAmount);
-
-        // Save distributed payment to the database
         await saveDistributedPayment(selectedItem._id, developerId, saleAmount);
 
-        // Update distributed payments state
         setDistributedPayments((prev) => ({
           ...prev,
           [selectedItem._id]: saleAmount,
@@ -225,8 +222,12 @@ const RentalPaymentsDash = () => {
                   }}
                 />
               </TableCell>
-              <TableCell>Rs.{item.amount ? (item.amount * DEVELOPER_SHARE_PERCENTAGE).toFixed(2) : "N/A"}</TableCell>
-              
+              <TableCell>
+                {distributedPayments[item._id] 
+                  ? <span style={{ color: '#00008B' }}>Rs.{distributedPayments[item._id].toFixed(2)}</span>
+                  : <span style={{ color: 'red' }}>Not Paid Yet</span>
+                }
+              </TableCell>
               <TableCell>
                 <Chip color={item.rental?._id ? "success" : "warning"} variant="flat">
                   {item.rental?._id ? 'Active' : 'Expired'}

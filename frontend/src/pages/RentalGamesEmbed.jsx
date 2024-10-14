@@ -4,6 +4,7 @@ import axios from "axios";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { Button, Progress } from "@nextui-org/react";
+import useAuthCheck from "../utils/authCheck";
 
 // Helper function to handle full-screen requests
 const requestFullScreen = (element) => {
@@ -32,6 +33,7 @@ const exitFullScreen = () => {
 };
 
 const RentalGamesEmbed = () => {
+  useAuthCheck();
   const { src, title, rentalTime, rentalId } = useParams();
   const navigate = useNavigate();
   const decodedSrc = decodeURIComponent(src);

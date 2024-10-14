@@ -2,7 +2,8 @@ import express from 'express';
 import {
   newRentalPayment,
   deleteRentalPayment,
-  getAllRentalPayments
+  getAllRentalPayments,
+  getPaymentsByUserId
 } from '../controllers/rentalPaymentsController.js';
 
 const rentalPaymentsRouter = express.Router();
@@ -15,5 +16,8 @@ rentalPaymentsRouter.get('/', getAllRentalPayments);
 
 // Delete a rental payment
 rentalPaymentsRouter.delete('/:paymentId', deleteRentalPayment);
+
+// Get payments by user ID
+rentalPaymentsRouter.get('/user/:userId', getPaymentsByUserId);
 
 export default rentalPaymentsRouter;
