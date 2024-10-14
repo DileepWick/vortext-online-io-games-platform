@@ -6,6 +6,10 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import Header from "../components/header";
 import Footer from "../components/footer";
+import { User } from "@nextui-org/react";
+import Loader from "../components/Loader/loader";
+
+//Accernity
 import { LampContainer } from "../components/ui/Lamp";
 import { FlipWords } from "../components/ui/FlipWords";
 import { TypewriterEffectSmooth } from "../components/ui/Typewriter";
@@ -16,6 +20,7 @@ import { Button } from "@nextui-org/react";
 import AIAssistantSection from "../components/ui/AIAssistantSection";
 import IndieDeveloperSection from "../components/ui/DeveloperSection";
 import { TypewriterEffectOneWordSmooth } from "../components/ui/TypeWriterOneWord";
+import { Cover } from "../components/ui/cover";
 
 const AnimatedSection = ({ children }) => {
   const ref = React.useRef(null);
@@ -138,6 +143,14 @@ const prevSlide = () => {
     right: { x: 10 },
     initial: { x: 0, y: 0 },
   };
+
+  const words = [
+    "Unleash your gaming potential",
+    "Discover the perfect game for you",
+    "Explore new worlds and challenges",
+    "Level up your gaming experience",
+  ];
+
   return (
     <div className="font-primaryRegular bg-customDark flex flex-col min-h-screen">
       {" "}
@@ -187,9 +200,10 @@ const prevSlide = () => {
           <BackgroundBeams />
           <div className="container mx-auto px-4 relative z-10">
             <AnimatedSection>
-              <h2 className="text-4xl font-bold text-white mb-8 text-center">
-                Vortex Game Shop
-              </h2>
+              <p className="text-[50px] font-primaryRegular text-grey-600 mb-8 text-center">
+                 With Our Game Shop <br/>
+                <FlipWords words={words} />
+              </p>
             </AnimatedSection>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {[
@@ -200,17 +214,38 @@ const prevSlide = () => {
               ].map((category, index) => (
                 <AnimatedSection key={index}>
                   <BackgroundGradient className="rounded-xl p-1">
-                    <div className="bg-gray-800 rounded-lg p-6 h-full flex flex-col justify-between">
-                      <h3 className="text-2xl font-bold text-white mb-4">
-                        {category}
-                      </h3>
-                      <p className="text-gray-300 mb-4">
-                        Discover amazing games in our {category.toLowerCase()}{" "}
-                        collection.
+                    <div className="bg-customDark rounded-lg p-6 h-full flex flex-col justify-between">
+                      <Cover>
+                        <h3 className="text-2xl font-primaryRegular text-white mb-4">
+                          {category}
+                        </h3>
+                      </Cover>
+                      <img
+                        src={
+                          category.toLowerCase() === "latest releases"
+                            ? "https://res.cloudinary.com/dhcawltsr/image/upload/v1728890476/DALL_E_2024-10-14_12.50.40_-_A_3D_cartoon-style_illustration_showcasing_the_latest_online_game_releases_in_a_violet-themed_setting._The_scene_features_a_futuristic_gaming_hub_with_vftf5x.webp"
+                            : category.toLowerCase() === "top sellers"
+                            ? "https://res.cloudinary.com/dhcawltsr/image/upload/v1728890386/DALL_E_2024-10-14_12.48.54_-_A_3D_cartoon-style_illustration_representing_top_online_game_sellers_in_a_violet-themed_environment._The_scene_features_a_dynamic_storefront_with_glow_uqtmlx.webp"
+                            : category.toLowerCase() === "indie games"
+                            ? "https://res.cloudinary.com/dhcawltsr/image/upload/v1728890520/DALL_E_2024-10-14_12.51.50_-_A_3D_cartoon-style_illustration_representing_the_latest_indie_games_in_a_violet-themed_setting._The_scene_features_a_cozy_and_creative_indie_game_stud_xn7dhk.webp"
+                            : category.toLowerCase() === "special offers"
+                            ? "https://res.cloudinary.com/dhcawltsr/image/upload/v1728888043/DALL_E_2024-10-14_12.06.26_-_A_vibrant_and_dynamic_cover_image_for_a_gaming_shop_s_special_offers._The_theme_uses_colors_9171bb_soft_purple_020617_dark_blue-black_7186a6_fxgokc.webp"
+                            : "https://res.cloudinary.com/dhcawltsr/image/upload/v1727709362/smart-girl-animation-download--unscreen_icm1qe.gif"
+                        }
+                        alt={`${category} category`}
+                        className="rounded-[200px] w-[200px] h-[200px] object-cover mx-auto"
+                      />
+                      <p className="text-white mb-4 mt-8">
+                        {category.toLowerCase() === "latest releases"
+                          ? "Discover exciting new adventures in our latest game releases."
+                          : category.toLowerCase() === "top sellers"
+                          ? "Play the most popular games loved by gamers worldwide."
+                          : category.toLowerCase() === "indie games"
+                          ? "Explore creative and unique games from indie developers."
+                          : category.toLowerCase() === "special offers"
+                          ? "Enjoy great deals on games with our special offers."
+                          : `Find amazing games in our ${category.toLowerCase()} collection.`}
                       </p>
-                      <Button color="primary" size="sm">
-                        Browse {category}
-                      </Button>
                     </div>
                   </BackgroundGradient>
                 </AnimatedSection>
@@ -221,6 +256,7 @@ const prevSlide = () => {
                 <Button
                   color="secondary"
                   size="lg"
+                  variant="ghost"
                   onClick={() => handleClick("/shop")}
                 >
                   Visit Full Shop
@@ -300,7 +336,7 @@ const prevSlide = () => {
     </button>
   </div>
 </section>
-        
+        </motion.section>
         <AIAssistantSection />
         <IndieDeveloperSection />
 
@@ -343,13 +379,10 @@ const prevSlide = () => {
                 <AnimatedSection key={index}>
                   <BackgroundGradient className="rounded-xl p-1">
                     <div className="bg-gray-800 rounded-lg p-6 h-full">
-                      <h3 className="text-2xl font-bold text-white mb-4">
+                      <h3 className="text-2xl font-primaryRegular text-white mb-4">
                         {item.title}
                       </h3>
                       <p className="text-gray-300 mb-4">{item.description}</p>
-                      <Button color="primary" size="sm">
-                        {item.buttonText}
-                      </Button>
                     </div>
                   </BackgroundGradient>
                 </AnimatedSection>
@@ -436,18 +469,33 @@ const prevSlide = () => {
                 <AnimatedSection key={index}>
                   <BackgroundGradient className="rounded-xl p-1">
                     <div className="bg-gray-800 rounded-lg p-6 h-full">
-                      <p className="text-gray-300 mb-4">{rating.comment}</p>
+                      <p className="text-[20px] text-white mt-2 mb-8 text-center">
+                        {rating.game?.AssignedGame?.title || "Unknown Game"}
+                      </p>
+                      <img
+                        src={
+                          rating.game?.AssignedGame?.coverPhoto ||
+                          "Unknown Game"
+                        }
+                        alt="Cover"
+                        className="w-[400px] rounded-[40px]"
+                      />
+                      <p className="text-white mb-4 mt-8 font-primaryRegular text-[25px]">
+                        {rating.comment}
+                      </p>
                       <div className="flex items-center justify-between">
-                        <span className="text-white font-semibold">
-                          {rating.user?.username || "Anonymous"}
-                        </span>
+                        <User
+                          className="cursor-pointer text-white"
+                          name={rating.user?.username || "Anonymous"}
+                          description={rating.user?.role || "Anonymous"}
+                          avatarProps={{
+                            src: rating.user.profilePic,
+                          }}
+                        />
                         <span className="text-yellow-400">
                           {rating.rating}/5
                         </span>
                       </div>
-                      <p className="text-sm text-gray-400 mt-2">
-                        {rating.game?.AssignedGame?.title || "Unknown Game"}
-                      </p>
                     </div>
                   </BackgroundGradient>
                 </AnimatedSection>
@@ -456,7 +504,7 @@ const prevSlide = () => {
           </div>
         </section>
 
-        {/* Newsletter Signup */}
+        {/* Newsletter Signup 
         <section className="py-16 relative overflow-hidden">
           <BackgroundBeams />
           <div className="container mx-auto px-4 text-center relative z-10">
@@ -484,7 +532,7 @@ const prevSlide = () => {
               </div>
             </AnimatedSection>
           </div>
-        </section>
+        </section>*/}
 
         <Footer />
       </TracingBeam>
