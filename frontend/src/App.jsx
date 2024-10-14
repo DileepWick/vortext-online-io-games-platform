@@ -30,6 +30,7 @@ import RentalTableHistory from "./pages/RentalTableHistory";
 import Leaderboard from "./pages/MathzLeaderboard";
 import DeveloperLoginSignup from "./pages/DeveloperLoginSignup";
 import UserMessages from "./pages/UserMessage";
+import RentalHistory from "./pages/RentalHistory";
 
 
 //Games
@@ -106,6 +107,7 @@ const App = () => {
         element={<UserManagementDashboard />}
       />
       <Route path="/SessionHistory" element={<SessionHistory />} />
+      <Route path="/RentHistory" element={<RentalHistory />} />
       <Route path="/HandleRentals/:id" element={<HandleRentals />} />
       <Route path="/Payment_manager_dashboard" element={<Payment_Manager />} />
       <Route
