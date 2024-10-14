@@ -376,6 +376,7 @@ const Shop = () => {
           <div className="mb-8 mt-8 text-customDark" ref={targetDivRef}>
             i
           </div>
+           {/*
           <button
             className="text-[white] font-primaryRegular px-16 pb-8 flex flex-row gap-2 items-center  text-left text-[22px] mt-8"
             onClick={() => {
@@ -389,7 +390,7 @@ const Shop = () => {
             }}
           >
             Show Top Rated This week <IoIosArrowForward />
-          </button>
+          </button>*/}
 
           {/* Search Bar */}
 

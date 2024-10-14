@@ -7,6 +7,7 @@ import axios from "axios";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { User } from "@nextui-org/react";
+import Loader from "../components/Loader/loader";
 
 //Accernity
 import { LampContainer } from "../components/ui/Lamp";
