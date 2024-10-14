@@ -207,8 +207,8 @@ const Profile = () => {
       <BackgroundGradient className="rounded-[5px]  bg-zinc-900 transition-transform duration-300 transform hover:scale-10">
         <div className="max-w-2xl mx-auto bg-[#13141f] rounded-[10px] shadow-lg overflow-hidden border-2 border-[#6366f1]">
         
-          <div className="bg-gradient-to-r from-[#3730a3] to-[#6366f1] p-6 relative overflow-hidden">
-            <h2 className="text-3xl font-bold text-white text-center z-10 relative">
+          <div className="bg-gradient-to-r from-[#060c2c] to-[#6366f1] p-6 relative overflow-hidden">
+            <h2 className="font-primaryRegular text-3xl font-bold text-white text-center z-10 relative">
               Player Profile
             </h2>
             <FaGamepad className="text-6xl text-white opacity-20 absolute top-2 left-2 animate-pulse" />
@@ -232,7 +232,7 @@ const Profile = () => {
               </div>
               {user ? (
                 <form onSubmit={handleUpdate} encType="multipart/form-data">
-                  <div className="space-y-4">
+                  <div className="space-y-4 font-primaryRegular">
                     <Input
                       label="First Name"
                       value={firstname}
@@ -278,7 +278,7 @@ const Profile = () => {
                     <button
                       type="button"
                       onClick={() => setShowChangePassword(!showChangePassword)}
-                      className="w-full bg-[#4f46e5] text-white py-3 rounded-md hover:bg-[#4338ca] transition duration-300"
+                   className="font-primaryRegular w-full bg-gradient-to-r from-[#060c2c] to-[#6366f1] text-white py-3 px-4 rounded-md hover:from-[#312e81] hover:to-[#4f46e5] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:ring-opacity-50"
                     >
                       {showChangePassword ? "Cancel Change Password" : "Change Password"}
                     </button>
@@ -307,13 +307,13 @@ const Profile = () => {
                           color="secondary"
                           className="bg-[#1c1d2b] text-white"
                         />
-                        <button
+                        <Button
                           type="button"
                           onClick={handleChangePassword}
-                          className="w-full bg-gradient-to-r from-[#3730a3] to-[#6366f1] text-white py-3 px-4 rounded-md hover:from-[#312e81] hover:to-[#4f46e5] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:ring-opacity-50"
+                          className="font-primaryRegular w-full bg-gradient-to-r from-[#060c2c] to-[#6366f1] text-white py-3 px-4 rounded-md hover:from-[#312e81] hover:to-[#4f46e5] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:ring-opacity-50"
                         >
                           Update Password
-                        </button>
+                        </Button>
                       </div>
                     )}
                     
@@ -339,7 +339,7 @@ const Profile = () => {
                             />
                           </svg>
                           <p className="mb-2 text-sm text-[#a5b4fc]">
-                            <span className="font-semibold">Click to upload</span> or drag and drop
+                            <span className="font-primaryRegular">Click to upload</span> or drag and drop
                           </p>
                           <p className="text-xs text-[#a5b4fc]">PNG, JPG or GIF (MAX. 800x400px)</p>
                         </div>
@@ -354,12 +354,12 @@ const Profile = () => {
                     </div>
                   </div>
                   <div className="mt-6">
-                    <button
+                    <Button
                       type="submit"
-                      className="w-full bg-gradient-to-r from-[#3730a3] to-[#6366f1] text-white py-3 px-4 rounded-md hover:from-[#312e81] hover:to-[#4f46e5] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:ring-opacity-50"
+                      className="font-primaryRegular w-full bg-gradient-to-r from-[#060c2c] to-[#6366f1] text-white py-3 px-4 rounded-md hover:from-[#312e81] hover:to-[#4f46e5] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:ring-opacity-50"
                     >
                       Level Up Profile
-                    </button>
+                    </Button>
                   </div>
                   <Button
         onClick={() => setDeleteModalOpen(true)} // Open delete modal
@@ -367,12 +367,12 @@ const Profile = () => {
         auto
         bordered
         fullWidth
-        className="w-full mt-4"
+        className="w-full mt-4 w-full bg-gradient-to-r from-[#d90429] to-[#ef233c] text-white py-3 px-4 rounded-md hover:from-[#b10619] hover:to-[#d90429] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#ef233c] focus:ring-opacity-50"
       >
         Delete Account
       </Button>{/* Delete Confirmation Modal */}
       <Modal isOpen={isDeleteModalOpen} onClose={() => setDeleteModalOpen(false)} className="text-black">
-        <ModalContent>
+        <ModalContent >
           <ModalHeader>Delete Account</ModalHeader>
           <ModalBody>
             Are you sure you want to delete your account? This action cannot be undone.
