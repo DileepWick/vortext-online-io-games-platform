@@ -14,7 +14,6 @@ import {
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate, useLocation } from "react-router-dom";
-import { motion } from "framer-motion";
 import { NotificationIcon } from "../assets/icons/NotificationIcon.jsx";
 
 // Utils
@@ -51,199 +50,162 @@ const Header = forwardRef((props, ref) => {
     Cookies.remove("token");
     navigate("/");
   };
-  const navItemVariants = {
-    hidden: { opacity: 0, y: -20 },
-    visible: { opacity: 1, y: 0 },
-  };
 
   return (
-    <motion.div
-      className="bg-customDark"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
+    <div className="bg-customDark">
       <Navbar className="font-primaryRegular bg-customDark text-white py-2 px-4">
         <NavbarContent
-          className="hidden sm:flex justify-center items-center w-full"
-          justify="center"
+          className="hidden sm:flex justify-start items-center w-full"
+          justify="start"
         >
-          <motion.div
-            variants={navItemVariants}
-            initial="hidden"
-            animate="visible"
-            transition={{ staggerChildren: 0.1 }}
-            className="flex items-center"
-          >
-            <NavbarItem className="mx-2">
-              <motion.div variants={navItemVariants}>
-                <Link
-                  color={location.pathname === "/" ? "blue" : "foreground"}
-                  href="/"
+          <NavbarItem className="mr-4">
+            <Link
+              color={location.pathname === "/" ? "blue" : "foreground"}
+              href="/"
+              className={`${
+                location.pathname === "/" ? "text-blue-500" : "text-white"
+              } hover:text-blue-300 transition-colors duration-200`}
+            >
+              HOME
+            </Link>
+          </NavbarItem>
+          <NavbarItem className="mr-4">
+            <Link
+              color={location.pathname === "/shop" ? "blue" : "foreground"}
+              href="/shop"
+              className={`${
+                location.pathname === "/shop" ? "text-blue-500" : "text-white"
+              } hover:text-blue-300 transition-colors duration-200`}
+            >
+              SHOP
+            </Link>
+          </NavbarItem>
+          <NavbarItem className="mr-4">
+            <Link
+              color={location.pathname === "/articles" ? "blue" : "foreground"}
+              href="/articles"
+              className={`${
+                location.pathname === "/articles"
+                  ? "text-blue-500"
+                  : "text-white"
+              } hover:text-blue-300 transition-colors duration-200`}
+            >
+              COMMUNITY
+            </Link>
+          </NavbarItem>
+          <NavbarItem className="mr-4">
+            <Link
+              color={location.pathname === "/chat" ? "blue" : "foreground"}
+              href="/chat"
+              className={`${
+                location.pathname === "/chat" ? "text-blue-500" : "text-white"
+              } hover:text-blue-300 transition-colors duration-200`}
+            >
+              CHAT
+            </Link>
+          </NavbarItem>
+          <NavbarItem className="mr-4">
+            <Link
+              color={
+                location.pathname === "/TailoredGames" ? "blue" : "foreground"
+              }
+              href="/TailoredGames"
+              className={`${
+                location.pathname === "/TailoredGames"
+                  ? "text-blue-500"
+                  : "text-white"
+              } hover:text-blue-300 transition-colors duration-200`}
+            >
+              OUR GAMES
+            </Link>
+          </NavbarItem>
+          <Dropdown placement="bottom-start" className="bg-gray-800 text-white">
+            <DropdownTrigger>
+              <NavbarItem className="cursor-pointer hover:text-blue-300 transition-colors duration-200 mr-4">
+                SUPPORT
+              </NavbarItem>
+            </DropdownTrigger>
+            <DropdownMenu
+              aria-label="Profile Actions"
+              variant="flat"
+              className="font-primaryRegular bg-gray-800 text-white"
+            >
+              <DropdownItem
+                key="support"
+                onClick={() => navigate("/support")}
+                className="hover:bg-gray-700"
+              >
+                Vortex Support
+              </DropdownItem>
+              <DropdownItem
+                Key="contactus"
+                onClick={() => navigate("/support#contactForm")}
+                className="hover:bg-gray-700"
+              >
+                Contact Us
+              </DropdownItem>
+              <DropdownItem
+                key="privacy"
+                onClick={() => navigate("/privacyPolicy")}
+                className="hover:bg-gray-700"
+              >
+                Privacy Policy
+              </DropdownItem>
+              <DropdownItem
+                key="about"
+                onClick={() => navigate("/about")}
+                className="hover:bg-gray-700"
+              >
+                About Vortex
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+          <Dropdown placement="bottom-start" className="bg-gray-800 text-white">
+            <DropdownTrigger>
+              <NavbarItem className="cursor-pointer flex items-center hover:text-blue-300 transition-colors duration-200">
+                <NotificationIcon style={{ marginRight: "8px" }} />
+                <span
                   className={`${
-                    location.pathname === "/" ? "text-blue-500" : "text-white"
-                  } hover:text-blue-300 transition-colors duration-200`}
+                    location.pathname === "/Notification" ? "text-blue-500" : ""
+                  }`}
                 >
-                  HOME
-                </Link>
-              </motion.div>
-            </NavbarItem>
-            <NavbarItem className="mx-2">
-              <motion.div variants={navItemVariants}>
-                <Link
-                  color={location.pathname === "/shop" ? "blue" : "foreground"}
-                  href="/shop"
-                  className={`${
-                    location.pathname === "/shop"
-                      ? "text-blue-500"
-                      : "text-white"
-                  } hover:text-blue-300 transition-colors duration-200`}
-                >
-                  SHOP
-                </Link>
-              </motion.div>
-            </NavbarItem>
-            <NavbarItem className="mr-4">
-              <Link
-                color={
-                  location.pathname === "/articles" ? "blue" : "foreground"
-                }
-                href="/articles"
-                className={`${
-                  location.pathname === "/articles"
-                    ? "text-blue-500"
-                    : "text-white"
-                } hover:text-blue-300 transition-colors duration-200`}
+                  {" "}
+                </span>
+              </NavbarItem>
+            </DropdownTrigger>
+            <DropdownMenu
+              aria-label="Notification Actions"
+              variant="flat"
+              className="font-primaryRegular bg-gray-800 text-white"
+            >
+              <DropdownItem
+                onClick={() => navigate("/Notification")}
+                className="hover:bg-gray-700"
               >
-                COMMUNITY
-              </Link>
-            </NavbarItem>
-            <NavbarItem className="mr-4">
-              <Link
-                color={location.pathname === "/chat" ? "blue" : "foreground"}
-                href="/chat"
-                className={`${
-                  location.pathname === "/chat" ? "text-blue-500" : "text-white"
-                } hover:text-blue-300 transition-colors duration-200`}
+                View All Notifications
+              </DropdownItem>
+              <DropdownItem
+                onClick={() => navigate("/UserMessage")}
+                className="hover:bg-gray-700"
               >
-                CHAT
-              </Link>
-            </NavbarItem>
-            <NavbarItem className="mr-4">
-              <Link
-                color={
-                  location.pathname === "/TailoredGames" ? "blue" : "foreground"
-                }
-                href="/TailoredGames"
-                className={`${
-                  location.pathname === "/TailoredGames"
-                    ? "text-blue-500"
-                    : "text-white"
-                } hover:text-blue-300 transition-colors duration-200`}
-              >
-                OUR GAMES
-              </Link>
-            </NavbarItem>
-            <Dropdown className="bg-gray-800 text-white">
-              <DropdownTrigger>
-                <NavbarItem className="cursor-pointer hover:text-blue-300 transition-colors duration-200 mx-2">
-                  <motion.div variants={navItemVariants}>SUPPORT</motion.div>
-                </NavbarItem>
-              </DropdownTrigger>
-              <DropdownMenu
-                aria-label="Profile Actions"
-                variant="flat"
-                className="font-primaryRegular bg-gray-800 text-white"
-              >
-                <DropdownItem
-                  key="support"
-                  onClick={() => navigate("/support")}
-                  className="hover:bg-gray-700"
-                >
-                  Vortex Support
-                </DropdownItem>
-                <DropdownItem
-                  Key="contactus"
-                  onClick={() => navigate("/support#contactForm")}
-                  className="hover:bg-gray-700"
-                >
-                  Contact Us
-                </DropdownItem>
-                <DropdownItem
-                  key="privacy"
-                  onClick={() => navigate("/privacyPolicy")}
-                  className="hover:bg-gray-700"
-                >
-                  Privacy Policy
-                </DropdownItem>
-                <DropdownItem
-                  key="about"
-                  onClick={() => navigate("/about")}
-                  className="hover:bg-gray-700"
-                >
-                  About Vortex
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-            <Dropdown className="bg-gray-800 text-white">
-              <DropdownTrigger>
-                <NavbarItem className="cursor-pointer flex items-center hover:text-blue-300 transition-colors duration-200 mx-2">
-                  <motion.div
-                    variants={navItemVariants}
-                    className="flex items-center"
-                  >
-                    <NotificationIcon style={{ marginRight: "8px" }} />
-                    <span
-                      className={`${
-                        location.pathname === "/Notification"
-                          ? "text-blue-500"
-                          : ""
-                      }`}
-                    >
-                      {" "}
-                    </span>
-                  </motion.div>
-                </NavbarItem>
-              </DropdownTrigger>
-              <DropdownMenu
-                aria-label="Notification Actions"
-                variant="flat"
-                className="font-primaryRegular bg-gray-800 text-white"
-              >
-                <DropdownItem
-                  onClick={() => navigate("/Notification")}
-                  className="hover:bg-gray-700"
-                >
-                  View All Notifications
-                </DropdownItem>
-                <DropdownItem
-                  onClick={() => navigate("/UserMessage")}
-                  className="hover:bg-gray-700"
-                >
-                  View All Messages
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          </motion.div>
+                View All Messages
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
         </NavbarContent>
 
         <NavbarContent as="div" justify="end">
           {token && user ? (
             <Dropdown placement="bottom-end" className="bg-gray-800 text-white">
               <DropdownTrigger>
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <User
-                    className="cursor-pointer text-white"
-                    name={user.username}
-                    description={user.role}
-                    avatarProps={{
-                      src: user.profilePic,
-                    }}
-                  />
-                </motion.div>
+                <User
+                  className="cursor-pointer text-white"
+                  name={user.username}
+                  description={user.role}
+                  avatarProps={{
+                    src: user.profilePic,
+                  }}
+                />
               </DropdownTrigger>
               <DropdownMenu
                 aria-label="Profile Actions"
@@ -402,18 +364,16 @@ const Header = forwardRef((props, ref) => {
               </DropdownMenu>
             </Dropdown>
           ) : (
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link
-                className="text-white hover:text-blue-300 transition-colors duration-200"
-                href="/login"
-              >
-                LOGIN
-              </Link>
-            </motion.div>
+            <Link
+              className="text-white hover:text-blue-300 transition-colors duration-200"
+              href="/login"
+            >
+              LOGIN
+            </Link>
           )}
         </NavbarContent>
       </Navbar>
-    </motion.div>
+    </div>
   );
 });
 

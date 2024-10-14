@@ -9,11 +9,19 @@ const MessageSchema = new Schema({
   },
   content: {
     type: String,
-    required: true,
+    required: false,
+  },
+  image: {
+    type: String, // This field will store the URL of the image
+    required: false, // Image is optional
   },
   timestamp: {
     type: Date,
     default: Date.now,
+  },
+  read: {
+    type: Boolean,
+    default: false, // Tracks if the message has been read
   },
 });
 

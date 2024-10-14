@@ -9,51 +9,124 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import PDFDocument from "pdfkit";
+import cloudinary from "../utils/cloudinary.js";
+import multer from "multer";
 
 export const submitContactForm = async (req, res) => {
   try {
+    const { userId, username, email, message } = req.body; // Get userId from the request body
+
+    console.log("Form data received:", { userId, username, email, message });
+
+    if (!userId || !username || !email || !message) {
+      return res.status(400).json({
+        message: "User ID, Username, email, and message are required",
+      });
+    }
+
+    let imageUrl = null;
+
+    // Process the image upload if an image is uploaded
+    if (req.file) {
+      console.log("Processing image upload...");
+      try {
+        const imageResult = await cloudinary.uploader.upload(req.file.path, {
+          folder: "contact form images",
+          resource_type: "image",
+        });
+
+        if (!imageResult || !imageResult.secure_url) {
+          return res.status(500).json({
+            message: "Image upload failed",
+          });
+        }
+
+        imageUrl = imageResult.secure_url;
+        console.log("Image uploaded to Cloudinary:", imageUrl);
+
+        // Optionally delete the image from the server after upload
+        fs.unlinkSync(req.file.path);
+      } catch (err) {
+        console.error("Error uploading image to Cloudinary:", err.message);
+        return res.status(500).json({
+          message: "Error uploading image",
+          error: err.message,
+        });
+      }
+    }
+
+    // Create a new contact form entry with the userId
+    const newContact = new ContactUsSchema({
+      userId, // Use the userId passed from the frontend
+      username,
+      email,
+      messages: [
+        {
+          sender: "user",
+          content: message,
+          image: imageUrl, // Add image URL if uploaded
+        },
+      ],
+      status: "open",
+    });
+
+    const createdContact = await newContact.save();
+    console.log("Contact form saved successfully:", createdContact);
+
+    return res.status(201).json({
+      message: "Contact form submitted successfully",
+      contact: createdContact,
+    });
+  } catch (error) {
+    console.error("Error submitting contact form:", error.message);
+    res.status(500).json({
+      message: "An error occurred while submitting the form",
+      error: error.message,
+    });
+  }
+};
+
+export const markMessagesAsRead = async (req, res) => {
+  try {
     const token = req.headers.authorization?.split(" ")[1];
 
+    // Check if token exists
     if (!token) {
       return res.status(401).json({ message: "No token provided" });
     }
 
     let decodedToken;
     try {
+      // Verify the token
       decodedToken = jwt.verify(token, JWT_SECRET);
     } catch (error) {
       return res.status(401).json({ message: "Invalid token" });
     }
 
     const userId = decodedToken.user.id;
-    const { username, email, message } = req.body;
+    const { ticketId } = req.params;
 
-    if (!username || !email || !message || message.trim() === "") {
-      return res.status(400).json({
-        message: "Username, email, and non-empty message are required",
-      });
+    // Find the contact entry by ticket ID and user ID
+    const contact = await ContactUsSchema.findOne({ _id: ticketId, userId });
+
+    if (!contact) {
+      return res.status(404).json({ message: "Ticket not found" });
     }
 
-    // Create a new contact entry for each submission
-    const newContact = new ContactUsSchema({
-      userId,
-      username,
-      email,
-      messages: [{ sender: "user", content: message }],
-      status: "open",
+    // Update all unread messages in the contact
+    await ContactUsSchema.updateOne(
+      { _id: ticketId, "messages.read": false },
+      { $set: { "messages.$[msg].read": true } },
+      { arrayFilters: [{ "msg.read": false }] } // Only update unread messages
+    );
+
+    return res.status(200).json({
+      message: "All unread messages marked as read",
+      ticketId,
     });
-
-    const createdContact = await newContact.save();
-
-    if (createdContact) {
-      return res.status(201).json({
-        message: "Contact form submitted successfully",
-        contact: createdContact,
-      });
-    }
   } catch (error) {
-    console.error(error);
-    res
+    console.error("Error marking messages as read:", error);
+    return res
       .status(500)
       .json({ message: "An error occurred", error: error.message });
   }
@@ -62,7 +135,7 @@ export const submitContactForm = async (req, res) => {
 export const replyToAgent = async (req, res) => {
   try {
     const { id } = req.params;
-    const { message, sender } = req.body; // Add sender to the request body
+    const { message, sender } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid Contact ID" });
@@ -77,17 +150,6 @@ export const replyToAgent = async (req, res) => {
     contact.messages.push({ sender, content: message });
     contact.updatedAt = new Date();
     await contact.save();
-
-    // Create a notification only if the sender is an agent
-    if (sender === "agent") {
-      const notification = new Notification({
-        userId: contact.userId,
-        type: "contact_reply",
-        content: "You have received a reply to your contact message",
-        contactId: contact._id,
-      });
-      await notification.save();
-    }
 
     res.status(200).json({
       message: "Reply sent successfully",
@@ -238,37 +300,6 @@ export const setStatus = async (req, res) => {
   }
 };
 
-// export const updateContact = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const { status } = req.body;
-
-//     if (!mongoose.Types.ObjectId.isValid(id)) {
-//       return res.status(400).json({ message: "Invalid Contact ID" });
-//     }
-
-//     const updatedContact = await ContactUsSchema.findByIdAndUpdate(
-//       id,
-//       { status, updatedAt: new Date() },
-//       { new: true }
-//     );
-
-//     if (!updatedContact) {
-//       return res.status(404).json({ message: "Contact not found" });
-//     }
-
-//     res.status(200).json({
-//       message: "Contact updated successfully",
-//       contact: updatedContact,
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     res
-//       .status(500)
-//       .json({ message: "An error occurred", error: error.message });
-//   }
-// };
-
 export const deleteContact = async (req, res) => {
   try {
     const { id } = req.params;
@@ -303,7 +334,7 @@ export const generateReport = async (req, res) => {
     );
     res.setHeader("Pragma", "no-cache");
     res.setHeader("Expires", "0");
-    // Fetch report data by grouping by userId and calculating the unique ticket count
+
     const report = await ContactUsSchema.aggregate([
       {
         $group: {
@@ -322,13 +353,9 @@ export const generateReport = async (req, res) => {
       return res.status(404).json({ message: "No data found for report" });
     }
 
-    // Create a new PDF document
     const doc = new PDFDocument();
-
-    // Define file name and path
     const reportsDir = path.resolve(__dirname, "../reports");
 
-    // Check if directory exists
     if (!fs.existsSync(reportsDir)) {
       fs.mkdirSync(reportsDir);
     }
@@ -336,33 +363,59 @@ export const generateReport = async (req, res) => {
     const pageWidth = doc.page.width;
     const pageCenter = pageWidth / 2;
     const now = new Date();
-    const timestamp = new Date().getTime();
-    const fileName = `support_report_${timestamp}.pdf`;
-    const filePath = path.join(reportsDir, fileName);
-    const formattedDate = now.toLocaleString();
 
-    // Pipe the PDF to a write stream
+    // Format the date for the filename (YYYY-MM-DD_HH-mm)
+    const fileNameDate = now
+      .toISOString()
+      .slice(0, 16)
+      .replace(/T/, "_")
+      .replace(/:/g, "-");
+    const fileName = `support_report_${fileNameDate}.pdf`;
+
+    // Format the date for display in the report
+    const options = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    };
+    const formattedDate = now.toLocaleString("en-US", options);
+
+    const filePath = path.join(reportsDir, fileName);
+
     const stream = fs.createWriteStream(filePath);
     doc.pipe(stream);
 
-    doc.fontSize(24).text("Vortex Gaming", { align: "center" });
+    // Add a background color
+    doc.rect(0, 0, doc.page.width, doc.page.height).fill("#f0f0f0");
+
+    // Add a header
+    doc
+      .fillColor("#333333")
+      .fontSize(28)
+      .text("Vortex Gaming", { align: "center" });
     doc.moveDown(0.5);
-    doc.fontSize(18).text("Support Ticket Report", { align: "center" });
+    doc
+      .fillColor("#666666")
+      .fontSize(20)
+      .text("Support Ticket Report", { align: "center" });
     doc.moveDown(0.5);
 
-    // Add the generated date and time to the PDF
     doc
+      .fillColor("#999999")
       .fontSize(12)
       .text(`Generated on: ${formattedDate}`, { align: "center" });
     doc.moveDown(1);
 
-    // Adjusted table columns
-    const tableWidth = 500; // Adjust as needed
+    // Table styling
+    const tableWidth = 520;
     const tableLeft = (pageWidth - tableWidth) / 2;
-    const tableTop = 200; // Increased to give more space for titles
+    const tableTop = 200;
     const idColumnWidth = 150;
     const usernameColumnWidth = 100;
-    const emailColumnWidth = 150;
+    const emailColumnWidth = 170;
     const ticketCountColumnWidth = 100;
     const rowHeight = 30;
 
@@ -370,22 +423,27 @@ export const generateReport = async (req, res) => {
       doc.moveTo(x1, y1).lineTo(x2, y2).stroke();
     };
 
-    doc.fontSize(10);
-    doc.rect(tableLeft, tableTop, tableWidth, rowHeight).stroke();
-    doc.text("User ID", tableLeft + 5, tableTop + 5);
-    doc.text("Username", tableLeft + idColumnWidth + 5, tableTop + 5);
+    // Table header
+    doc
+      .fillColor("#ffffff")
+      .rect(tableLeft, tableTop, tableWidth, rowHeight)
+      .fill("#4a4a4a");
+    doc.fillColor("#ffffff").fontSize(11);
+    doc.text("User ID", tableLeft + 5, tableTop + 10);
+    doc.text("Username", tableLeft + idColumnWidth + 5, tableTop + 10);
     doc.text(
       "Email",
       tableLeft + idColumnWidth + usernameColumnWidth + 5,
-      tableTop + 5
+      tableTop + 10
     );
     doc.text(
       "Ticket Count",
       tableLeft + idColumnWidth + usernameColumnWidth + emailColumnWidth + 5,
-      tableTop + 5
+      tableTop + 10
     );
 
     // Draw vertical lines for header
+    doc.strokeColor("#ffffff");
     drawLine(
       tableLeft + idColumnWidth,
       tableTop,
@@ -408,28 +466,34 @@ export const generateReport = async (req, res) => {
     // Add table rows
     let yPosition = tableTop + rowHeight;
     report.forEach((row, index) => {
-      // Draw row
-      doc.rect(tableLeft, yPosition, tableWidth, rowHeight).stroke();
+      // Alternating row colors
+      doc
+        .fillColor(index % 2 === 0 ? "#ffffff" : "#f9f9f9")
+        .rect(tableLeft, yPosition, tableWidth, rowHeight)
+        .fill();
 
       // Add text
+      doc.fillColor("#333333").fontSize(10);
       doc.text(
         row._id.toString().substring(0, 24),
         tableLeft + 5,
-        yPosition + 5
+        yPosition + 10
       );
-      doc.text(row.username, tableLeft + idColumnWidth + 5, yPosition + 5);
+      doc.text(row.username, tableLeft + idColumnWidth + 5, yPosition + 10);
       doc.text(
         row.email,
         tableLeft + idColumnWidth + usernameColumnWidth + 5,
-        yPosition + 5
+        yPosition + 10
       );
       doc.text(
         row.ticketCount.toString(),
         tableLeft + idColumnWidth + usernameColumnWidth + emailColumnWidth + 5,
-        yPosition + 5
+        yPosition + 10
       );
 
       // Draw vertical lines for row
+      doc.strokeColor("#e0e0e0");
+      drawLine(tableLeft, yPosition, tableLeft + tableWidth, yPosition);
       drawLine(
         tableLeft + idColumnWidth,
         yPosition,
@@ -450,59 +514,11 @@ export const generateReport = async (req, res) => {
       );
 
       yPosition += rowHeight;
-
-      if (yPosition > 700) {
-        doc.addPage();
-        yPosition = 50;
-
-        // Redraw header on new page
-        doc.rect(tableLeft, yPosition, tableWidth, rowHeight).stroke();
-        doc.text("User ID", tableLeft + 5, yPosition + 5);
-        doc.text("Username", tableLeft + idColumnWidth + 5, yPosition + 5);
-        doc.text(
-          "Email",
-          tableLeft + idColumnWidth + usernameColumnWidth + 5,
-          yPosition + 5
-        );
-        doc.text(
-          "Ticket Count",
-          tableLeft +
-            idColumnWidth +
-            usernameColumnWidth +
-            emailColumnWidth +
-            5,
-          yPosition + 5
-        );
-
-        drawLine(
-          tableLeft + idColumnWidth,
-          yPosition,
-          tableLeft + idColumnWidth,
-          yPosition + rowHeight
-        );
-        drawLine(
-          tableLeft + idColumnWidth + usernameColumnWidth,
-          yPosition,
-          tableLeft + idColumnWidth + usernameColumnWidth,
-          yPosition + rowHeight
-        );
-        drawLine(
-          tableLeft + idColumnWidth + usernameColumnWidth + emailColumnWidth,
-          yPosition,
-          tableLeft + idColumnWidth + usernameColumnWidth + emailColumnWidth,
-          yPosition + rowHeight
-        );
-
-        yPosition += rowHeight;
-      }
     });
 
-    // Finalize the PDF and end the stream
     doc.end();
 
-    // Wait for the stream to finish before sending the response
     stream.on("finish", () => {
-      // Send the PDF file as a downloadable response
       res.download(filePath, fileName, (err) => {
         if (err) {
           console.error("Error during file download:", err);
@@ -510,7 +526,7 @@ export const generateReport = async (req, res) => {
             .status(500)
             .json({ message: "Error downloading the file" });
         } else {
-          fs.unlinkSync(filePath); // Clean up after sending
+          fs.unlinkSync(filePath);
         }
       });
     });

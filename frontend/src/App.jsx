@@ -28,7 +28,7 @@ import RentalTableHistory from "./pages/RentalTableHistory";
 import Leaderboard from "./pages/MathzLeaderboard";
 import DeveloperLoginSignup from "./pages/DeveloperLoginSignup";
 import UserMessages from "./pages/UserMessage";
-
+import Notification from "./pages/Notification";
 
 //Games
 import Snake from "../Games/Snake";
@@ -98,6 +98,7 @@ const App = () => {
       <Route path="//chat-history" element={<ChatHistory />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/Leaderboard" element={<Leaderboard />} />
+      <Route path="/Notification" element={<Notification />} />
       <Route path="/chat" element={<Chat />} />
       <Route
         path="/UserManagementDashboard"
@@ -125,8 +126,8 @@ const App = () => {
       <Route path="/ColorGuessingGame" element={<ColorGuessingGame />} />
       <Route path="/RentalPayments" element={<RentalPaymentsDash />} />
       <Route path="/SessionAnalytics" element={<SessionAnalytics />} />
-      <Route path="DeveloperEarningTable" element={<DeveloperIncomeTable/>} />
-      <Route path="RentalTableHistory" element={<RentalTableHistory/>} />
+      <Route path="DeveloperEarningTable" element={<DeveloperIncomeTable />} />
+      <Route path="RentalTableHistory" element={<RentalTableHistory />} />
       {/*Game Routes*/}
       <Route path="/HangmanGame" element={<Hangman />} />
       <Route path="/WordSearch" element={<WordSearch />} />
