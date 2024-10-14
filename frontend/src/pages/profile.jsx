@@ -367,7 +367,7 @@ const Profile = () => {
         auto
         bordered
         fullWidth
-        className="w-full mt-4 w-full bg-gradient-to-r from-[#d90429] to-[#ef233c] text-white py-3 px-4 rounded-md hover:from-[#b10619] hover:to-[#d90429] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#ef233c] focus:ring-opacity-50"
+        className="font-primaryRegular w-full mt-4 w-full bg-gradient-to-r from-[#d90429] to-[#ef233c] text-white py-3 px-4 rounded-md hover:from-[#b10619] hover:to-[#d90429] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#ef233c] focus:ring-opacity-50"
       >
         Delete Account
       </Button>{/* Delete Confirmation Modal */}

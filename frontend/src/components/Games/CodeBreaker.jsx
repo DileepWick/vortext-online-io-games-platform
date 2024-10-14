@@ -4,6 +4,7 @@ import Header from "../header";
 import Footer from "../footer";
 import { Terminal, Zap, Shield, Award, Code, Database, Server } from 'lucide-react';
 import useAuthCheck from "../../utils/authCheck";
+import { BackgroundBeams } from '../ui/BackgroundBeams';
 
 
 
@@ -795,33 +796,47 @@ const CodeBreaker = () => {
     <div className="flex flex-col min-h-screen bg-gray-900 text-white">
       {gameStage === GAME_STAGES.INTRO && <Header />}
       
-      <main className="flex-grow flex flex-col items-center justify-center p-4">
+      <main className="flex-grow flex flex-col items-center justify-center p-4 min-h-[90vh]">
+      <BackgroundBeams />
+
         
         {gameStage === GAME_STAGES.INTRO ? (
-          <h1 className="text-5xl font-bold mb-8 text-blue-400">Code Breaker: The Cyber Adventure</h1>
+          <h1 className="text-7xl font-bold text-black bg-clip-text bg-no-repeat text-transparent bg-gradient-to-r py-4 from-purple-900 via-purple-600 to-purple-300 [text-shadow:0_0_rgba(0,0,0,0.1)]">Code Breaker: The Cyber Adventure</h1>
+
         ) : (
           <h1 className="text-6xl font-bold mb-4 text-blue-400">Code Breaker</h1>
         )}
         
         {gameStage === GAME_STAGES.INTRO && (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-center"
-          >
-            <p className="mb-4 text-xl">Welcome, agent! The Cyber Security Agency needs your help. Choose your difficulty level:</p>
-            {Object.values(DIFFICULTY_LEVELS).map((level) => (
-              <button 
-                key={level}
-                className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition duration-300 m-2 text-lg"
-                onClick={() => startGame(level)}
-              >
-                {level.charAt(0).toUpperCase() + level.slice(1)}
-              </button>
-            ))}
-          </motion.div>
-        )}
+  <motion.div 
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5 }}
+    className="text-center"
+  >
+    <p className="mb-4 text-xl">Welcome, agent! The Cyber Security Agency needs your help. Choose your difficulty level:</p>
+    <div className="items-center space-y-4">
+      {Object.values(DIFFICULTY_LEVELS).map((level) => (
+        <button
+          key={level}
+          className="p-[3px] relative m-2"
+          onClick={() => startGame(level)}
+        >
+          {/* Gradient border with dark purple colors */}
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-purple-900 rounded-lg" />
+          
+          {/* Inner button content with hover effect */}
+          <div className="px-6 py-3 bg-gray-800 rounded-[6px] relative group transition duration-200 text-white text-xl hover:bg-transparent">
+            {level.charAt(0).toUpperCase() + level.slice(1)}
+            
+          </div>
+        </button>
+      ))}
+      
+    </div>
+  </motion.div>
+  
+)}
 
         {gameStage === GAME_STAGES.CHALLENGE && currentChallenge && (
           <div className="w-full max-w-5xl bg-gray-800 rounded-lg shadow-xl p-8">
