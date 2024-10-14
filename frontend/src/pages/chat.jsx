@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import axios from "axios";
-import { getToken } from "../utils/getToken";
-import { getUserIdFromToken } from "../utils/user_id_decoder";
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import axios from 'axios';
+import { getToken } from '../utils/getToken';
+import { getUserIdFromToken } from '../utils/user_id_decoder';
 import Header from "../components/header";
 import { User, Input, Button, Card, Spacer, Badge } from "@nextui-org/react";
 
@@ -30,9 +30,9 @@ const SendIcon = (props) => (
 const UserListItem = ({ user, isSelected, onClick, unreadCount }) => (
   <div
     className={`p-3 rounded-lg mb-2 cursor-pointer transition-all duration-200 ${
-      isSelected
-        ? "bg-blue-100 border-l-4 border-blue-500"
-        : "hover:bg-gray-50 border-l-4 border-transparent"
+      isSelected 
+        ? 'bg-blue-100 border-l-4 border-blue-500' 
+        : 'hover:bg-gray-50 border-l-4 border-transparent'
     }`}
     onClick={() => onClick(user)}
   >
@@ -44,10 +44,10 @@ const UserListItem = ({ user, isSelected, onClick, unreadCount }) => (
           </span>
         </div>
         <div>
-          <p className="font-medium text-gray-800">
-            {user.username || user.name}
-          </p>
-          {user.email && <p className="text-sm text-gray-500">{user.email}</p>}
+          <p className="font-medium text-gray-800">{user.username || user.name}</p>
+          {user.email && (
+            <p className="text-sm text-gray-500">{user.email}</p>
+          )}
         </div>
       </div>
       {unreadCount > 0 && (
@@ -59,15 +59,17 @@ const UserListItem = ({ user, isSelected, onClick, unreadCount }) => (
   </div>
 );
 
+
+
 const Chat = () => {
   useAuthCheck();
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
-  const [newMessage, setNewMessage] = useState("");
-  const [recipientId, setRecipientId] = useState("");
+  const [newMessage, setNewMessage] = useState('');
+  const [recipientId, setRecipientId] = useState('');
   const [unreadCounts, setUnreadCounts] = useState({});
   const token = getToken();
   const currentUserId = getUserIdFromToken(token);
@@ -75,26 +77,20 @@ const Chat = () => {
 
   const fetchUsers = useCallback(async () => {
     try {
-      const response = await axios.get("http://localhost:8098/users/allusers", {
+      const response = await axios.get('http://localhost:8098/users/allusers', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (
-        response.data &&
-        response.data.allUsers &&
-        Array.isArray(response.data.allUsers)
-      ) {
-        const filteredUserList = response.data.allUsers.filter(
-          (user) => user._id !== currentUserId
-        );
+      if (response.data && response.data.allUsers && Array.isArray(response.data.allUsers)) {
+        const filteredUserList = response.data.allUsers.filter(user => user._id !== currentUserId);
         setUsers(filteredUserList);
         setFilteredUsers(filteredUserList);
       } else {
-        console.error("Unexpected API response structure:", response.data);
+        console.error('Unexpected API response structure:', response.data);
         setUsers([]);
         setFilteredUsers([]);
       }
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error('Error fetching users:', error);
       setUsers([]);
       setFilteredUsers([]);
     }
@@ -102,28 +98,25 @@ const Chat = () => {
 
   const fetchUnreadMessageCounts = useCallback(async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:8098/api/messages/unread/${currentUserId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await axios.get(`http://localhost:8098/api/messages/unread/${currentUserId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const counts = {};
-      response.data.forEach((item) => {
+      response.data.forEach(item => {
         counts[item._id] = item.count;
       });
       setUnreadCounts(counts);
     } catch (error) {
-      console.error("Error fetching unread message counts:", error);
+      console.error('Error fetching unread message counts:', error);
     }
   }, [currentUserId, token]);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
-    if (query.trim() === "") {
+    if (query.trim() === '') {
       setFilteredUsers(users);
     } else {
-      const filtered = users.filter((user) =>
+      const filtered = users.filter(user => 
         (user.username || user.name).toLowerCase().includes(query.toLowerCase())
       );
       setFilteredUsers(filtered);
@@ -132,26 +125,23 @@ const Chat = () => {
 
   const handleUserSelect = (user) => {
     setMessages([]);
-    setNewMessage("");
+    setNewMessage('');
     setSelectedUser(user);
     setRecipientId(user._id);
     // Clear unread count for the selected user
-    setUnreadCounts((prev) => ({ ...prev, [user._id]: 0 }));
+    setUnreadCounts(prev => ({ ...prev, [user._id]: 0 }));
   };
 
   const fetchMessages = useCallback(async () => {
     if (!recipientId) return;
     try {
-      const response = await axios.get(
-        `http://localhost:8098/api/messages/${recipientId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { currentUserId },
-        }
-      );
+      const response = await axios.get(`http://localhost:8098/api/messages/${recipientId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { currentUserId }
+      });
       setMessages(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
-      console.error("Error fetching messages:", error);
+      console.error('Error fetching messages:', error);
       setMessages([]);
     }
   }, [recipientId, token, currentUserId]);
@@ -173,52 +163,40 @@ const Chat = () => {
 
   useEffect(() => {
     if (messageContainerRef.current) {
-      messageContainerRef.current.scrollTop =
-        messageContainerRef.current.scrollHeight;
+      messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
     }
   }, [messages]);
 
   const handleSendMessage = async () => {
     if (!recipientId || !newMessage.trim()) return;
     try {
-      const response = await axios.post(
-        "http://localhost:8098/api/messages",
-        {
-          content: newMessage,
-          recipientId: recipientId,
-          messageUser: currentUserId,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setNewMessage("");
-      setMessages((prevMessages) => [...prevMessages, response.data]);
+      const response = await axios.post('http://localhost:8098/api/messages', {
+        content: newMessage,
+        recipientId: recipientId,
+        messageUser: currentUserId,
+      }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setNewMessage('');
+      setMessages(prevMessages => [...prevMessages, response.data]);
     } catch (error) {
-      console.error("Error sending message:", error);
+      console.error('Error sending message:', error);
     }
   };
 
   return (
     <div className="min-h-screen bg-slate-950 ">
       <Header />
-      <div className="pointer-events-none">
-        <BackgroundBeams />
-      </div>
-
+      <BackgroundBeams />
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-5xl font-bold text-black bg-clip-text bg-no-repeat text-transparent bg-gradient-to-r py-4 from-blue-500 via-orange-500 to-orange-500 [text-shadow:0_0_rgba(0,0,0,0.1)]">
-          Messaging Center
-        </h1>
+        <h1 className="text-5xl font-bold text-black bg-clip-text bg-no-repeat text-transparent bg-gradient-to-r py-4 from-blue-500 via-orange-500 to-orange-500 [text-shadow:0_0_rgba(0,0,0,0.1)]">Messaging Center</h1>
         <div className="flex flex-col md:flex-row gap-6">
           <Card className="p-6 w-full md:w-1/3 shadow-md ">
             <div className="flex justify-between items-center mb-4 ">
               <h2 className="text-xl font-semibold text-gray-800">Contacts</h2>
-              <span className="text-sm text-gray-500">
-                {filteredUsers.length} contacts
-              </span>
+              <span className="text-sm text-gray-500">{filteredUsers.length} contacts</span>
             </div>
-
+            
             <Input
               className="mb-4"
               placeholder="Search contacts..."
@@ -253,9 +231,7 @@ const Chat = () => {
                 ))
               ) : (
                 <div className="text-center py-4 text-gray-500">
-                  {searchQuery
-                    ? "No matching contacts found"
-                    : "No contacts available"}
+                  {searchQuery ? "No matching contacts found" : "No contacts available"}
                 </div>
               )}
             </div>
@@ -267,9 +243,7 @@ const Chat = () => {
                 <div className="flex items-center mb-4">
                   <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-3">
                     <span className="text-gray-600 font-semibold">
-                      {(selectedUser.username || selectedUser.name)
-                        .charAt(0)
-                        .toUpperCase()}
+                      {(selectedUser.username || selectedUser.name).charAt(0).toUpperCase()}
                     </span>
                   </div>
                   <div>
@@ -277,33 +251,19 @@ const Chat = () => {
                       {selectedUser.username || selectedUser.name}
                     </h2>
                     {selectedUser.email && (
-                      <p className="text-sm text-gray-500">
-                        {selectedUser.email}
-                      </p>
+                      <p className="text-sm text-gray-500">{selectedUser.email}</p>
                     )}
                   </div>
                 </div>
-
-                <div
-                  ref={messageContainerRef}
-                  className="h-[calc(100vh-400px)] overflow-y-auto mb-4 p-4 bg-white rounded-lg border border-gray-200"
-                >
+                
+                <div ref={messageContainerRef} className="h-[calc(100vh-400px)] overflow-y-auto mb-4 p-4 bg-white rounded-lg border border-gray-200">
                   {messages.map((message) => (
-                    <div
-                      key={message._id}
-                      className={`mb-4 ${
-                        message.messageUser._id === currentUserId
-                          ? "text-right"
-                          : "text-left"
-                      }`}
-                    >
-                      <div
-                        className={`inline-block p-3 rounded-lg ${
-                          message.messageUser._id === currentUserId
-                            ? "bg-blue-100 text-black"
-                            : "bg-gray-100 text-black"
-                        }`}
-                      >
+                    <div key={message._id} className={`mb-4 ${message.messageUser._id === currentUserId ? 'text-right' : 'text-left'}`}>
+                      <div className={`inline-block p-3 rounded-lg ${
+                        message.messageUser._id === currentUserId 
+                          ? 'bg-blue-100 text-black' 
+                          : 'bg-gray-100 text-black'
+                      }`}>
                         <p>{message.content}</p>
                       </div>
                     </div>
@@ -316,13 +276,13 @@ const Chat = () => {
                     placeholder="Type your message..."
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                     className="flex-grow"
                   />
-                  <Button
-                    auto
-                    onClick={handleSendMessage}
-                    icon={<SendIcon />}
+                  <Button 
+                    auto 
+                    onClick={handleSendMessage} 
+                    icon={<SendIcon />} 
                     className="bg-blue-500 text-white"
                   >
                     Send
@@ -343,9 +303,7 @@ const Chat = () => {
                   >
                     <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
-                  <p className="mt-2 text-lg">
-                    Select a contact to start a conversation
-                  </p>
+                  <p className="mt-2 text-lg">Select a contact to start a conversation</p>
                 </div>
               </div>
             )}
