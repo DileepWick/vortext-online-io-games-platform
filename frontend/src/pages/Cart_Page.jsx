@@ -59,8 +59,6 @@ const CartPage = () => {
   const [agreeToShare, setAgreeToShare] = useState(false);
   const [paypalEmail, setPaypalEmail] = useState('');
 
-
-  //Get cart items
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
@@ -81,7 +79,6 @@ const CartPage = () => {
     fetchCartItems();
   }, []);
 
-   // Calculate total, subtotal, and total of Discounted Totals
   const calculateTotal = (items) => {
     let subTotal = 0;
     let totalDiscountedTotal = 0;
@@ -96,7 +93,6 @@ const CartPage = () => {
     setTotalDiscountedTotal(totalDiscountedTotal);
   };
 
-   // Calculate discounted price
   const calculateDiscountedPrice = (item) => {
     const discount = item.stockid.discount || 0;
     return discount > 0
@@ -104,7 +100,6 @@ const CartPage = () => {
       : item.stockid.UnitPrice;
   };
 
-  //Handle Remove Items
   const handleRemoveItem = async (stockid) => {
     try {
       const response = await axios.delete(
@@ -165,20 +160,19 @@ const CartPage = () => {
         return false;
       }
 
-      // Check if the card is not expired
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear() % 100;
-    const currentMonth = currentDate.getMonth() + 1;
-    if (parseInt(year) < currentYear || (parseInt(year) === currentYear && parseInt(month) < currentMonth)) {
-      toast.error("Card has expired");
-      return false;
-    }
+      const currentDate = new Date();
+      const currentYear = currentDate.getFullYear() % 100;
+      const currentMonth = currentDate.getMonth() + 1;
+      if (parseInt(year) < currentYear || (parseInt(year) === currentYear && parseInt(month) < currentMonth)) {
+        toast.error("Card has expired");
+        return false;
+      }
 
       if (cvv.length !== 3) {
         toast.error("Invalid CVV");
         return false;
       }
-    }  else if (paymentMethod === "paypal") {
+    } else if (paymentMethod === "paypal") {
       const emailPattern = /^[^\s@]+@[^\s@]+\.[com]+$/;
       if (!paypalEmail || !emailPattern.test(paypalEmail)) {
         toast.error("Invalid PayPal email.");
@@ -236,9 +230,8 @@ const CartPage = () => {
         }
       );
 
-      const orderid = response.data._id; // Assuming the created order ID is returned in the response
+      const orderid = response.data._id;
 
-      // Create order items for each cart item
       await Promise.all(
         cartItems.map((item) => {
           const orderItemData = {
@@ -265,7 +258,6 @@ const CartPage = () => {
           transition: Flip,
           style: { fontFamily: "Rubik" },
         });
-        // Clear cart items and close modal
         setCartItems([]);
         onOpenChange(false);
       }
@@ -307,15 +299,16 @@ const CartPage = () => {
     );
 
   return (
-    <div className="min-h-screen font-primaryRegular">
+    <div className="min-h-screen font-primaryRegular bg-gradient-to-b from-customDark to-gray-900">
       <Helmet>
         <title>My Cart</title>
       </Helmet>
       <Header />
-      <div className="container mx-auto px-4 py-8 bg-customDark">
-        <div className="bg-customDark rounded-lg shadow-lg p-8 flex flex-row">
-          <ScrollShadow hideScrollBar className="w-full h-[500px]">
-            <div className="flex flex-col">
+      <div className="container mx-auto px-4 py-12">
+        <h1 className="text-4xl font-bold mb-4 text-center text-white">My Cart</h1>
+        <div className="bg-gray-800 rounded-lg shadow-2xl p-8 flex flex-col lg:flex-row gap-8">
+          <ScrollShadow hideScrollBar className="w-full lg:w-2/3 h-[600px]">
+            <div className="space-y-6">
               {cartItems.map((item) => {
                 const game = item.stockid.AssignedGame;
                 const gameExists = game && game._id;
@@ -323,55 +316,56 @@ const CartPage = () => {
                 return (
                   <div
                     key={item._id}
-                    className="flex justify-between items-center mb-4"
+                    className="bg-gray-700 rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:shadow-lg hover:scale-102"
                   >
                     {gameExists ? (
-                      <>
-                        <div className="flex flex-row p-4">
-                          <Image
-                            isBlurred
-                            isZoomed
-                            className="w-[180px] h-[220px]"
-                            radius="none"
-                            alt={game.title || "Game Cover"}
-                            src={game.coverPhoto || "default-image-url"}
-                          />
-                          <div className="flex flex-col m-4 p-4">
-                            <h2 className="text-xl text-white">
+                      <div className="flex flex-col sm:flex-row">
+                        <Image
+                          isBlurred
+                          isZoomed
+                          className="w-full sm:w-[180px] h-[220px] object-cover"
+                          radius="none"
+                          alt={game.title || "Game Cover"}
+                          src={game.coverPhoto || "default-image-url"}
+                        />
+                        <div className="flex flex-col justify-between p-4 w-full">
+                          <div>
+                            <h2 className="text-2xl font-bold text-white mb-2">
                               {game.title || "N/A"}
                             </h2>
-                            <p className="text-white mt-2">
-                              <span className="line-through text-editionColor">
+                            <p className="text-lg text-white mb-2">
+                              <span className="line-through text-gray-400 mr-2">
                                 LKR.
                                 {(
                                   item.stockid.UnitPrice * item.quantity
                                 ).toFixed(2)}
-                              </span>{" "}
-                              <span className="text-white">
+                              </span>
+                              <span className="text-green-400 font-semibold">
                                 LKR.
                                 {calculateDiscountedPrice(item).toFixed(2)}
                               </span>
                             </p>
                             {item.stockid.discount > 0 && (
                               <Chip
-                                color="primary"
-                                radius="none"
-                                className="text-white mt-2"
+                                color="success"
+                                size="sm"
+                                className="text-white"
                               >
                                 {item.stockid.discount}% OFF
                               </Chip>
                             )}
                           </div>
+                          <Button
+                            onClick={() => handleRemoveItem(item.stockid._id)}
+                            color="danger"
+                            variant="flat"
+                            size="sm"
+                            className="self-end mt-4"
+                          >
+                            <DeleteIcon /> Remove
+                          </Button>
                         </div>
-                        <Button
-                          onClick={() => handleRemoveItem(item.stockid._id)}
-                          color="danger"
-                          variant="flat"
-                          size="sm"
-                        >
-                          <DeleteIcon />
-                        </Button>
-                      </>
+                      </div>
                     ) : (
                       <div className="flex justify-between items-center p-4">
                         <p className="text-white">
@@ -393,151 +387,177 @@ const CartPage = () => {
               })}
             </div>
           </ScrollShadow>
-          <div className="mt-8 p-4 m-8 w-[30%] rounded-md bg-customCardDark h-[500px]">
-            <h2 className="text-lg font-bold mb-4 text-white">Summary</h2>
-            <p className="text-sm mb-2 text-white">Total: LKR.{subtotal.toFixed(2)}</p>
-            <p className="text-sm mb-2 text-white">
-              Discounted Total: LKR.{totalDiscountedTotal.toFixed(2)}
-            </p>
-            <Button
-              onPress={onOpen}
-              variant="bordered"
-              color="primary"
-              className="text-white mt-2"
-              radius="none"
-            >
-              Checkout
-            </Button>
+          <div className="lg:w-1/3">
+            <div className="bg-gray-700 p-6 rounded-lg shadow-md">
+              <h2 className="text-2xl font-bold mb-4 text-white">Order Summary</h2>
+              <div className="space-y-2 mb-4">
+                <p className="flex justify-between text-white">
+                  <span>Subtotal:</span>
+                  <span>LKR.{subtotal.toFixed(2)}</span>
+                </p>
+                <p className="flex justify-between  text-white">
+                  <span>Discount:</span>
+                  <span>LKR.{(subtotal - totalDiscountedTotal).toFixed(2)}</span>
+                </p>
+                <p className="flex justify-between font-bold text-xl text-white">
+                  <span>Total:</span>
+                  <span>LKR.{totalDiscountedTotal.toFixed(2)}</span>
+                </p>
+              </div>
+              <Button
+                onPress={onOpen}
+                color="primary"
+                className="w-full text-white font-bold py-3 rounded-md transition-all duration-300 hover:bg-blue-600"
+                size="lg"
+              >
+                Proceed to Checkout
+              </Button>
+            </div>
           </div>
-          <Modal
-            isOpen={isOpen}
-            onOpenChange={onOpenChange}
-            placement="center"
-            size="2xl"
-            scrollBehavior="inside"
-          >
-            <ModalContent>
-              {(onClose) => (
-                <>
-                  <ModalHeader className="font-primaryBold text-black">Checkout</ModalHeader>
-                  <ModalBody>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="bg-customCardDark p-4 rounded-lg">
-                        <h2 className="text-lg font-semibold mb-2 text-black"> PAYMENT METHOD</h2>
-                        <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                          <div className="border border-gray-900 p-5 rounded mb-4 w-[550px]">
-                            <Radio value="creditCard">
-                              <div className="flex items-center">
-                                <CreditCardIcon />
-                                <span className="text-black ml-2 mr-4">Credit Card</span>
-                              
-                              </div>
-                            </Radio>
-                            {paymentMethod === 'creditCard' && (
-                              <div className="mt-4">
-                                <Input
-                                  label="Card Number"
-                                  placeholder="1111-1111-1111-1111"
-                                  value={cardNumber}
-                                  onChange={handleCardNumberChange}
-                                  className="mb-5"
-                                />
-                                <div className="flex gap-4">
-                                  <Input
-                                    label="Expiration (MM/YY)"
-                                    placeholder="MM/YY"
-                                    value={expirationDate}
-                                    onChange={handleExpirationDateChange}
-                                    className="mb-5"
-                                  />
-                                  <Input
-                                    label="CVV"
-                                    placeholder="123"
-                                    value={cvv}
-                                    onChange={handleCvvChange}
-                                  />
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                          {/*<div className="border border-gray-700 p-4 rounded">
-                            <Radio value="paypal">
-                              <div className="flex items-center">
-                                <PayPalIcon />
-                                <span className="text-black ml-2">PayPal</span>
-                              </div>
-                            </Radio>
-                            {paymentMethod === 'paypal' && (
-                              <Input
-                                label="PayPal Email"
-                                placeholder="your@email.com"
-                                value={paypalEmail}
-                                onChange={(e) => setPaypalEmail(e.target.value)}
-                                className="mt-2"
-                              />
-                            )}
-                          </div>*/}
-                        </RadioGroup>
-                        {/*<Checkbox
-                          isSelected={savePaymentMethod}
-                          onValueChange={setSavePaymentMethod}
-                          className="mt-4"
-                        >
-                        Save this payment method for future purchases
-                        </Checkbox>*/}
-                      </div>
-                    </div>
-                    <div className="mt-0 bg-customCardDark p-0 rounded-lg">
-                      <h2 className="text-lg font-semibold mb-4 text-black">ORDER SUMMARY</h2>
-                      {cartItems.map((item) => (
-                        <div key={item._id} className="flex mb-4">
-                          <img src={item.stockid.AssignedGame.coverPhoto} alt={item.stockid.AssignedGame.title} className="w-16 h-20 object-cover mr-4" />
-                          <div>
-                            <h3 className="font-semibold text-black">{item.stockid.AssignedGame.title}</h3>
-                          {/*  <p className="text-sm text-gray-400">Id:{item.stockid.AssignedGame.developer}</p>*/}
-                            <p className="text-black">Rs.{item.stockid.UnitPrice.toFixed(2)}</p>
-                          </div>
-                        </div>
-                      ))}
-                      <div className="border-t border-gray-700 pt-4 mt-4">
-                        <div className="flex justify-between text-black">
-                          <span>Total</span>
-                          <span>Rs.{totalDiscountedTotal.toFixed(2)}</span>
-                        </div>
-                        <div className="bg-yellow-900 text-yellow-200 p-2 rounded mt-2 text-sm">
-                          Get some rewards with this purchase.
-                        </div>
-                      </div>
-                    {/*}  <Input
-                        label="Enter creator code"
-                        value={creatorCode}
-                        onChange={(e) => setCreatorCode(e.target.value)}
-                        className="mt-4"
-                      />*/}
-                      <Checkbox
-                        isSelected={agreeToShare}
-                        onValueChange={setAgreeToShare}
-                        className="mt-4"
-                      >
-                        Agree to share your email for marketing purposes
-                      </Checkbox>
-                    </div>
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button color="danger" variant="light" onPress={onClose}>
-                      Cancel
-                    </Button>
-                    <Button color="primary" onPress={handlePlaceOrder}>
-                      CONFIRM
-                    </Button>
-                  </ModalFooter>
-                </>
-              )}
-            </ModalContent>
-          </Modal>
         </div>
       </div>
       <Footer />
+      
+      <Modal
+  isOpen={isOpen}
+  onOpenChange={onOpenChange}
+  placement="center"
+  size="2xl"
+>
+  <ModalContent
+    style={{
+      backgroundColor: "#f9f9f9",  // Very light gray
+      boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.1)",  // Soft shadow
+      borderRadius: "12px",  // Rounded corners
+      padding: "20px",  // Spacing for the whole modal
+    }}
+  >
+    {(onClose) => (
+      <>
+        <ModalHeader className="font-bold text-2xl text-gray-900">Checkout</ModalHeader>
+        <ModalBody>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* PAYMENT METHOD SECTION */}
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h2 className="text-lg font-semibold mb-4 text-gray-800">Payment Method</h2>
+              <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+                <div className="border border-gray-300 p-5 rounded-lg mb-4">
+                  <Radio value="creditCard">
+                    <div className="flex items-center">
+                      <CreditCardIcon />
+                      <span className="text-gray-700 ml-2 mr-4">Credit Card</span>
+                    </div>
+                  </Radio>
+                  {paymentMethod === 'creditCard' && (
+                    <div className="mt-4">
+                      <Input
+                        label="Card Number"
+                        placeholder="1111-1111-1111-1111"
+                        value={cardNumber}
+                        onChange={handleCardNumberChange}
+                        className="mb-5"
+                        style={{
+                          borderColor: "#e0e0e0",
+                          borderRadius: "8px",
+                          boxShadow: "0px 1px 4px rgba(0, 0, 0, 0.05)",
+                        }}
+                      />
+                      <div className="flex gap-4">
+                        <Input
+                          label="Expiration (MM/YY)"
+                          placeholder="MM/YY"
+                          value={expirationDate}
+                          onChange={handleExpirationDateChange}
+                          className="mb-5"
+                          style={{
+                            borderColor: "#e0e0e0",
+                            borderRadius: "8px",
+                            boxShadow: "0px 1px 4px rgba(0, 0, 0, 0.05)",
+                          }}
+                        />
+                        <Input
+                          label="CVV"
+                          placeholder="123"
+                          value={cvv}
+                          onChange={handleCvvChange}
+                          style={{
+                            borderColor: "#e0e0e0",
+                            borderRadius: "8px",
+                            boxShadow: "0px 1px 4px rgba(0, 0, 0, 0.05)",
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </RadioGroup>
+            </div>
+
+            {/* ORDER SUMMARY SECTION */}
+            <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-lg font-semibold mb-4 text-blue-900">Order Summary</h2>
+              {cartItems.map((item) => (
+                <div
+                  key={item._id}
+                  className="flex items-center mb-4 bg-gray-50 p-4 rounded-lg shadow-sm"
+                >
+                  <img
+                    src={item.stockid.AssignedGame.coverPhoto}
+                    alt={item.stockid.AssignedGame.title}
+                    className="w-16 h-20 object-cover mr-4 rounded-lg"
+                  />
+                  <div>
+                    <h3 className="font-semibold text-blue-700">{item.stockid.AssignedGame.title}</h3>
+                    <p className="text-gray-700">Rs.{item.stockid.UnitPrice.toFixed(2)}</p>
+                  </div>
+                </div>
+              ))}
+              <div className="border-t border-gray-200 pt-4 mt-4">
+                <div className="flex justify-between text-gray-900 font-semibold">
+                  <span>Total</span>
+                  <span>Rs.{totalDiscountedTotal.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            color="danger"
+            variant="light"
+            onPress={onClose}
+            style={{
+              padding: "10px 20px",
+              borderRadius: "8px",
+              backgroundColor: "#ff6b6b",
+              color: "#fff",
+              fontWeight: "bold",
+              boxShadow: "0px 2px 10px rgba(255, 107, 107, 0.3)",
+            }}
+            className="mr-4"
+          >
+            Cancel
+          </Button>
+          <Button
+            color="primary"
+            onPress={handlePlaceOrder}
+            style={{
+              padding: "10px 20px",
+              borderRadius: "8px",
+              backgroundColor: "#4CAF50",
+              color: "#fff",
+              fontWeight: "bold",
+              boxShadow: "0px 2px 10px rgba(76, 175, 80, 0.3)",
+            }}
+            className="hover:bg-green-600 transition duration-300"
+          >
+            Confirm
+          </Button>
+        </ModalFooter>
+      </>
+    )}
+  </ModalContent>
+</Modal>
     </div>
   );
 };
