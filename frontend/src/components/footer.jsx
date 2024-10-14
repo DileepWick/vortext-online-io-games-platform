@@ -29,23 +29,23 @@ const Footer = () => {
             <h3 className="text-white text-lg font-semibold mb-4">Services</h3>
             <ul>
               <li className="mb-2">
-                <Link to="/services#service1" className="hover:text-white">
-                  Service 1
+                <Link to="/shop" className="hover:text-white">
+                  Game Sales
                 </Link>
               </li>
               <li className="mb-2">
-                <Link to="/services#service2" className="hover:text-white">
-                  Service 2
+                <Link to="/shop" className="hover:text-white">
+                  Game Rentals
                 </Link>
               </li>
               <li className="mb-2">
-                <Link to="/services#service3" className="hover:text-white">
-                  Service 3
+                <Link to="#" className="hover:text-white">
+                  Game Reviews
                 </Link>
               </li>
               <li className="mb-2">
-                <Link to="/services#service4" className="hover:text-white">
-                  Service 4
+                <Link to="/support" className="hover:text-white">
+                  24/7 Support
                 </Link>
               </li>
             </ul>
@@ -61,7 +61,7 @@ const Footer = () => {
                 </Link>
               </li>
               <li className="mb-2">
-                <Link to="/support#contact" className="hover:text-white">
+                <Link to="/support#contactForm" className="hover:text-white">
                   Contact Us
                 </Link>
               </li>

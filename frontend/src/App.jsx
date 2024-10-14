@@ -24,6 +24,7 @@ import TailoredGames from "./pages/tailoredGames";
 import TransactionHistory from "./pages/TransactionHistoryPage";
 import DeveloperIncomeTable from "./pages/DeveloperEarningTable";
 
+
 import ChatHistory from "./pages/ChatHistory";
 import RentalTableHistory from "./pages/RentalTableHistory";
 import Leaderboard from "./pages/MathzLeaderboard";
