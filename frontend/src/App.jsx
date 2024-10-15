@@ -29,10 +29,7 @@ import Leaderboard from "./pages/MathzLeaderboard";
 import DeveloperLoginSignup from "./pages/DeveloperLoginSignup";
 import UserMessages from "./pages/UserMessage";
 
-import Notification from "./pages/Notification";
-
 import RentalHistory from "./pages/RentalHistory";
-
 
 //Games
 import Snake from "../Games/Snake";
@@ -102,7 +99,6 @@ const App = () => {
       <Route path="//chat-history" element={<ChatHistory />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/Leaderboard" element={<Leaderboard />} />
-      <Route path="/Notification" element={<Notification />} />
       <Route path="/chat" element={<Chat />} />
       <Route
         path="/UserManagementDashboard"
