@@ -14,6 +14,8 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
 import { toast } from "react-toastify";
+import { getToken } from "../../src/utils/getToken";
+import { getUserIdFromToken } from "../../src/utils/user_id_decoder";
 
 const API_BASE_URL = "http://localhost:8098";
 const DEVELOPER_SHARE_PERCENTAGE = 0.7; // 70% share for the developer
@@ -24,6 +26,9 @@ const DevRentalEarnings = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [distributedPayments, setDistributedPayments] = useState({});
   const rowsPerPage = 7;
+
+  const token = getToken();
+  const userId = getUserIdFromToken(token);
 
   useEffect(() => {
     fetchRentalPayments();
@@ -58,9 +63,10 @@ const DevRentalEarnings = () => {
 
   const filteredItems = useMemo(() => {
     return rentalPayments.filter((item) =>
-      item.game?.title?.toLowerCase().includes(searchQuery.toLowerCase())
+      item.game?.title?.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      item.game?.developer?._id === userId
     );
-  }, [rentalPayments, searchQuery]);
+  }, [rentalPayments, searchQuery, userId]);
 
   const paginatedItems = useMemo(() => {
     const start = (page - 1) * rowsPerPage;

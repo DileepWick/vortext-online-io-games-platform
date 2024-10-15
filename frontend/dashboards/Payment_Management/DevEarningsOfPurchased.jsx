@@ -13,6 +13,8 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
 import { toast } from "react-toastify";
+import { getToken } from "../../src/utils/getToken";
+import { getUserIdFromToken } from "../../src/utils/user_id_decoder";
 
 const API_BASE_URL = "http://localhost:8098";
 
@@ -22,6 +24,9 @@ const DevEarningsOfPurchased = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [distributedPayments, setDistributedPayments] = useState({});
   const rowsPerPage = 7;
+
+  const token = getToken();
+  const userId = getUserIdFromToken(token);
 
   const fetchDistributedPayments = async () => {
     try {
@@ -58,9 +63,10 @@ const DevEarningsOfPurchased = () => {
     return tableData.filter((item) =>
       item.stockid?.AssignedGame?.title
         ?.toLowerCase()
-        .includes(searchQuery.toLowerCase())
+        .includes(searchQuery.toLowerCase()) &&
+      item.stockid?.AssignedGame?.developer?._id === userId
     );
-  }, [tableData, searchQuery]);
+  }, [tableData, searchQuery, userId]);
 
   const paginatedItems = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
@@ -120,7 +126,6 @@ const DevEarningsOfPurchased = () => {
           {paginatedItems.map((item) => (
             <TableRow key={item._id} className="text-black">
               <TableCell>{item.stockid?.AssignedGame?.title || "N/A"}</TableCell>
-              
               <TableCell>
                 {item.date
                   ? new Date(item.date).toLocaleDateString()

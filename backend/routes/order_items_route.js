@@ -6,7 +6,8 @@ import {
   updateOrderItemById,
   deleteOrderItemById,
   getOrderItemsByUserId,
-  checkLibraryItem
+  checkLibraryItem,
+  getOrderItemsByDeveloperId
 } from '../controllers/order_items_controller.js';
 
 const OrderItemsRouter = express.Router();
@@ -25,6 +26,9 @@ OrderItemsRouter.get('/order/:orderId', getOrderItemsByOrderId);
 
 // Get order items by user ID
 OrderItemsRouter.get('/useOrders/:userId', getOrderItemsByUserId);
+
+
+OrderItemsRouter.get('/developerItems/:developerId',getOrderItemsByDeveloperId)
 
 // Update an order item by ID
 OrderItemsRouter.put('/:orderItemId', updateOrderItemById);

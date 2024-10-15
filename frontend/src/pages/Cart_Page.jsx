@@ -20,7 +20,6 @@ import {
   Image,
   Chip,
   Input,
-  Checkbox,
   Radio,
   RadioGroup
 } from "@nextui-org/react";
@@ -32,12 +31,37 @@ const CreditCardIcon = () => (
   </svg>
 );
 
-const PayPalIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M7 14c-1.66 0-3-1.34-3-3 0-1.31.84-2.41 2-2.83V3.65C2.5 4.18 0 6.6 0 9.5c0 3.03 2.47 5.5 5.5 5.5h3.07c-.07-.32-.07-.66 0-1H7z"></path>
-    <path d="M17 9.5c0-2.9-2.5-5.32-5.5-5.85v4.52c1.16.42 2 1.52 2 2.83 0 1.66-1.34 3-3 3H7.07c.07.34.07.68 0 1H10.5c3.03 0 5.5-2.47 5.5-5.5z"></path>
-  </svg>
-);
+const OrderSummary = ({ subtotal, totalDiscountedTotal, onCheckout }) => {
+  const discount = subtotal - totalDiscountedTotal;
+
+  return (
+    <div className="bg-gray-700 p-6 rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold mb-4 text-white">Order Summary</h2>
+      <div className="space-y-2 mb-4">
+        <p className="flex justify-between text-white">
+          <span>Subtotal:</span>
+          <span>LKR.{subtotal.toFixed(2)}</span>
+        </p>
+        <p className="flex justify-between text-white">
+          <span>Discount:</span>
+          <span>LKR.{discount.toFixed(2)}</span>
+        </p>
+        <p className="flex justify-between font-bold text-xl text-white">
+          <span>Total:</span>
+          <span>LKR.{totalDiscountedTotal.toFixed(2)}</span>
+        </p>
+      </div>
+      <Button
+        onPress={onCheckout}
+        color="primary"
+        className="w-full text-white font-bold py-3 rounded-md transition-all duration-300 hover:bg-blue-600"
+        size="lg"
+      >
+        Proceed to Checkout
+      </Button>
+    </div>
+  );
+};
 
 const CartPage = () => {
   useAuthCheck();
@@ -54,10 +78,6 @@ const CartPage = () => {
   const [cardNumber, setCardNumber] = useState('');
   const [expirationDate, setExpirationDate] = useState('');
   const [cvv, setCvv] = useState('');
-  const [savePaymentMethod, setSavePaymentMethod] = useState(false);
-  const [creatorCode, setCreatorCode] = useState('');
-  const [agreeToShare, setAgreeToShare] = useState(false);
-  const [paypalEmail, setPaypalEmail] = useState('');
 
   useEffect(() => {
     const fetchCartItems = async () => {
@@ -85,7 +105,7 @@ const CartPage = () => {
 
     items.forEach((item) => {
       const discountedPrice = calculateDiscountedPrice(item);
-      subTotal += discountedPrice * item.quantity;
+      subTotal += item.stockid.UnitPrice * item.quantity;
       totalDiscountedTotal += discountedPrice * item.quantity;
     });
 
@@ -132,7 +152,7 @@ const CartPage = () => {
       const month = value.slice(0, 2);
       const year = value.slice(2, 4);
       if (parseInt(month) > 12) {
-        setExpirationDate('12/${year}' + year);
+        setExpirationDate('12/' + year);
       } else {
         setExpirationDate(`${month}/${year}`);
       }
@@ -172,20 +192,13 @@ const CartPage = () => {
         toast.error("Invalid CVV");
         return false;
       }
-    } else if (paymentMethod === "paypal") {
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[com]+$/;
-      if (!paypalEmail || !emailPattern.test(paypalEmail)) {
-        toast.error("Invalid PayPal email.");
-        return false;
-      }
     }
     return true;
   };
 
   const handlePlaceOrder = async () => {
     if (!validateForm()) return;
-    if ((paymentMethod === 'creditCard' && (!cardNumber || !expirationDate || !cvv)) ||
-        (paymentMethod === 'paypal' && !paypalEmail)) {
+    if (paymentMethod === 'creditCard' && (!cardNumber || !expirationDate || !cvv)) {
       toast.error("Please fill in your payment details before placing the order.", {
         position: "top-right",
         autoClose: 3000,
@@ -210,9 +223,7 @@ const CartPage = () => {
         paymentMethod: paymentMethod,
         paymentDetails: paymentMethod === 'creditCard' 
           ? { cardNumber, expirationDate, cvv }
-          : { paypalEmail },
-        creatorCode,
-        agreeToShare,
+          : {},
         items: cartItems.map(item => ({
           gameId: item.stockid.AssignedGame._id,
           quantity: 1,
@@ -388,316 +399,156 @@ const CartPage = () => {
             </div>
           </ScrollShadow>
           <div className="lg:w-1/3">
-            <div className="bg-gray-700 p-6 rounded-lg shadow-md">
-              <h2 className="text-2xl font-bold mb-4 text-white">Order Summary</h2>
-              <div className="space-y-2 mb-4">
-                <p className="flex justify-between text-white">
-                  <span>Subtotal:</span>
-                  <span>LKR.{subtotal.toFixed(2)}</span>
-                </p>
-                <p className="flex justify-between  text-white">
-                  <span>Discount:</span>
-                  <span>LKR.{(subtotal - totalDiscountedTotal).toFixed(2)}</span>
-                </p>
-                <p className="flex justify-between font-bold text-xl text-white">
-                  <span>Total:</span>
-                  <span>LKR.{totalDiscountedTotal.toFixed(2)}</span>
-                </p>
-              </div>
-              <Button
-                onPress={onOpen}
-                color="primary"
-                className="w-full text-white font-bold py-3 rounded-md transition-all duration-300 hover:bg-blue-600"
-                size="lg"
-              >
-                Proceed to Checkout
-              </Button>
-            </div>
+            <OrderSummary
+              subtotal={subtotal}
+              totalDiscountedTotal={totalDiscountedTotal}
+              onCheckout={onOpen}
+            />
           </div>
-          <Modal
-  isOpen={isOpen}
-  onOpenChange={onOpenChange}
-  placement="center"
-  size="2xl"
->
-  <ModalContent
-    style={{
-      backgroundColor: "#f9f9f9",  // Very light gray
-      boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.1)",  // Soft shadow
-      borderRadius: "12px",  // Rounded corners
-      padding: "20px",  // Spacing for the whole modal
-    }}
-  >
-    {(onClose) => (
-      <>
-        <ModalHeader className="font-bold text-2xl text-gray-900">Checkout</ModalHeader>
-        <ModalBody>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* PAYMENT METHOD SECTION */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-lg font-semibold mb-4 text-gray-800">Payment Method</h2>
-              <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                <div className="border border-gray-300 p-5 rounded-lg mb-4">
-                  <Radio value="creditCard">
-                    <div className="flex items-center">
-                      <CreditCardIcon />
-                      <span className="text-gray-700 ml-2 mr-4">Credit Card</span>
-                    </div>
-                  </Radio>
-                  {paymentMethod === 'creditCard' && (
-                    <div className="mt-4">
-                      <Input
-                        label="Card Number"
-                        placeholder="1111-1111-1111-1111"
-                        value={cardNumber}
-                        onChange={handleCardNumberChange}
-                        className="mb-5"
-                        style={{
-                          borderColor: "#e0e0e0",
-                          borderRadius: "8px",
-                          boxShadow: "0px 1px 4px rgba(0, 0, 0, 0.05)",
-                        }}
-                      />
-                      <div className="flex gap-4">
-                        <Input
-                          label="Expiration (MM/YY)"
-                          placeholder="MM/YY"
-                          value={expirationDate}
-                          onChange={handleExpirationDateChange}
-                          className="mb-5"
-                          style={{
-                            borderColor: "#e0e0e0",
-                            borderRadius: "8px",
-                            boxShadow: "0px 1px 4px rgba(0, 0, 0, 0.05)",
-                          }}
-                        />
-                        <Input
-                          label="CVV"
-                          placeholder="123"
-                          value={cvv}
-                          onChange={handleCvvChange}
-                          style={{
-                            borderColor: "#e0e0e0",
-                            borderRadius: "8px",
-                            boxShadow: "0px 1px 4px rgba(0, 0, 0, 0.05)",
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </RadioGroup>
-            </div>
-
-            {/* ORDER SUMMARY SECTION */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-lg font-semibold mb-4 text-blue-900">Order Summary</h2>
-              {cartItems.map((item) => (
-                <div
-                  key={item._id}
-                  className="flex items-center mb-4 bg-gray-50 p-4 rounded-lg shadow-sm"
-                >
-                  <img
-                    src={item.stockid.AssignedGame.coverPhoto}
-                    alt={item.stockid.AssignedGame.title}
-                    className="w-16 h-20 object-cover mr-4 rounded-lg"
-                  />
-                  <div>
-                    <h3 className="font-semibold text-blue-700">{item.stockid.AssignedGame.title}</h3>
-                    <p className="text-gray-700">Rs.{item.stockid.UnitPrice.toFixed(2)}</p>
-                  </div>
-                </div>
-              ))}
-              <div className="border-t border-gray-200 pt-4 mt-4">
-                <div className="flex justify-between text-gray-900 font-semibold">
-                  <span>Total</span>
-                  <span>Rs.{totalDiscountedTotal.toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </ModalBody>
-        <ModalFooter>
-          <Button
-            color="danger"
-            variant="light"
-            onPress={onClose}
-            style={{
-              padding: "10px 20px",
-              borderRadius: "8px",
-              backgroundColor: "#ff6b6b",
-              color: "#fff",
-              fontWeight: "bold",
-              boxShadow: "0px 2px 10px rgba(255, 107, 107, 0.3)",
-            }}
-            className="mr-4"
-          >
-            Cancel
-          </Button>
-          <Button
-            color="primary"
-            onPress={handlePlaceOrder}
-            style={{
-              padding: "10px 20px",
-              borderRadius: "8px",
-              backgroundColor: "#4CAF50",
-              color: "#fff",
-              fontWeight: "bold",
-              boxShadow: "0px 2px 10px rgba(76, 175, 80, 0.3)",
-            }}
-            className="hover:bg-green-600 transition duration-300"
-          >
-            Confirm
-          </Button>
-        </ModalFooter>
-      </>
-    )}
-  </ModalContent>
-</Modal>
         </div>
       </div>
       <Footer />
       
       <Modal
-  isOpen={isOpen}
-  onOpenChange={onOpenChange}
-  placement="center"
-  size="2xl"
->
-  <ModalContent
-    style={{
-      backgroundColor: "#f9f9f9",  // Very light gray
-      boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.1)",  // Soft shadow
-      borderRadius: "12px",  // Rounded corners
-      padding: "20px",  // Spacing for the whole modal
-    }}
-  >
-    {(onClose) => (
-      <>
-        <ModalHeader className="font-bold text-2xl text-gray-900">Checkout</ModalHeader>
-        <ModalBody>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* PAYMENT METHOD SECTION */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-lg font-semibold mb-4 text-gray-800">Payment Method</h2>
-              <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                <div className="border border-gray-300 p-5 rounded-lg mb-4">
-                  <Radio value="creditCard">
-                    <div className="flex items-center">
-                      <CreditCardIcon />
-                      <span className="text-gray-700 ml-2 mr-4">Credit Card</span>
-                    </div>
-                  </Radio>
-                  {paymentMethod === 'creditCard' && (
-                    <div className="mt-4">
-                      <Input
-                        label="Card Number"
-                        placeholder="1111-1111-1111-1111"
-                        value={cardNumber}
-                        onChange={handleCardNumberChange}
-                        className="mb-5"
-                        style={{
-                          borderColor: "#e0e0e0",
-                          borderRadius: "8px",
-                          boxShadow: "0px 1px 4px rgba(0, 0, 0, 0.05)",
-                        }}
-                      />
-                      <div className="flex gap-4">
-                        <Input
-                          label="Expiration (MM/YY)"
-                          placeholder="MM/YY"
-                          value={expirationDate}
-                          onChange={handleExpirationDateChange}
-                          className="mb-5"
-                          style={{
-                            borderColor: "#e0e0e0",
-                            borderRadius: "8px",
-                            boxShadow: "0px 1px 4px rgba(0, 0, 0, 0.05)",
-                          }}
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        placement="center"
+        size="2xl"
+      >
+        <ModalContent
+          style={{
+            backgroundColor: "#f9f9f9",
+            boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.1)",
+            borderRadius: "12px",
+            padding: "20px",
+          }}
+        >
+          {(onClose) => (
+            <>
+              <ModalHeader className="font-bold text-2xl text-gray-900">Checkout</ModalHeader>
+              <ModalBody>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* PAYMENT METHOD SECTION */}
+                  <div className="bg-white p-6 rounded-lg shadow-md">
+                    <h2 className="text-lg font-semibold mb-4 text-gray-800">Payment Method</h2>
+                    <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+                      <div className="border border-gray-300 p-5 rounded-lg mb-4">
+                        <Radio value="creditCard">
+                          <div className="flex items-center">
+                            <CreditCardIcon />
+                            <span className="text-gray-700 ml-2 mr-4">Credit Card</span>
+                          </div>
+                        </Radio>
+                        {paymentMethod === 'creditCard' && (
+                          <div className="mt-4">
+                            <Input
+                              label="Card Number"
+                              placeholder="1111-1111-1111-1111"
+                              value={cardNumber}
+                              onChange={handleCardNumberChange}
+                              className="mb-5"
+                              style={{
+                                borderColor: "#e0e0e0",
+                                borderRadius: "8px",
+                                boxShadow: "0px 1px 4px rgba(0, 0, 0, 0.05)",
+                              }}
+                            />
+                            <div className="flex gap-4">
+                              <Input
+                                label="Expiration (MM/YY)"
+                                placeholder="MM/YY"
+                                value={expirationDate}
+                                onChange={handleExpirationDateChange}
+                                className="mb-5"
+                                style={{
+                                  borderColor: "#e0e0e0",
+                                  borderRadius: "8px",
+                                  boxShadow: "0px 1px 4px rgba(0, 0, 0, 0.05)",
+                                }}
+                              />
+                              <Input
+                                label="CVV"
+                                placeholder="123"
+                                value={cvv}
+                                onChange={handleCvvChange}
+                                style={{
+                                  borderColor: "#e0e0e0",
+                                  borderRadius: "8px",
+                                  boxShadow: "0px 1px 4px rgba(0, 0, 0, 0.05)",
+                                }}
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </RadioGroup>
+                  </div>
+
+                  {/* ORDER SUMMARY SECTION */}
+                  <div className="bg-white p-6 rounded-lg shadow-md">
+                    <h2 className="text-lg font-semibold mb-4 text-blue-900">Order Summary</h2>
+                    {cartItems.map((item) => (
+                      <div
+                        key={item._id}
+                        className="flex items-center mb-4 bg-gray-50 p-4 rounded-lg shadow-sm"
+                      >
+                        <img
+                          src={item.stockid.AssignedGame.coverPhoto}
+                          alt={item.stockid.AssignedGame.title}
+                          className="w-16 h-20 object-cover mr-4 rounded-lg"
                         />
-                        <Input
-                          label="CVV"
-                          placeholder="123"
-                          value={cvv}
-                          onChange={handleCvvChange}
-                          style={{
-                            borderColor: "#e0e0e0",
-                            borderRadius: "8px",
-                            boxShadow: "0px 1px 4px rgba(0, 0, 0, 0.05)",
-                          }}
-                        />
+                        <div>
+                          <h3 className="font-semibold text-blue-700">{item.stockid.AssignedGame.title}</h3>
+                          <p className="text-gray-700">Rs.{item.stockid.UnitPrice.toFixed(2)}</p>
+                        </div>
+                      </div>
+                    ))}
+                    <div className="border-t border-gray-200 pt-4 mt-4">
+                      <div className="flex justify-between text-gray-900 font-semibold">
+                        <span>Total</span>
+                        <span>Rs.{totalDiscountedTotal.toFixed(2)}</span>
                       </div>
                     </div>
-                  )}
-                </div>
-              </RadioGroup>
-            </div>
-
-            {/* ORDER SUMMARY SECTION */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-lg font-semibold mb-4 text-blue-900">Order Summary</h2>
-              {cartItems.map((item) => (
-                <div
-                  key={item._id}
-                  className="flex items-center mb-4 bg-gray-50 p-4 rounded-lg shadow-sm"
-                >
-                  <img
-                    src={item.stockid.AssignedGame.coverPhoto}
-                    alt={item.stockid.AssignedGame.title}
-                    className="w-16 h-20 object-cover mr-4 rounded-lg"
-                  />
-                  <div>
-                    <h3 className="font-semibold text-blue-700">{item.stockid.AssignedGame.title}</h3>
-                    <p className="text-gray-700">Rs.{item.stockid.UnitPrice.toFixed(2)}</p>
                   </div>
                 </div>
-              ))}
-              <div className="border-t border-gray-200 pt-4 mt-4">
-                <div className="flex justify-between text-gray-900 font-semibold">
-                  <span>Total</span>
-                  <span>Rs.{totalDiscountedTotal.toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </ModalBody>
-        <ModalFooter>
-          <Button
-            color="danger"
-            variant="light"
-            onPress={onClose}
-            style={{
-              padding: "10px 20px",
-              borderRadius: "8px",
-              backgroundColor: "#ff6b6b",
-              color: "#fff",
-              fontWeight: "bold",
-              boxShadow: "0px 2px 10px rgba(255, 107, 107, 0.3)",
-            }}
-            className="mr-4"
-          >
-            Cancel
-          </Button>
-          <Button
-            color="primary"
-            onPress={handlePlaceOrder}
-            style={{
-              padding: "10px 20px",
-              borderRadius: "8px",
-              backgroundColor: "#4CAF50",
-              color: "#fff",
-              fontWeight: "bold",
-              boxShadow: "0px 2px 10px rgba(76, 175, 80, 0.3)",
-            }}
-            className="hover:bg-green-600 transition duration-300"
-          >
-            Confirm
-          </Button>
-        </ModalFooter>
-      </>
-    )}
-  </ModalContent>
-</Modal>
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  color="danger"
+                  variant="light"
+                  onPress={onClose}
+                  style={{
+                    padding: "10px 20px",
+                    borderRadius: "8px",
+                    backgroundColor: "#ff6b6b",
+                    color: "#fff",
+                    fontWeight: "bold",
+                    boxShadow: "0px 2px 10px rgba(255, 107, 107, 0.3)",
+                  }}
+                  className="mr-4"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  color="primary"
+                  onPress={handlePlaceOrder}
+                  style={{
+                    padding: "10px 20px",
+                    borderRadius: "8px",
+                    backgroundColor: "#4CAF50",
+                    color: "#fff",
+                    fontWeight: "bold",
+                    boxShadow: "0px 2px 10px rgba(76, 175, 80, 0.3)",
+                  }}
+                  className="hover:bg-green-600 transition duration-300"
+                >
+                  Confirm
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

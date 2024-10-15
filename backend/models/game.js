@@ -122,4 +122,12 @@ gameSchema.methods.updateAverageRating = async function() {
   }
 };
 
+
+
+
+
+
+
+
+
 export const Game = mongoose.model("Game", gameSchema);

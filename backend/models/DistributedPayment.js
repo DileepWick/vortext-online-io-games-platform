@@ -5,7 +5,7 @@ const { Schema } = mongoose;
 const DistributedPaymentSchema = new Schema({
   paymentId: {
     type: Schema.Types.ObjectId,
-    ref: "OrderItem", // assuming this refers to your OrderItem model
+    ref: "OrderItems", // assuming this refers to your OrderItem model
     required: true,
   },
   developerId: {

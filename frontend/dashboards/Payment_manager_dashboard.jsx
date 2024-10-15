@@ -59,7 +59,7 @@ const Payment_Manager = () => {
   }, []);
 
   return (
-    <div>
+    <div className="bg-white min-h-screen"> {/* Added bg-white and min-h-screen classes */}
       <Header />
       <div className="flex w-full flex-col">
         <div className="flex items-center p-4 font-primaryRegular">
@@ -71,7 +71,7 @@ const Payment_Manager = () => {
             size="lg"
             color="primary"
           >
-            <Tab key="tab1" title="All Order Items" />
+            <Tab key="tab1" title="Purchased Items" />
             <Tab key="tab2" title="Rentals" />
             <Tab key="tab3" title="Price Comparison Chart" />
             <Tab key="tab4" title="Most Sold Games " />
