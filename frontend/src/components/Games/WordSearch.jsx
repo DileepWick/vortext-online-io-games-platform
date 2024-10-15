@@ -4,6 +4,7 @@ import { TextGenerateEffect } from "../ui/TextGenerateEffect";
 import ScrollToTop from "../ScrollToTop";
 import Header from "../header";
 import Footer from "../footer";
+import useAuthCheck from "../../utils/authCheck";
 
 // Define constants for the game
 const GRID_SIZE = 15;
@@ -81,6 +82,7 @@ const generateGrid = (words) => {
 };
 
 const WordSearch = () => {
+  useAuthCheck();
   const [grid, setGrid] = useState([]);
   const [placedWords, setPlacedWords] = useState([]);
   const [foundWords, setFoundWords] = useState([]);
