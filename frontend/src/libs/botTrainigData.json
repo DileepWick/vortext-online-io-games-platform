@@ -1,0 +1,270 @@
+[
+  {
+    "pattern": "fuck|bitch|damn|shit|arshole|Bullshit|ass",
+    "response": "Whoa there! Let's keep it classy, my circuits are sensitive!"
+  },
+  {
+    "pattern": "howdy|howdy partner",
+    "response": "Howdy, partner! 🤠 What can I do for ya today?"
+  },
+  {
+    "pattern": "hello|hi|hey|greetings",
+    "response": "Hi there! How can I assist you today?"
+  },
+  {
+    "pattern": "goodbye|bye|see you later|farewell|talk to you later",
+    "response": "Bye! Have a great day!"
+  },
+  {
+    "pattern": "contact|email|phone|support email|contact support",
+    "response": "You can contact us via email at support@vortex.com or call us at 1-800-123-4567."
+  },
+  {
+    "pattern": "problem|issue|having trouble|something wrong",
+    "response": "I'm sorry to hear you're experiencing an issue. Can you please provide more details?"
+  },
+  {
+    "pattern": "password|account|forgot password|reset account|reset password|account help",
+    "response": "For account-related issues, you can reset your password at example.com/reset-password."
+  },
+  {
+    "pattern": "what is my name(?:,\\s*([\\w]+))?",
+    "response": "Your name is {name}. How can I assist you, {name}?"
+  },
+  {
+    "pattern": "help|assist|support",
+    "response": "I'm here to help. What can I do for you?"
+  },
+  {
+    "pattern": "log in|login|cannot log in|can't log in|server error|error logging in|can't access account|unable to log in|issue logging in|problem logging in",
+    "response": [
+      {
+        "order": 1,
+        "text": "It looks like you're having trouble logging in. Please check your internet connection and try again."
+      },
+      {
+        "order": 2,
+        "text": "If you're seeing a server error, the issue might be on our end. Please try again later, or contact support if the problem persists."
+      },
+      {
+        "order": 3,
+        "text": "You can also try resetting your password or clearing your browser's cache. If that doesn't help, please reach out to our support team for further assistance."
+      }
+    ]
+  },
+  {
+    "pattern": "how old|your age|what age|years old|how many years|age are you|old are you|when were you made|creation date|do you age|birth year|how long have you been around|how old is this bot",
+    "response": [
+      {
+        "order": 1,
+        "text": "I’m so old, I remember when floppy disks were cool. Wait… do you even know what a floppy disk is?"
+      },
+      {
+        "order": 2,
+        "text": "In human years, I’m about… let me calculate… oh wait, I don’t age! I’m forever young, just like a fine vintage of code."
+      }
+    ]
+  },
+  {
+    "pattern": "subscription|membership|pricing plan|subscriptions|plans",
+    "response": "We do not offer various subscription tiers. But you can rent a game before you buy to play as a demo to see if you really like the game or not."
+  },
+  {
+    "pattern": "system requirements|compatibility|minimum requirements|system specs|system info",
+    "response": "Most of our games run in-browser and are compatible with modern web browsers. For specific game requirements, please check the game's information page."
+  },
+  {
+    "pattern": "multiplayer|play with friends|invite friends|multiplayer games|play online with friends",
+    "response": "Many of our games support multiplayer. You can invite friends to play by sharing a game link or using our built-in friend system."
+  },
+  {
+    "pattern": "leaderboard|rankings|high scores|game rankings|top players",
+    "response": "We maintain global and friend leaderboards for most games. You can view your rankings in your profile or on each game's leaderboard page."
+  },
+  {
+    "pattern": "game progress|save game|saved progress|continue game|resume game",
+    "response": "Your game progress is automatically saved to your account. You can resume your games from any device by logging into your account."
+  },
+  {
+    "pattern": "lag|connection issues|slow|connection problem|latency",
+    "response": "If you're experiencing lag, try refreshing the page or clearing your browser cache. For persistent issues, please contact our support team."
+  },
+  {
+    "pattern": "payment method|billing|credit card|payment options|pay|payment issue",
+    "response": "We accept credit cards, PayPal, and various other payment methods. You can manage your payment information in your account settings."
+  },
+  {
+    "pattern": "refund policy|refund|request refund|money back|return payment",
+    "response": "We offer refunds for subscription cancellations within 14 days of purchase. Please review our full refund policy at example.com/refund-policy."
+  },
+  {
+    "pattern": "age restriction|parental controls|age limit|parent controls|limit access",
+    "response": "Our website is suitable for users 13 and older. We offer parental control options to restrict access to certain games or limit playtime."
+  },
+  {
+    "pattern": "account deletion|close account|delete account|remove account|terminate account",
+    "response": "To delete your account, please go to your account settings and select 'Close Account'. Note that this action is irreversible."
+  },
+  {
+    "pattern": "browser support|compatible browsers|browser compatibility|supported browsers|browser requirements",
+    "response": "Our website is optimized for Chrome, Firefox, Safari, and Edge. We recommend using the latest version of your preferred browser for the best experience."
+  },
+  {
+    "pattern": "mobile gaming|app|mobile app|play on mobile|gaming on phone|tablet gaming",
+    "response": "While we don't have a dedicated mobile app, many of our games are mobile-friendly and can be played through your device's web browser."
+  },
+  {
+    "pattern": "tournament|competitions|online tournament|game competition|contest",
+    "response": "We host regular online tournaments for various games. Check our 'Events' page for upcoming competitions and how to participate."
+  },
+  {
+    "pattern": "community|forum|join community|player discussions|game forum",
+    "response": "Join our community discussions in our forum at example.com/forum. You can chat with other players, share strategies, and get game tips."
+  },
+  {
+    "pattern": "feedback|suggest feature|report issue|feedback form|feature request",
+    "response": "We value your feedback! You can suggest new features or report issues through our feedback form at example.com/feedback."
+  },
+  {
+    "pattern": "gift subscription|gift card|gift account|gift voucher|buy gift",
+    "response": "You can purchase gift subscriptions for friends or family members. Visit example.com/gift to learn more about our gifting options."
+  },
+  {
+    "pattern": "privacy policy|data protection|personal data|privacy|user data",
+    "response": "We take your privacy seriously. You can review our privacy policy and data protection practices at example.com/privacy."
+  },
+  {
+    "pattern": "in-game purchases|buy in-game items|in-game currency|purchase items",
+    "response": "In-game purchases can be made through our store. Visit the 'Shop' section in the game or on our website to buy in-game items or currency."
+  },
+  {
+    "pattern": "free trial|trial version|demo version|try for free|free version|demo",
+    "response": "We do not offer free trial versions of games. You can try out the renting a game before purchasing the full version. Visit gamerental page for more info."
+  },
+  {
+    "pattern": "rental| game renting|rent|rent a game|game rental",
+    "response": "We do offer rental game services. You can renting a game before purchasing the full version. Visit gamerental page for more info."
+  },
+  {
+    "pattern": "uninstall|remove game|delete game|how to uninstall",
+    "response": "To uninstall a game, go to your system settings, find the installed game, and select 'Uninstall'. For more help, visit our support page."
+  },
+  {
+    "pattern": "update game|game updates|patch|new version|latest version",
+    "response": "You can update your game to the latest version from the game's page or through your account. Ensure your internet connection is stable during updates."
+  },
+  {
+    "pattern": "server status|down|server down|maintenance|game not working",
+    "response": "Our servers may be undergoing maintenance or experiencing issues. Please check the 'Server Status' page for updates or contact support if the issue persists."
+  },
+  {
+    "pattern": "error code|error message|game crash|crash|error",
+    "response": "If you're experiencing error messages or crashes, try restarting the game or checking our FAQ for troubleshooting steps. If the issue continues, contact support."
+  },
+  {
+    "pattern": "how to play|instructions|game guide|tutorial|play guide",
+    "response": "Each game has a tutorial or guide available in its menu. You can also visit example.com/game-guides for detailed instructions on how to play."
+  },
+  {
+    "pattern": "bug report|report bug|game glitch|glitch|found a bug",
+    "response": "If you've found a bug or glitch, please report it through our feedback form at example.com/feedback, and our team will investigate it."
+  },
+  {
+    "pattern": "my profile|view profile|profile settings|update profile|profile info",
+    "response": "You can view and update your profile information by logging into your account and visiting the 'Profile' section."
+  },
+
+  {
+    "pattern": "i cannot find my game even in my library|can't find my game in the library|my game is missing from my library|i purchased a game but can't find it in my library|my library doesn't show the game i bought|i can't locate my game in the library|i bought a game but it’s not in my library|the game is missing from my library|i don't see the game i purchased in my library|can't find the game i bought in my library",
+    "response": "I'm sorry you're having trouble finding your game! Please make sure you're logged into the correct account, and check your library. If the game is still missing, try refreshing the page or contact support for further assistance."
+  },
+  {
+    "pattern": "mute|volume|sound issue|audio problem|no sound",
+    "response": "If you're experiencing sound issues, check your device's audio settings or in-game sound options. For further assistance, contact support."
+  },
+  {
+    "pattern": "notifications|turn off notifications|disable notifications|stop notifications",
+    "response": "You can manage your notification settings in your account preferences. Visit 'Settings' to enable or disable notifications."
+  },
+  {
+    "pattern": "achievements|game rewards|badges|earn achievements|game badges",
+    "response": "You can earn achievements and badges by completing certain in-game tasks. Check your profile for the list of available achievements."
+  },
+  {
+    "pattern": "change language|language settings|switch language|set language",
+    "response": "You can change the language of the website or game in the 'Settings' section. Visit example.com/language-settings for more details."
+  },
+  {
+    "pattern": "forgot username|recover username|lost username|retrieve username",
+    "response": "If you've forgotten your username, you can recover it by visiting example.com/recover-username and entering your email address."
+  },
+  {
+    "pattern": "two-factor authentication|2fa|enable 2fa|secure account|security settings",
+    "response": "We recommend enabling two-factor authentication (2FA) for added account security. Visit your account's security settings to enable 2FA."
+  },
+  {
+    "pattern": "invite friends|refer a friend|friend referral|refer friend",
+    "response": "Invite your friends to join and earn rewards! You can send invites through your account's 'Referral' section at example.com/refer."
+  },
+  {
+    "pattern": "discord|join discord|discord server|community chat",
+    "response": "Join our Discord community for real-time discussions with players and developers. Click the invite link on our website to join!"
+  },
+  {
+    "pattern": "patch notes|update details|game changes|latest patch|new patch",
+    "response": "Patch notes and update details are available on the game's page or in our blog. Check example.com/patch-notes for more information."
+  },
+  {
+    "pattern": "rewards program|loyalty rewards|earn points|rewards system",
+    "response": "Our rewards program allows you to earn points for playing games, which can be redeemed for in-game items. Visit example.com/rewards for details."
+  },
+  {
+    "pattern": "talk to a real agent|real agent|human|speak with a real person",
+    "response": {
+      "text": "If you need to talk to a real agent, You must raise a ticket first. You can do that right here: ",
+      "link": "/support#contactForm"
+    }
+  },
+  {
+    "pattern": "new games|what games do you have in stock|game list|new released games|game stock|what games are available",
+    "response": {
+      "text": "Unfortunately, I don't have access to see game stockts yet. But i can help you navigate to our store. If you like to visit our store you can go throgh here ",
+      "link": "/shop"
+    }
+  },
+  {
+    "pattern": "can't find my game|cannot find my game|where is my game?|where is my game|my game|I recently purchased a game and I can't find it|purchased a game and can't find it|bought a game but can't find it|where is my purchased game|can't locate my purchased game|I purchased a game but it's missing|can't find the game I bought|I bought a game and can't see it in my library|my game is missing after purchase|I bought a game but it doesn't show up",
+    "response": {
+      "text": "If you cannot find your game, I assume you recenltly purchased it. You can check your library here: ",
+      "link": "/mylibrary"
+    }
+  },
+  {
+    "pattern": "buy a game|buy game|buy games|how can i purchase a game|how to buy a game|how do i buy a game|where can i purchase a game|how do i purchase a game|how can i get a game|how to buy games|how do i buy games|how can i buy games|where to buy games|how do i purchase games",
+    "response": {
+      "text": "To purchase a game, simply browse our game library, select the game you want, and click the 'Add to Cart' button.Then click on your profile icon in the top right corner and select mycart from the dropdown menu. You can complete your purchase using various payment methods, including credit cards and PayPal. If you want to browse games go through here",
+      "link": "/shop"
+    }
+  },
+  {
+    "pattern": "do you have vortex original games|vortex games|vortex game|do you have games that developed by vortex|do you have vortex original games|vortex games|vortex game|do you have games developed by vortex|are there any vortex original games|are there vortex games|does vortex develop games|are there vortex-developed games",
+    "response": {
+      "text": "Yes, we have a selection of Vortex original games! You can explore our exclusive titles by visiting the 'Our Games' section on our website.If you want to check the out follow the link below: ",
+      "link": "/TailoredGames"
+    }
+  },
+  {
+    "pattern": "do you make your own games|do you make games",
+    "response": {
+      "text": "Do I make games? Oh no, I just chat! But our talented developers sure do! Check out their awesome work in OURGAMES library!",
+      "link": "/TailoredGames"
+    }
+  },
+  {
+    "pattern": "i submitted a ticket now i cannot find it to reply|can't find my support ticket to reply|where is my ticket i submitted|i can't locate the ticket i submitted|i submitted a support ticket but can't find it|how do i reply to my submitted ticket|where can i reply to my support ticket|can't find my ticket to respond|i submitted a ticket and can't find where to respond|where can i see my open support tickets",
+    "response": {
+      "text": "You can check you raised tickets here: ",
+      "link": "/UserMessage"
+    }
+  }
+]

@@ -42,6 +42,12 @@ const Support = () => {
   const [emailError, setEmailError] = useState("");
   const [messageError, setMessageError] = useState("");
   const navigate = useNavigate();
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+
+  // Function to open the Chatbot
+  const openChatbot = () => {
+    setIsChatbotOpen(true);
+  };
 
   const validateEmail = (value) => {
     // Convert value to a String object and then use match
@@ -263,7 +269,42 @@ const Support = () => {
           </BackgroundGradient>
         </div>
 
-        <Chatbot className="absolute bottom-4 right-4 z-100" />
+        <motion.section
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="container mx-auto px-4 py-16 text-center"
+        >
+          <h2 className="text-5xl text-white mb-8 font-primaryRegular">
+            Need Immediate Assistance?
+          </h2>
+          <p className="text-2xl text-gray-300 mb-8">
+            Our AI-powered Chatbot is here to help you 24/7!
+          </p>
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="inline-block"
+          >
+            <BackgroundGradient className="rounded-[22px] p-4 sm:p-10 bg-zinc-900">
+              <Card className="bg-zinc-900 text-white text-center">
+                <h3 className="text-3xl m-4">Chat Now</h3>
+                <p className="text-lg mb-4">
+                  Get instant answers to your questions with our intelligent
+                  Chatbot.
+                </p>
+                <Button color="primary" size="lg" onPress={openChatbot}>
+                  Start Chatting
+                </Button>
+              </Card>
+            </BackgroundGradient>
+          </motion.div>
+          <p className="text-lg text-gray-400 mt-8">
+            Look for the chat icon in the bottom right corner of your screen!
+          </p>
+        </motion.section>
+
+        <Chatbot isOpen={isChatbotOpen} setIsOpen={setIsChatbotOpen} />
 
         <div className="container mx-auto px-4 py-16">
           <h2 className="text-5xl text-center text-white mb-8 font-primaryRegular">
