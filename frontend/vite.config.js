@@ -10,7 +10,9 @@ export default defineConfig({
     },
   },
   server: {
-    logo: 'https://res.cloudinary.com/dhcawltsr/image/upload/v1724754847/photo_2024-08-25_16-32-06_zhbyw7.jpg', // Image in the public directory
+    logo: 'https://res.cloudinary.com/dhcawltsr/image/upload/v1724754847/photo_2024-08-25_16-32-06_zhbyw7.jpg', 
+    host: '127.0.0.1',
+    port: 5000,
   },
 })
 
