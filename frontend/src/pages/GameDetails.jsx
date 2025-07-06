@@ -367,12 +367,12 @@ const GameDetails = () => {
     : originalPrice;
 
   return (
-    <div className="bg-black text-white min-h-screen font-sans">
+    <div className="bg-white text-white min-h-screen font-sans">
       <Header />
       
       {/* Main Game Details Section */}
       <div className="container mx-auto px-4 py-8">
-        <div className="bg-gray-900 border border-gray-800 rounded-lg shadow-2xl overflow-hidden">
+        <div className="bg-white  rounded-lg shadow-2xl overflow-hidden">
           <div className="flex flex-col lg:flex-row gap-8 p-6 lg:p-8">
             
             {/* Left Column - Video and Description */}
@@ -386,14 +386,14 @@ const GameDetails = () => {
               />
               
               <div className="space-y-6">
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white border-b border-gray-700 pb-4">
+                <h1 className="text-xl sm:text-4xl lg:text-5xl font-primaryRegular text-black mt-8">
                   About the Game
                 </h1>
                 
-                <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                <div className="bg-white rounded-lg p-4 ">
                   <ScrollShadow
                     hideScrollBar
-                    className="h-32 sm:h-40 lg:h-48 text-gray-300 text-sm sm:text-base lg:text-lg leading-relaxed"
+                    className="h-32 sm:h-40 lg:h-48 text-black text-sm sm:text-base lg:text-lg leading-relaxed"
                   >
                     {gameStock.AssignedGame.Description}
                   </ScrollShadow>
@@ -403,7 +403,7 @@ const GameDetails = () => {
 
             {/* Right Column - Game Card */}
             <div className="w-full lg:w-80 flex-shrink-0">
-              <Card className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden shadow-xl">
+              <Card className="bg-white overflow-hidden shadow-xl">
                 <Image
                   removeWrapper
                   alt={gameStock.AssignedGame.title}
@@ -412,23 +412,24 @@ const GameDetails = () => {
                 />
                 
                 <CardBody className="p-6 space-y-4">
-                  <h2 className="text-xl sm:text-2xl font-bold text-white">
+                  <h2 className="text-xl sm:text-2xl font-primaryRegular text-black">
                     {gameStock.AssignedGame.title}
                   </h2>
                   
                   {gameStock.discount > 0 && (
                     <div className="space-y-3">
                       <Chip
-                        className="bg-white text-black font-bold px-3 py-1 text-sm"
+                        className="font-primaryRegular"
                         radius="sm"
+                        color="danger"
                       >
                         -{gameStock.discount}% OFF
                       </Chip>
                       <div className="flex items-center gap-3">
-                        <span className="line-through text-gray-400 text-lg">
+                        <span className="line-through text-black text-lg">
                           LKR {originalPrice.toFixed(2)}
                         </span>
-                        <span className="text-white font-bold text-xl">
+                        <span className="text-black  text-xl">
                           LKR {discountedPrice.toFixed(2)}
                         </span>
                       </div>
@@ -446,14 +447,14 @@ const GameDetails = () => {
                   <div className="w-full space-y-3">
                     <Button
                       onClick={() => handleAddToCart(gameStock._id)}
-                      className="w-full bg-white text-black font-bold py-3 text-lg hover:bg-gray-200 transition-colors duration-200"
+                      className="w-full "
                       size="lg"
                     >
                       Add to Cart
                     </Button>
                     <Button
                       onClick={() => handleRent(gameStock.AssignedGame._id)}
-                      className="w-full bg-gray-700 text-white font-bold py-3 text-lg hover:bg-gray-600 transition-colors duration-200 border border-gray-600"
+                      className="w-full"
                       size="lg"
                       variant="bordered"
                     >
@@ -467,8 +468,8 @@ const GameDetails = () => {
         </div>
 
         {/* Ratings Section */}
-        <div className="mt-12 bg-gray-900 border border-gray-800 rounded-lg p-6 lg:p-8">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-8 border-b border-gray-700 pb-4">
+        <div className="mt-12 bg-white rounded-lg p-6 lg:p-8">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-black mb-8 pb-4">
             Ratings & Reviews
           </h2>
 
