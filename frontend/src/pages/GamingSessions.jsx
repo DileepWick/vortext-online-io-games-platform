@@ -437,7 +437,7 @@ const GamingSessions = () => {
                     isBlurred
                     radius="none"
                     alt={rental.game.title}
-                    className="w-[200px] h-[200px] object-cover"
+                    className="w-[245px] h-[245px] object-cover"
                     src={rental.game.coverPhoto}
                   />
                   <CardBody className="p-4">
