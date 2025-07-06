@@ -7,7 +7,6 @@ import GPTRouter from "./routes/gpt_route.js";
 
 //Route files
 import userRouter from "./routes/userAuthenticationRoutes.js";
-import bookRouter from "./routes/book_Routes.js";
 import gameRouter from "./routes/game_Routes.js";
 import GameCategoryRouter from "./routes/Game_Category_Routes.js";
 import gameStockRouter from "./routes/Game_Stock_Routes.js";
@@ -64,7 +63,6 @@ mongoose
   });
 
 //Routes
-app.use("/books", bookRouter); //Books
 app.use("/users", userRouter); //Users
 app.use("/games", gameRouter); //Games
 app.use("/gameCategories", GameCategoryRouter); //Game categories
