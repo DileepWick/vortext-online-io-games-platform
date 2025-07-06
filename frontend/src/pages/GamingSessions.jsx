@@ -426,7 +426,7 @@ const GamingSessions = () => {
           <div className="flex justify-between items-center mb-6">
             <div className="text-2xl font-primaryRegular">MY RENTED GAMES</div>
             <Button
-              color="primary"
+              color="black"
               onClick={handleRentHistoryClick}
               className="font-primaryRegular"
             >
@@ -463,7 +463,7 @@ const GamingSessions = () => {
                         ).map((genre, index) => (
                           <Chip
                             key={index}
-                            color="primary"
+                            color="black"
                             variant="flat"
                             size="sm"
                             className="text-white"
@@ -473,13 +473,12 @@ const GamingSessions = () => {
                           </Chip>
                         ))}
                     </div>
-
                     <div className="flex flex-col gap-2">
                       <Button
                         onClick={() => openModal(rental)}
                         color="primary"
-                        className="font-primaryRegular"
-                        radius="none"
+                        className="font-primaryRegular bg-black text-white"
+                        radius="7px"
                         variant="solid"
                         size="md"
                       >
@@ -489,8 +488,8 @@ const GamingSessions = () => {
                       <Button
                         onClick={() => openExtendModal(rental)}
                         color="secondary"
-                        className="font-primaryRegular"
-                        radius="none"
+                        className="font-primaryRegular bg-white text-black border border-gray-300"
+                        radius="7px"
                         variant="solid"
                         size="md"
                       >
@@ -511,13 +510,13 @@ const GamingSessions = () => {
             {(onClose) => (
               <>
                 <ModalHeader className="flex flex-col gap-1">
-                  <span style={{ color: "#0072F5", fontWeight: "bold" }}>
+                  <span style={{ color: "black", fontWeight: "bold" }}>
                     Start Session
                   </span>
                 </ModalHeader>
                 <ModalBody>
                   {currentGame ? (
-                    <span style={{ color: "#0072F5" }}>
+                    <span style={{ color: "black" }}>
                       <p>
                         Are you sure you want to start a session for{" "}
                         {currentGame.game.title}?
@@ -528,14 +527,23 @@ const GamingSessions = () => {
                     <p>Loading game details...</p>
                   )}
                 </ModalBody>
-                <ModalFooter>
-                  <Button color="danger" variant="light" onPress={onClose}>
-                    Cancel
-                  </Button>
-                  <Button color="primary" onPress={handleStartSession}>
-                    Start Session
-                  </Button>
-                </ModalFooter>
+                  <ModalFooter>
+                    <Button 
+                      color="danger" 
+                      variant="light" 
+                      onPress={onClose}
+                      className="bg-white text-black border border-gray-300"
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      color="primary" 
+                      onPress={handleStartSession}
+                      className="bg-black text-white"
+                    >
+                      Start Session
+                    </Button>
+                  </ModalFooter>
               </>
             )}
           </ModalContent>
@@ -548,7 +556,7 @@ const GamingSessions = () => {
         >
           <ModalContent>
             <ModalHeader className="flex flex-col gap-1">
-              <span style={{ color: "#0072F5", fontWeight: "bold" }}>
+              <span style={{ color: "black", fontWeight: "bold" }}>
                 Extend Rental
               </span>
             </ModalHeader>
