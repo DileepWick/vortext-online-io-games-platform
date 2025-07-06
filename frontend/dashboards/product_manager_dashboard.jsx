@@ -203,17 +203,11 @@ const Blogger = () => {
           variant="bordered"
           color="primary"
         >
-          <Tab key="analytics" title="Analytics" />
           <Tab key="products" title="All Games" />
           <Tab key="stock" title="Published Games" />
         </Tabs>
       </div>
       <div className="p-4">
-        {activeTab === "analytics" && (
-          <div className="bg-white flex flex-col min-h-screen">
-            <Analytics/>
-          </div>
-        )}
         {/*PRODUCTS*/}
         {activeTab === "products" && (
           <>

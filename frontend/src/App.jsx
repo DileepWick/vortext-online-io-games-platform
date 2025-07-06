@@ -71,7 +71,7 @@ import { BackgroundBeamsWithCollision } from "./components/ui/BackgroundBeamsWit
 const App = () => {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<Shop />} />
       <Route path="/login" element={<Login />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/adminAddNewGame" element={<AddGameForm />} />

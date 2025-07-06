@@ -137,7 +137,7 @@ const Header = forwardRef((props, ref) => {
       <Navbar 
         onMenuOpenChange={setIsMenuOpen}
         isMenuOpen={isMenuOpen}
-        className="bg-black"
+        className="bg-black font-primaryRegular"
         maxWidth="full"
       >
         {/* Mobile Menu Toggle */}
@@ -154,11 +154,6 @@ const Header = forwardRef((props, ref) => {
 
         {/* Desktop Navigation */}
         <NavbarContent className="hidden sm:flex gap-4" justify="center">
-          <NavbarItem className="mr-4">
-            <Link color="foreground" href="/" className="text-white hover:text-gray-300">
-              Home
-            </Link>
-          </NavbarItem>
           <NavbarItem className="mr-4">
             <Link color="foreground" href="/shop" className="text-white hover:text-gray-300">
               Shop
@@ -269,7 +264,7 @@ const Header = forwardRef((props, ref) => {
               </DropdownTrigger>
               <DropdownMenu
                 aria-label="Profile Actions"
-                className="font-primaryRegular bg-black"
+                className="font-primaryRegular"
               >
                 <DropdownItem
                   key="settings"
@@ -494,7 +489,7 @@ const Header = forwardRef((props, ref) => {
           {token && user ? (
             <>
               <NavbarMenuItem>
-                <p className="text-white font-semibold text-lg py-2 border-t border-gray-600 mt-4 pt-4">
+                <p className="text-white font-semibold text-lg py-2 mt-4 pt-4">
                   My Account
                 </p>
               </NavbarMenuItem>
