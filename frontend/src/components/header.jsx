@@ -36,11 +36,9 @@ const Header = forwardRef((props, ref) => {
 
   // Navigation items for mobile menu
   const menuItems = [
-    { name: "Home", path: "/" },
     { name: "Shop", path: "/shop" },
     { name: "Community", path: "/articles" },
     { name: "Chat", path: "/chat" },
-    { name: "Our Games", path: "/TailoredGames" },
   ];
 
   // Support menu items
@@ -133,11 +131,11 @@ const Header = forwardRef((props, ref) => {
   };
 
   return (
-    <div className="dark">
+    <div className="text-black">
       <Navbar 
         onMenuOpenChange={setIsMenuOpen}
         isMenuOpen={isMenuOpen}
-        className="bg-black font-primaryRegular"
+        className="bg-white font-primaryRegular"
         maxWidth="full"
       >
         {/* Mobile Menu Toggle */}
@@ -148,36 +146,36 @@ const Header = forwardRef((props, ref) => {
           />
           <NavbarBrand>
             <AcmeLogo />
-            <p className="font-bold text-inherit text-white">VORTEX</p>
+            <p className="font-bold text-inherit text-black">VORTEX</p>
           </NavbarBrand>
         </NavbarContent>
 
         {/* Desktop Navigation */}
         <NavbarContent className="hidden sm:flex gap-4" justify="center">
           <NavbarItem className="mr-4">
-            <Link color="foreground" href="/shop" className="text-white hover:text-gray-300">
+            <Link color="foreground" href="/shop" className="text-black hover:underline">
               Shop
             </Link>
           </NavbarItem>
           <NavbarItem className="mr-4">
-            <Link color="foreground" href="/articles" className="text-white hover:text-gray-300">
+            <Link color="foreground" href="/articles" className="text-black hover:underline">
               Community
             </Link>
           </NavbarItem>
           <NavbarItem className="mr-4">
-            <Link color="foreground" href="/chat" className="text-white hover:text-gray-300">
+            <Link color="foreground" href="/chat" className="text-black hover:underline">
               Chat
             </Link>
           </NavbarItem>
           <NavbarItem className="mr-4">
-            <Link href="/TailoredGames" color="foreground" className="text-white hover:text-gray-300">
+            <Link href="/TailoredGames" color="foreground" className="text-black hover:underline">
               Our Games
             </Link>
           </NavbarItem>
           
-          <Dropdown placement="bottom-start" className="dark text-white">
+          <Dropdown placement="bottom-start" className="text-black hover:underline">
             <DropdownTrigger>
-              <NavbarItem className="cursor-pointer text-white hover:text-gray-300">Support</NavbarItem>
+              <NavbarItem className="cursor-pointer text-black hover:underline">Support</NavbarItem>
             </DropdownTrigger>
             <DropdownMenu
               aria-label="Support Actions"
@@ -570,8 +568,7 @@ const Header = forwardRef((props, ref) => {
               <NavbarMenuItem>
                 <Button
                   color="danger"
-                  variant="flat"
-                  className="w-full mt-4 text-white bg-gray-800 hover:bg-gray-700"
+                  className="w-full text-white py-1 mb-4"
                   onClick={handleLogout}
                 >
                   Log Out
