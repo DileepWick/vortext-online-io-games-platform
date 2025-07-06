@@ -3,6 +3,9 @@ import { PORT } from "./config.js";
 import { mongoDBURL } from "./config.js";
 import mongoose from "mongoose";
 import cors from "cors";
+import { createServer } from "http";
+import { Server } from "socket.io";
+
 import GPTRouter from "./routes/gpt_route.js";
 
 //Route files
@@ -34,16 +37,108 @@ import rockPaperScissorsRouter from "./routes/rock_paper_scissors_routes.js";
 
 //Create the app
 const app = express();
+const server = createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: ["http://127.0.0.1:5000", "http://localhost:3001"], // Add your frontend URLs
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
+
+// Store active users and their socket IDs
+const activeUsers = new Map();
+
+// Make io and activeUsers accessible to routes
+app.set("io", io);
+app.set("activeUsers", activeUsers);
+
+// Socket.IO connection handling
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
+
+  // Handle user joining
+  socket.on("join", (userId) => {
+    activeUsers.set(userId, socket.id);
+    socket.userId = userId;
+    console.log(`User ${userId} joined with socket ${socket.id}`);
+  });
+
+  // Handle new message
+  socket.on("sendMessage", async (messageData) => {
+    try {
+      const { recipientId, content, messageUser } = messageData;
+
+      // Emit to recipient if they're online
+      const recipientSocketId = activeUsers.get(recipientId);
+      if (recipientSocketId) {
+        io.to(recipientSocketId).emit("newMessage", {
+          ...messageData,
+          _id: Date.now().toString(), // Temporary ID
+          createdAt: new Date(),
+        });
+      }
+
+      // Emit back to sender for confirmation
+      socket.emit("messageConfirmed", {
+        ...messageData,
+        _id: Date.now().toString(),
+        createdAt: new Date(),
+      });
+
+      // Update unread counts for recipient
+      if (recipientSocketId) {
+        io.to(recipientSocketId).emit("updateUnreadCount", {
+          senderId: messageUser,
+          increment: true,
+        });
+      }
+    } catch (error) {
+      console.error("Error handling sendMessage:", error);
+    }
+  });
+
+  // Handle typing indicators
+  socket.on("typing", (data) => {
+    const { recipientId, isTyping } = data;
+    const recipientSocketId = activeUsers.get(recipientId);
+    if (recipientSocketId) {
+      io.to(recipientSocketId).emit("userTyping", {
+        userId: socket.userId,
+        isTyping,
+      });
+    }
+  });
+
+  // Handle message read
+  socket.on("markAsRead", (data) => {
+    const { senderId } = data;
+    const senderSocketId = activeUsers.get(senderId);
+    if (senderSocketId) {
+      io.to(senderSocketId).emit("messageRead", {
+        readBy: socket.userId,
+      });
+    }
+  });
+
+  // Handle disconnect
+  socket.on("disconnect", () => {
+    if (socket.userId) {
+      activeUsers.delete(socket.userId);
+      console.log(`User ${socket.userId} disconnected`);
+    }
+  });
+});
 
 //Middleware for parsing request body
 app.use(express.json());
 
 //Middleware for handling CORS Policy
-app.use(cors());
-
-//Configure app to run in port
-app.listen(PORT, () =>
-  console.log(`Server running on http://localhost:${PORT}`)
+app.use(
+  cors({
+    origin: ["http://127.0.0.1:5000", "http://localhost:3001"],
+    credentials: true,
+  })
 );
 
 //Connect DB
@@ -54,57 +149,44 @@ mongoose
 
     // Root Configuration
     app.get("/", (request, response) => {
-      response.status(200).send("Welocome to my game shop.");
+      response.status(200).send("Welcome to my game shop.");
     });
+
+    // Configure app to run in port
+    server.listen(PORT, () =>
+      console.log(`Server running on http://localhost:${PORT}`)
+    );
   })
-  .catch(() => {
-    console.error("Error connecting to MongoDB");
+  .catch((error) => {
+    console.error("Error connecting to MongoDB:", error);
   });
 
 //Routes
-app.use("/users", userRouter); //Users
-app.use("/games", gameRouter); //Games
-app.use("/gameCategories", GameCategoryRouter); //Game categories
-app.use("/gameStocks", gameStockRouter); //GameStocks
-app.use("/cart", cartRouter); //Cart
-app.use("/cartItems", cartItemsRouter); //Cart Items
-app.use("/orders", orderRouter); //Orders
-app.use("/orderItems", OrderItemsRouter); //Order Items
-app.use("/articles", articleRouter); //Articles
-app.use("/feed", postRouter); //Post
-app.use("/spookeyEditons", spookeyRouter); //Spookey_Game
+app.use("/users", userRouter);
+app.use("/games", gameRouter);
+app.use("/gameCategories", GameCategoryRouter);
+app.use("/gameStocks", gameStockRouter);
+app.use("/cart", cartRouter);
+app.use("/cartItems", cartItemsRouter);
+app.use("/orders", orderRouter);
+app.use("/orderItems", OrderItemsRouter);
+app.use("/articles", articleRouter);
+app.use("/feed", postRouter);
+app.use("/spookeyEditons", spookeyRouter);
 app.use("/faq", faqRouter);
-app.use("/gameStocks", gameStockRouter); //GameStocks
-app.use("/cart", cartRouter); //Cart
-app.use("/cartItems", cartItemsRouter); //Cart Items
-app.use("/orders", orderRouter); //Orders
-app.use("/orderItems", OrderItemsRouter); //Order Items
-app.use("/articles", articleRouter); //Articles
-app.use("/community", CommunityPost); //community
-app.use("/feed", postRouter); //Post
+app.use("/community", CommunityPost);
 app.use("/ratings", ratingRouter);
-app.use("/spookeyEditons", spookeyRouter); //Spookey_Game
-app.use("/Rentals", RentalRouter); //Rentals
-app.use("/api", chatRouter); // Use chatbot routes
-app.use("/gameStocks", gameStockRouter); //GameStocks
-app.use("/cart", cartRouter); //Cart
-app.use("/cartItems", cartItemsRouter); //Cart Items
-app.use("/orders", orderRouter); //Orders
-app.use("/orderItems", OrderItemsRouter); //Order Items
-app.use("/articles", articleRouter); //Articles
-app.use("/feed", postRouter); //Post
-app.use("/ratings", ratingRouter);
-app.use("/spookeyEditons", spookeyRouter); //Spookey_Game
-app.use("/Rentals", RentalRouter); //Rentals
-app.use("/api", chatRouter); // Use chatbot routes
+app.use("/Rentals", RentalRouter);
+app.use("/api", chatRouter);
 app.use("/rentalDurations", RentalDurationRouter);
-app.use("/rentalPayments", rentalPaymentsRouter); //payments for the rentals
+app.use("/rentalPayments", rentalPaymentsRouter);
 app.use("/mathzblaster", MathzBlasterScore);
 app.use("/directContactUs", DirectContactUsRoute);
 app.use("/api", GPTRouter);
-app.use("/api", GPTRouter);
 app.use("/contacts", contactRouter);
-app.use("/api/messages", messageRoutes); // Changed the path to "/api/messages"
+app.use("/api/messages", messageRoutes);
 app.use("/notifications", NotificationRouter);
 app.use("/api/distributed-payments", distributedPaymentRoutes);
 app.use("/api/rock-paper-scissors", rockPaperScissorsRouter);
+
+export { io, activeUsers };
