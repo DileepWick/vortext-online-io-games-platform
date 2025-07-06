@@ -72,6 +72,7 @@ const Header = forwardRef((props, ref) => {
     setIsMenuOpen(false);
   };
 
+
   const handleMenuItemClick = (path) => {
     navigate(path);
     setIsMenuOpen(false);
@@ -158,6 +159,7 @@ const Header = forwardRef((props, ref) => {
             </Link>
           </NavbarItem>
           <NavbarItem className="mr-4">
+
             <Link color="foreground" href="/articles" className="text-black hover:underline">
               Community
             </Link>
@@ -168,6 +170,7 @@ const Header = forwardRef((props, ref) => {
             </Link>
           </NavbarItem>
           <NavbarItem className="mr-4">
+
             <Link href="/TailoredGames" color="foreground" className="text-black hover:underline">
               Our Games
             </Link>
@@ -175,6 +178,7 @@ const Header = forwardRef((props, ref) => {
           
           <Dropdown placement="bottom-start" className="dark text-white">
             <DropdownTrigger>
+
               <NavbarItem className="cursor-pointer text-black">Support</NavbarItem>
             </DropdownTrigger>
             <DropdownMenu
@@ -186,6 +190,7 @@ const Header = forwardRef((props, ref) => {
                 key="support"
                 onClick={() => navigate("/support")}
                 className="text-white "
+
               >
                 Vortex Support
               </DropdownItem>
@@ -193,6 +198,7 @@ const Header = forwardRef((props, ref) => {
                 key="contactus"
                 onClick={() => navigate("/support#contactForm")}
                 className="text-white"
+
               >
                 Contact Us
               </DropdownItem>
@@ -212,6 +218,7 @@ const Header = forwardRef((props, ref) => {
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
+
         </NavbarContent>
 
         {/* User Profile or Login */}
@@ -257,6 +264,7 @@ const Header = forwardRef((props, ref) => {
                   key="cart" 
                   onClick={() => navigate("/cartItems")}
                   className="text-white hover:bg-gray-800"
+
                 >
                   My Cart
                 </DropdownItem>
@@ -327,6 +335,7 @@ const Header = forwardRef((props, ref) => {
                   <DropdownItem
                     key="community-panel"
                     onClick={() => navigate("/CommunityDashBoard")}
+
                     className="text-white hover:bg-gray-800"
                   >
                     Community Dashboard
@@ -336,6 +345,7 @@ const Header = forwardRef((props, ref) => {
                   <DropdownItem
                     key="Review-panel"
                     onClick={() => navigate("/review_dashboard")}
+
                     className="text-white hover:bg-gray-800"
                   >
                     Review Dashboard
@@ -363,7 +373,9 @@ const Header = forwardRef((props, ref) => {
                   <DropdownItem
                     key="manage-payment"
                     onClick={() => navigate("/Payment_manager_dashboard")}
+
                     className="text-white hover:bg-gray-800"
+
                   >
                     Payment Management Dashboard
                   </DropdownItem>
@@ -373,6 +385,7 @@ const Header = forwardRef((props, ref) => {
                   className="text-white hover:bg-gray-800"
                   color="danger"
                   onClick={handleLogout}
+
                 >
                   Log Out
                 </DropdownItem>
