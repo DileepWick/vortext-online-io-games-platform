@@ -7,7 +7,9 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 
 import GPTRouter from "./routes/gpt_route.js";
-
+import session from "express-session";
+import passport from "passport";
+import "./middleware/passport.js"; // Import passport middleware
 //Route files
 import userRouter from "./routes/userAuthenticationRoutes.js";
 import gameRouter from "./routes/game_Routes.js";
@@ -34,7 +36,9 @@ import { RentalDurationRouter } from "./routes/rentalDurationRoutes.js";
 import distributedPaymentRoutes from "./routes/distributedPayment_routes.js";
 import NotificationRouter from "./routes/notification_routes.js";
 import rockPaperScissorsRouter from "./routes/rock_paper_scissors_routes.js";
+import dotenv from "dotenv";
 
+dotenv.config();
 //Create the app
 const app = express();
 const server = createServer(app);
@@ -130,6 +134,17 @@ io.on("connection", (socket) => {
   });
 });
 
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 //Middleware for parsing request body
 app.use(express.json());
 
@@ -163,6 +178,7 @@ mongoose
 
 //Routes
 app.use("/users", userRouter);
+
 app.use("/games", gameRouter);
 app.use("/gameCategories", GameCategoryRouter);
 app.use("/gameStocks", gameStockRouter);
@@ -173,6 +189,7 @@ app.use("/orderItems", OrderItemsRouter);
 app.use("/articles", articleRouter);
 app.use("/feed", postRouter);
 app.use("/spookeyEditons", spookeyRouter);
+
 app.use("/faq", faqRouter);
 app.use("/community", CommunityPost);
 app.use("/ratings", ratingRouter);
@@ -189,4 +206,12 @@ app.use("/notifications", NotificationRouter);
 app.use("/api/distributed-payments", distributedPaymentRoutes);
 app.use("/api/rock-paper-scissors", rockPaperScissorsRouter);
 
+
 export { io, activeUsers };
+
+app.use("/auth", userRouter);
+
+app.get("/", (req, res) => {
+  res.send('<a href="/auth/google">Login with Google</a>');
+});
+

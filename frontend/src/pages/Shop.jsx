@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Search, Filter, ShoppingCart, Star, ArrowRight, Menu, X } from "lucide-react";
+import { Link } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
 
@@ -7,7 +8,6 @@ const MinimalistShop = () => {
   const [gameStocks, setGameStocks] = useState([]);
   const [filteredStocks, setFilteredStocks] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedGenre, setSelectedGenre] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -34,9 +34,9 @@ const MinimalistShop = () => {
     fetchGameStocks();
   }, []);
 
-  // Filter stocks based on search and genre
+  // Filter stocks based on search only
   useEffect(() => {
-    if (searchTerm === "" && selectedGenre === "") {
+    if (searchTerm === "") {
       setFilteredStocks(gameStocks);
     } else {
       setFilteredStocks(
@@ -44,30 +44,12 @@ const MinimalistShop = () => {
           const matchesTitle = stock.AssignedGame?.title
             ?.toLowerCase()
             .includes(searchTerm.toLowerCase());
-          
-          const matchesGenre = selectedGenre
-            ? stock.AssignedGame?.Genre?.flatMap((genre) =>
-                genre.includes(",") ? genre.split(",") : genre
-              ).some(
-                (genre) =>
-                  genre.trim().toLowerCase() === selectedGenre.toLowerCase()
-              )
-            : true;
-
-          return matchesTitle && matchesGenre;
+          return matchesTitle;
         })
       );
     }
-  }, [searchTerm, selectedGenre, gameStocks]);
 
-  // Get unique genres from the data
-  const uniqueGenres = [...new Set(
-    gameStocks.flatMap(stock => 
-      stock.AssignedGame?.Genre?.flatMap(genre => 
-        genre.includes(",") ? genre.split(",").map(g => g.trim()) : genre.trim()
-      ) || []
-    )
-  )];
+  }, [searchTerm, gameStocks]);
 
   const calculateDiscountedPrice = (originalPrice, discount) => {
     return discount > 0
@@ -75,34 +57,42 @@ const MinimalistShop = () => {
       : originalPrice;
   };
 
+
   const LoadingSpinner = () => (
     <div className="flex justify-center items-center min-h-[400px]">
-      <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+      <div className="w-8 h-8 border-2 border-gray-800 border-t-transparent rounded-full animate-spin"></div>
     </div>
   );
 
 
   const Hero = () => (
-    <section className="relative py-32 px-4 overflow-hidden font-primaryRegular">
-      {/* Background with overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/60 to-black/80"></div>
+    <section 
+      className="relative py-32 px-4 overflow-hidden font-primaryRegular"
+      style={{
+        backgroundImage: `url('https://r4.wallpaperflare.com/wallpaper/242/56/18/the-witcher-3-wild-hunt-wallpaper-e980c83da1caddbbf64738bf903136cd.jpg')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
+      {/* Subtle overlay for text readability */}
+      <div className="absolute inset-0 bg-black/20"></div>
       
       <div className="relative max-w-4xl mx-auto text-center text-white z-10">
-        <h2 className="text-4xl md:text-6xl font-bold mb-6">
-          Discover Your Next
+        <h2 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
+          DISCOVER
           <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300">
-            Gaming Adventure
+          <span className="text-4xl md:text-6xl font-light">
+            Your Next Adventure
           </span>
         </h2>
-        <p className="text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
-          Explore our curated collection of premium games with exclusive deals and instant downloads.
+        <p className="text-xl text-white/90 mb-12 max-w-2xl mx-auto font-light">
+          Curated collection of premium games with exclusive deals and instant downloads
         </p>
         <button 
           onClick={() => document.getElementById('shop-section').scrollIntoView({ behavior: 'smooth' })}
-          className="bg-white text-black px-8 py-4 hover:bg-gray-200 transition-all duration-300 font-semibold inline-flex items-center transform hover:scale-105"
+          className="bg-white text-black px-12 py-4 hover:bg-gray-100 transition-all duration-300 font-medium inline-flex items-center transform hover:scale-105 text-lg"
         >
-          Shop Now <ArrowRight className="ml-2 w-5 h-5" />
+          EXPLORE GAMES <ArrowRight className="ml-3 w-5 h-5" />
         </button>
       </div>
     </section>
@@ -114,170 +104,132 @@ const MinimalistShop = () => {
     const discountedPrice = calculateDiscountedPrice(originalPrice, discount);
 
     return (
-      <div className="bg-white/95 backdrop-blur-sm text-black border border-gray-200 hover:border-black transition-all duration-300 group hover:shadow-2xl">
-        <div className="aspect-[3/4] overflow-hidden">
-          <img
-            src={stock.AssignedGame?.coverPhoto}
-            alt={stock.AssignedGame?.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            onError={(e) => {
-              e.target.src = 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=600&fit=crop';
-            }}
-          />
-        </div>
-        
-        <div className="p-4">
-          <h3 className="font-semibold text-lg mb-2 line-clamp-2">
-            {stock.AssignedGame?.title}
-          </h3>
-          
-          <div className="flex flex-wrap gap-1 mb-3">
-            {stock.AssignedGame?.Genre?.flatMap((genre) =>
-              genre.includes(",") ? genre.split(",") : genre
-            ).slice(0, 3).map((genre, index) => (
-              <span
-                key={index}
-                className="px-2 py-1 bg-black text-white text-xs font-medium"
-              >
-                {genre.trim().toUpperCase()}
-              </span>
-            ))}
+      <div className=" border border-gray-200 hover:border-black transition-all duration-300 group hover:shadow-xl">
+        <Link to={`/game/${stock._id}`}>
+          <div className="aspect-[3/4] overflow-hidden">
+            <img
+              src={stock.AssignedGame?.coverPhoto}
+              alt={stock.AssignedGame?.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              onError={(e) => {
+                e.target.src = 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=600&fit=crop';
+              }}
+            />
           </div>
           
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              {discount > 0 && (
-                <span className="text-sm text-gray-500 line-through">
-                  LKR {originalPrice}
+          <div className="p-6">
+            <h3 className="font-semibold text-xl mb-3 text-black">
+              {stock.AssignedGame?.title}
+            </h3>
+            
+            <div className="flex flex-wrap gap-2 mb-4">
+              {stock.AssignedGame?.Genre?.slice(0, 2).map((genre, index) => (
+                <span
+                  key={index}
+                  className="px-3 py-1 bg-gray-100 text-gray-700 text-sm font-medium"
+                >
+                  {genre.trim()}
                 </span>
-              )}
-              <span className="font-bold text-lg">
-                LKR {discountedPrice.toFixed(2)}
-              </span>
-              {discount > 0 && (
-                <span className="bg-black text-white px-2 py-1 text-xs font-medium">
-                  -{discount}%
-                </span>
-              )}
+              ))}
             </div>
-            <button className="bg-black text-white px-4 py-2 hover:bg-gray-800 transition-colors text-sm font-medium">
-              Add to Cart
-            </button>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                {discount > 0 && (
+                  <span className="text-sm text-gray-500 line-through">
+                    LKR {originalPrice}
+                  </span>
+                )}
+                <span className="font-bold text-sm text-black">
+                  LKR {discountedPrice.toFixed(2)}
+                </span>
+                {discount > 0 && (
+                  <span className="bg-black text-white px-3 py-1 text-sm font-medium">
+                    -{discount}%
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
+        </Link>
       </div>
     );
   };
 
+
+
   if (loading) return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center">
+    <div className="min-h-screen bg-white text-black flex items-center justify-center">
       <LoadingSpinner />
     </div>
   );
   
   if (error) return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center">
+    <div className="min-h-screen bg-white text-black flex items-center justify-center">
       <div className="text-center">
         <h2 className="text-2xl font-bold mb-4">Error Loading Games</h2>
-        <p className="text-gray-400">{error}</p>
+        <p className="text-gray-600">{error}</p>
       </div>
     </div>
   );
 
   return (
-    <div 
-      className="min-h-screen bg-black text-white relative"
-      style={{
-        backgroundImage: `url('https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1920&h=1080&fit=crop')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
-      }}
-    >
-      {/* Background overlay */}
-      <div className="absolute inset-0 bg-black/60 z-0"></div>
-      
-      {/* Content */}
-      <div className="relative z-10">
-        <Header />
-        <Hero />
-        <section id="shop-section" className="py-16 px-4">
-          <div className="max-w-7xl mx-auto">
-            {/* Filters Section */}
-            <div className="mb-12 bg-black/80 backdrop-blur-sm p-6 rounded-lg border border-gray-800">
-              <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-                <div className="relative flex-1 max-w-md">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search games..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-white/95 text-black border border-gray-300 focus:border-black focus:outline-none backdrop-blur-sm"
-                  />
-                </div>
-                
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => setSelectedGenre("")}
-                    className={`px-4 py-2 text-sm font-medium transition-colors ${
-                      selectedGenre === ""
-                        ? "bg-white text-black"
-                        : "bg-white/20 text-white border border-white/50 hover:bg-white hover:text-black backdrop-blur-sm"
-                    }`}
-                  >
-                    All Games
-                  </button>
-                  {uniqueGenres.slice(0, 6).map((genre) => (
-                    <button
-                      key={genre}
-                      onClick={() => setSelectedGenre(genre)}
-                      className={`px-4 py-2 text-sm font-medium transition-colors ${
-                        selectedGenre === genre
-                          ? "bg-white text-black"
-                          : "bg-white/20 text-white border border-white/50 hover:bg-white hover:text-black backdrop-blur-sm"
-                      }`}
-                    >
-                      {genre}
-                    </button>
-                  ))}
-                </div>
+    <div className="min-h-screen dark text-black font-primaryRegular">
+      <Header />
+      <Hero />
+      <section id="shop-section" className="py-20 px-4 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          {/* Search Section */}
+          <div className="mb-16">
+            <div className="max-w-2xl mx-auto text-center mb-12">
+              <h2 className="text-4xl font-bold mb-4">ALL GAMES</h2>
+              <p className="text-gray-600 text-lg">Find your perfect gaming experience</p>
+            </div>
+            
+            <div className="max-w-md mx-auto">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search games..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-12 pr-4 py-4 bg-white text-black border-2 border-gray-300 focus:border-black focus:outline-none text-lg"
+                />
               </div>
             </div>
-
-            {/* Results */}
-            <div className="mb-8">
-              <p className="text-gray-300 bg-black/50 backdrop-blur-sm px-4 py-2 rounded inline-block">
-                {filteredStocks.length} {filteredStocks.length === 1 ? 'game' : 'games'} found
-              </p>
-            </div>
-
-            {/* Games Grid */}
-            {filteredStocks.length === 0 ? (
-              <div className="text-center py-20 bg-black/80 backdrop-blur-sm rounded-lg border border-gray-800">
-                <h3 className="text-2xl font-bold mb-4 text-white">No Games Found</h3>
-                <p className="text-gray-400 mb-8">Try adjusting your search or filters</p>
-                <button
-                  onClick={() => {
-                    setSearchTerm("");
-                    setSelectedGenre("");
-                  }}
-                  className="bg-white text-black px-6 py-3 hover:bg-gray-200 transition-colors font-semibold"
-                >
-                  Reset Filters
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredStocks.map((stock) => (
-                  <GameCard key={stock._id} stock={stock} />
-                ))}
-              </div>
-            )}
           </div>
-        </section>
-        <Footer />
-      </div>
+
+          {/* Results */}
+          <div className="mb-8">
+            <p className="text-gray-600 text-lg">
+              {filteredStocks.length} {filteredStocks.length === 1 ? 'game' : 'games'} available
+            </p>
+          </div>
+
+          {/* Games Grid */}
+          {filteredStocks.length === 0 ? (
+            <div className="text-center py-20 bg-white border-2 border-gray-200">
+              <h3 className="text-3xl font-bold mb-4 text-black">No Games Found</h3>
+              <p className="text-gray-600 mb-8 text-lg">Try adjusting your search</p>
+              <button
+                onClick={() => setSearchTerm("")}
+                className="bg-black text-white px-8 py-4 hover:bg-gray-800 transition-colors font-medium text-lg"
+              >
+                RESET SEARCH
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {filteredStocks.map((stock) => (
+                <GameCard key={stock._id} stock={stock} />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+      
+      <Footer />
     </div>
   );
 };

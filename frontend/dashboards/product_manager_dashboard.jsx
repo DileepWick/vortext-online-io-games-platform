@@ -189,7 +189,7 @@ const Blogger = () => {
   };
 
   return (
-    <div className="flex w-full flex-col dark text-white">
+    <div className="flex w-full flex-col dark text-white bg-black h-screen">
       <div className="relative">
         <Header />
       </div>
