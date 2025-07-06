@@ -163,7 +163,7 @@ const RentalGamesEmbed = () => {
         <div className="absolute top-4 right-4 z-20 w-64">
           <Progress
             value={calculateProgress()}
-            color="primary"
+            color="default"
             className="mb-2"
           />
           <div className="text-white text-center">
@@ -184,33 +184,33 @@ const RentalGamesEmbed = () => {
             className="block"
           ></iframe>
 
-          <div className="flex flex-col">
-            {/* Full Screen Button */}
-            <Button
-              onClick={handleFullScreenToggle}
-              className="absolute top-4 right-4 z-10 font-primaryRegular ml-4"
-              radius="none"
-              color="primary"
-              style={{ padding: "10px", position: "absolute" }}
-            >
-              {isFullScreen ? "Exit Full Screen" : "Full Screen"}
-            </Button>
+<div className="flex flex-col ">
+  {/* Full Screen Button */}
+  <Button
+    onClick={handleFullScreenToggle}
+    className="absolute top-4 right-4 z-10 font-primaryRegular bg-black text-white"
+    radius="7px"
+    color="primary"
+    style={{ padding: "10px", position: "absolute" }}
+  >
+    {isFullScreen ? "Exit Full Screen" : "Full Screen"}
+  </Button>
 
-            {/* Exit Game Button */}
-            <Button
-              onClick={handleCut}
-              className="absolute top-4 right-24 z-10 font-primaryRegular"
-              variant="ghost"
-              color="primary"
-              radius="none"
-              style={{
-                padding: "10px",
-                position: "absolute",
-              }}
-            >
-              EXIT GAME
-            </Button>
-          </div>
+  {/* Exit Game Button */}
+  <Button
+    onClick={handleCut}
+    className="absolute top-4 right-44 z-10 font-primaryRegular bg-white text-black border border-gray-300"
+    variant="ghost"
+    color="primary"
+    radius="7px"
+    style={{
+      padding: "10px",
+      position: "absolute",
+    }}
+  >
+    EXIT GAME
+  </Button>
+</div>
         </div>
       </div>
       <Footer />
