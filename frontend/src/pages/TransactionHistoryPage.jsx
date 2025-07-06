@@ -62,20 +62,20 @@ const TransactionHistory = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-customDark">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-purple-500"></div>
+      <div className="flex justify-center items-center h-screen bg-black">
+        <div className="animate-spin rounded-full h-16 w-16 md:h-32 md:w-32 border-t-2 border-b-2 border-white"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-customDark flex flex-col min-h-screen">
+      <div className="bg-black flex flex-col min-h-screen">
         <Header />
-        <div className="flex-grow flex justify-center items-center">
-          <Card className="bg-red-900 border-red-700 text-red-200 p-4 rounded-lg shadow-lg">
+        <div className="flex-grow flex justify-center items-center p-4">
+          <Card className="bg-gray-900 border-gray-700 text-white p-4 rounded-lg shadow-lg max-w-md w-full">
             <CardBody>
-              <p className="text-center font-primaryRegular text-2xl">{error}</p>
+              <p className="text-center font-primaryRegular text-lg md:text-2xl">{error}</p>
             </CardBody>
           </Card>
         </div>
@@ -84,27 +84,67 @@ const TransactionHistory = () => {
     );
   }
 
+  // Mobile Card Component for transactions
+  const MobileTransactionCard = ({ transaction }) => (
+    <Card className="bg-white mb-4 shadow-md">
+      <CardBody className="p-4">
+        <div className="flex items-start gap-4">
+          <img 
+            src={transaction.stockid.AssignedGame.coverPhoto} 
+            alt={transaction.stockid.AssignedGame.title}
+            className="w-16 h-16 object-cover rounded-lg shadow-sm flex-shrink-0"
+          />
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-black text-sm md:text-base truncate">
+              {transaction.stockid.AssignedGame.title}
+            </h3>
+            <p className="text-gray-600 text-xs md:text-sm mt-1">
+              {new Date(transaction.date).toLocaleDateString()}
+            </p>
+            <div className="flex items-center gap-2 mt-2 flex-wrap">
+              <span className="bg-black text-white px-2 py-1 rounded text-xs">
+                {transaction.stockid.discount}% OFF
+              </span>
+              <span className="text-gray-700 text-xs">
+                Unit: Rs.{transaction.price}
+              </span>
+            </div>
+            <div className="mt-2">
+              <span className="font-bold text-black text-sm md:text-base">
+                Total: Rs.{transaction.order.paymentAmount}
+              </span>
+            </div>
+          </div>
+        </div>
+      </CardBody>
+    </Card>
+  );
+
   return (
-    <div className="bg-customDark min-h-screen font-sans text-white">
+    <div className="bg-white min-h-screen font-sans text-white">
       <Header />
-      <div className="container mx-auto p-6">
-        <h1 className="text-6xl font-primaryRegular mb-6 text-center text-purple-400">Transactions</h1>
-        <p className="mb-8 text-center text-lg text-gray-300">Your account payment details, transactions, and earned Vortex Rewards.</p>
+      <div className="container mx-auto p-4 md:p-6">
+        <h1 className="text-3xl md:text-6xl font-primaryRegular mb-4 md:mb-6 text-center text-black">
+          Transactions
+        </h1>
+        <p className="mb-6 md:mb-8 text-center text-sm md:text-lg text-gray-300 px-4">
+          Your account payment details, transactions, and earned Vortex Rewards.
+        </p>
        
         <Tabs 
           aria-label="Transaction Tabs"
           selectedKey={activeTab}
           onSelectionChange={setActiveTab}
           className="mb-6"
-          color="secondary"
+          color="default"
           variant="bordered"
         >
           <Tab 
             key="purchase" 
             title={
               <div className="flex items-center space-x-2">
-                <CreditCard />
-                <span>Purchase</span>
+                <CreditCard size={16} />
+                <span className="text-sm md:text-base">Purchase</span>
               </div>
             }
           />
@@ -112,8 +152,8 @@ const TransactionHistory = () => {
             key="rentals" 
             title={
               <div className="flex items-center space-x-2">
-                <Clock />
-                <span>Rentals</span>
+                <Clock size={16} />
+                <span className="text-sm md:text-base">Rentals</span>
               </div>
             }
           />
@@ -124,12 +164,51 @@ const TransactionHistory = () => {
             <Input
               className="mb-6 w-full max-w-md mx-auto"
               placeholder="Search by game title..."
-              startContent={<SearchIcon className="text-gray-400" />}
+              startContent={<SearchIcon className="text-gray-400" size={16} />}
               value={searchQuery}
               onChange={handleSearchChange}
               size="lg"
+              classNames={{
+                input: "text-black",
+                inputWrapper: "bg-white"
+              }}
             />
-            <Card className="bg-gray-900 shadow-xl">
+            
+            {/* Mobile View - Cards */}
+            <div className="block md:hidden">
+              {items.length > 0 ? (
+                <>
+                  {items.map((transaction) => (
+                    <MobileTransactionCard key={transaction.id} transaction={transaction} />
+                  ))}
+                  <div className="flex justify-center mt-6">
+                    <Pagination
+                      isCompact
+                      showControls
+                      showShadow
+                      color="default"
+                      page={page}
+                      total={Math.ceil(filteredItems.length / rowsPerPage)}
+                      onChange={(page) => setPage(page)}
+                      classNames={{
+                        wrapper: "gap-0 overflow-visible h-8",
+                        item: "w-8 h-8 text-small rounded-none bg-white text-black border-gray-300",
+                        cursor: "bg-black text-white border-black"
+                      }}
+                    />
+                  </div>
+                </>
+              ) : (
+                <Card className="bg-white">
+                  <CardBody className="text-center py-8">
+                    <p className="text-gray-600">No transactions found.</p>
+                  </CardBody>
+                </Card>
+              )}
+            </div>
+
+            {/* Desktop View - Table */}
+            <Card className="bg-white shadow-xl hidden md:block">
               <CardBody>
                 <Table
                   aria-label="Transaction history table"
@@ -139,18 +218,18 @@ const TransactionHistory = () => {
                         isCompact
                         showControls
                         showShadow
-                        color="secondary"
+                        color="default"
                         page={page}
                         total={Math.ceil(filteredItems.length / rowsPerPage)}
                         onChange={(page) => setPage(page)}
+                        classNames={{
+                          wrapper: "gap-0 overflow-visible h-8",
+                          item: "w-8 h-8 text-small rounded-none bg-white text-black",
+                          cursor: "bg-black text-white  font-primaryRegular"
+                        }}
                       />
                     </div>
                   }
-                  classNames={{
-                    wrapper: "min-h-[222px]",
-                    th: "text-black font-bold",   // Keeping table headers purple
-                    td: "text-black",  // Changing table body text color to black
-                  }}
                 >
                   <TableHeader>
                     <TableColumn>Cover</TableColumn>
@@ -162,7 +241,7 @@ const TransactionHistory = () => {
                   </TableHeader>
                   <TableBody>
                     {items.map((transaction) => (
-                      <TableRow key={transaction.id} className="hover:bg-purple-900/30 transition-colors">
+                      <TableRow key={transaction.id} className="hover:bg-gray-50 transition-colors font-primaryRegular">
                         <TableCell>
                           <img 
                             src={transaction.stockid.AssignedGame.coverPhoto} 
@@ -174,11 +253,11 @@ const TransactionHistory = () => {
                         <TableCell className="font-semibold">{transaction.stockid.AssignedGame.title}</TableCell>
                         <TableCell>Rs.{transaction.price}</TableCell>
                         <TableCell>
-                          <span className="bg-green-600 text-green-100 px-2 py-1 rounded-full text-xs">
+                          <span className="bg-black text-white px-2 py-1 rounded-full text-xs">
                             {transaction.stockid.discount}% OFF
                           </span>
                         </TableCell>
-                        <TableCell className="text-red-500 font-bold">Rs.{transaction.order.paymentAmount}</TableCell>
+                        <TableCell className="font-bold">Rs.{transaction.order.paymentAmount}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

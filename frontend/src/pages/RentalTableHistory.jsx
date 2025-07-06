@@ -87,7 +87,7 @@ const RentalTableHistory = ({ userId }) => {
             }
             classNames={{
               wrapper: "min-h-[222px]",
-              th: "text-black font-bold",  
+              th: "text-black font-primaryRegular",  
               td: "text-black",
             }}
           >
@@ -100,7 +100,7 @@ const RentalTableHistory = ({ userId }) => {
             </TableHeader>
             <TableBody>
               {items.map((rental) => (
-                <TableRow key={rental._id} className="hover:bg-purple-900/30 transition-colors">
+                <TableRow key={rental._id}>
                   <TableCell>
                     <img 
                       src={rental.game.coverPhoto} 
