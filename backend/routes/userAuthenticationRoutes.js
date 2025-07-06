@@ -128,7 +128,7 @@ userRouter.get(
   passport.authenticate("google", { session: false }),
   (req, res) => {
     const token = req.user.token;
-    res.redirect(`http://localhost:5000/login?token=${token}`);
+    res.redirect(`http://127.0.0.1:5000/login?token=${token}`);
   }
 );
 
