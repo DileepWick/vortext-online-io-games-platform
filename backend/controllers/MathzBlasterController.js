@@ -2,7 +2,6 @@
 import { MathzBlasterScore } from "../models/MathzBlasterScore.js";
 import mongoose, { get } from "mongoose";
 import jwt from "jsonwebtoken";
-import { getUserIdFromToken } from "../../frontend/src/utils/user_id_decoder.js";
 
 // Middleware to authenticate user
 export const authenticateUser = (req, res, next) => {
@@ -22,7 +21,7 @@ export const authenticateUser = (req, res, next) => {
 export const saveGameStats = async (req, res) => {
   try {
     const { score = 0, playtime = 0, level = 1, difficulty } = req.body;
-    const userId = getUserIdFromToken(req.headers.authorization);
+    const userId = '686a4659a58b5ac21fe8a311';
     console.log("User ID:", userId);
 
     if (!["easy", "medium", "hard"].includes(difficulty)) {

@@ -4,7 +4,6 @@ import { mongoDBURL } from "./config.js";
 import mongoose from "mongoose";
 import cors from "cors";
 import { createServer } from "http";
-const serverless = require('serverless-http');
 import { Server } from "socket.io";
 
 import GPTRouter from "./routes/gpt_route.js";
@@ -201,8 +200,8 @@ export { io, activeUsers };
 
 app.use("/auth", userRouter);
 
-// Example route to test the server
-app.get('/api/hello', (req, res) => {
-  res.json({ message: 'Hello from Express on Vercel!' });
+//Start the server
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT} in Railway environment`); // Updated message for Railway
 });
 
