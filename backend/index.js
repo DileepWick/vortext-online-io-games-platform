@@ -44,7 +44,7 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["http://127.0.0.1:5000", "http://localhost:3001"], // Add your frontend URLs
+    origin: ["*"], // Add your frontend URLs
     methods: ["GET", "POST"],
     credentials: true,
   },
