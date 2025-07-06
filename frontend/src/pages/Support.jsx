@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import Header from "../components/header";
 import Footer from "../components/footer";
+import { API_BASE_URL } from "../utils/getAPI";
 import {
   Card,
   Button,
@@ -84,7 +85,7 @@ const Support = () => {
       setMessageError("");
     }
   };
-
+  console.log(API_BASE_URL);
   const handleSubmit = async (e) => {
     e.preventDefault();
 
