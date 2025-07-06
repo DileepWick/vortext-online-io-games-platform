@@ -501,7 +501,11 @@ const GamingSessions = () => {
               ))}
             </div>
           ) : (
-            <p>No Rentals found</p>
+            <div className="bg-customDark flex flex-col min-h-screen">
+        <p className="text-center text-white font-primaryRegular text-5xl mt-[100px]">
+            No Rented Games Found
+          </p>
+      </div>
           )}
         </div>
 
