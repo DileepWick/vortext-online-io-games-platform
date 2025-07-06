@@ -298,16 +298,12 @@ const HandleRentals = () => {
       <div className="bg-black py-4">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl font-primaryRegular text-white text-center">
-            Rent the Game
+             {game.title}
           </h1>
         </div>
       </div>
       <div className="container mx-auto px-4 py-8">
         <div className="bg-customDark rounded-lg shadow-lg p-8">
-          <h1 className="text-5xl text-white mb-4">
-            {game.title}
-            <br />
-          </h1>
           <div className="flex flex-col lg:flex-row gap-8 mb-8">
             <div className="flex-1">
               <VideoPlayer
@@ -441,11 +437,11 @@ const HandleRentals = () => {
       
       {/* New Checkout Modal */}
       <Modal
-  isOpen={isOpen}
-  onOpenChange={onClose}
-  placement="center"
-  size="2xl"
->
+      isOpen={isOpen}
+      onOpenChange={onClose}
+      placement="center"
+      size="2xl"
+      >
   <ModalContent
     style={{
       backgroundColor: "#f9f9f9",  // Very light gray
@@ -520,13 +516,22 @@ const HandleRentals = () => {
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button color="danger" variant="light" onPress={onClose}>
-            Cancel
-          </Button>
-          <Button color="primary" onPress={handlePlaceOrder}>
-            Confirm
-          </Button>
-        </ModalFooter>
+  <Button 
+    color="danger" 
+    variant="light" 
+    onPress={onClose}
+    className="bg-white text-black border border-gray-300"
+  >
+    Cancel
+  </Button>
+  <Button 
+    color="primary" 
+    onPress={handlePlaceOrder}
+    className="bg-black text-white"
+  >
+    Confirm
+  </Button>
+</ModalFooter>
       </>
     )}
   </ModalContent>

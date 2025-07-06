@@ -587,14 +587,23 @@ const GamingSessions = () => {
                 ))}
               </div>
             </ModalBody>
-            <ModalFooter>
-              <Button color="danger" variant="light" onPress={closeExtendModal}>
-                Cancel
-              </Button>
-              <Button color="primary" onPress={openPaymentModal}>
-                Confirm and Pay
-              </Button>
-            </ModalFooter>
+              <ModalFooter>
+                <Button 
+                  color="danger" 
+                  variant="light" 
+                  onPress={closeExtendModal}
+                  className="bg-white text-black border border-gray-300"
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  color="primary" 
+                  onPress={openPaymentModal}
+                  className="bg-black text-white"
+                >
+                  Confirm and Pay
+                </Button>
+              </ModalFooter>
           </ModalContent>
         </Modal>
 
