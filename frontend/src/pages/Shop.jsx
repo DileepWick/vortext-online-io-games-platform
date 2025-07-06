@@ -214,7 +214,7 @@ const Shop = () => {
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <div className="h-[4000px] bg-customDark text-white dark">
+    <div className=" text-white dark">
       <Header />
       <div
         className="relative min-h-screen bg-cover bg-center bg-no-repeat bg-customDark"

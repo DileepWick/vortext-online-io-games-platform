@@ -30,7 +30,6 @@ import DirectContactUsRoute from "./routes/direct_contact_us_route.js";
 import { RentalDurationRouter } from "./routes/rentalDurationRoutes.js";
 import distributedPaymentRoutes from "./routes/distributedPayment_routes.js";
 import NotificationRouter from "./routes/notification_routes.js";
-
 import rockPaperScissorsRouter from "./routes/rock_paper_scissors_routes.js";
 
 //Create the app
