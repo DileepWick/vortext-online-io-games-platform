@@ -4,7 +4,9 @@ import { mongoDBURL } from "./config.js";
 import mongoose from "mongoose";
 import cors from "cors";
 import GPTRouter from "./routes/gpt_route.js";
-
+import session from "express-session";
+import passport from "passport";
+import "./middleware/passport.js"; // Import passport middleware
 //Route files
 import userRouter from "./routes/userAuthenticationRoutes.js";
 import gameRouter from "./routes/game_Routes.js";
@@ -32,9 +34,22 @@ import distributedPaymentRoutes from "./routes/distributedPayment_routes.js";
 import NotificationRouter from "./routes/notification_routes.js";
 
 import rockPaperScissorsRouter from "./routes/rock_paper_scissors_routes.js";
+import dotenv from "dotenv";
 
+dotenv.config();
 //Create the app
 const app = express();
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 //Middleware for parsing request body
 app.use(express.json());
@@ -63,7 +78,7 @@ mongoose
   });
 
 //Routes
-app.use("/users", userRouter); //Users
+app.use("/users", userRouter);
 app.use("/games", gameRouter); //Games
 app.use("/gameCategories", GameCategoryRouter); //Game categories
 app.use("/gameStocks", gameStockRouter); //GameStocks
@@ -109,3 +124,9 @@ app.use("/api/messages", messageRoutes); // Changed the path to "/api/messages"
 app.use("/notifications", NotificationRouter);
 app.use("/api/distributed-payments", distributedPaymentRoutes);
 app.use("/api/rock-paper-scissors", rockPaperScissorsRouter);
+
+app.use("/auth", userRouter);
+
+app.get("/", (req, res) => {
+  res.send('<a href="/auth/google">Login with Google</a>');
+});

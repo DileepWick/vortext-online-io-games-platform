@@ -8,7 +8,7 @@ import { Cart } from "../models/cart.js";
 import fs from "fs";
 import cloudinary from "../utils/cloudinary.js";
 import upload from "../middleware/multer.js";
-
+import passport from "passport";
 
 // Router
 const userRouter = express.Router();
@@ -16,8 +16,16 @@ const userRouter = express.Router();
 // User Registration
 userRouter.post("/register", async (request, response) => {
   try {
-    const { firstname, lastname, username, password, email, birthday, role , portfolioLink } =
-      request.body;
+    const {
+      firstname,
+      lastname,
+      username,
+      password,
+      email,
+      birthday,
+      role,
+      portfolioLink,
+    } = request.body;
 
     // Validate input
     if (
@@ -73,18 +81,16 @@ userRouter.post("/register", async (request, response) => {
       birthday,
       age, // Store the calculated age
       playerType, // Store the categorized player type
-      developerAttributes: {}
-      
+      developerAttributes: {},
     };
 
     // Add developer-specific attributes if role is Developer
-    if (role === 'Developer') {
+    if (role === "Developer") {
       newUser.developerAttributes = {
-        portfolioLink: portfolioLink ? portfolioLink.trim() : '',  // Assign portfolioLink here
-        status: 'pending',  // Default status for developer
+        portfolioLink: portfolioLink ? portfolioLink.trim() : "", // Assign portfolioLink here
+        status: "pending", // Default status for developer
       };
     }
-    
 
     // Create a new user
     const createdUser = await User.create(newUser);
@@ -95,11 +101,9 @@ userRouter.post("/register", async (request, response) => {
 
     if (createdUser && cartCreation) {
       if (role === "developer") {
-        return response
-          .status(201)
-          .json({
-            message: "Developer account created successfully.",
-          });
+        return response.status(201).json({
+          message: "Developer account created successfully.",
+        });
       } else {
         return response
           .status(201)
@@ -114,12 +118,42 @@ userRouter.post("/register", async (request, response) => {
   }
 });
 
+userRouter.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+userRouter.get(
+  "/google/callback",
+  passport.authenticate("google", { session: false }),
+  (req, res) => {
+    const token = req.user.token;
+    res.redirect(`http://localhost:5000/login?token=${token}`);
+  }
+);
+
+// Add success route for debugging
+userRouter.get("/profile", (req, res) => {
+  if (req.user) {
+    res.json({ user: req.user });
+  } else {
+    res.status(401).json({ message: "Not authenticated" });
+  }
+});
+
+userRouter.get("/logout", (req, res) => {
+  req.logout(() => {
+    req.session.destroy();
+    res.redirect("/");
+  });
+});
+
 // Get all developers with pending status
 userRouter.get("/developers/requests", async (req, res) => {
   try {
-    const pendingDevelopers = await User.find({ 
-      role: 'Developer', 
-      "developerAttributes.status": 'pending' 
+    const pendingDevelopers = await User.find({
+      role: "Developer",
+      "developerAttributes.status": "pending",
     });
 
     if (!pendingDevelopers.length) {
@@ -175,7 +209,6 @@ userRouter.put("/developers/reject/:id", async (req, res) => {
   }
 });
 
-
 // Helper function to calculate age from birthday
 function calculateAge(birthday) {
   const birthDate = new Date(birthday);
@@ -217,15 +250,17 @@ userRouter.post("/login", async (req, res) => {
 
       // If the developer's account status is pending, reject login
       if (developerStatus === "pending") {
-        return res.status(403).json({ 
-          message: "Your account is still pending approval. Please wait for confirmation." 
+        return res.status(403).json({
+          message:
+            "Your account is still pending approval. Please wait for confirmation.",
         });
       }
 
       // If the developer's account status is rejected, reject login
       if (developerStatus === "rejected") {
         return res.status(403).json({
-          message: "Your developer account has been rejected. Please contact support."
+          message:
+            "Your developer account has been rejected. Please contact support.",
         });
       }
 
@@ -276,7 +311,6 @@ userRouter.post("/login", async (req, res) => {
   }
 });
 
-
 // Get all users
 userRouter.get("/allusers", async (request, response) => {
   try {
@@ -323,7 +357,6 @@ userRouter.get("/approvedDevelopers", async (req, res) => {
   }
 });
 
-
 // Update developer info
 userRouter.put("/developers/update/:id", async (req, res) => {
   try {
@@ -338,7 +371,10 @@ userRouter.put("/developers/update/:id", async (req, res) => {
       return res.status(404).json({ message: "Developer not found" });
     }
 
-    res.status(200).json({ message: "Developer updated successfully", developer: updatedDeveloper });
+    res.status(200).json({
+      message: "Developer updated successfully",
+      developer: updatedDeveloper,
+    });
   } catch (error) {
     console.error("Error updating developer:", error);
     res.status(500).json({ message: "Server error" });
@@ -361,8 +397,6 @@ userRouter.delete("/developers/delete/:id", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
-
 
 // Get user profile
 userRouter.get("/profile/:id", async (request, response) => {
@@ -470,9 +504,13 @@ userRouter.put("/profile/change-password/:id", async (req, res) => {
     }
 
     // Check password validation
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     if (!passwordRegex.test(newPassword)) {
-      return res.status(400).json({ message: "New password must be at least 8 characters long and include uppercase, lowercase, number, and symbol." });
+      return res.status(400).json({
+        message:
+          "New password must be at least 8 characters long and include uppercase, lowercase, number, and symbol.",
+      });
     }
 
     // Hash new password and update user
@@ -485,7 +523,6 @@ userRouter.put("/profile/change-password/:id", async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 });
-
 
 // Change Status
 userRouter.put("/changeStatus/:id", async (request, response) => {
@@ -529,21 +566,23 @@ userRouter.delete("/delete/:id", async (request, response) => {
 });
 
 // Update developer income route
-userRouter.put('/update-income/:id', async (req, res) => {
+userRouter.put("/update-income/:id", async (req, res) => {
   const { id } = req.params; // Developer ID
   const { saleAmount } = req.body; // Sale amount from the body
 
   // Validate saleAmount
-  if (typeof saleAmount !== 'number' || isNaN(saleAmount)) {
-    return res.status(400).json({ error: 'Invalid sale amount' });
+  if (typeof saleAmount !== "number" || isNaN(saleAmount)) {
+    return res.status(400).json({ error: "Invalid sale amount" });
   }
 
   try {
     // Find the developer by ID and ensure the user is a developer
-    const developer = await User.findOne({ _id: id, role: 'developer' });
+    const developer = await User.findOne({ _id: id, role: "developer" });
 
     if (!developer) {
-      return res.status(404).json({ error: 'Developer not found or not a developer' });
+      return res
+        .status(404)
+        .json({ error: "Developer not found or not a developer" });
     }
 
     // Calculate 70% of the sale amount (DevFunds)
@@ -558,56 +597,68 @@ userRouter.put('/update-income/:id', async (req, res) => {
     await developer.save();
 
     res.status(200).json({
-      message: 'Income updated successfully',
+      message: "Income updated successfully",
       updatedIncome: newIncome,
       developer: developer,
     });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to update income', details: error.message });
+    res
+      .status(500)
+      .json({ error: "Failed to update income", details: error.message });
   }
 });
 
 // Get developer income route
-userRouter.get('/get-income/:id', async (req, res) => {
+userRouter.get("/get-income/:id", async (req, res) => {
   const { id } = req.params; // Developer ID
 
   try {
     // Find the developer by ID and ensure the user is a developer
-    const developer = await User.findOne({ _id: id, role: 'developer' });
+    const developer = await User.findOne({ _id: id, role: "developer" });
 
     if (!developer) {
-      return res.status(404).json({ error: 'Developer not found or not a developer' });
+      return res
+        .status(404)
+        .json({ error: "Developer not found or not a developer" });
     }
 
     // Get the developer's income
     const currentIncome = developer.developerAttributes.income || 0;
 
     res.status(200).json({
-      message: 'Income retrieved successfully',
+      message: "Income retrieved successfully",
       income: currentIncome,
       developer: developer,
     });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to retrieve income', details: error.message });
+    res
+      .status(500)
+      .json({ error: "Failed to retrieve income", details: error.message });
   }
 });
-
 
 // Get all users with moderator roles
 userRouter.get("/moderators", async (req, res) => {
   try {
     const moderatorRoles = [
-      'Product Manager', 'User Manager', 'Order Manager',
-      'Session_Manager', 'Community Manager', 'Review Manager', 
-      'Support Agent', 'Staff_Manager', 'Payment Manager'
+      "Product Manager",
+      "User Manager",
+      "Order Manager",
+      "Session_Manager",
+      "Community Manager",
+      "Review Manager",
+      "Support Agent",
+      "Staff_Manager",
+      "Payment Manager",
     ];
-    const moderators = await User.find({ role: { $in: moderatorRoles } }).select("-password");
+    const moderators = await User.find({
+      role: { $in: moderatorRoles },
+    }).select("-password");
     res.status(200).json(moderators);
   } catch (error) {
     console.error("Error fetching moderators:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
 
 export default userRouter;
