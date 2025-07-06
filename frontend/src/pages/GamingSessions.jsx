@@ -419,19 +419,19 @@ const GamingSessions = () => {
   }
 
   return (
-    <div className="bg-black min-h-screen font-sans text-white">
+    <div className="bg-white min-h-screen font-sans text-white">
       <Header />
       <div className="relative">
         <div className="container mx-auto p-6">
           <div className="flex justify-between items-center mb-6">
-            <div className="text-2xl font-primaryRegular text-white">MY RENTED GAMES</div>
+            <div className="text-2xl font-primaryRegular text-black">MY RENTED GAMES</div>
           </div>
           {rentals.length > 0 ? (
             <div className="flex flex-wrap gap-6">
               {rentals.map((rental) => (
                 <Card
                   key={rental._id}
-                  className="relative dark overflow-hidden transition-transform transform hover:scale-105 hover:shadow-lg"
+                  className="relative white overflow-hidden transition-transform transform hover:scale-105 hover:shadow-lg"
                 >
                   <Image
                     isBlurred
@@ -441,11 +441,11 @@ const GamingSessions = () => {
                     src={rental.game.coverPhoto}
                   />
                   <CardBody className="p-4">
-                    <p className="mb-2 font-primaryRegular text-lg text-white">
+                    <p className="mb-2 font-primaryRegular text-lg text-black">
                       {rental.game.title}
                     </p>
 
-                    <p className="mb-2 text-sm text-gray-300">
+                    <p className="mb-2 text-sm text-gray-500">
                       Rental Time: {formatTime(rental.time)}
                     </p>
 
@@ -459,7 +459,7 @@ const GamingSessions = () => {
                             color="black"
                             variant="flat"
                             size="sm"
-                            className="text-white"
+                            className="text-black"
                             radius="none"
                           >
                             {genre.trim()}
@@ -494,8 +494,8 @@ const GamingSessions = () => {
               ))}
             </div>
           ) : (
-            <div className="bg-black flex flex-col min-h-screen">
-        <p className="text-center text-white font-primaryRegular text-5xl mt-[100px]">
+            <div className="bg-white flex flex-col min-h-screen">
+        <p className="text-center text-black font-primaryRegular text-5xl mt-[100px]">
             No Rented Games Found
           </p>
       </div>

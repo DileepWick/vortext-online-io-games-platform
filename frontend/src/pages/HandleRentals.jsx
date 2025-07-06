@@ -292,13 +292,13 @@ const HandleRentals = () => {
   if (!game) return <div className="text-center py-8">Game not found</div>;
 
   return (
-    <div className="bg-black text-white min-h-screen font-primaryRegular">
+    <div className="bg-white text-white min-h-screen font-primaryRegular">
       <Header />
       
       {/* Game Title Section */}
-      <div className="bg-black py-4">
+      <div className="bg-white py-4">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-primaryRegular text-white text-center">
+          <h1 className="text-4xl font-primaryRegular text-black text-center">
             {game.title}
           </h1>
         </div>
@@ -306,7 +306,7 @@ const HandleRentals = () => {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
-        <div className="bg-black rounded-lg shadow-lg p-8">
+        <div className="bg-white rounded-lg shadow-lg p-8">
           
           {/* Game Cover and Description Section */}
           <div className="flex flex-col lg:flex-row gap-8 mb-8">
@@ -324,7 +324,7 @@ const HandleRentals = () => {
               <div className="mb-1">
                 <h2 className="text-3xl text-editionColor mb-4">About the game</h2>
                 <ScrollShadow hideScrollBar className="h-[150px]">
-                  <p className="text-lg">{game.Description}</p>
+                  <p className="text-lg text-black">{game.Description}</p>
                 </ScrollShadow>
               </div>
             </div>
@@ -332,13 +332,13 @@ const HandleRentals = () => {
 
           {/* Terms and Conditions Section */}
           <div className="ml-4 flex-1 mb-8">
-            <h3 className="text-2xl font-primaryRegular mb-4">
+            <h3 className="text-2xl font-primaryRegular text-black mb-4">
               Terms and Conditions
             </h3>
-            <ScrollShadow className="h-[350px]">
+            <ScrollShadow className="h-[250px]">
               <ul className="list-disc pl-5 space-y-2">
                 {termsAndConditions.map((term, index) => (
-                  <li key={index} className="text-lg text-white">
+                  <li key={index} className="text-lg text-black">
                     {term}
                   </li>
                 ))}
@@ -355,7 +355,7 @@ const HandleRentals = () => {
             {rentalOptions.length > 0 ? (
               <>
                 {/* Rental Options Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-9">
                   {rentalOptions.map((option) => (
                     <Card
                       key={option.time}
@@ -366,7 +366,7 @@ const HandleRentals = () => {
                         transition-all duration-300 ease-in-out
                         ${
                           selectedRental?.time === option.time
-                            ? "border-white border-2 shadow-lg scale-105 bg-black bg-opacity-20"
+                            ? "border-black border-2 shadow-lg scale-105 bg-black bg-opacity-20"
                             : "border-gray-600 hover:border-gray-400"
                         }
                       `}
@@ -405,10 +405,10 @@ const HandleRentals = () => {
                 <Button
                   color="black"
                   onPress={handleRentClick}
-                  className="w-full border-2 border-white"
+                  className="w-full border-2 border-black"
                   disabled={!selectedRental}
                 >
-                  Rent the game
+                  <p className="text-black">Rent The Game</p>
                 </Button>
               </>
             ) : (
