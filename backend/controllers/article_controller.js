@@ -77,7 +77,9 @@ export const toggleLike = async (req, res) => {
 
     await article.save();
 
-    res.status(200).json({ message: "Like toggled successfully", likes: article.likes });
+    res
+      .status(200)
+      .json({ message: "Like toggled successfully", likes: article.likes });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "An error occurred", error });
@@ -87,7 +89,9 @@ export const toggleLike = async (req, res) => {
 // Get all articles
 export const getAllArticles = async (req, res) => {
   try {
-    const articles = await Article.find().populate("uploader").populate("comments.user");
+    const articles = await Article.find()
+      .populate("uploader")
+      .populate("comments.user");
 
     if (articles && articles.length > 0) {
       return res.json({
@@ -111,7 +115,9 @@ export const getBloggerArticles = async (req, res) => {
   try {
     const { uploaderid } = req.params;
 
-    const bloggerArticles = await Article.find({ uploader: uploaderid }).populate("uploader").populate("comments.user");
+    const bloggerArticles = await Article.find({ uploader: uploaderid })
+      .populate("uploader")
+      .populate("comments.user");
 
     if (bloggerArticles && bloggerArticles.length > 0) {
       return res.json({
@@ -149,7 +155,10 @@ export const addComment = async (req, res) => {
     article.comments.push({ user: userId, text });
     await article.save();
 
-    res.status(201).json({ message: "Comment added successfully", comment: article.comments[article.comments.length - 1] });
+    res.status(201).json({
+      message: "Comment added successfully",
+      comment: article.comments[article.comments.length - 1],
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "An error occurred", error });
@@ -172,7 +181,7 @@ export const deleteArticle = async (req, res) => {
     }
 
     // Delete the image from Cloudinary
-    const publicId = article.image.split('/').pop().split('.')[0]; // Extract the public ID from the image URL
+    const publicId = article.image.split("/").pop().split(".")[0]; // Extract the public ID from the image URL
     await cloudinary.uploader.destroy(publicId);
 
     // Delete the article from the database
@@ -210,7 +219,7 @@ export const updateArticle = async (req, res) => {
     if (req.files && req.files.image) {
       // Delete the old image from Cloudinary
       if (article.image) {
-        const publicId = article.image.split('/').pop().split('.')[0];
+        const publicId = article.image.split("/").pop().split(".")[0];
         await cloudinary.uploader.destroy(publicId);
       }
 
@@ -240,12 +249,13 @@ export const updateArticle = async (req, res) => {
 
     res.status(200).json({
       message: "Article updated successfully",
-      article: updatedArticle
+      article: updatedArticle,
     });
-
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "An error occurred while updating the article", error });
+    res
+      .status(500)
+      .json({ message: "An error occurred while updating the article", error });
   }
 };
 
@@ -254,8 +264,13 @@ export const deleteComment = async (req, res) => {
   try {
     const { articleId, commentId } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(articleId) || !mongoose.Types.ObjectId.isValid(commentId)) {
-      return res.status(400).json({ message: "Invalid article ID or comment ID" });
+    if (
+      !mongoose.Types.ObjectId.isValid(articleId) ||
+      !mongoose.Types.ObjectId.isValid(commentId)
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Invalid article ID or comment ID" });
     }
 
     const article = await Article.findById(articleId);
@@ -264,7 +279,9 @@ export const deleteComment = async (req, res) => {
       return res.status(404).json({ message: "Article not found" });
     }
 
-    const commentIndex = article.comments.findIndex(comment => comment._id.toString() === commentId);
+    const commentIndex = article.comments.findIndex(
+      (comment) => comment._id.toString() === commentId
+    );
 
     if (commentIndex === -1) {
       return res.status(404).json({ message: "Comment not found" });
@@ -278,8 +295,6 @@ export const deleteComment = async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "An error occurred", error });
   }
-
-  
 };
 //report article
 export const reportArticle = async (req, res) => {
@@ -311,7 +326,9 @@ export const getReportedArticles = async (req, res) => {
 
     res.status(200).json({ reportedArticles });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching reported articles", error });
+    res
+      .status(500)
+      .json({ message: "Error fetching reported articles", error });
   }
 };
 
@@ -339,8 +356,13 @@ export const editComment = async (req, res) => {
     const { articleId, commentId } = req.params;
     const { text, userId } = req.body;
 
-    if (!mongoose.Types.ObjectId.isValid(articleId) || !mongoose.Types.ObjectId.isValid(commentId)) {
-      return res.status(400).json({ message: "Invalid article ID or comment ID" });
+    if (
+      !mongoose.Types.ObjectId.isValid(articleId) ||
+      !mongoose.Types.ObjectId.isValid(commentId)
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Invalid article ID or comment ID" });
     }
 
     const article = await Article.findById(articleId);
@@ -357,7 +379,9 @@ export const editComment = async (req, res) => {
 
     // Check if the user trying to edit is the original commenter
     if (comment.user.toString() !== userId) {
-      return res.status(403).json({ message: "You are not authorized to edit this comment" });
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to edit this comment" });
     }
 
     comment.text = text;
@@ -368,6 +392,8 @@ export const editComment = async (req, res) => {
     res.status(200).json({ message: "Comment updated successfully", comment });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "An error occurred while editing the comment", error });
+    res
+      .status(500)
+      .json({ message: "An error occurred while editing the comment", error });
   }
 };

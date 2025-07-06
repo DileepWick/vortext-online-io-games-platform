@@ -173,20 +173,58 @@ const Articles = () => {
       const response = await axios.get(
         "http://localhost:8098/articles/getAllArticles"
       );
-      const fetchedArticles = response.data.articles;
+
+      // Handle different response structures
+      let fetchedArticles = [];
+      if (response.data && response.data.articles) {
+        fetchedArticles = response.data.articles;
+      } else if (response.data && Array.isArray(response.data)) {
+        fetchedArticles = response.data;
+      } else {
+        // If no articles property or unexpected structure, default to empty array
+        fetchedArticles = [];
+      }
+
       setArticles(fetchedArticles);
 
-      const likedArticlesObj = {};
-      fetchedArticles.forEach((article) => {
-        if (article.likedBy.includes(userId)) {
-          likedArticlesObj[article._id] = true;
-        }
-      });
-      setLikedArticles(likedArticlesObj);
+      // Only process liked articles if there are articles
+      if (fetchedArticles.length > 0) {
+        const likedArticlesObj = {};
+        fetchedArticles.forEach((article) => {
+          if (article.likedBy && article.likedBy.includes(userId)) {
+            likedArticlesObj[article._id] = true;
+          }
+        });
+        setLikedArticles(likedArticlesObj);
+      }
 
       setLoading(false);
     } catch (err) {
-      setError("Error fetching articles");
+      console.error("Error fetching articles:", err);
+
+      // Check if it's a network error or server error
+      if (err.response) {
+        // Server responded with error status
+        if (err.response.status === 404) {
+          // Handle 404 - no articles found
+          setArticles([]);
+          setLoading(false);
+          return;
+        } else if (err.response.status >= 500) {
+          setError("Server error. Please try again later.");
+        } else {
+          setError("Error fetching articles. Please try again.");
+        }
+      } else if (err.request) {
+        // Network error
+        setError("Network error. Please check your connection and try again.");
+      } else {
+        // Other error
+        setError("An unexpected error occurred. Please try again.");
+      }
+
+      // Set empty articles array and stop loading even on error
+      setArticles([]);
       setLoading(false);
     }
   };
@@ -441,10 +479,6 @@ const Articles = () => {
     return <Loader />;
   }
 
-  if (error) {
-    return <div className="text-center mt-10 text-red-500">{error}</div>;
-  }
-
   return (
     <div className="bg-customDark min-h-screen text-white font-sans">
       <BackgroundBeams />
@@ -467,9 +501,66 @@ const Articles = () => {
             user={user}
           />
 
+          {error && (
+            <div className="bg-red-900 border border-red-500 text-red-200 px-4 py-3 rounded mb-6">
+              <div className="flex items-center">
+                <svg
+                  className="w-5 h-5 mr-2"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span className="font-primaryRegular">{error}</span>
+              </div>
+              <button
+                onClick={() => setError("")}
+                className="mt-2 text-sm underline font-primaryRegular"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
+
           <h2 className="text-3xl font-primaryRegular mb-6">Posts</h2>
           {articles.length === 0 ? (
-            <div className="text-center mt-10">No articles found.</div>
+            <div className="text-center mt-10">
+              <div className="bg-gray-800 rounded-lg p-8 max-w-md mx-auto">
+                <div className="text-gray-400 mb-4">
+                  <svg
+                    className="w-16 h-16 mx-auto mb-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-primaryRegular mb-2 text-white">
+                  No Posts Yet
+                </h3>
+                <p className="text-gray-400 font-primaryRegular mb-4">
+                  Be the first to share something! Click the "Create New Post"
+                  button to get started.
+                </p>
+                <Button
+                  onClick={() => setIsModalOpen(true)}
+                  color="primary"
+                  className="font-primaryRegular"
+                >
+                  Create Your First Post
+                </Button>
+              </div>
+            </div>
           ) : (
             <div className="space-y-6">
               {articles.map((article) => (
@@ -501,11 +592,18 @@ const Articles = () => {
                       disabled={reportingArticleId === article._id}
                     >
                       {reportingArticleId === article._id ? (
-                        <span className="font-primaryRegular text-[20px]">Reporting...</span>
+                        <span className="font-primaryRegular text-[20px]">
+                          Reporting...
+                        </span>
                       ) : (
                         <>
-                          <FaFlag className="inline-block text-[40px]" size={16} />
-                          <span className="font-primaryRegular text-[20px]">Report</span>
+                          <FaFlag
+                            className="inline-block text-[40px]"
+                            size={16}
+                          />
+                          <span className="font-primaryRegular text-[20px]">
+                            Report
+                          </span>
                         </>
                       )}
                     </Button>
@@ -540,23 +638,36 @@ const Articles = () => {
 
                   <div className="flex justify-between items-center mt-4">
                     <div className="flex items-center">
-                      <Button onClick={() => handleLikeToggle(article._id)} color="danger" size="md">
+                      <Button
+                        onClick={() => handleLikeToggle(article._id)}
+                        color="danger"
+                        size="md"
+                      >
                         {likedArticles[article._id] ? (
-                         <FaHeart className="text-red-500 mr-2 text-[40px]" fill="white" stroke="currentColor" strokeWidth="30" />
+                          <FaHeart
+                            className="text-red-500 mr-2 text-[40px]"
+                            fill="white"
+                            stroke="currentColor"
+                            strokeWidth="30"
+                          />
                         ) : (
                           <FaRegHeart className="text-white mr-2 text-[40px]" />
                         )}
                       </Button>
-                      <span className="font-primaryRegular text-[20px] ml-4">{article.likes} Likes</span>
+                      <span className="font-primaryRegular text-[20px] ml-4">
+                        {article.likes} Likes
+                      </span>
                     </div>
                     <Button
-                      onClick={() => toggleComments(article._id)} 
+                      onClick={() => toggleComments(article._id)}
                       variant="ghost"
                       color="primary"
                       className="flex items-center"
                     >
                       <FaComments className="mr-2 text-[40px]" />
-                      <span className="font-primaryRegular text-[20px]">{article.comments.length} Comments</span>
+                      <span className="font-primaryRegular text-[20px]">
+                        {article.comments.length} Comments
+                      </span>
                     </Button>
                   </div>
 
@@ -651,7 +762,9 @@ const Articles = () => {
                                   </div>
                                 </form>
                               ) : (
-                                <p className="text-md font-primaryRegular">{comment.text}</p>
+                                <p className="text-md font-primaryRegular">
+                                  {comment.text}
+                                </p>
                               )}
                               {comment.editedAt && (
                                 <p className="text-xs text-gray-500 mt-1 font-primaryRegular">
@@ -669,7 +782,7 @@ const Articles = () => {
                                     setEditedCommentText(comment.text);
                                   }}
                                 >
-                                  <FaEdit className="text-[20px]"/>
+                                  <FaEdit className="text-[20px]" />
                                 </button>
                                 <button
                                   className="text-red-600 hover:text-red-400 text-xs"
@@ -684,7 +797,7 @@ const Articles = () => {
                                   {deletingCommentId === comment._id ? (
                                     "Deleting..."
                                   ) : (
-                                    <FaTrash  className="text-[20px] ml-4"/>
+                                    <FaTrash className="text-[20px] ml-4" />
                                   )}
                                 </button>
                               </div>
