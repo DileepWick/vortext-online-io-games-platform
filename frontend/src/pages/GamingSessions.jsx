@@ -419,19 +419,19 @@ const GamingSessions = () => {
   }
 
   return (
-    <div className="bg-customDark min-h-screen font-sans text-white">
+    <div className="bg-black min-h-screen font-sans text-white">
       <Header />
       <div className="relative">
         <div className="container mx-auto p-6">
           <div className="flex justify-between items-center mb-6">
-            <div className="text-2xl font-primaryRegular">MY RENTED GAMES</div>
+            <div className="text-2xl font-primaryRegular text-white">MY RENTED GAMES</div>
           </div>
           {rentals.length > 0 ? (
             <div className="flex flex-wrap gap-6">
               {rentals.map((rental) => (
                 <Card
                   key={rental._id}
-                  className="relative bg-customDark overflow-hidden transition-transform transform hover:scale-105 hover:shadow-lg"
+                  className="relative dark overflow-hidden transition-transform transform hover:scale-105 hover:shadow-lg"
                 >
                   <Image
                     isBlurred
@@ -494,7 +494,7 @@ const GamingSessions = () => {
               ))}
             </div>
           ) : (
-            <div className="bg-customDark flex flex-col min-h-screen">
+            <div className="bg-black flex flex-col min-h-screen">
         <p className="text-center text-white font-primaryRegular text-5xl mt-[100px]">
             No Rented Games Found
           </p>
