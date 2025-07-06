@@ -425,13 +425,6 @@ const GamingSessions = () => {
         <div className="container mx-auto p-6">
           <div className="flex justify-between items-center mb-6">
             <div className="text-2xl font-primaryRegular">MY RENTED GAMES</div>
-            <Button
-              color="black"
-              onClick={handleRentHistoryClick}
-              className="font-primaryRegular"
-            >
-              Rent History
-            </Button>
           </div>
           {rentals.length > 0 ? (
             <div className="flex flex-wrap gap-6">
