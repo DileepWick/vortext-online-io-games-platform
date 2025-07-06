@@ -43,106 +43,7 @@ import dotenv from "dotenv";
 dotenv.config();
 //Create the app
 const app = express();
-const server = createServer(app);
-// const io = new Server(server, {
-//   cors: {
-//     origin: ["*"], // Add your frontend URLs
-//     methods: ["GET", "POST"],
-//     credentials: true,
-//   },
-// });
 
-// // Store active users and their socket IDs
-// const activeUsers = new Map();
-
-// // Make io and activeUsers accessible to routes
-// app.set("io", io);
-// app.set("activeUsers", activeUsers);
-
-// // Socket.IO connection handling
-// io.on("connection", (socket) => {
-//   console.log("User connected:", socket.id);
-
-//   // Handle user joining
-//   socket.on("join", (userId) => {
-//     activeUsers.set(userId, socket.id);
-//     socket.userId = userId;
-//     console.log(`User ${userId} joined with socket ${socket.id}`);
-//   });
-
-//   // Handle new message
-//   socket.on("sendMessage", async (messageData) => {
-//     try {
-//       const { recipientId, content, messageUser } = messageData;
-
-//       // Emit to recipient if they're online
-//       const recipientSocketId = activeUsers.get(recipientId);
-//       if (recipientSocketId) {
-//         io.to(recipientSocketId).emit("newMessage", {
-//           ...messageData,
-//           _id: Date.now().toString(), // Temporary ID
-//           createdAt: new Date(),
-//         });
-//       }
-
-//       // Emit back to sender for confirmation
-//       socket.emit("messageConfirmed", {
-//         ...messageData,
-//         _id: Date.now().toString(),
-//         createdAt: new Date(),
-//       });
-
-//       // Update unread counts for recipient
-//       if (recipientSocketId) {
-//         io.to(recipientSocketId).emit("updateUnreadCount", {
-//           senderId: messageUser,
-//           increment: true,
-//         });
-//       }
-//     } catch (error) {
-//       console.error("Error handling sendMessage:", error);
-//     }
-//   });
-
-//   // Handle typing indicators
-//   socket.on("typing", (data) => {
-//     const { recipientId, isTyping } = data;
-//     const recipientSocketId = activeUsers.get(recipientId);
-//     if (recipientSocketId) {
-//       io.to(recipientSocketId).emit("userTyping", {
-//         userId: socket.userId,
-//         isTyping,
-//       });
-//     }
-//   });
-
-//   // Handle message read
-//   socket.on("markAsRead", (data) => {
-//     const { senderId } = data;
-//     const senderSocketId = activeUsers.get(senderId);
-//     if (senderSocketId) {
-//       io.to(senderSocketId).emit("messageRead", {
-//         readBy: socket.userId,
-//       });
-//     }
-//   });
-
-//   // Handle disconnect
-//   socket.on("disconnect", () => {
-//     if (socket.userId) {
-//       activeUsers.delete(socket.userId);
-//       console.log(`User ${socket.userId} disconnected`);
-//     }
-//   });
-// });
-
-// app.use(
-//   session({
-//     secret: process.env.SESSION_SECRET,
-//     resave: false,
-//     saveUninitialized: false,
-//   })
-// );
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -197,13 +98,16 @@ app.use("/api/distributed-payments", distributedPaymentRoutes);
 app.use("/api/rock-paper-scissors", rockPaperScissorsRouter);
 
 
-// export { io, activeUsers };
-
+// Set up session management
 app.use("/auth", userRouter);
 
+// Serve static files from the 'public' directory
 app.get("/", (req, res) => {
   res.send("Welcome to the IoGames API!");
 });
 
-
-export default serverless(app);
+// Start the server
+const PORT = process.env.PORT || 8098;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
