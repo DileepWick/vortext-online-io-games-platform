@@ -10,7 +10,7 @@ const TailoredGames = () => {
   // Reusable GameCard component defined within the same file
   const GameCard = ({ title, imageUrl, link, devName, devId, devPicUrl }) => {
     return (
-      <Card className="relative bg-black border border-gray-700 rounded-lg overflow-hidden transition-transform transform hover:scale-105 hover:shadow-2xl hover:bg-opacity-80 w-full max-w-[270px] h-[450px]">
+      <Card className="relative dark rounded-lg overflow-hidden transition-transform transform hover:scale-105 hover:shadow-2xl hover:bg-opacity-80 w-full font-primaryRegular">
         <Link
           to={link}
           className="relative block focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -46,9 +46,8 @@ const TailoredGames = () => {
   };
 
   return (
-    <div className="bg-black min-h-screen flex flex-col">
+    <div className="dark min-h-screen flex flex-col text-white">
       <Header />
-
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 justify-items-center">
           {/* Game 1 */}
@@ -58,9 +57,6 @@ const TailoredGames = () => {
             link="/HangmanGame"
             devName={"Wickramsinghe M.G.D.D"}
             devId={"IT22056252"}
-            devPicUrl={
-              "https://res.cloudinary.com/dhcawltsr/image/upload/v1727702080/340636206_739289724364300_6898680733432403275_n_1_djhsuc.jpg"
-            }
           />
 
           {/* Game 2 */}
@@ -115,7 +111,6 @@ const TailoredGames = () => {
           />
         </div>
       </main>
-
       <Footer />
     </div>
   );

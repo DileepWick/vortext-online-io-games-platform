@@ -61,7 +61,7 @@ const CreatePostModal = ({ isOpen, onClose, onSubmit, user }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
+    <div className="fixed inset-0 dark flex justify-center items-center z-50">
       <div className="bg-white border-2 border-black rounded-lg shadow-2xl p-8 w-full max-w-lg">
         <h2 className="text-3xl font-bold mb-6 text-black border-b-2 border-black pb-2 font-primaryRegular">
           Create Post
@@ -467,24 +467,22 @@ const Articles = () => {
   }
 
   return (
-    <div className="bg-white min-h-screen text-black font-primaryRegular">
+    <div className="dark min-h-screen text-white font-primaryRegular">
       <Header />
 
       <div className="container mx-auto p-6">
-        <button
+        <Button
           onClick={() => setIsModalOpen(true)}
-          className="mb-8 px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition duration-200 font-semibold text-lg border-2 border-black font-primaryRegular"
+          size="sm"
         >
           Create New Post
-        </button>
-
+        </Button>
         <CreatePostModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onSubmit={handleSubmit}
           user={user}
         />
-
         <h2 className="font-primaryRegular text-4xl font-bold mb-8 text-black border-b-4 border-black pb-2">
           Posts
         </h2>
