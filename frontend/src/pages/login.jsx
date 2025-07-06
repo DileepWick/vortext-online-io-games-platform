@@ -29,9 +29,6 @@ const Login = () => {
   const [selectedRole, setSelectedRole] = useState("User"); // New state for role selection
   const [portfolioLink, setPortfolioLinks] = useState(""); // Initialize with one empty input
   const [showPassword, setShowPassword] = useState(false);
-  
- 
-
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -70,52 +67,16 @@ const Login = () => {
 
   // Add input fields for developer portfolio links
   // Handle portfolio link input change and enforce www.linkedin.com/ format
-const handlePortfolioLinkChange = (e) => {
-  let value = e.target.value;
+  const handlePortfolioLinkChange = (e) => {
+    let value = e.target.value;
 
-  // Automatically add "www.linkedin.com/" if it doesn't start with it
-  if (!value.startsWith("www.linkedin.com/")) {
-    value = "www.linkedin.com/";
-  }
+    // Automatically add "www.linkedin.com/" if it doesn't start with it
+    if (!value.startsWith("www.linkedin.com/")) {
+      value = "www.linkedin.com/";
+    }
 
-  setPortfolioLinks(value); // Set the modified value
-};
-  // Validation functions
-  const validateFirstname = (firstname) => /^[a-zA-Z]+$/.test(firstname);
-  const validateLastname = (lastname) => /^[a-zA-Z]+$/.test(lastname);
-
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.com$/i;
-    return emailRegex.test(email);
+    setPortfolioLinks(value); // Set the modified value
   };
-  const validatePassword = (password) =>
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-      password
-    );
-
-
-  
-    
-
-    const validateForm = () => {
-      const errors = {};
-  
-      if (!validateFirstname(formData.firstname)) {
-        errors.firstname = "Firstname must contain only letters.";
-      }
-      if (!validateLastname(formData.lastname)) {
-        errors.lastname = "Lastname must contain only letters.";
-      }
-      if (!validateEmail(formData.email)) {
-        errors.email = "Invalid email format. Email must contain '@' and end with '.com'.";
-      }
-      if (!validatePassword(formData.password)) {
-        errors.password = "Password must be at least 8 characters long and include uppercase, lowercase, number, and symbol.";
-      }
-  
-      setValidationErrors(errors);
-      return Object.keys(errors).length === 0;
-    };
 
   // Handle login submission
   const handleLogin = async () => {
@@ -168,10 +129,6 @@ const handlePortfolioLinkChange = (e) => {
 
   // Handle sign-up submission
   const handleSignUp = async () => {
-    if (!validateForm()) {
-      return; // Prevent signup if validation fails
-    }
-
     try {
       const { firstname, lastname, username, email, password, birthday } =
         formData;
@@ -243,7 +200,6 @@ const handlePortfolioLinkChange = (e) => {
           style: { fontFamily: "Rubik" },
         });
       } else {
-        
         toast.success("User Account created successfully !", {
           position: "top-right",
           autoClose: 3000,
@@ -286,317 +242,352 @@ const handlePortfolioLinkChange = (e) => {
 
   const inputClassName = "max-w-full text-sm";
   return (
-    <div><Header/>
-    <div className="min-h-screen flex">
-      {/* Left side - Image */}
-      <div
-        className="hidden lg:block w-1/2 bg-cover bg-center"
-        style={{
-          backgroundImage:
-            "url(https://cdn.dribbble.com/users/1646023/screenshots/6625629/gamer_800x600.gif)",
-        }}
-      >
-        {/* Replace the placeholder URL with your actual image URL */}
-      </div>
+    <div>
+      <Header />
+      <div className="min-h-screen flex">
+        {/* Left side - Image */}
+        <div
+          className="hidden lg:block w-1/2 bg-cover bg-center"
+          style={{
+            backgroundImage:
+              "url(https://cdn.dribbble.com/users/1646023/screenshots/6625629/gamer_800x600.gif)",
+          }}
+        >
+          {/* Replace the placeholder URL with your actual image URL */}
+        </div>
 
-      {/* Right side - Login/Signup form */}
-      <div className="font-primaryRegular w-full lg:w-1/2 bg-gradient-to-r from-[#060c2c] to-[#7F60D9] flex items-center justify-center p-4">
-
-
-        <Card className="w-full max-w-md">
-          <CardBody className="overflow-hidden p-3">
-            <h1 className="text-xl font-bold text-center mb-3">
-              Welcome to Vortex Gaming
-            </h1>
-            <Tabs
-              fullWidth
-              size="md"
-              aria-label="Login/Signup Tabs"
-              selectedKey={selectedTab}
-              onSelectionChange={setSelectedTab}
-              className="mb-2"
-            >
-              <Tab key="login" title="Login">
-                <form className="space-y-3">
-                  <Input
-                    isRequired
-                    label="Username"
-                    placeholder="Enter your username"
-                    name="username"
-                    value={formData.username}
-                    onChange={handleInputChange}
-                    className="max-w-full"
-                  />
-                  <Input
-                    isRequired
-                    label="Password"
-                    placeholder="Enter your password"
-                    name="password"
-                    type="password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    className="max-w-full"
-                  />
-                  <p className="text-center text-sm">
-                    Need to create an account?{" "}
-                    <Link size="sm" onPress={() => setSelectedTab("sign-up")}>
-                      Sign up
-                    </Link>
-                  </p>
-                  <Button
+        {/* Right side - Login/Signup form */}
+        <div className="font-primaryRegular w-full lg:w-1/2 bg-gradient-to-r from-[#060c2c] to-[#7F60D9] flex items-center justify-center p-4">
+          <Card className="w-full max-w-md">
+            <CardBody className="overflow-hidden p-3">
+              <h1 className="text-xl font-bold text-center mb-3">
+                Welcome to Vortex Gaming
+              </h1>
+              <Tabs
+                fullWidth
+                size="md"
+                aria-label="Login/Signup Tabs"
+                selectedKey={selectedTab}
+                onSelectionChange={setSelectedTab}
+                className="mb-2"
+              >
+                <Tab key="login" title="Login">
+                  <form className="space-y-3">
+                    <Input
+                      isRequired
+                      label="Username"
+                      placeholder="Enter your username"
+                      name="username"
+                      value={formData.username}
+                      onChange={handleInputChange}
+                      className="max-w-full"
+                    />
+                    <Input
+                      isRequired
+                      label="Password"
+                      placeholder="Enter your password"
+                      name="password"
+                      type="password"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      className="max-w-full"
+                    />
+                    <p className="text-center text-sm">
+                      Need to create an account?{" "}
+                      <Link size="sm" onPress={() => setSelectedTab("sign-up")}>
+                        Sign up
+                      </Link>
+                    </p>
+                    <Button
+                      fullWidth
+                      color="primary"
+                      onClick={handleLogin}
+                      className="font-primaryRegular w-full bg-gradient-to-r from-[#060c2c] to-[#6366f1] text-white py-3 px-4 rounded-md hover:from-[#312e81] hover:to-[#4f46e5] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:ring-opacity-50"
+                    >
+                      Login
+                    </Button>
+                  </form>
+                </Tab>
+                <Tab key="sign-up" title="Sign up">
+                  <Tabs
                     fullWidth
-                    color="primary"
-                    onClick={handleLogin}
-                    className="font-primaryRegular w-full bg-gradient-to-r from-[#060c2c] to-[#6366f1] text-white py-3 px-4 rounded-md hover:from-[#312e81] hover:to-[#4f46e5] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:ring-opacity-50"
+                    size="md"
+                    aria-label="Signup Tabs"
+                    selectedKey={selectedRole}
+                    onSelectionChange={setSelectedRole}
+                    className="mb-1"
                   >
-                    Login
-                  </Button>
-                </form>
-              </Tab>
-              <Tab key="sign-up" title="Sign up">
-                <Tabs
-                  fullWidth
-                  size="md"
-                  aria-label="Signup Tabs"
-                  selectedKey={selectedRole}
-                  onSelectionChange={setSelectedRole}
-                  className="mb-1"
-                >
-                  <Tab key="user" title="User">
-                    <form className="space-y-3">
-                    <div className="flex space-x-2">
-  <Tooltip
-    content={<span style={{ color: 'black' }}>Firstname must contain only letters</span>}
-    placement="bottom"
-  >
-    <Input
-      isRequired
-      label="First Name"
-      placeholder="Enter your first name"
-      name="firstname"
-      value={formData.firstname}
-      onChange={handleInputChange}
-      color={validationErrors.firstname ? "error" : "default"}
-      className="max-w-full  flex-1"
-    
-    />
-  </Tooltip>
-  <Tooltip
-    content={<span style={{ color: 'black' }}>Lastname must contain only letters</span>}
-    placement="bottom"
-  >
-    <Input
-      isRequired
-      label="Last Name"
-      placeholder="Enter your last name"
-      name="lastname"
-      value={formData.lastname}
-      onChange={handleInputChange}
-      color={validationErrors.lastname ? "error" : "default"}
-      className="max-w-full  flex-1"
-      
-    />
-  </Tooltip>
-</div>
-                      <Input
-                        isRequired
-                        label="Username"
-                        placeholder="Choose a username"
-                        name="username"
-                        value={formData.username}
-                        onChange={handleInputChange}
-                        className="max-w-full "
-                        
-                      />
-                      <Tooltip
-                content={<span style={{ color: 'black' }}>{validationErrors.email}</span>}
-                isOpen={!!validationErrors.email}
-                color="error"
-              >
-                      <Input
-                        isRequired
-                        label="Email"
-                        placeholder="Enter your email"
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        color={validationErrors.email ? "error" : "default"}
-                        className="max-w-full "
-                        
-                      />
-                      </Tooltip>
-                      <Input
-                        isRequired
-                        label="Birthday"
-                        placeholder="Enter your birthday"
-                        name="birthday"
-                        type="date"
-                        value={formData.birthday}
-                        onChange={handleInputChange}
-                        max={maxDate}
-                        className="max-w-full "
-                        
-                      />
-                       <Tooltip
-                content={<span style={{ color: 'black' }}>{validationErrors.password}</span>}
-                isOpen={!!validationErrors.password}
-                color="error"
-              >
-                      <Input
-                        isRequired
-                        label="Password"
-                        placeholder="Create a password"
-                        name="password"
-                        type="password"
-                        value={formData.password}
-                        onChange={handleInputChange}
-                        color={validationErrors.password ? "error" : "default"}
-                        className="max-w-full "
-                        
-                      />
-                      </Tooltip>
-                      <Button
-                        fullWidth
-                        color="primary"
-                        onClick={handleSignUp}
-                        className="font-primaryRegular w-full bg-gradient-to-r from-[#060c2c] to-[#6366f1] text-white py-3 px-4 rounded-md hover:from-[#312e81] hover:to-[#4f46e5] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:ring-opacity-50"
-                      >
-                        Sign up as User
-                      </Button>
-                    </form>
-                  </Tab>
-                  <Tab key="developer" title="Developer">
-                    <form className="space-y-3">
-                    <div className="flex space-x-2">
-  <Tooltip
-    content={<span style={{ color: 'black' }}>Firstname must contain only letters</span>}
-    placement="bottom"
-  >
-    <Input
-      isRequired
-      label="First Name"
-      placeholder="Enter your first name"
-      name="firstname"
-      value={formData.firstname}
-      onChange={handleInputChange}
-      color={validationErrors.firstname ? "error" : "default"}
-      className="max-w-full text-sm flex-1"
-      size="sm"
-    />
-  </Tooltip>
-  <Tooltip
-    content={<span style={{ color: 'black' }}>Lastname must contain only letters</span>}
-    placement="bottom"
-  >
-    <Input
-      isRequired
-      label="Last Name"
-      placeholder="Enter your last name"
-      name="lastname"
-      value={formData.lastname}
-      onChange={handleInputChange}
-      color={validationErrors.lastname ? "error" : "default"}
-      className="max-w-full text-sm flex-1"
-      size="sm"
-    />
-  </Tooltip>
-</div>
-                      <Input
-                        isRequired
-                        label="Username"
-                        placeholder="Choose a username"
-                        name="username"
-                        value={formData.username}
-                        onChange={handleInputChange}
-                        className="max-w-full "
-                        
-                      />
-                      <Tooltip
-                content={<span style={{ color: 'black' }}>{validationErrors.email}</span>}
-                isOpen={!!validationErrors.email}
-                color="error"
-              >
-                      <Input
-                        isRequired
-                        label="Email"
-                        placeholder="Enter your email"
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        color={validationErrors.email ? "error" : "default"}
-                        className="max-w-full "
-                        
-                      />
-                      </Tooltip>
-                      <Input
-                        isRequired
-                        label="Birthday"
-                        placeholder="Enter your birthday"
-                        name="birthday"
-                        type="date"
-                        value={formData.birthday}
-                        onChange={handleInputChange}
-                        max={maxDate}
-                        className="max-w-full "
-                        
-                      />
-                      <Tooltip
-                content={<span style={{ color: 'black' }}>{validationErrors.password}</span>}
-                isOpen={!!validationErrors.password}
-                color="error"
-              >
-                      <Input
-                        isRequired
-                        label="Password"
-                        placeholder="Create a password"
-                        name="password"
-                        type="password"
-                        value={formData.password}
-                        onChange={handleInputChange}
-                        color={validationErrors.password ? "error" : "default"}
-                        className="max-w-full "
-                        
-                      />
-                      </Tooltip>
-                      <Tooltip
-                          content={<span style={{ color: 'black' }}>LinkedIn link should start with www.linkedin.com/</span>}
+                    <Tab key="user" title="User">
+                      <form className="space-y-3">
+                        <div className="flex space-x-2">
+                          <Tooltip
+                            content={
+                              <span style={{ color: "black" }}>
+                                Firstname must contain only letters
+                              </span>
+                            }
+                            placement="bottom"
+                          >
+                            <Input
+                              isRequired
+                              label="First Name"
+                              placeholder="Enter your first name"
+                              name="firstname"
+                              value={formData.firstname}
+                              onChange={handleInputChange}
+                              color={
+                                validationErrors.firstname ? "error" : "default"
+                              }
+                              className="max-w-full  flex-1"
+                            />
+                          </Tooltip>
+                          <Tooltip
+                            content={
+                              <span style={{ color: "black" }}>
+                                Lastname must contain only letters
+                              </span>
+                            }
+                            placement="bottom"
+                          >
+                            <Input
+                              isRequired
+                              label="Last Name"
+                              placeholder="Enter your last name"
+                              name="lastname"
+                              value={formData.lastname}
+                              onChange={handleInputChange}
+                              color={
+                                validationErrors.lastname ? "error" : "default"
+                              }
+                              className="max-w-full  flex-1"
+                            />
+                          </Tooltip>
+                        </div>
+                        <Input
+                          isRequired
+                          label="Username"
+                          placeholder="Choose a username"
+                          name="username"
+                          value={formData.username}
+                          onChange={handleInputChange}
+                          className="max-w-full "
+                        />
+                        <Tooltip
+                          content={
+                            <span style={{ color: "black" }}>
+                              {validationErrors.email}
+                            </span>
+                          }
+                          isOpen={!!validationErrors.email}
+                          color="error"
+                        >
+                          <Input
+                            isRequired
+                            label="Email"
+                            placeholder="Enter your email"
+                            name="email"
+                            type="email"
+                            value={formData.email}
+                            onChange={handleInputChange}
+                            color={validationErrors.email ? "error" : "default"}
+                            className="max-w-full "
+                          />
+                        </Tooltip>
+                        <Input
+                          isRequired
+                          label="Birthday"
+                          placeholder="Enter your birthday"
+                          name="birthday"
+                          type="date"
+                          value={formData.birthday}
+                          onChange={handleInputChange}
+                          max={maxDate}
+                          className="max-w-full "
+                        />
+                        <Tooltip
+                          content={
+                            <span style={{ color: "black" }}>
+                              {validationErrors.password}
+                            </span>
+                          }
+                          isOpen={!!validationErrors.password}
+                          color="error"
+                        >
+                          <Input
+                            isRequired
+                            label="Password"
+                            placeholder="Create a password"
+                            name="password"
+                            type="password"
+                            value={formData.password}
+                            onChange={handleInputChange}
+                            color={
+                              validationErrors.password ? "error" : "default"
+                            }
+                            className="max-w-full "
+                          />
+                        </Tooltip>
+                        <Button
+                          fullWidth
+                          color="primary"
+                          onClick={handleSignUp}
+                          className="font-primaryRegular w-full bg-gradient-to-r from-[#060c2c] to-[#6366f1] text-white py-3 px-4 rounded-md hover:from-[#312e81] hover:to-[#4f46e5] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:ring-opacity-50"
+                        >
+                          Sign up as User
+                        </Button>
+                      </form>
+                    </Tab>
+                    <Tab key="developer" title="Developer">
+                      <form className="space-y-3">
+                        <div className="flex space-x-2">
+                          <Tooltip
+                            content={
+                              <span style={{ color: "black" }}>
+                                Firstname must contain only letters
+                              </span>
+                            }
+                            placement="bottom"
+                          >
+                            <Input
+                              isRequired
+                              label="First Name"
+                              placeholder="Enter your first name"
+                              name="firstname"
+                              value={formData.firstname}
+                              onChange={handleInputChange}
+                              color={
+                                validationErrors.firstname ? "error" : "default"
+                              }
+                              className="max-w-full text-sm flex-1"
+                              size="sm"
+                            />
+                          </Tooltip>
+                          <Tooltip
+                            content={
+                              <span style={{ color: "black" }}>
+                                Lastname must contain only letters
+                              </span>
+                            }
+                            placement="bottom"
+                          >
+                            <Input
+                              isRequired
+                              label="Last Name"
+                              placeholder="Enter your last name"
+                              name="lastname"
+                              value={formData.lastname}
+                              onChange={handleInputChange}
+                              color={
+                                validationErrors.lastname ? "error" : "default"
+                              }
+                              className="max-w-full text-sm flex-1"
+                              size="sm"
+                            />
+                          </Tooltip>
+                        </div>
+                        <Input
+                          isRequired
+                          label="Username"
+                          placeholder="Choose a username"
+                          name="username"
+                          value={formData.username}
+                          onChange={handleInputChange}
+                          className="max-w-full "
+                        />
+                        <Tooltip
+                          content={
+                            <span style={{ color: "black" }}>
+                              {validationErrors.email}
+                            </span>
+                          }
+                          isOpen={!!validationErrors.email}
+                          color="error"
+                        >
+                          <Input
+                            isRequired
+                            label="Email"
+                            placeholder="Enter your email"
+                            name="email"
+                            type="email"
+                            value={formData.email}
+                            onChange={handleInputChange}
+                            color={validationErrors.email ? "error" : "default"}
+                            className="max-w-full "
+                          />
+                        </Tooltip>
+                        <Input
+                          isRequired
+                          label="Birthday"
+                          placeholder="Enter your birthday"
+                          name="birthday"
+                          type="date"
+                          value={formData.birthday}
+                          onChange={handleInputChange}
+                          max={maxDate}
+                          className="max-w-full "
+                        />
+                        <Tooltip
+                          content={
+                            <span style={{ color: "black" }}>
+                              {validationErrors.password}
+                            </span>
+                          }
+                          isOpen={!!validationErrors.password}
+                          color="error"
+                        >
+                          <Input
+                            isRequired
+                            label="Password"
+                            placeholder="Create a password"
+                            name="password"
+                            type="password"
+                            value={formData.password}
+                            onChange={handleInputChange}
+                            color={
+                              validationErrors.password ? "error" : "default"
+                            }
+                            className="max-w-full "
+                          />
+                        </Tooltip>
+                        <Tooltip
+                          content={
+                            <span style={{ color: "black" }}>
+                              LinkedIn link should start with www.linkedin.com/
+                            </span>
+                          }
                           placement="bottom"
                         >
-                      <Input
-                      
-  label="LinkedIn Link"
-  placeholder="Enter your LinkedIn URL (www.linkedin.com/)"
-  value={portfolioLink}
-  onChange={handlePortfolioLinkChange}
-  className="max-w-full "
-                       
-/>
-</Tooltip>
-                      <Button
-                        fullWidth
-                        color="secondary"
-                        onClick={handleSignUp}
-                        className="font-primaryRegular w-full bg-gradient-to-r from-[#6366f1] to-[#060c2c] text-white py-3 px-4 rounded-md hover:from-[#312e81] hover:to-[#4f46e5] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:ring-opacity-50"
-                      >
-                        Sign up as Developer
-                      </Button>
-                    </form>
-                  </Tab>
-                </Tabs>
-              </Tab>
-            </Tabs>
-            {alertMessage && (
-              <div className="mt-3 text-center text-red-500 text-sm">
-                {alertMessage}
-              </div>
-            )}
-          </CardBody>
-        </Card>
+                          <Input
+                            label="LinkedIn Link"
+                            placeholder="Enter your LinkedIn URL (www.linkedin.com/)"
+                            value={portfolioLink}
+                            onChange={handlePortfolioLinkChange}
+                            className="max-w-full "
+                          />
+                        </Tooltip>
+                        <Button
+                          fullWidth
+                          color="secondary"
+                          onClick={handleSignUp}
+                          className="font-primaryRegular w-full bg-gradient-to-r from-[#6366f1] to-[#060c2c] text-white py-3 px-4 rounded-md hover:from-[#312e81] hover:to-[#4f46e5] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:ring-opacity-50"
+                        >
+                          Sign up as Developer
+                        </Button>
+                      </form>
+                    </Tab>
+                  </Tabs>
+                </Tab>
+              </Tabs>
+              {alertMessage && (
+                <div className="mt-3 text-center text-red-500 text-sm">
+                  {alertMessage}
+                </div>
+              )}
+            </CardBody>
+          </Card>
+        </div>
       </div>
-    </div>
-    <Footer/>
+      <Footer />
     </div>
   );
 };
