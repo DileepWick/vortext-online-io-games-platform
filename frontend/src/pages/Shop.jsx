@@ -48,6 +48,7 @@ const MinimalistShop = () => {
         })
       );
     }
+
   }, [searchTerm, gameStocks]);
 
   const calculateDiscountedPrice = (originalPrice, discount) => {
@@ -55,6 +56,7 @@ const MinimalistShop = () => {
       ? originalPrice - (originalPrice * discount) / 100
       : originalPrice;
   };
+
 
   const LoadingSpinner = () => (
     <div className="flex justify-center items-center min-h-[400px]">
@@ -153,6 +155,7 @@ const MinimalistShop = () => {
       </div>
     );
   };
+
 
 
   if (loading) return (
