@@ -467,12 +467,8 @@ const GameDetails = () => {
           </div>
         </div>
 
-        {/* Ratings Section */}
+        {/* Ratings Section
         <div className="mt-12 bg-white rounded-lg p-6 lg:p-8">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-black mb-8 pb-4">
-            Ratings & Reviews
-          </h2>
-
           {user && user.role === "Review Manager" ? (
             <RatingSystemEditing
               gameId={id}
@@ -491,77 +487,8 @@ const GameDetails = () => {
               onUpdateRating={handleRateUpdate}
             />
           )}
-        </div>
+        </div> */}
       </div>
-
-      {/* Related Games Section */}
-      {relatedGameStocks.length > 0 && (
-        <div className="container mx-auto px-4 py-8">
-          <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 lg:p-8">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-8 text-center border-b border-gray-700 pb-4">
-              Related Editions
-            </h2>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {relatedGameStocks.map((stock) => (
-                <div
-                  key={stock._id}
-                  className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300"
-                >
-                  <img
-                    src={stock.AssignedGame.coverPhoto}
-                    alt={stock.AssignedGame.title}
-                    className="w-full h-48 sm:h-64 object-cover"
-                  />
-                  
-                  <div className="p-4 space-y-4">
-                    <h3 className="text-lg sm:text-xl font-bold text-white truncate">
-                      {stock.AssignedGame.title} {stock.Edition} Edition
-                    </h3>
-                    
-                    <Link
-                      to={`/game/${stock._id}`}
-                      className="block w-full bg-white text-black font-bold py-2 px-4 rounded text-center hover:bg-gray-200 transition-colors duration-200"
-                    >
-                      View Details
-                    </Link>
-                    
-                    <div className="space-y-2">
-                      <label className="block text-gray-300 text-sm font-medium">
-                        Quantity:
-                      </label>
-                      <input
-                        type="number"
-                        min="1"
-                        value={quantityByStockId[stock._id] || 1}
-                        onChange={(e) =>
-                          handleQuantityChange(stock._id, Number(e.target.value))
-                        }
-                        className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <button
-                        onClick={() => handleAddToCart(stock._id)}
-                        className="w-full bg-white text-black font-bold py-2 px-4 rounded hover:bg-gray-200 transition-colors duration-200"
-                      >
-                        Add to Cart
-                      </button>
-                      <button
-                        onClick={() => handleRent(stock.AssignedGame._id)}
-                        className="w-full bg-gray-700 text-white font-bold py-2 px-4 rounded hover:bg-gray-600 transition-colors duration-200 border border-gray-600"
-                      >
-                        Rent
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
       <Footer />
     </div>

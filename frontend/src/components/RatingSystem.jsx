@@ -49,13 +49,11 @@ const RatingSystem = ({
 
   return (
     <div
-      className="mt-4 rounded-lg shadow-lg bg-customDark"
+      className="mt-4 p-6 rounded-lg  bg-white"
     >
-      <h3 className="text-2xl font-primaryRegular text-white mb-6 bg-customDark">User Ratings</h3>
-
       {/* Main User Rating */}
-      <div className="flex items-center mb-6 bg-customDark">
-        <span className="text-5xl font-primaryRegular text-white mr-4">
+      <div className="flex items-center mb-6 bg-white">
+        <span className="text-5xl text-black mr-4">
           {isNaN(averageRating) ? "N/A" : averageRating.toFixed(1)}
         </span>
         <div className="flex">
@@ -108,7 +106,7 @@ const RatingSystem = ({
           value={comment}
           onChange={(e) => setComment(e.target.value)}
           placeholder="Write your review..."
-          className="mb-4"
+          className="mb-4 font-primaryRegular"
           css={{
             backgroundColor: "#333333",
             color: "#e0e0e0",
@@ -120,7 +118,7 @@ const RatingSystem = ({
         <Button
           onClick={handleSubmit}
           color="primary"
-          className="transition-colors duration-200"
+          className="font-primaryRegular"
           css={{
             backgroundColor: "#0056cc",
             hoverBackgroundColor: "#003399",
@@ -128,6 +126,7 @@ const RatingSystem = ({
             maxWidth: "200px",
           }}
           disabled={userRating === 0}
+          variant="ghost"
         >
           Submit Review
         </Button>
@@ -135,18 +134,18 @@ const RatingSystem = ({
 
       {/* User Reviews */}
       <div className="mt-10">
-        <h4 className="text-xl font-bold text-white mb-4 bg-customDark">User Reviews:</h4>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {ratings.map((rating, index) => (
             <div
               key={index}
-              className={`p-6 rounded-lg bg-black`}
+              className={`p-6 rounded-lg bg-white text-black shadow-lg`}
               cla
             >
               <div className="flex items-center mb-2">
                 <div className="flex">
                 <User
-                  className="cursor-pointer text-white"
+                  className="cursor-pointer text-black font-primaryRegular"
                   name={rating.user.username}
                   avatarProps={{
                     src: rating.user.profilePic,
@@ -170,12 +169,12 @@ const RatingSystem = ({
                 </div>
 
               </div>
-              <p className="text-white mb-4">{rating.comment}</p>
+              <p className="text-black mb-4">{rating.comment}</p>
               {userid === rating.user._id ? (
                 <div>
                   <div className={`${edit === index ? "block" : "hidden"}  `}>
                     <div className="mb-6">
-                      <h4 className="text-xl text-white mb-2">
+                      <h4 className="text-xl text-black mb-2">
                         Rate this game
                       </h4>
                       <div className="flex mb-4">
@@ -234,12 +233,6 @@ const RatingSystem = ({
                             onCancel();
                           }}
                           color="primary"
-                          className="transition-colors duration-200 bg-[#f5f5f5] text-[#6b7280]"
-                          css={{
-                            hoverBackgroundColor: "#003399",
-                            width: "100%",
-                            maxWidth: "200px",
-                          }}
                         >
                           Cancel
                         </Button>
@@ -261,7 +254,7 @@ const RatingSystem = ({
                 </div>
               ) : (
                 <a href="#" className="text-blue-400 hover:underline">
-                  Read Full Review
+                  
                 </a>
               )}
             </div>
