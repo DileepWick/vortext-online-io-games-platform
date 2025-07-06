@@ -1,8 +1,13 @@
+import dotenv from "dotenv";
+
+dotenv.config();
+
 import express from 'express';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
+
 const GPTRouter = express.Router();
-const apiKey = "AIzaSyCBDy3_sMwyBcuoXrb3xdJoUrCnV2XZ21A";
+const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
 
 // Create the generative model
