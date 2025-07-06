@@ -385,7 +385,7 @@ const Profile = () => {
             </ModalHeader>
             <ModalBody className="py-4">
               <p className="text-black text-sm sm:text-base">
-                Are you sure you want to delete your account? This action cannot be undone.
+                Are you sure you want to delete your account ? This action cannot be undone.
               </p>
             </ModalBody>
             <ModalFooter className="pt-2 gap-2">
