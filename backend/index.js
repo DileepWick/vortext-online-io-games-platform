@@ -4,12 +4,14 @@ import { mongoDBURL } from "./config.js";
 import mongoose from "mongoose";
 import cors from "cors";
 import { createServer } from "http";
+const serverless = require('serverless-http');
 import { Server } from "socket.io";
 
 import GPTRouter from "./routes/gpt_route.js";
 import session from "express-session";
 import passport from "passport";
 import "./middleware/passport.js"; // Import passport middleware
+
 //Route files
 import userRouter from "./routes/userAuthenticationRoutes.js";
 import gameRouter from "./routes/game_Routes.js";
@@ -161,16 +163,6 @@ mongoose
   .connect(mongoDBURL)
   .then(() => {
     console.log("Database connected.");
-
-    // Root Configuration
-    app.get("/", (request, response) => {
-      response.status(200).send("Welcome to my game shop.");
-    });
-
-    // Configure app to run in port
-    server.listen(PORT, () =>
-      console.log(`Server running on http://localhost:${PORT}`)
-    );
   })
   .catch((error) => {
     console.error("Error connecting to MongoDB:", error);
@@ -178,7 +170,6 @@ mongoose
 
 //Routes
 app.use("/users", userRouter);
-
 app.use("/games", gameRouter);
 app.use("/gameCategories", GameCategoryRouter);
 app.use("/gameStocks", gameStockRouter);
@@ -189,7 +180,6 @@ app.use("/orderItems", OrderItemsRouter);
 app.use("/articles", articleRouter);
 app.use("/feed", postRouter);
 app.use("/spookeyEditons", spookeyRouter);
-
 app.use("/faq", faqRouter);
 app.use("/community", CommunityPost);
 app.use("/ratings", ratingRouter);
@@ -211,7 +201,8 @@ export { io, activeUsers };
 
 app.use("/auth", userRouter);
 
-app.get("/", (req, res) => {
-  res.send('<a href="/auth/google">Login with Google</a>');
+// Example route to test the server
+app.get('/api/hello', (req, res) => {
+  res.json({ message: 'Hello from Express on Vercel!' });
 });
 
