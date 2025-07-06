@@ -109,6 +109,5 @@ app.use("/api", GPTRouter);
 app.use("/contacts", contactRouter);
 app.use("/api/messages", messageRoutes); // Changed the path to "/api/messages"
 app.use("/notifications", NotificationRouter);
-
 app.use("/api/distributed-payments", distributedPaymentRoutes);
 app.use("/api/rock-paper-scissors", rockPaperScissorsRouter);
