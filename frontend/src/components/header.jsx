@@ -72,7 +72,6 @@ const Header = forwardRef((props, ref) => {
     setIsMenuOpen(false);
   };
 
-
   const handleMenuItemClick = (path) => {
     navigate(path);
     setIsMenuOpen(false);
@@ -93,15 +92,21 @@ const Header = forwardRef((props, ref) => {
 
   const getRoleBasedMenuItems = () => {
     const roleItems = [];
-    
+
     if (user?.role === "developer") {
-      roleItems.push({ name: "Developer Dashboard", path: "/GamedeveloperDashboard" });
+      roleItems.push({
+        name: "Developer Dashboard",
+        path: "/GamedeveloperDashboard",
+      });
     }
     if (user?.role === "Product Manager") {
       roleItems.push({ name: "Products Dashboard", path: "/productDashboard" });
     }
     if (user?.role === "User Manager") {
-      roleItems.push({ name: "User Management", path: "/UserManagementDashboard" });
+      roleItems.push({
+        name: "User Management",
+        path: "/UserManagementDashboard",
+      });
     }
     if (user?.role === "Order Manager") {
       roleItems.push({ name: "Order Management", path: "/ordersDashboard" });
@@ -113,7 +118,10 @@ const Header = forwardRef((props, ref) => {
       roleItems.push({ name: "Session Dashboard", path: "/sessionDashboard" });
     }
     if (user?.role === "Community Manager") {
-      roleItems.push({ name: "Community Dashboard", path: "/CommunityDashBoard" });
+      roleItems.push({
+        name: "Community Dashboard",
+        path: "/CommunityDashBoard",
+      });
     }
     if (user?.role === "Review Manager") {
       roleItems.push({ name: "Review Dashboard", path: "/review_dashboard" });
@@ -125,7 +133,10 @@ const Header = forwardRef((props, ref) => {
       roleItems.push({ name: "Manage Staff", path: "/staffManager" });
     }
     if (user?.role === "Payment Manager") {
-      roleItems.push({ name: "Payment Management Dashboard", path: "/Payment_manager_dashboard" });
+      roleItems.push({
+        name: "Payment Management Dashboard",
+        path: "/Payment_manager_dashboard",
+      });
     }
 
     return roleItems;
@@ -133,7 +144,7 @@ const Header = forwardRef((props, ref) => {
 
   return (
     <div className="text-black">
-      <Navbar 
+      <Navbar
         onMenuOpenChange={setIsMenuOpen}
         isMenuOpen={isMenuOpen}
         className="bg-white font-primaryRegular"
@@ -154,32 +165,47 @@ const Header = forwardRef((props, ref) => {
         {/* Desktop Navigation */}
         <NavbarContent className="hidden sm:flex gap-4" justify="center">
           <NavbarItem className="mr-4">
-            <Link color="foreground" href="/shop" className="text-black hover:underline">
+            <Link
+              color="foreground"
+              href="/shop"
+              className="text-black hover:underline"
+            >
               Shop
             </Link>
           </NavbarItem>
           <NavbarItem className="mr-4">
-
-            <Link color="foreground" href="/articles" className="text-black hover:underline">
+            <Link
+              color="foreground"
+              href="/articles"
+              className="text-black hover:underline"
+            >
               Community
             </Link>
           </NavbarItem>
           <NavbarItem className="mr-4">
-            <Link color="foreground" href="/chat" className="text-black hover:underline">
+            <Link
+              color="foreground"
+              href="/chat"
+              className="text-black hover:underline"
+            >
               Chat
             </Link>
           </NavbarItem>
           <NavbarItem className="mr-4">
-
-            <Link href="/TailoredGames" color="foreground" className="text-black hover:underline">
+            <Link
+              href="/TailoredGames"
+              color="foreground"
+              className="text-black hover:underline"
+            >
               Our Games
             </Link>
           </NavbarItem>
-          
+
           <Dropdown placement="bottom-start" className="dark text-white">
             <DropdownTrigger>
-
-              <NavbarItem className="cursor-pointer text-black">Support</NavbarItem>
+              <NavbarItem className="cursor-pointer text-black">
+                Support
+              </NavbarItem>
             </DropdownTrigger>
             <DropdownMenu
               aria-label="Support Actions"
@@ -190,7 +216,6 @@ const Header = forwardRef((props, ref) => {
                 key="support"
                 onClick={() => navigate("/support")}
                 className="text-white "
-
               >
                 Vortex Support
               </DropdownItem>
@@ -198,7 +223,6 @@ const Header = forwardRef((props, ref) => {
                 key="contactus"
                 onClick={() => navigate("/support#contactForm")}
                 className="text-white"
-
               >
                 Contact Us
               </DropdownItem>
@@ -218,7 +242,6 @@ const Header = forwardRef((props, ref) => {
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
-
         </NavbarContent>
 
         {/* User Profile or Login */}
@@ -228,7 +251,7 @@ const Header = forwardRef((props, ref) => {
               <DropdownTrigger>
                 <User
                   className="cursor-pointer"
-                  name={user.username}
+                  name={user.firstname + " " + user.lastname}
                   description={user.role}
                   avatarProps={{
                     src: user.profilePic,
@@ -260,11 +283,10 @@ const Header = forwardRef((props, ref) => {
                 >
                   Rentals
                 </DropdownItem>
-                <DropdownItem 
-                  key="cart" 
+                <DropdownItem
+                  key="cart"
                   onClick={() => navigate("/cartItems")}
                   className="text-white hover:bg-gray-800"
-
                 >
                   My Cart
                 </DropdownItem>
@@ -335,7 +357,6 @@ const Header = forwardRef((props, ref) => {
                   <DropdownItem
                     key="community-panel"
                     onClick={() => navigate("/CommunityDashBoard")}
-
                     className="text-white hover:bg-gray-800"
                   >
                     Community Dashboard
@@ -345,7 +366,6 @@ const Header = forwardRef((props, ref) => {
                   <DropdownItem
                     key="Review-panel"
                     onClick={() => navigate("/review_dashboard")}
-
                     className="text-white hover:bg-gray-800"
                   >
                     Review Dashboard
@@ -373,9 +393,7 @@ const Header = forwardRef((props, ref) => {
                   <DropdownItem
                     key="manage-payment"
                     onClick={() => navigate("/Payment_manager_dashboard")}
-
                     className="text-white hover:bg-gray-800"
-
                   >
                     Payment Management Dashboard
                   </DropdownItem>
@@ -385,7 +403,6 @@ const Header = forwardRef((props, ref) => {
                   className="text-white hover:bg-gray-800"
                   color="danger"
                   onClick={handleLogout}
-
                 >
                   Log Out
                 </DropdownItem>
