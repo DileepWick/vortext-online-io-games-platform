@@ -189,7 +189,7 @@ const Blogger = () => {
   };
 
   return (
-    <div className="flex w-full flex-col text-black bg-white">
+    <div className="flex w-full flex-col dark text-white bg-black h-screen">
       <div className="relative">
         <Header />
       </div>
@@ -199,21 +199,15 @@ const Blogger = () => {
           className="flex-1 mt-8"
           onSelectionChange={setActiveTab}
           selectedKey={activeTab}
-          size="lg"
+          size="sm"
           variant="bordered"
           color="primary"
         >
-          <Tab key="analytics" title="Analytics" />
           <Tab key="products" title="All Games" />
           <Tab key="stock" title="Published Games" />
         </Tabs>
       </div>
       <div className="p-4">
-        {activeTab === "analytics" && (
-          <div className="bg-white flex flex-col min-h-screen">
-            <Analytics/>
-          </div>
-        )}
         {/*PRODUCTS*/}
         {activeTab === "products" && (
           <>
@@ -308,7 +302,7 @@ const Blogger = () => {
                             className="text-lg text-default-400 cursor-pointer active:opacity-20"
                             onClick={() => handleEditIconClick(game)}
                           >
-                            <EditIcon />
+                            <EditIcon size="sm" />
                           </span>
                         </Tooltip>
                         <Tooltip
@@ -334,6 +328,7 @@ const Blogger = () => {
                           <Button
                             color="primary"
                             variant="ghost"
+                            size="sm"
                             onClick={() => handleAddNewStock(game)}
                           >
                             Publish

@@ -61,19 +61,21 @@ const CreatePostModal = ({ isOpen, onClose, onSubmit, user }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-gray-800 rounded-lg shadow-md p-6 w-full max-w-lg">
-        <h2 className="text-2xl font-bold mb-4 text-white">Create Post</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50 p-4">
+      <div className="bg-white border-2 border-black rounded-lg shadow-2xl p-4 sm:p-6 md:p-8 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-black border-b-2 border-black pb-2 font-primaryRegular">
+          Create Post
+        </h2>
         <form onSubmit={handleSubmit}>
-          <div className="flex items-center mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center mb-4 sm:mb-6">
             {user && (
-              <User
-                avatarProps={{
-                  src: user.profilePic,
-                  size: "sm",
-                }}
-                className="mr-3"
-              />
+              <div className="mb-3 sm:mb-0 sm:mr-4 w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-black overflow-hidden self-center sm:self-auto">
+                <img
+                  src={user.profilePic}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              </div>
             )}
             <Input
               type="text"
@@ -81,11 +83,14 @@ const CreatePostModal = ({ isOpen, onClose, onSubmit, user }) => {
               value={heading}
               onChange={(e) => setHeading(e.target.value)}
               placeholder="What's on your mind?"
-              className="w-full"
+              className="w-full border-2 border-black rounded-lg p-2 sm:p-3 bg-white text-black placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-black font-primaryRegular text-sm sm:text-base"
             />
           </div>
-          <div className="mb-4">
-            <Label htmlFor="articleBody" className="mb-2 block text-white">
+          <div className="mb-4 sm:mb-6">
+            <Label
+              htmlFor="articleBody"
+              className="mb-2 block text-black font-semibold font-primaryRegular text-sm sm:text-base"
+            >
               Write something...
             </Label>
             <textarea
@@ -93,12 +98,15 @@ const CreatePostModal = ({ isOpen, onClose, onSubmit, user }) => {
               value={articleBody}
               onChange={(e) => setArticleBody(e.target.value)}
               placeholder="Share your thoughts..."
-              className="w-full border border-gray-600 bg-gray-700 text-white rounded-lg p-2 min-h-[100px] focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-200"
+              className="w-full border-2 border-black bg-white text-black placeholder-gray-600 rounded-lg p-2 sm:p-3 min-h-[100px] sm:min-h-[120px] focus:outline-none focus:ring-2 focus:ring-black transition duration-200 font-primaryRegular text-sm sm:text-base"
               rows="4"
             ></textarea>
           </div>
-          <div className="mb-4">
-            <Label htmlFor="image" className="mb-2 block text-white">
+          <div className="mb-4 sm:mb-6">
+            <Label
+              htmlFor="image"
+              className="mb-2 block text-black font-semibold font-primaryRegular text-sm sm:text-base"
+            >
               Add to your post
             </Label>
             <div className="relative">
@@ -110,20 +118,29 @@ const CreatePostModal = ({ isOpen, onClose, onSubmit, user }) => {
               />
               <label
                 htmlFor="image"
-                className="flex items-center justify-center w-full px-4 py-2 bg-gray-700 text-gray-200 rounded-lg cursor-pointer hover:bg-gray-600 transition duration-200"
+                className="flex items-center justify-center w-full px-3 py-2 sm:px-4 sm:py-3 bg-white border-2 border-black text-black rounded-lg cursor-pointer hover:bg-gray-100 transition duration-200 font-primaryRegular text-sm sm:text-base"
               >
-                <FaImage className="mr-2" />
-                {image ? image.name : "Choose an image"}
+                <FaImage className="mr-2 text-black" />
+                <span className="font-medium truncate">
+                  {image ? image.name : "Choose an image"}
+                </span>
               </label>
             </div>
           </div>
-          <div className="flex justify-end space-x-2">
-            <Button onClick={onClose} color="danger">
+          <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-full sm:w-auto px-4 py-2 sm:px-6 border-2 border-black bg-white text-black rounded-lg hover:bg-black hover:text-white transition duration-200 font-medium font-primaryRegular text-sm sm:text-base"
+            >
               Cancel
-            </Button>
-            <Button type="submit" color="primary">
+            </button>
+            <button
+              type="submit"
+              className="w-full sm:w-auto px-4 py-2 sm:px-6 bg-black text-white rounded-lg hover:bg-gray-800 transition duration-200 font-medium font-primaryRegular text-sm sm:text-base"
+            >
               Post
-            </Button>
+            </button>
           </div>
         </form>
       </div>
@@ -173,58 +190,20 @@ const Articles = () => {
       const response = await axios.get(
         "http://localhost:8098/articles/getAllArticles"
       );
-
-      // Handle different response structures
-      let fetchedArticles = [];
-      if (response.data && response.data.articles) {
-        fetchedArticles = response.data.articles;
-      } else if (response.data && Array.isArray(response.data)) {
-        fetchedArticles = response.data;
-      } else {
-        // If no articles property or unexpected structure, default to empty array
-        fetchedArticles = [];
-      }
-
+      const fetchedArticles = response.data.articles;
       setArticles(fetchedArticles);
 
-      // Only process liked articles if there are articles
-      if (fetchedArticles.length > 0) {
-        const likedArticlesObj = {};
-        fetchedArticles.forEach((article) => {
-          if (article.likedBy && article.likedBy.includes(userId)) {
-            likedArticlesObj[article._id] = true;
-          }
-        });
-        setLikedArticles(likedArticlesObj);
-      }
+      const likedArticlesObj = {};
+      fetchedArticles.forEach((article) => {
+        if (article.likedBy.includes(userId)) {
+          likedArticlesObj[article._id] = true;
+        }
+      });
+      setLikedArticles(likedArticlesObj);
 
       setLoading(false);
     } catch (err) {
-      console.error("Error fetching articles:", err);
-
-      // Check if it's a network error or server error
-      if (err.response) {
-        // Server responded with error status
-        if (err.response.status === 404) {
-          // Handle 404 - no articles found
-          setArticles([]);
-          setLoading(false);
-          return;
-        } else if (err.response.status >= 500) {
-          setError("Server error. Please try again later.");
-        } else {
-          setError("Error fetching articles. Please try again.");
-        }
-      } else if (err.request) {
-        // Network error
-        setError("Network error. Please check your connection and try again.");
-      } else {
-        // Other error
-        setError("An unexpected error occurred. Please try again.");
-      }
-
-      // Set empty articles array and stop loading even on error
-      setArticles([]);
+      setError("Error fetching articles");
       setLoading(false);
     }
   };
@@ -479,246 +458,207 @@ const Articles = () => {
     return <Loader />;
   }
 
+  if (error) {
+    return (
+      <div className="text-center mt-10 text-black bg-white min-h-screen flex items-center justify-center font-bold text-lg sm:text-xl font-primaryRegular px-4">
+        {error}
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-customDark min-h-screen text-white font-sans">
-      <BackgroundBeams />
-      <TracingBeam>
-        <Header />
+    <div className="bg-white min-h-screen text-black font-primaryRegular">
+      <Header />
 
-        <div className="container mx-auto p-4">
-          <Button
-            onClick={() => setIsModalOpen(true)}
-            color="primary"
-            className="mb-6 font-primaryRegular"
-          >
-            Create New Post
-          </Button>
+      <div className="container mx-auto p-4 sm:p-6">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="mb-6 sm:mb-8 w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition duration-200 font-semibold text-base sm:text-lg border-2 border-black font-primaryRegular"
+        >
+          Create New Post
+        </button>
 
-          <CreatePostModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            onSubmit={handleSubmit}
-            user={user}
-          />
+        <CreatePostModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={handleSubmit}
+          user={user}
+        />
 
-          {error && (
-            <div className="bg-red-900 border border-red-500 text-red-200 px-4 py-3 rounded mb-6">
-              <div className="flex items-center">
-                <svg
-                  className="w-5 h-5 mr-2"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="font-primaryRegular">{error}</span>
-              </div>
-              <button
-                onClick={() => setError("")}
-                className="mt-2 text-sm underline font-primaryRegular"
+        <h2 className="font-primaryRegular text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8 text-black border-b-4 border-black pb-2">
+          Posts
+        </h2>
+        {articles.length === 0 ? (
+          <div className="text-center mt-20 text-gray-600 text-lg sm:text-xl font-primaryRegular px-4">
+            No articles found.
+          </div>
+        ) : (
+          <div className="space-y-6 sm:space-y-8">
+            {articles.map((article) => (
+              <div
+                key={article._id}
+                className="bg-white border-2 sm:border-4 border-black rounded-lg shadow-2xl p-4 sm:p-6 relative"
               >
-                Dismiss
-              </button>
-            </div>
-          )}
-
-          <h2 className="text-3xl font-primaryRegular mb-6">Posts</h2>
-          {articles.length === 0 ? (
-            <div className="text-center mt-10">
-              <div className="bg-gray-800 rounded-lg p-8 max-w-md mx-auto">
-                <div className="text-gray-400 mb-4">
-                  <svg
-                    className="w-16 h-16 mx-auto mb-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                {article.uploader._id === userId && (
+                  <button
+                    className="absolute top-2 right-2 sm:top-4 sm:right-4 flex items-center justify-center space-x-1 sm:space-x-2 text-black hover:text-gray-600 border-2 border-black rounded-lg px-2 py-1 sm:px-3 sm:py-2 bg-white hover:bg-gray-100 transition duration-200 font-primaryRegular text-sm sm:text-base"
+                    onClick={() => handleDeleteArticle(article._id)}
+                    disabled={deletingArticleId === article._id}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                    {deletingArticleId === article._id ? (
+                      <span className="text-xs sm:text-sm font-medium">
+                        Deleting...
+                      </span>
+                    ) : (
+                      <>
+                        <FaTrash className="inline-block" size={12} />
+                        <span className="font-medium hidden sm:inline">
+                          Delete
+                        </span>
+                      </>
+                    )}
+                  </button>
+                )}
+
+                {article.uploader._id !== userId && (
+                  <button
+                    className="absolute top-2 right-2 sm:top-4 sm:right-4 flex items-center justify-center space-x-1 sm:space-x-2 border-2 border-black rounded-lg px-2 py-1 sm:px-3 sm:py-2 bg-white hover:bg-gray-100 transition duration-200 font-primaryRegular text-sm sm:text-base"
+                    onClick={() => handleReportArticle(article._id)}
+                    disabled={reportingArticleId === article._id}
+                  >
+                    {reportingArticleId === article._id ? (
+                      <span className="font-medium text-xs sm:text-sm">
+                        Reporting...
+                      </span>
+                    ) : (
+                      <>
+                        <FaFlag className="inline-block" size={12} />
+                        <span className="font-medium hidden sm:inline">
+                          Report
+                        </span>
+                      </>
+                    )}
+                  </button>
+                )}
+
+                <div className="flex flex-col lg:flex-row mb-4 sm:mb-6 pt-8 sm:pt-0">
+                  <div className="flex-shrink-0 w-full lg:w-1/3 mb-4 lg:mb-0 lg:pr-6">
+                    <img
+                      src={article.image}
+                      alt={article.heading}
+                      className="w-full h-[200px] sm:h-[250px] lg:h-[300px] object-cover rounded-lg border-2 border-black"
                     />
-                  </svg>
+                  </div>
+                  <div className="flex-grow">
+                    <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-3 sm:mb-4 lg:mb-6 text-black border-b-2 border-black pb-2 font-primaryRegular">
+                      {article.heading}
+                    </h3>
+                    <p className="text-gray-800 font-medium text-sm sm:text-base lg:text-lg leading-relaxed mb-4 sm:mb-6 font-primaryRegular">
+                      {article.articleBody}
+                    </p>
+                    <div className="flex items-center mt-4 sm:mt-6">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-full border-2 border-black overflow-hidden mr-3 sm:mr-4">
+                        <img
+                          src={article.uploader.profilePic}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div>
+                        <p className="font-bold text-sm sm:text-base lg:text-lg text-black font-primaryRegular">
+                          {article.uploader.username}
+                        </p>
+                        <p className="text-gray-600 font-medium text-xs sm:text-sm font-primaryRegular">
+                          {article.uploader.role}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <h3 className="text-xl font-primaryRegular mb-2 text-white">
-                  No Posts Yet
-                </h3>
-                <p className="text-gray-400 font-primaryRegular mb-4">
-                  Be the first to share something! Click the "Create New Post"
-                  button to get started.
-                </p>
-                <Button
-                  onClick={() => setIsModalOpen(true)}
-                  color="primary"
-                  className="font-primaryRegular"
-                >
-                  Create Your First Post
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {articles.map((article) => (
-                <div
-                  key={article._id}
-                  className="bg-black rounded-lg shadow-md p-4 relative"
-                >
-                  {article.uploader._id === userId && (
+
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-4 sm:mt-6 border-t-2 border-black pt-4 space-y-3 sm:space-y-0">
+                  <div className="flex items-center w-full sm:w-auto">
                     <button
-                      className="absolute top-2 right-2 flex items-center justify-center space-x-1 text-red-500 hover:text-red-400"
-                      onClick={() => handleDeleteArticle(article._id)}
-                      disabled={deletingArticleId === article._id}
+                      onClick={() => handleLikeToggle(article._id)}
+                      className="flex items-center space-x-2 px-3 py-2 sm:px-4 border-2 border-black rounded-lg bg-white hover:bg-gray-100 transition duration-200"
                     >
-                      {deletingArticleId === article._id ? (
-                        <span className="text-sm">Deleting...</span>
+                      {likedArticles[article._id] ? (
+                        <FaHeart className="text-black text-lg sm:text-xl" />
                       ) : (
-                        <>
-                          <FaTrash className="inline-block" size={16} />
-                          <span>Delete</span>
-                        </>
+                        <FaRegHeart className="text-black text-lg sm:text-xl" />
                       )}
                     </button>
-                  )}
-
-                  {article.uploader._id !== userId && (
-                    <Button
-                      className="absolute top-2 right-2 flex items-center justify-center space-x-1 "
-                      onClick={() => handleReportArticle(article._id)}
-                      disabled={reportingArticleId === article._id}
-                    >
-                      {reportingArticleId === article._id ? (
-                        <span className="font-primaryRegular text-[20px]">
-                          Reporting...
-                        </span>
-                      ) : (
-                        <>
-                          <FaFlag
-                            className="inline-block text-[40px]"
-                            size={16}
-                          />
-                          <span className="font-primaryRegular text-[20px]">
-                            Report
-                          </span>
-                        </>
-                      )}
-                    </Button>
-                  )}
-
-                  <div className="flex mb-4">
-                    <div className="flex-shrink-0 w-1/3 pr-4">
-                      <img
-                        src={article.image}
-                        alt={article.heading}
-                        className="w-[500px] h-[300px] object-cover rounded"
-                      />
-                    </div>
-                    <div className="flex-grow">
-                      <h3 className="text-[30px] font-primaryRegular mb-8">
-                        {article.heading}
-                      </h3>
-                      <p className="text-white font-primaryRegular">
-                        {article.articleBody}
-                      </p>
-                      <User
-                        avatarProps={{
-                          src: article.uploader.profilePic,
-                          size: "lg",
-                        }}
-                        name={article.uploader.username}
-                        description={article.uploader.role}
-                        className="mr-3 mt-8 scale-120 font-primaryRegular text-[20px]"
-                      />
-                    </div>
+                    <span className="font-bold text-sm sm:text-base lg:text-lg ml-3 sm:ml-4 text-black font-primaryRegular">
+                      {article.likes} Likes
+                    </span>
                   </div>
+                  <button
+                    onClick={() => toggleComments(article._id)}
+                    className="flex items-center space-x-2 px-3 py-2 sm:px-4 border-2 border-black rounded-lg bg-white hover:bg-gray-100 transition duration-200 w-full sm:w-auto justify-center sm:justify-start"
+                  >
+                    <FaComments className="text-black text-lg sm:text-xl" />
+                    <span className="font-bold text-sm sm:text-base lg:text-lg font-primaryRegular">
+                      {article.comments.length} Comments
+                    </span>
+                  </button>
+                </div>
 
-                  <div className="flex justify-between items-center mt-4">
-                    <div className="flex items-center">
-                      <Button
-                        onClick={() => handleLikeToggle(article._id)}
-                        color="danger"
-                        size="md"
-                      >
-                        {likedArticles[article._id] ? (
-                          <FaHeart
-                            className="text-red-500 mr-2 text-[40px]"
-                            fill="white"
-                            stroke="currentColor"
-                            strokeWidth="30"
-                          />
-                        ) : (
-                          <FaRegHeart className="text-white mr-2 text-[40px]" />
-                        )}
-                      </Button>
-                      <span className="font-primaryRegular text-[20px] ml-4">
-                        {article.likes} Likes
-                      </span>
-                    </div>
-                    <Button
-                      onClick={() => toggleComments(article._id)}
-                      variant="ghost"
-                      color="primary"
-                      className="flex items-center"
+                {expandedComments[article._id] && (
+                  <div className="mt-4 sm:mt-6 border-t-2 border-black pt-4 sm:pt-6">
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        handleCommentSubmit(article._id);
+                      }}
                     >
-                      <FaComments className="mr-2 text-[40px]" />
-                      <span className="font-primaryRegular text-[20px]">
-                        {article.comments.length} Comments
-                      </span>
-                    </Button>
-                  </div>
-
-                  {expandedComments[article._id] && (
-                    <div className="mt-4">
-                      <form
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          handleCommentSubmit(article._id);
-                        }}
+                      <textarea
+                        value={commentTexts[article._id] || ""}
+                        onChange={(e) =>
+                          handleCommentChange(article._id, e.target.value)
+                        }
+                        placeholder="Add a comment..."
+                        className="w-full mb-3 sm:mb-4 p-2 sm:p-3 border-2 border-black rounded-lg bg-white text-black placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-black font-medium font-primaryRegular text-sm sm:text-base"
+                        rows="3"
+                      />
+                      <button
+                        type="submit"
+                        className="w-full sm:w-auto px-4 py-2 sm:px-6 bg-black text-white rounded-lg hover:bg-gray-800 transition duration-200 font-medium font-primaryRegular text-sm sm:text-base"
+                        disabled={
+                          !commentTexts[article._id] ||
+                          commentTexts[article._id].trim() === ""
+                        }
                       >
-                        <Textarea
-                          type="text"
-                          value={commentTexts[article._id] || ""}
-                          onChange={(e) =>
-                            handleCommentChange(article._id, e.target.value)
-                          }
-                          placeholder="Add a comment..."
-                          className="w-full mb-2 font-primaryRegular"
-                        />
-                        <Button
-                          type="submit"
-                          color="primary"
-                          className=" font-primaryRegular"
-                          disabled={
-                            !commentTexts[article._id] ||
-                            commentTexts[article._id].trim() === ""
-                          }
+                        Comment
+                      </button>
+                    </form>
+
+                    <div className="mt-4 sm:mt-6 space-y-3 sm:space-y-4">
+                      {article.comments.map((comment) => (
+                        <div
+                          key={comment._id}
+                          className="bg-gray-100 border-2 border-black p-3 sm:p-4 rounded-lg"
                         >
-                          Comment
-                        </Button>
-                      </form>
-
-                      <div className="mt-4 space-y-2 flex flex-wrap gap-[20px]">
-                        {article.comments.map((comment) => (
-                          <div
-                            key={comment._id}
-                            className="bg-gray-900 p-2 rounded-lg flex justify-between items-start "
-                          >
+                          <div className="flex flex-col sm:flex-row justify-between items-start">
                             <div className="w-full">
-                              <div className="flex items-center mb-1 font-primaryRegular">
+                              <div className="flex items-center mb-2 sm:mb-3">
                                 {comment.user && (
-                                  <User
-                                    avatarProps={{
-                                      src: comment.user.profilePic,
-                                      size: "lg",
-                                    }}
-                                    name={comment.user.username}
-                                    className="mr-2"
-                                    description={comment.user.role}
-                                  />
+                                  <>
+                                    <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-full border-2 border-black overflow-hidden mr-2 sm:mr-3">
+                                      <img
+                                        src={comment.user.profilePic}
+                                        alt="Profile"
+                                        className="w-full h-full object-cover"
+                                      />
+                                    </div>
+                                    <div>
+                                      <p className="font-bold text-black font-primaryRegular text-sm sm:text-base">
+                                        {comment.user.username}
+                                      </p>
+                                      <p className="text-gray-600 text-xs sm:text-sm font-primaryRegular">
+                                        {comment.user.role}
+                                      </p>
+                                    </div>
+                                  </>
                                 )}
                               </div>
                               {editingCommentId === comment._id ? (
@@ -732,60 +672,58 @@ const Articles = () => {
                                     );
                                   }}
                                 >
-                                  <Textarea
-                                    type="text"
+                                  <textarea
                                     value={editedCommentText}
                                     onChange={(e) =>
                                       setEditedCommentText(e.target.value)
                                     }
-                                    className="w-full mb-2 font-primaryRegular"
+                                    className="w-full mb-2 sm:mb-3 p-2 border-2 border-black rounded-lg bg-white text-black font-medium font-primaryRegular text-sm sm:text-base"
+                                    rows="3"
                                   />
-                                  <div>
-                                    <Button
+                                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                                    <button
                                       type="submit"
-                                      color="primary"
-                                      className="text-white font-primaryRegular mr-2"
+                                      className="w-full sm:w-auto px-3 py-2 sm:px-4 bg-black text-white rounded-lg hover:bg-gray-800 transition duration-200 font-medium font-primaryRegular text-sm sm:text-base"
                                     >
                                       Update
-                                    </Button>
-                                    <Button
+                                    </button>
+                                    <button
                                       type="button"
                                       onClick={() => {
                                         setEditingCommentId(null);
                                         setEditedCommentText("");
                                       }}
-                                      color="danger"
-                                      className=" text-white font-primaryRegular"
+                                      className="w-full sm:w-auto px-3 py-2 sm:px-4 border-2 border-black bg-white text-black rounded-lg hover:bg-gray-100 transition duration-200 font-medium font-primaryRegular text-sm sm:text-base"
                                     >
                                       Cancel
-                                    </Button>
+                                    </button>
                                   </div>
                                 </form>
                               ) : (
-                                <p className="text-md font-primaryRegular">
+                                <p className="text-black font-medium text-sm sm:text-base leading-relaxed font-primaryRegular">
                                   {comment.text}
                                 </p>
                               )}
                               {comment.editedAt && (
-                                <p className="text-xs text-gray-500 mt-1 font-primaryRegular">
+                                <p className="text-xs sm:text-sm text-gray-500 mt-2 font-medium font-primaryRegular">
                                   (Edited:{" "}
                                   {new Date(comment.editedAt).toLocaleString()})
                                 </p>
                               )}
                             </div>
                             {comment.user && comment.user._id === userId && (
-                              <div className="flex">
+                              <div className="flex space-x-2 mt-2 sm:mt-0 sm:ml-4">
                                 <button
-                                  className="text-blue-500 hover:text-blue-400 text-xs mr-2"
+                                  className="text-black hover:text-gray-600 border-2 border-black rounded-lg p-1.5 sm:p-2 bg-white hover:bg-gray-100 transition duration-200"
                                   onClick={() => {
                                     setEditingCommentId(comment._id);
                                     setEditedCommentText(comment.text);
                                   }}
                                 >
-                                  <FaEdit className="text-[20px]" />
+                                  <FaEdit className="text-sm sm:text-base" />
                                 </button>
                                 <button
-                                  className="text-red-600 hover:text-red-400 text-xs"
+                                  className="text-black hover:text-gray-600 border-2 border-black rounded-lg p-1.5 sm:p-2 bg-white hover:bg-gray-100 transition duration-200"
                                   onClick={() =>
                                     handleDeleteComment(
                                       article._id,
@@ -795,24 +733,26 @@ const Articles = () => {
                                   disabled={deletingCommentId === comment._id}
                                 >
                                   {deletingCommentId === comment._id ? (
-                                    "Deleting..."
+                                    <span className="text-xs sm:text-sm font-primaryRegular">
+                                      ...
+                                    </span>
                                   ) : (
-                                    <FaTrash className="text-[20px] ml-4" />
+                                    <FaTrash className="text-sm sm:text-base" />
                                   )}
                                 </button>
                               </div>
                             )}
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      ))}
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </TracingBeam>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
       <Footer />
     </div>
   );

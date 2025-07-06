@@ -1,23 +1,21 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom"; // Import useLocation
+import { Link, useLocation } from "react-router-dom";
+import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 
 const Footer = () => {
-  const location = useLocation(); // Get current location
+  const location = useLocation();
 
-  // Conditional background class
-  const bgClass =
-    location.pathname === "/support" ? "bg-slate-950" : "bg-headerDark";
+  // Conditional background class - black and white only
+  const bgClass = location.pathname === "/support" ? "bg-black" : "bg-black";
 
   return (
-    <footer
-      className={`${bgClass} text-gray-400 py-16 font-primaryRegular mt-auto`}
-    >
-      <div className="container mx-auto px-6 lg:px-8">
-        <div className="flex flex-wrap justify-between">
+    <footer className={`${bgClass} text-white py-12 sm:py-16 font-primaryRegular mt-auto dark`}>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* About Us Section */}
-          <div className="w-full md:w-1/4 mb-6 md:mb-0">
-            <h3 className="text-white text-lg font-semibold mb-4">About Us</h3>
-            <p className="text-sm">
+          <div className="space-y-4">
+            <h3 className="text-white text-lg font-semibold">About Us</h3>
+            <p className="text-sm leading-relaxed">
               We are a leading company in providing the best quality products
               and services to our customers. Our mission is to enrich lives
               through our offerings.
@@ -25,26 +23,38 @@ const Footer = () => {
           </div>
 
           {/* Services Section */}
-          <div className="w-full md:w-1/4 mb-6 md:mb-0">
-            <h3 className="text-white text-lg font-semibold mb-4">Services</h3>
-            <ul>
-              <li className="mb-2">
-                <Link to="/shop" className="hover:text-white">
+          <div className="space-y-4">
+            <h3 className="text-white text-lg font-semibold">Services</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link 
+                  to="/shop" 
+                  className="text-sm hover:text-black hover:bg-white transition-colors duration-200 p-1 rounded"
+                >
                   Game Sales
                 </Link>
               </li>
-              <li className="mb-2">
-                <Link to="/shop" className="hover:text-white">
+              <li>
+                <Link 
+                  to="/shop" 
+                  className="text-sm hover:text-black hover:bg-white transition-colors duration-200 p-1 rounded"
+                >
                   Game Rentals
                 </Link>
               </li>
-              <li className="mb-2">
-                <Link to="#" className="hover:text-white">
+              <li>
+                <Link 
+                  to="#" 
+                  className="text-sm hover:text-black hover:bg-white transition-colors duration-200 p-1 rounded"
+                >
                   Game Reviews
                 </Link>
               </li>
-              <li className="mb-2">
-                <Link to="/support" className="hover:text-white">
+              <li>
+                <Link 
+                  to="/support" 
+                  className="text-sm hover:text-black hover:bg-white transition-colors duration-200 p-1 rounded"
+                >
                   24/7 Support
                 </Link>
               </li>
@@ -52,26 +62,38 @@ const Footer = () => {
           </div>
 
           {/* Support Section */}
-          <div className="w-full md:w-1/4 mb-6 md:mb-0">
-            <h3 className="text-white text-lg font-semibold mb-4">Support</h3>
-            <ul>
-              <li className="mb-2">
-                <Link to="/support#faq" className="hover:text-white">
+          <div className="space-y-4">
+            <h3 className="text-white text-lg font-semibold">Support</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link 
+                  to="/support#faq" 
+                  className="text-sm hover:text-black hover:bg-white transition-colors duration-200 p-1 rounded"
+                >
                   FAQ
                 </Link>
               </li>
-              <li className="mb-2">
-                <Link to="/support#contactForm" className="hover:text-white">
+              <li>
+                <Link 
+                  to="/support#contactForm" 
+                  className="text-sm hover:text-black hover:bg-white transition-colors duration-200 p-1 rounded"
+                >
                   Contact Us
                 </Link>
               </li>
-              <li className="mb-2">
-                <Link to="/support#terms" className="hover:text-white">
+              <li>
+                <Link 
+                  to="/support#terms" 
+                  className="text-sm hover:text-black hover:bg-white transition-colors duration-200 p-1 rounded"
+                >
                   Terms of Service
                 </Link>
               </li>
-              <li className="mb-2">
-                <Link to="/support#privacy" className="hover:text-white">
+              <li>
+                <Link 
+                  to="/support#privacy" 
+                  className="text-sm hover:text-black hover:bg-white transition-colors duration-200 p-1 rounded"
+                >
                   Privacy Policy
                 </Link>
               </li>
@@ -79,20 +101,40 @@ const Footer = () => {
           </div>
 
           {/* Social Media Section */}
-          <div className="w-full md:w-1/4 mb-6 md:mb-0">
-            <h3 className="text-white text-lg font-semibold mb-4">Follow Us</h3>
-            <div className="flex space-x-4">
-              <a href="#" className="hover:text-white">
-                <i className="fab fa-facebook-f"></i> Facebook
+          <div className="space-y-4">
+            <h3 className="text-white text-lg font-semibold">Follow Us</h3>
+            <div className="flex flex-wrap gap-4">
+              <a 
+                href="#" 
+                className="flex items-center space-x-2 text-sm hover:text-black hover:bg-white transition-colors duration-200 p-2 rounded"
+                aria-label="Facebook"
+              >
+                <Facebook size={18} />
+                <span className="hidden sm:inline">Facebook</span>
               </a>
-              <a href="#" className="hover:text-white">
-                <i className="fab fa-twitter"></i> Twitter
+              <a 
+                href="#" 
+                className="flex items-center space-x-2 text-sm hover:text-black hover:bg-white transition-colors duration-200 p-2 rounded"
+                aria-label="Twitter"
+              >
+                <Twitter size={18} />
+                <span className="hidden sm:inline">Twitter</span>
               </a>
-              <a href="#" className="hover:text-white">
-                <i className="fab fa-instagram"></i> Instagram
+              <a 
+                href="#" 
+                className="flex items-center space-x-2 text-sm hover:text-black hover:bg-white transition-colors duration-200 p-2 rounded"
+                aria-label="Instagram"
+              >
+                <Instagram size={18} />
+                <span className="hidden sm:inline">Instagram</span>
               </a>
-              <a href="#" className="hover:text-white">
-                <i className="fab fa-linkedin-in"></i> LinkedIn
+              <a 
+                href="#" 
+                className="flex items-center space-x-2 text-sm hover:text-black hover:bg-white transition-colors duration-200 p-2 rounded"
+                aria-label="LinkedIn"
+              >
+                <Linkedin size={18} />
+                <span className="hidden sm:inline">LinkedIn</span>
               </a>
             </div>
           </div>

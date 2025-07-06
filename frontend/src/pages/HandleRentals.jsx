@@ -295,19 +295,15 @@ const HandleRentals = () => {
   return (
     <div className="bg-customDark text-white min-h-screen font-primaryRegular">
       <Header />
-      <div className="bg-primary py-4">
+      <div className="bg-black py-4">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold text-white text-center">
-            Rent the Game
+          <h1 className="text-4xl font-primaryRegular text-white text-center">
+             {game.title}
           </h1>
         </div>
       </div>
       <div className="container mx-auto px-4 py-8">
         <div className="bg-customDark rounded-lg shadow-lg p-8">
-          <h1 className="text-5xl text-white mb-4">
-            {game.title}
-            <br />
-          </h1>
           <div className="flex flex-col lg:flex-row gap-8 mb-8">
             <div className="flex-1">
               <VideoPlayer
@@ -324,27 +320,8 @@ const HandleRentals = () => {
                 className="w-[300px] h-[400px] object-cover rounded-lg shadow-md"
                 src={game.coverPhoto}
               />
-              <div className="ml-4 flex-1">
-                <h3 className="text-2xl font-semibold mb-4">
-                  Terms and Conditions
-                </h3>
-                <ScrollShadow className="h-[350px]">
-                  <ul className="list-disc pl-5 space-y-2">
-                    {termsAndConditions.map((term, index) => (
-                      <li key={index} className="text-sm">
-                        {term}
-                      </li>
-                    ))}
-                  </ul>
-                </ScrollShadow>
-              </div>
+              
             </div>
-          </div>
-          <div className="mb-8">
-            <h2 className="text-3xl text-editionColor mb-4">About the game</h2>
-            <ScrollShadow hideScrollBar className="h-[150px]">
-              <p className="text-lg">{game.Description}</p>
-            </ScrollShadow>
           </div>
           <div className="flex flex-wrap gap-2 mb-8">
             {game.Genre.flatMap((genre) =>
@@ -352,7 +329,7 @@ const HandleRentals = () => {
             ).map((genre, index) => (
               <Chip
                 key={index}
-                color="primary"
+                color="black"
                 variant="flat"
                 size="sm"
                 radius="none"
@@ -362,8 +339,29 @@ const HandleRentals = () => {
               </Chip>
             ))}
           </div>
+          <div className="mb-1">
+            <h2 className="text-3xl text-editionColor mb-4">About the game</h2>
+            <ScrollShadow hideScrollBar className="h-[150px]">
+              <p className="text-lg">{game.Description}</p>
+            </ScrollShadow>
+          </div>
+          <div className="ml-4 flex-1">
+                <h3 className="text-2xl font-primaryRegular mb-4">
+                  Terms and Conditions
+                </h3>
+                <ScrollShadow className="h-[350px]">
+                  <ul className="list-disc pl-5 space-y-2">
+                    {termsAndConditions.map((term, index) => (
+                      <li key={index} className="text-lg text-white">
+                        {term}
+                      </li>
+                    ))}
+                  </ul>
+                </ScrollShadow>
+              </div>
+
           <div>
-            <h3 className="text-2xl font-semibold mb-4">
+            <h3 className="text-2xl font-primaryRegular mb-4">
               Select Rental Duration
             </h3>
             {rentalOptions.length > 0 ? (
@@ -379,7 +377,7 @@ const HandleRentals = () => {
                         transition-all duration-300 ease-in-out
                         ${
                           selectedRental?.time === option.time
-                            ? "border-primary border-2 shadow-lg scale-105 bg-primary bg-opacity-20"
+                            ? "border-white border-2 shadow-lg scale-105 bg-black bg-opacity-20"
                             : "border-gray-600 hover:border-gray-400"
                         }
                       `}
@@ -414,12 +412,12 @@ const HandleRentals = () => {
                   ))}
                 </div>
                 <Button
-                  color="primary"
+                  color="black"
                   onPress={handleRentClick}
-                  className="w-full"
+                 className="w-full border-2 border-white"
                   disabled={!selectedRental}
                 >
-                  Rent Now for LKR {selectedRental?.price || ""}
+                  Rent the game
                 </Button>
               </>
             ) : (
@@ -439,11 +437,11 @@ const HandleRentals = () => {
       
       {/* New Checkout Modal */}
       <Modal
-  isOpen={isOpen}
-  onOpenChange={onClose}
-  placement="center"
-  size="2xl"
->
+      isOpen={isOpen}
+      onOpenChange={onClose}
+      placement="center"
+      size="2xl"
+      >
   <ModalContent
     style={{
       backgroundColor: "#f9f9f9",  // Very light gray
@@ -518,13 +516,22 @@ const HandleRentals = () => {
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button color="danger" variant="light" onPress={onClose}>
-            Cancel
-          </Button>
-          <Button color="primary" onPress={handlePlaceOrder}>
-            Confirm
-          </Button>
-        </ModalFooter>
+  <Button 
+    color="danger" 
+    variant="light" 
+    onPress={onClose}
+    className="bg-white text-black border border-gray-300"
+  >
+    Cancel
+  </Button>
+  <Button 
+    color="primary" 
+    onPress={handlePlaceOrder}
+    className="bg-black text-white"
+  >
+    Confirm
+  </Button>
+</ModalFooter>
       </>
     )}
   </ModalContent>
