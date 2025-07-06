@@ -1,17 +1,27 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Input, Avatar } from "@nextui-org/react";
-import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
+import { 
+  Input, 
+  Button, 
+  Avatar, 
+  Card, 
+  CardHeader, 
+  CardBody, 
+  Modal, 
+  ModalContent, 
+  ModalHeader, 
+  ModalBody, 
+  ModalFooter,
+  useDisclosure,
+  Divider
+} from "@nextui-org/react";
 import { toast, Flip } from 'react-toastify';
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { getToken } from "../utils/getToken";
-import { FaGamepad, FaTrophy, FaUserNinja } from 'react-icons/fa';
-import { TracingBeam } from "../components/ui/TracingBeam";
-import { BackgroundBeams } from "../components/ui/BackgroundBeams";
-import { BackgroundGradient } from "../components/ui/BackgroundGradient";
+import { User, Lock, Upload, Trash2 } from "lucide-react";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -21,11 +31,12 @@ const Profile = () => {
   const [email, setEmail] = useState("");
   const [profilePic, setProfilePic] = useState(null);
   const [existingProfilePic, setExistingProfilePic] = useState("");
-  const [currentPassword, setCurrentPassword] = useState(""); // New state for current password
-  const [newPassword, setNewPassword] = useState("");         // New state for new password
-  const [showChangePassword, setShowChangePassword] = useState(false); // Show change password section
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [showChangePassword, setShowChangePassword] = useState(false);
   const navigate = useNavigate();
+  
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -55,8 +66,7 @@ const Profile = () => {
     fetchUser();
   }, [navigate]);
 
-  const handleUpdate = async (e) => {
-    e.preventDefault();
+  const handleUpdate = async () => {
     try {
       const token = getToken();
       if (!token) {
@@ -106,9 +116,7 @@ const Profile = () => {
     setProfilePic(e.target.files[0]);
   };
 
-  const handleChangePassword = async (e) => {
-    e.preventDefault();
-    // Validate new password
+  const handleChangePassword = async () => {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
     if (!passwordRegex.test(newPassword)) {
@@ -147,7 +155,6 @@ const Profile = () => {
         style: { fontFamily: 'Rubik' }
       });
 
-      // Clear the fields
       setCurrentPassword("");
       setNewPassword("");
       setShowChangePassword(false);
@@ -157,6 +164,7 @@ const Profile = () => {
       toast.error("Failed to change password. Please check your current password.");
     }
   };
+
   const handleDeleteAccount = async () => {
     try {
       const token = getToken();
@@ -165,7 +173,7 @@ const Profile = () => {
         return;
       }
       const userId = getUserIdFromToken(token);
-  
+
       await axios.delete(
         `http://localhost:8098/users/delete/${userId}`,
         {
@@ -174,7 +182,7 @@ const Profile = () => {
           },
         }
       );
-  
+
       toast.success('Account deleted successfully!', {
         position: "top-right",
         autoClose: 2000,
@@ -186,249 +194,222 @@ const Profile = () => {
         transition: Flip,
         style: { fontFamily: 'Rubik' }
       });
-  
+
       localStorage.removeItem('token');
       navigate("/");
-  
+
     } catch (error) {
       console.error("Error deleting account:", error);
       toast.error("Failed to delete account. Please try again.");
     }
   };
-  
-  
-  
 
   return (
-    <div className="bg-[#0a0b14] min-h-screen text-white">
+    <div className="min-h-screen bg-black text-white">
       <Header />
       
-      <div className="rounded-[5px] container mx-auto px-4 py-8 w-[700px]">
-      <BackgroundGradient className="rounded-[5px]  bg-zinc-900 transition-transform duration-300 transform hover:scale-10">
-        <div className="max-w-2xl mx-auto bg-[#13141f] rounded-[10px] shadow-lg overflow-hidden border-2 border-[#6366f1]">
-        
-          <div className="bg-gradient-to-r from-[#060c2c] to-[#6366f1] p-6 relative overflow-hidden">
-            <h2 className="font-primaryRegular text-3xl font-bold text-white text-center z-10 relative">
-              Player Profile
-            </h2>
-            <FaGamepad className="text-6xl text-white opacity-20 absolute top-2 left-2 animate-pulse" />
-            <FaTrophy className="text-6xl text-white opacity-20 absolute bottom-2 right-2 animate-bounce" />
-          </div>
-          <div className="p-6 relative">
-            <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-            <div className="relative z-10">
-              <div className="flex justify-center mb-6">
-                <div className="relative">
+      {/* Mobile-responsive container with proper padding */}
+      <div className="max-w-2xl mx-auto p-4 sm:p-6 lg:p-8">
+        <Card className="bg-white text-black">
+          <CardHeader className="flex flex-col gap-3 pb-4 sm:pb-6">
+            <div className="flex items-center gap-3">
+              <User className="w-6 h-6 sm:w-8 sm:h-8" />
+              <h1 className="text-xl sm:text-2xl font-bold font-primaryRegular">Profile Settings</h1>
+            </div>
+            <Divider className="bg-gray-300" />
+          </CardHeader>
+          
+          <CardBody className="gap-4 sm:gap-6 px-4 sm:px-6">
+            {user ? (
+              <>
+                {/* Profile Picture Section - Mobile optimized */}
+                <div className="flex flex-col items-center gap-3 sm:gap-4">
                   <Avatar
-                    isBordered
-                    color="secondary"
                     src={profilePic ? URL.createObjectURL(profilePic) : existingProfilePic}
-                    className="w-32 h-32 text-large border-4 border-[#6366f1]"
+                    className="w-24 h-24 sm:w-32 sm:h-32 text-large border-4 border-gray-300"
                   />
-                  <div className="absolute -bottom-2 -right-2 bg-[#6366f1] rounded-full p-2 animate-ping">
-                    <FaUserNinja className="text-[#13141f]" />
+                  
+                  <div className="flex flex-col items-center gap-2 w-full max-w-xs">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                      id="profile-pic-input"
+                    />
+                    <Button
+                      variant="bordered"
+                      startContent={<Upload className="w-4 h-4" />}
+                      onPress={() => document.getElementById('profile-pic-input').click()}
+                      className="border-gray-300 text-black hover:bg-gray-50 font-primaryRegular text-sm sm:text-base w-full"
+                    >
+                      Update Profile Picture
+                    </Button>
                   </div>
                 </div>
-              </div>
-              {user ? (
-                <form onSubmit={handleUpdate} encType="multipart/form-data">
-                  <div className="space-y-4 font-primaryRegular">
+
+                <Divider className="bg-gray-300" />
+
+                {/* Profile Form - Mobile responsive grid */}
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <Input
                       label="First Name"
                       value={firstname}
                       onChange={(e) => setFirstname(e.target.value)}
-                      fullWidth
-                      size="lg"
-                      bordered
-                      color="secondary"
-                      style={{ backgroundColor: '#1c1d2b', color: '#060c2c' }}
+                      variant="bordered"
+                      className="text-black"
+                      size="sm"
                     />
                     <Input
                       label="Last Name"
                       value={lastname}
                       onChange={(e) => setLastname(e.target.value)}
-                      fullWidth
-                      size="lg"
-                      bordered
-                      color="secondary"
-                      style={{ backgroundColor: '#1c1d2b', color: '#060c2c' }}
+                      variant="bordered"
+                      className="text-black"
+                      size="sm"
                     />
-                    <Input
-                      label="Username"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      fullWidth
-                      size="lg"
-                      bordered
-                      color="secondary"
-                      style={{ backgroundColor: '#1c1d2b', color: '#060c2c' }}
-                    />
-                    <Input
-                      label="Email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      fullWidth
-                      size="lg"
-                      bordered
-                      color="secondary"
-                      style={{ backgroundColor: '#1c1d2b', color: '#060c2c' }}
-                    />
-                    
-                    <button
-                      type="button"
-                      onClick={() => setShowChangePassword(!showChangePassword)}
-                   className="font-primaryRegular w-full bg-gradient-to-r from-[#060c2c] to-[#6366f1] text-white py-3 px-4 rounded-md hover:from-[#312e81] hover:to-[#4f46e5] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:ring-opacity-50"
-                    >
-                      {showChangePassword ? "Cancel Change Password" : "Change Password"}
-                    </button>
+                  </div>
+                  
+                  <Input
+                    label="Username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    variant="bordered"
+                    className="text-black"
+                    size="sm"
+                  />
+                  
+                  <Input
+                    label="Email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    variant="bordered"
+                    className="text-black"
+                    size="sm"
+                  />
 
-                    {showChangePassword && (
-                      <div className="space-y-4 mt-4">
+                  <Button
+                    onPress={handleUpdate}
+                    className="w-full bg-black text-white hover:bg-gray-800 font-primaryRegular text-sm sm:text-base py-2 sm:py-3"
+                    size="lg"
+                  >
+                    Update Profile
+                  </Button>
+                </div>
+
+                <Divider className="bg-gray-300" />
+
+                {/* Password Section - Mobile optimized */}
+                <div className="space-y-3">
+                  <Button
+                    variant="bordered"
+                    startContent={<Lock className="w-4 h-4" />}
+                    onPress={() => setShowChangePassword(!showChangePassword)}
+                    className="w-full bg-black text-white hover:bg-gray-800 font-primaryRegular text-sm sm:text-base py-2 sm:py-3"
+                    size="lg"
+                  >
+                    {showChangePassword ? "Cancel Password Change" : "Change Password"}
+                  </Button>
+
+                  {showChangePassword && (
+                    <Card className="bg-gray-50 border border-gray-200">
+                      <CardBody className="gap-3 p-4">
                         <Input
                           label="Current Password"
                           type="password"
                           value={currentPassword}
                           onChange={(e) => setCurrentPassword(e.target.value)}
-                          fullWidth
-                          size="lg"
-                          bordered
-                          color="secondary"
-                          className="bg-[#1c1d2b] text-white"
+                          variant="bordered"
+                          className="text-black"
+                          size="sm"
                         />
                         <Input
                           label="New Password"
                           type="password"
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
-                          fullWidth
-                          size="lg"
-                          bordered
-                          color="secondary"
-                          className="bg-[#1c1d2b] text-white"
+                          variant="bordered"
+                          className="text-black"
+                          size="sm"
                         />
                         <Button
-                          type="button"
-                          onClick={handleChangePassword}
-                          className="font-primaryRegular w-full bg-gradient-to-r from-[#060c2c] to-[#6366f1] text-white py-3 px-4 rounded-md hover:from-[#312e81] hover:to-[#4f46e5] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:ring-opacity-50"
+                          onPress={handleChangePassword}
+                          className="w-full bg-black text-white hover:bg-gray-800 font-primaryRegular text-sm sm:text-base py-2"
+                          size="md"
                         >
                           Update Password
                         </Button>
-                      </div>
-                    )}
-                    
-                    <div className="flex items-center justify-center w-full">
-                      <label
-                        htmlFor="dropzone-file"
-                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-[#6366f1] border-dashed rounded-lg cursor-pointer bg-[#1c1d2b] hover:bg-[#2e3149] transition-all duration-300"
-                      >
-                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                          <svg
-                            className="w-8 h-8 mb-4 text-[#6366f1] animate-bounce"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 20 16"
-                          >
-                            <path
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
-                            />
-                          </svg>
-                          <p className="mb-2 text-sm text-[#a5b4fc]">
-                            <span className="font-primaryRegular">Click to upload</span> or drag and drop
-                          </p>
-                          <p className="text-xs text-[#a5b4fc]">PNG, JPG or GIF (MAX. 800x400px)</p>
-                        </div>
-                        <input
-                          id="dropzone-file"
-                          type="file"
-                          className="hidden"
-                          accept="image/*"
-                          onChange={handleFileChange}
-                        />
-                      </label>
-                    </div>
-                  </div>
-                  <div className="mt-6">
-                    <Button
-                      type="submit"
-                      className="font-primaryRegular w-full bg-gradient-to-r from-[#060c2c] to-[#6366f1] text-white py-3 px-4 rounded-md hover:from-[#312e81] hover:to-[#4f46e5] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:ring-opacity-50"
-                    >
-                      Level Up Profile
-                    </Button>
-                  </div>
-                  <Button
-        onClick={() => setDeleteModalOpen(true)} // Open delete modal
-        style={{ backgroundColor: '#e63946', color: '#fff' }} // Red delete button
-        auto
-        bordered
-        fullWidth
-        className="font-primaryRegular w-full mt-4 w-full bg-gradient-to-r from-[#d90429] to-[#ef233c] text-white py-3 px-4 rounded-md hover:from-[#b10619] hover:to-[#d90429] transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#ef233c] focus:ring-opacity-50"
-      >
-        Delete Account
-      </Button>{/* Delete Confirmation Modal */}
-      <Modal isOpen={isDeleteModalOpen} onClose={() => setDeleteModalOpen(false)} className="text-black">
-        <ModalContent >
-          <ModalHeader>Delete Account</ModalHeader>
-          <ModalBody>
-            Are you sure you want to delete your account? This action cannot be undone.
-          </ModalBody>
-          <ModalFooter>
-          <Button
-        style={{ backgroundColor: '#6366f1', color: '#fff' }} // Blue cancel button
-        flat
-        onClick={() => setDeleteModalOpen(false)} // Close modal
-      >
-        Cancel
-      </Button>
-      <Button
-        style={{ backgroundColor: '#e63946', color: '#fff' }} // Red confirm button
-        onClick={handleDeleteAccount}
-      >
-        Confirm
-      </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-
-
-
-                </form>
-              ) : (
-                <div className="flex justify-center items-center h-64">
-                  <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-[#6366f1]"></div>
+                      </CardBody>
+                    </Card>
+                  )}
                 </div>
-              )}
-            </div>
-          </div>
-          
-        </div>
-        </BackgroundGradient>
-        <BackgroundBeams/>
-        
+
+                <Divider className="bg-gray-300" />
+
+                {/* Danger Zone - Mobile optimized */}
+                <div className="space-y-2">
+                  <Button
+                    startContent={<Trash2 className="w-4 h-4" />}
+                    onPress={onOpen}
+                    className="w-full bg-red-600 text-white hover:bg-red-700 font-primaryRegular text-sm sm:text-base py-2 sm:py-3"
+                    size="lg"
+                  >
+                    Delete Account
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <div className="flex justify-center items-center h-48 sm:h-64">
+                <div className="text-center">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                  <p className="text-black text-base sm:text-lg">Loading Profile...</p>
+                </div>
+              </div>
+            )}
+          </CardBody>
+        </Card>
+
+        {/* Delete Confirmation Modal - Mobile responsive */}
+        <Modal 
+          isOpen={isOpen} 
+          onClose={onClose}
+          size="sm"
+          placement="center"
+          className="mx-4"
+        >
+          <ModalContent>
+            <ModalHeader className="pb-2">
+              <h3 className="text-lg font-semibold text-black">Delete Account</h3>
+            </ModalHeader>
+            <ModalBody className="py-4">
+              <p className="text-black text-sm sm:text-base">
+                Are you sure you want to delete your account ? This action cannot be undone.
+              </p>
+            </ModalBody>
+            <ModalFooter className="pt-2 gap-2">
+              <Button
+                variant="light"
+                onPress={onClose}
+                className="text-black flex-1 sm:flex-none"
+                size="sm"
+              >
+                Cancel
+              </Button>
+              <Button
+                color="danger"
+                onPress={handleDeleteAccount}
+                className="flex-1 sm:flex-none"
+                size="sm"
+              >
+                Delete Account
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       </div>
       
-      <style jsx>{`
-        @keyframes gridMove {
-          0% {
-            background-position: 0 0;
-          }
-          100% {
-            background-position: 50px 50px;
-          }
-        }
-        .bg-grid-pattern {
-          background-image: 
-            linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px);
-          background-size: 20px 20px;
-          animation: gridMove 5s linear infinite;
-        }
-      `}</style>
       <Footer />
     </div>
   );
