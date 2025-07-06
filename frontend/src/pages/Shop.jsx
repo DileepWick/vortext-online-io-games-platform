@@ -67,7 +67,7 @@ const MinimalistShop = () => {
     <section 
       className="relative py-32 px-4 overflow-hidden font-primaryRegular"
       style={{
-        backgroundImage: `url('https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1920&h=1080&fit=crop')`,
+        backgroundImage: `url('https://r4.wallpaperflare.com/wallpaper/242/56/18/the-witcher-3-wild-hunt-wallpaper-e980c83da1caddbbf64738bf903136cd.jpg')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}

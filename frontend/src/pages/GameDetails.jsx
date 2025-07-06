@@ -12,7 +12,7 @@ import VideoPlayer from "../components/videoPlayer";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
-import RatingSystem from "../components/RatingSystem"; // New import
+import RatingSystem from "../components/RatingSystem";
 
 // NextUI
 import { Button, Chip } from "@nextui-org/react";
@@ -30,8 +30,8 @@ const GameDetails = () => {
   const [relatedGameStocks, setRelatedGameStocks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [cartId, setCartId] = useState(null); // State to handle cart ID
-  const [quantityByStockId, setQuantityByStockId] = useState({}); // State to handle quantity by stock id
+  const [cartId, setCartId] = useState(null);
+  const [quantityByStockId, setQuantityByStockId] = useState({});
   const [checkItem, setCheckItem] = useState("not in the library");
   const [ratings, setRatings] = useState([]);
   const [averageRating, setAverageRating] = useState(0);
@@ -56,6 +56,7 @@ const GameDetails = () => {
       fetchUser();
     }
   }, [userId]);
+
   useEffect(() => {
     try {
       if (user) {
@@ -77,19 +78,17 @@ const GameDetails = () => {
           `http://localhost:8098/gameStocks/GetStockById/${id}`
         );
         const currentGameStock = response.data;
-        setGameStock(currentGameStock); // Set the current game stock details
+        setGameStock(currentGameStock);
 
-        // Fetch related game stocks with the same AssignedGame ID
         const relatedResponse = await axios.get(
           `http://localhost:8098/gameStocks/getGameStockDetails/${currentGameStock.AssignedGame._id}`
         );
 
-        // Filter out the current game stock from related stocks
         const filteredRelatedStocks = relatedResponse.data.filter(
           (stock) => stock._id !== currentGameStock._id
         );
 
-        setRelatedGameStocks(filteredRelatedStocks); // Set related game stocks
+        setRelatedGameStocks(filteredRelatedStocks);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -97,7 +96,6 @@ const GameDetails = () => {
       }
     };
 
-    // Add this new fetch for ratings
     const fetchRatings = async () => {
       try {
         const response = await axios.get(
@@ -105,7 +103,6 @@ const GameDetails = () => {
         );
         setRatings(response.data);
         console.log("id", id);
-        // Calculate average rating
         const avg =
           response.data.reduce((sum, rating) => sum + rating.rating, 0) /
           response.data.length;
@@ -119,22 +116,21 @@ const GameDetails = () => {
 
     const fetchCartId = async () => {
       try {
-        const token = getToken(); // Get token
-        const userId = getUserIdFromToken(token); // Use token to get user id
+        const token = getToken();
+        const userId = getUserIdFromToken(token);
         const response = await axios.get(
           `http://localhost:8098/cart/getCartByUserId/${userId}`
         );
-        setCartId(response.data._id); // Set the cart ID
+        setCartId(response.data._id);
       } catch (error) {
         console.error("Error fetching cart ID:", error);
       }
     };
 
-    //Check library Item
     const checkLibrary = async () => {
       try {
-        const token = getToken(); // Get token
-        const userId = getUserIdFromToken(token); // Use token to get user id
+        const token = getToken();
+        const userId = getUserIdFromToken(token);
         const checkStatus = await axios.get(
           `http://localhost:8098/orderItems/checkItem/${id}/${userId}/`
         );
@@ -145,12 +141,11 @@ const GameDetails = () => {
       } catch (error) {}
     };
 
-    checkLibrary(); //Check library item
-    fetchGameDetails(); //fetch game details
-    fetchCartId(); // Fetch cart
+    checkLibrary();
+    fetchGameDetails();
+    fetchCartId();
   }, [id]);
 
-  // Handle Add to Cart
   const handleAddToCart = async (stockId) => {
     if (checkItem === "in the library") {
       toast.warning("Game is already in Library.", {
@@ -175,9 +170,9 @@ const GameDetails = () => {
         const response = await axios.post(
           `http://localhost:8098/cartItems/createCartItem`,
           {
-            cartid: cartId, // Use the fetched cart id
+            cartid: cartId,
             stockid: stockId,
-            quantity: quantityByStockId[stockId] || 1, // Use the selected quantity or default to 1
+            quantity: quantityByStockId[stockId] || 1,
           }
         );
 
@@ -215,7 +210,6 @@ const GameDetails = () => {
     }
   };
 
-  // New function to handle rating submission
   const handleRatingSubmit = async (rating, comment) => {
     try {
       const token = getToken();
@@ -238,9 +232,17 @@ const GameDetails = () => {
 
       if (response.status === 201) {
         toast.success("Rating submitted successfully", {
-          // ... (keep existing toast options)
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Flip,
+          style: { fontFamily: "Rubik" },
         });
-        // Refresh ratings
         const updatedRatings = await axios.get(
           `http://localhost:8098/ratings/game/${id}`
         );
@@ -258,13 +260,21 @@ const GameDetails = () => {
           error.response?.data?.message || error.message
         }`,
         {
-          // ... (keep existing toast options)
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Flip,
+          style: { fontFamily: "Rubik" },
         }
       );
     }
   };
 
-  // Handle Rent
   const navigate = useNavigate();
 
   const handleRent = (gameId) => {
@@ -287,11 +297,9 @@ const GameDetails = () => {
   };
 
   const handleQuantityChange = (stockId, newQuantity) => {
-    // Update quantityByStockId state
     setQuantityByStockId({ ...quantityByStockId, [stockId]: newQuantity });
   };
 
-  //Rating Update Function
   const handleRateUpdate = async (ratingId, rating, comment) => {
     try {
       const response = await axios.put(
@@ -304,9 +312,17 @@ const GameDetails = () => {
       console.log("Rating update response:", response);
       if (response.status === 200) {
         toast.success("Rating updated successfully", {
-          // ... (keep existing toast options)
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Flip,
+          style: { fontFamily: "Rubik" },
         });
-        // Refresh ratings
         const updatedRatings = await axios.get(
           `http://localhost:8098/ratings/game/${id}`
         );
@@ -324,7 +340,16 @@ const GameDetails = () => {
           error.response?.data?.message || error.message
         }`,
         {
-          // ... (keep existing toast options)
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Flip,
+          style: { fontFamily: "Rubik" },
         }
       );
     }
@@ -332,9 +357,9 @@ const GameDetails = () => {
 
   if (loading) return <Loader />;
   if (error)
-    return <p className="text-center mt-8 text-black">Error: {error}</p>;
+    return <p className="text-center mt-8 text-white">Error: {error}</p>;
   if (!gameStock)
-    return <p className="text-center mt-8 text-black">Game not found</p>;
+    return <p className="text-center mt-8 text-white">Game not found</p>;
 
   const originalPrice = gameStock.UnitPrice;
   const discountedPrice = gameStock.discount
@@ -342,86 +367,95 @@ const GameDetails = () => {
     : originalPrice;
 
   return (
-    <div className="bg-customDark text-black min-h-screen font-primaryRegular">
+    <div className="bg-black text-white min-h-screen font-sans">
       <Header />
-      <div className="container">
-        <div className="bg-customDark rounded-lg shadow-lg h-[850px]">
-          <div className="flex flex-col md:flex-row items-start justify-start gap-4 bg-customDark scale-90 m-8">
-            <div className="flex flex-col">
+      
+      {/* Main Game Details Section */}
+      <div className="container mx-auto px-4 py-8">
+        <div className="bg-gray-900 border border-gray-800 rounded-lg shadow-2xl overflow-hidden">
+          <div className="flex flex-col lg:flex-row gap-8 p-6 lg:p-8">
+            
+            {/* Left Column - Video and Description */}
+            <div className="flex-1">
               <VideoPlayer
                 videoUrl={gameStock.AssignedGame.TrailerVideo}
                 autoPlay
                 controls
                 muted
-                className="w-[600px] h-[400px] object-cover mb-4 shadow-md"
+                className="w-full h-64 sm:h-80 lg:h-96 object-cover mb-6 rounded-lg shadow-lg border border-gray-700"
               />
-              <h1 className="mt-8 text-editionColor text-5xl">
-                About the game
-              </h1>
-              <p
-                className="text-lg mt-4"
-                style={{ fontSize: "24px", padding: "4px" }}
-              >
-                <ScrollShadow
-                  hideScrollBar
-                  className="w-[1000px] h-[200px] text-white"
-                >
-                  {gameStock.AssignedGame.Description}
-                </ScrollShadow>
-              </p>
+              
+              <div className="space-y-6">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white border-b border-gray-700 pb-4">
+                  About the Game
+                </h1>
+                
+                <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                  <ScrollShadow
+                    hideScrollBar
+                    className="h-32 sm:h-40 lg:h-48 text-gray-300 text-sm sm:text-base lg:text-lg leading-relaxed"
+                  >
+                    {gameStock.AssignedGame.Description}
+                  </ScrollShadow>
+                </div>
+              </div>
             </div>
-            <div className="flex flex-col items-center text-center md:text-left">
-              <Card className="bg-customDark" radius="none">
+
+            {/* Right Column - Game Card */}
+            <div className="w-full lg:w-80 flex-shrink-0">
+              <Card className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden shadow-xl">
                 <Image
-                  radius="none"
                   removeWrapper
                   alt={gameStock.AssignedGame.title}
-                  className="w-[300px] h-[400px] object-cover rounded-t"
+                  className="w-full h-64 sm:h-80 lg:h-96 object-cover"
                   src={gameStock.AssignedGame.coverPhoto}
                 />
-                <CardBody>
-                  <h2
-                    className="text-xl font-primaryRegular text-white mb-2"
-                    style={{ fontSize: "20px" }}
-                  >
-                    {gameStock.AssignedGame.title} <br />
-                    {gameStock.discount > 0 && (
-                      <>
-                        <Chip
-                          color="primary"
-                          radius="none"
-                          style={{ fontSize: "20px" }}
-                        >
-                          -{gameStock.discount}% off
-                        </Chip>
-                        <div className="flex items-center mt-2">
-                          <span className="line-through mr-4 text-editionColor">
-                            LKR .{originalPrice.toFixed(2)}
-                          </span>
-                          <span className="text-lg">
-                            LKR .{discountedPrice.toFixed(2)}
-                          </span>
-                        </div>
-                      </>
-                    )}
+                
+                <CardBody className="p-6 space-y-4">
+                  <h2 className="text-xl sm:text-2xl font-bold text-white">
+                    {gameStock.AssignedGame.title}
                   </h2>
+                  
+                  {gameStock.discount > 0 && (
+                    <div className="space-y-3">
+                      <Chip
+                        className="bg-white text-black font-bold px-3 py-1 text-sm"
+                        radius="sm"
+                      >
+                        -{gameStock.discount}% OFF
+                      </Chip>
+                      <div className="flex items-center gap-3">
+                        <span className="line-through text-gray-400 text-lg">
+                          LKR {originalPrice.toFixed(2)}
+                        </span>
+                        <span className="text-white font-bold text-xl">
+                          LKR {discountedPrice.toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {!gameStock.discount && (
+                    <div className="text-white font-bold text-xl">
+                      LKR {originalPrice.toFixed(2)}
+                    </div>
+                  )}
                 </CardBody>
-                <CardFooter className="text-center">
-                  <div className="flex flex-col items-center">
+                
+                <CardFooter className="p-6 pt-0">
+                  <div className="w-full space-y-3">
                     <Button
                       onClick={() => handleAddToCart(gameStock._id)}
-                      color="primary"
-                      style={{ height: "50px", fontSize: "20px" }}
-                      className="w-[300px] mb-2"
-                      variant="solid"
+                      className="w-full bg-white text-black font-bold py-3 text-lg hover:bg-gray-200 transition-colors duration-200"
+                      size="lg"
                     >
                       Add to Cart
                     </Button>
                     <Button
                       onClick={() => handleRent(gameStock.AssignedGame._id)}
-                      color="default"
-                      style={{ height: "50px", fontSize: "20px" }}
-                      className="w-[300px] mt-2 "
+                      className="w-full bg-gray-700 text-white font-bold py-3 text-lg hover:bg-gray-600 transition-colors duration-200 border border-gray-600"
+                      size="lg"
+                      variant="bordered"
                     >
                       Rent Game
                     </Button>
@@ -432,12 +466,13 @@ const GameDetails = () => {
           </div>
         </div>
 
-        <div className="mt-4 m-8 scale-90 bg-customDark">
-          <h2 className="mt-8 text-editionColor text-5xl">
-            Ratings and Reviews
+        {/* Ratings Section */}
+        <div className="mt-12 bg-gray-900 border border-gray-800 rounded-lg p-6 lg:p-8">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-8 border-b border-gray-700 pb-4">
+            Ratings & Reviews
           </h2>
 
-          {user.role === "Review Manager" ? (
+          {user && user.role === "Review Manager" ? (
             <RatingSystemEditing
               gameId={id}
               ratings={ratings}
@@ -457,60 +492,76 @@ const GameDetails = () => {
           )}
         </div>
       </div>
+
+      {/* Related Games Section */}
       {relatedGameStocks.length > 0 && (
-        <div className="mt-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">
-            Related Editions
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {relatedGameStocks.map((stock) => (
-              <div
-                key={stock._id}
-                className="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center text-center"
-              >
-                <img
-                  src={stock.AssignedGame.coverPhoto}
-                  alt={stock.AssignedGame.title}
-                  className="w-40 h-52 object-cover rounded-lg mb-2"
-                />
-                <h2 className="text-xl font-bold text-gray-900 mb-2">
-                  {stock.AssignedGame.title} {stock.Edition} Edition
-                </h2>
-                <Link
-                  to={`/game/${stock._id}`}
-                  className="block text-center bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300"
+        <div className="container mx-auto px-4 py-8">
+          <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 lg:p-8">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-8 text-center border-b border-gray-700 pb-4">
+              Related Editions
+            </h2>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {relatedGameStocks.map((stock) => (
+                <div
+                  key={stock._id}
+                  className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300"
                 >
-                  View Details
-                </Link>
-                <div className="mt-4">
-                  <label className="block text-gray-700 mb-2">Quantity:</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={quantityByStockId[stock._id] || 1}
-                    onChange={(e) =>
-                      handleQuantityChange(stock._id, Number(e.target.value))
-                    }
-                    className="block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 bg-gray-100 text-black px-3 py-2"
+                  <img
+                    src={stock.AssignedGame.coverPhoto}
+                    alt={stock.AssignedGame.title}
+                    className="w-full h-48 sm:h-64 object-cover"
                   />
+                  
+                  <div className="p-4 space-y-4">
+                    <h3 className="text-lg sm:text-xl font-bold text-white truncate">
+                      {stock.AssignedGame.title} {stock.Edition} Edition
+                    </h3>
+                    
+                    <Link
+                      to={`/game/${stock._id}`}
+                      className="block w-full bg-white text-black font-bold py-2 px-4 rounded text-center hover:bg-gray-200 transition-colors duration-200"
+                    >
+                      View Details
+                    </Link>
+                    
+                    <div className="space-y-2">
+                      <label className="block text-gray-300 text-sm font-medium">
+                        Quantity:
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={quantityByStockId[stock._id] || 1}
+                        onChange={(e) =>
+                          handleQuantityChange(stock._id, Number(e.target.value))
+                        }
+                        className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <button
+                        onClick={() => handleAddToCart(stock._id)}
+                        className="w-full bg-white text-black font-bold py-2 px-4 rounded hover:bg-gray-200 transition-colors duration-200"
+                      >
+                        Add to Cart
+                      </button>
+                      <button
+                        onClick={() => handleRent(stock.AssignedGame._id)}
+                        className="w-full bg-gray-700 text-white font-bold py-2 px-4 rounded hover:bg-gray-600 transition-colors duration-200 border border-gray-600"
+                      >
+                        Rent
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <button
-                  onClick={() => handleAddToCart(stock._id)}
-                  className="block w-full text-center bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300 mt-4"
-                >
-                  Add to Cart
-                </button>
-                <button
-                  onClick={() => handleRent(gameStock.AssignedGame._id)}
-                  className="block w-full text-center bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition duration-300 mt-4"
-                >
-                  Rent
-                </button>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}
+
       <Footer />
     </div>
   );

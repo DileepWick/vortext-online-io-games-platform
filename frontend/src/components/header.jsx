@@ -142,7 +142,7 @@ const Header = forwardRef((props, ref) => {
         <NavbarContent>
           <NavbarMenuToggle
             aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-            className="sm:hidden text-white"
+            className="sm:hidden text-black"
           />
           <NavbarBrand>
             <AcmeLogo />
@@ -173,74 +173,42 @@ const Header = forwardRef((props, ref) => {
             </Link>
           </NavbarItem>
           
-          <Dropdown placement="bottom-start" className="text-black hover:underline">
+          <Dropdown placement="bottom-start" className="dark text-white">
             <DropdownTrigger>
-              <NavbarItem className="cursor-pointer text-black hover:underline">Support</NavbarItem>
+              <NavbarItem className="cursor-pointer text-black">Support</NavbarItem>
             </DropdownTrigger>
             <DropdownMenu
               aria-label="Support Actions"
               variant="flat"
-              className="font-primaryRegular bg-black"
+              className="font-primaryRegular "
             >
               <DropdownItem
                 key="support"
                 onClick={() => navigate("/support")}
-                className="text-white hover:bg-gray-800"
+                className="text-white "
               >
                 Vortex Support
               </DropdownItem>
               <DropdownItem
                 key="contactus"
                 onClick={() => navigate("/support#contactForm")}
-                className="text-white hover:bg-gray-800"
+                className="text-white"
               >
                 Contact Us
               </DropdownItem>
               <DropdownItem
                 key="privacy"
                 onClick={() => navigate("/privacyPolicy")}
-                className="text-white hover:bg-gray-800"
+                className="text-white"
               >
                 Privacy Policy
               </DropdownItem>
               <DropdownItem
                 key="about"
                 onClick={() => navigate("/about")}
-                className="text-white hover:bg-gray-800"
+                className="text-white"
               >
                 About Vortex
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
-
-          <Dropdown placement="bottom-start" className="text-white dark">
-            <DropdownTrigger>
-              <NavbarItem className="cursor-pointer flex items-center hover:text-gray-300 transition-colors duration-200">
-                <NotificationIcon style={{ marginRight: "8px" }} />
-                <span
-                  className={`${
-                    location.pathname === "/Notification" ? "text-gray-300" : ""
-                  }`}
-                >
-                </span>
-              </NavbarItem>
-            </DropdownTrigger>
-            <DropdownMenu
-              aria-label="Notification Actions"
-              variant="flat"
-              className="font-primaryRegular text-white bg-black"
-            >
-              <DropdownItem
-                onClick={() => navigate("/Notification")}
-                className="text-white hover:bg-gray-800"
-              >
-                All Notifications
-              </DropdownItem>
-              <DropdownItem
-                onClick={() => navigate("/UserMessage")}
-                className="text-white hover:bg-gray-800"
-              >
-                All Messages
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
