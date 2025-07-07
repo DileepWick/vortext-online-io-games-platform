@@ -126,12 +126,17 @@ userRouter.get(
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
+const frontendURL =
+  process.env.NODE_ENV === "production"
+    ? process.env.FRONTEND_URL_PROD
+    : process.env.FRONTEND_URL_DEV;
+
 userRouter.get(
   "/google/callback",
   passport.authenticate("google", { session: false }),
   (req, res) => {
     const token = req.user.token;
-    res.redirect(`http://127.0.0.1:5000/login?token=${token}`);
+    res.redirect(`${frontendURL}/login?token=${token}`);
   }
 );
 
