@@ -34,7 +34,7 @@ passport.use(
           user = await User.create({
             firstname: profile.name.givenName,
             lastname: profile.name.familyName,
-            username: email.split("@")[0] + "_" + Date.now(),
+            username: profile.name.givenName + "_" + Date.now(),
             email,
             googleId: profile.id,
             role: "User",

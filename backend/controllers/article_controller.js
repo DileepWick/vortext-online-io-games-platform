@@ -39,6 +39,7 @@ export const createArticle = async (req, res) => {
     if (createdArticle) {
       return res.status(201).json({
         message: "Article created successfully",
+        article: createdArticle,
       });
     }
 

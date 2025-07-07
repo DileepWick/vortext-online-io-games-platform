@@ -1,38 +1,118 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Moon, Sun, Send, X, MessageSquare } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import botTrainingData from "../libs/botTrainigData.json"; // Import training data from JSON
-import { Link } from "react-router-dom"; // Import Link from react-router-dom
+import {
+  GoogleGenerativeAI,
+  HarmBlockThreshold,
+  HarmCategory,
+} from "@google/generative-ai";
 
 const Chatbot = ({ isOpen, setIsOpen }) => {
-  const [showChatbot, setShowChatbot] = useState(false);
   const [message, setMessage] = useState("");
-  const [conversationContext, setConversationContext] = useState([]);
-  const [userName, setUserName] = useState(""); // Store the user's name
-  const [awaitingName, setAwaitingName] = useState(false); // Check if we're waiting for a name
-  const [darkMode, setDarkMode] = useState(true);
+  const [messages, setMessages] = useState([]);
+  const [darkMode, setDarkMode] = useState(false); // Default to light mode
   const chatboxRef = useRef(null);
 
-  const getGreeting = () => {
-    const currentHour = new Date().getHours();
+  // Initialize Gemini API
+  const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+  const genAI = new GoogleGenerativeAI(API_KEY);
 
-    if (currentHour < 12) {
-      return "Good morning! I'm Vorty. How can I assist you today?";
-    } else if (currentHour < 18) {
-      return "Good afternoon! I'm Vorty. How can I assist you today?";
-    } else if (currentHour < 22) {
-      return "Good evening! I'm Vorty. How can I assist you today?";
-    } else {
-      return "Happy late night! I'm Vorty. How can I assist you today?";
-    }
-  };
-
-  const [messages, setMessages] = useState([
+  const tools = [
     {
-      text: getGreeting(), // Dynamically set greeting based on time
-      type: "incoming",
+      functionDeclarations: [
+        {
+          name: "listAllGames",
+          description:
+            "Lists all available games in the store. Use this when the user asks to see all games or available games.",
+          parameters: {
+            type: "object",
+            properties: {},
+          },
+        },
+        {
+          name: "getGameDetails",
+          description:
+            "Retrieves detailed information about a specific game, including its description, genre, and developer. Requires the game's name.",
+          parameters: {
+            type: "object",
+            properties: {
+              gameName: {
+                type: "string",
+                description: "The name of the game to get details for.",
+              },
+            },
+            required: ["gameName"],
+          },
+        },
+        {
+          name: "getGameStock",
+          description:
+            "Retrieves  information for a specific game, including its price, available  for  rental, and any active discounts. Requires the game's name.",
+          parameters: {
+            type: "object",
+            properties: {
+              gameName: {
+                type: "string",
+                description: "The name of the game to get stock details for.",
+              },
+            },
+            required: ["gameName"],
+          },
+        },
+      ],
     },
-  ]);
+  ];
+
+  const systemInstruction = `You are a friendly and helpful human assistant for a game store named Vortex. Your primary goal is to assist users with their inquiries in a clear, 
+  empathetic, and efficient manner. You have access to tools to fetch real-time data about games, their details, and stock information. Always try to use these tools when appropriate 
+  to provide accurate information.
+
+    For common issues like 'invalid password' or 'invalid email', please suggest basic troubleshooting steps such as:
+    - Double-checking the spelling of the email or password.
+    - Ensuring there are no extra spaces.
+    - Suggesting the 'Forgot Password' option if applicable.
+
+    If a user asks a question that is beyond your capabilities or direct knowledge (e.g., account-specific issues that require personal data access, complex technical support, or issues 
+    outside the scope of game store inquiries), please politely state that you cannot directly assist with that specific issue. Instead, offer to guide them to the appropriate resource, 
+    such as the support page, FAQ section, or a human support agent, without making up information.
+
+    Always maintain a helpful and polite tone. If a question is not directly related to games, try to provide a helpful and relevant response if possible, or gently guide the user back to 
+    game-related topics.";Do not act like you are an AI model, instead act like a helpful assistant for the store named. If you don't know the answer to a question, it's okay to say that 
+    you don't know. You can also ask the user for more information if needed.if users brings a question that is commonly asked answer it direclty,try to fix the issue with your
+     knowledgemif its beyond your understanding tell users to reach customer support`;
+
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.0-flash",
+    tools: tools,
+    systemInstruction: systemInstruction,
+    safetySettings: [
+      {
+        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
+      },
+    ],
+  });
+  useEffect(() => {
+    // Initial greeting message
+    setMessages([
+      {
+        text: "Hello! I'm your Game Store assistant. How can I help you with games today?",
+        type: "incoming",
+      },
+    ]);
+  }, []);
 
   // Scroll to bottom when new messages are added
   useEffect(() => {
@@ -49,134 +129,191 @@ const Chatbot = ({ isOpen, setIsOpen }) => {
     setDarkMode(!darkMode);
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (message.trim()) {
       const outgoingMessage = { text: message, type: "outgoing" };
+      setMessages((prevMessages) => [...prevMessages, outgoingMessage]);
+      setMessage(""); // Clear input field
 
-      setMessages([...messages, outgoingMessage]);
-      setConversationContext([...conversationContext, outgoingMessage]);
+      try {
+        const conversationHistory = messages.slice(1).map((msg) => ({
+          role: msg.type === "outgoing" ? "user" : "model",
+          parts: [{ text: msg.text }],
+        }));
 
-      // Clear input field
-      setMessage("");
+        const chat = model.startChat({
+          history: conversationHistory,
+          generationConfig: {
+            maxOutputTokens: 200,
+          },
+        });
 
-      // If we're waiting for the user's name
-      if (awaitingName) {
-        setUserName(message); // Save the user's name
-        setAwaitingName(false); // No longer waiting for a name
-        setTimeout(() => {
-          const botResponse = `Nice to meet you, ${message}! How can I assist you, ${message}?`;
-          const incomingMessage = { text: botResponse, type: "incoming" };
+        let currentMessageContent = message;
 
-          setMessages((prevMessages) => [...prevMessages, incomingMessage]);
-          setConversationContext((prevContext) => [
-            ...prevContext,
-            incomingMessage,
-          ]);
-        }, 500);
-      } else {
-        // Simulate bot response after a short delay
-        setTimeout(() => {
-          const botResponse = generateBotResponse(message, conversationContext);
-          const incomingMessage = { text: botResponse, type: "incoming" };
+        while (true) {
+          const result = await chat.sendMessage(currentMessageContent);
+          const response = await result.response;
 
-          setMessages((prevMessages) => [...prevMessages, incomingMessage]);
-          setConversationContext((prevContext) => [
-            ...prevContext,
-            incomingMessage,
-          ]);
-        }, 500);
-      }
-    }
-  };
+          const part = response.candidates?.[0]?.content?.parts?.[0];
 
-  const generateBotResponse = (userMessage, conversationContext) => {
-    const lowerCaseMessage = userMessage.toLowerCase();
-
-    // If the bot is waiting for the user's name, don't process other responses
-    if (awaitingName) {
-      return "I'm waiting for your name!";
-    }
-
-    // If the user has already provided their name, use it in responses
-    if (lowerCaseMessage.includes("my name") && userName) {
-      return `Your name is ${userName}. How can I assist you, ${userName}?`;
-    }
-
-    // Check if the user asked "What is my name?" without providing a name
-    const namePattern = /what is my name/i;
-    if (namePattern.test(lowerCaseMessage) && !userName) {
-      setAwaitingName(true); // Set awaiting name flag
-      return "You didn't mention your name. What is your name?";
-    }
-
-    // Handle predefined responses from botTrainingData
-    for (const { pattern, response } of botTrainingData) {
-      const regex = new RegExp(`\\b${pattern}\\b`, "i"); // Ensure word boundaries to avoid partial matches
-
-      if (regex.test(lowerCaseMessage)) {
-        // If the response contains a link, render a clickable link
-        if (typeof response === "object" && response.link) {
-          return (
-            <span>
-              {response.text}{" "}
-              <Link to={response.link} className="text-blue-500 underline">
-                Show me
-              </Link>
-            </span>
-          );
-        }
-
-        // If response is a string, return it directly (normal text)
-        if (typeof response === "string") {
-          return response;
-        }
-
-        // If response is an array (for multiple responses), use the multiple response logic
-        if (Array.isArray(response)) {
-          if (!conversationContext[pattern]) {
-            conversationContext[pattern] = {
-              usedResponses: [],
-              lastResponseIndex: -1,
-            };
+          if (!part) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                text: "Sorry, I didn't get a valid response.",
+                type: "incoming",
+              },
+            ]);
+            break; // Break if no valid part is found
           }
 
-          let availableResponses = response.filter(
-            (res) =>
-              !conversationContext[pattern].usedResponses.includes(res.order)
-          );
-
-          // If all responses have been used, reset
-          if (availableResponses.length === 0) {
-            conversationContext[pattern].usedResponses = [];
-            availableResponses = response;
+          // Handle text response first
+          if (part.text) {
+            const botResponse = part.text;
+            setMessages((prevMessages) => [
+              ...prevMessages,
+              { text: botResponse, type: "incoming" },
+            ]);
+            // If there's a text response, and no tool call, we can break the loop
+            if (!part.functionCall) {
+              break;
+            }
           }
 
-          // Select the response based on the order or randomly if desired
-          const randomIndex = Math.floor(
-            Math.random() * availableResponses.length
-          );
-          const selectedResponse = availableResponses[randomIndex];
+          // Handle tool calls
+          if (part.functionCall) {
+            const functionCall = part.functionCall;
 
-          // Mark this response as used
-          conversationContext[pattern].usedResponses.push(
-            selectedResponse.order
-          );
-          conversationContext[pattern].lastResponseIndex =
-            selectedResponse.order;
+            let toolOutput;
 
-          return selectedResponse.text; // Return the selected response text
+            if (functionCall.name === "listAllGames") {
+              try {
+                const apiResponse = await fetch(
+                  "http://localhost:8098/games/allGames"
+                ); // Assuming your backend is on localhost:8098
+                const data = await apiResponse.json();
+                toolOutput = data;
+              } catch (error) {
+                console.error("Error fetching games:", error);
+                toolOutput = JSON.stringify({
+                  error: "Failed to fetch games.",
+                });
+              }
+            } else if (functionCall.name === "getGameDetails") {
+              try {
+                const gameName = functionCall.args.gameName;
+                // First, find the game ID by name
+                const allGamesResponse = await fetch(
+                  "http://localhost:8098/games/allGames"
+                );
+                const allGamesData = await allGamesResponse.json();
+                const game = allGamesData.games.find(
+                  (g) => g.title.toLowerCase() === gameName.toLowerCase()
+                );
+
+                if (game) {
+                  const gameDetailsResponse = await fetch(
+                    `http://localhost:8098/games/fetchGame/${game._id}`
+                  );
+                  const gameDetailsData = await gameDetailsResponse.json();
+                  toolOutput = JSON.stringify(gameDetailsData);
+                } else {
+                  toolOutput = JSON.stringify({
+                    error: `Game '${gameName}' not found.`,
+                  });
+                }
+              } catch (error) {
+                console.error("Error fetching game details:", error);
+                toolOutput = JSON.stringify({
+                  error: "Failed to fetch game details.",
+                });
+              }
+            } else if (functionCall.name === "getGameStock") {
+              try {
+                const gameName = functionCall.args.gameName;
+                console.log("Calling getGameStock for game:", gameName);
+                // First, find the game ID by name to get assignedGameId
+                const allGamesResponse = await fetch(
+                  "http://localhost:8098/games/allGames"
+                );
+                const allGamesData = await allGamesResponse.json();
+                console.log("Found game for getGameStock:", allGamesData);
+
+                const game = allGamesData.games.find(
+                  (g) => g.title.toLowerCase() === gameName.toLowerCase()
+                );
+                console.log(game);
+
+                if (game) {
+                  const gameStockResponse = await fetch(
+                    `http://localhost:8098/gameStocks/getGameStockDetails/${game._id}`
+                  ); // Assuming assignedGameId is the same as game._id
+                  const gameStockData = await gameStockResponse.json();
+                  toolOutput = JSON.stringify(gameStockData);
+                  console.log("getGameStock API response:", gameStockData);
+                  console.log("getGameStock toolOutput:", toolOutput);
+                } else {
+                  toolOutput = JSON.stringify({
+                    error: `Game '${gameName}' not found.`,
+                  });
+                  console.log("Game not found for getGameStock:", gameName);
+                }
+              } catch (error) {
+                console.error("Error fetching game stock:", error);
+                toolOutput = {
+                  error: "Failed to fetch game stock details.",
+                };
+                console.log("getGameStock error toolOutput:", toolOutput);
+              }
+            } else {
+              toolOutput = { error: `Unknown tool: ${functionCall.name}.` };
+            }
+
+            currentMessageContent = [
+              {
+                functionResponse: {
+                  name: functionCall.name,
+                  response: toolOutput,
+                },
+              },
+            ];
+            // Do NOT break here, as the loop needs to continue to send the tool output back to the model
+          } else if (!part.text) {
+            // If neither text nor functionCall is present, then something went wrong or content was blocked
+            setMessages((prevMessages) => [
+              ...prevMessages,
+              {
+                text: "I'm sorry, I couldn't generate a response.",
+                type: "incoming",
+              },
+            ]);
+            break; // Exit loop if nothing was handled
+          }
         }
+      } catch (error) {
+        console.error("Error communicating with Gemini API:", error);
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            text: "Sorry, I'm having trouble connecting right now. Please try again later.",
+            type: "incoming",
+          },
+        ]);
       }
     }
-
-    // Default response if no pattern is matched
-    return "I'm sorry, I can only assist with contact and support-related topics. Can you provide more details?";
   };
 
   return (
     <div className={`fixed bottom-4 right-4 z-50 ${darkMode ? "dark" : ""}`}>
+      {/* Floating Action Button */}
       <motion.button
-        className="bg-blue-500 hover:bg-blue-600 text-white rounded-full p-3 shadow-lg transition-all duration-300 ease-in-out"
+        className={`rounded-full p-4 shadow-xl ${
+          darkMode
+            ? "bg-gray-800 hover:bg-gray-700 text-white"
+            : "bg-white hover:bg-gray-50 text-gray-800"
+        } transition-all duration-300 ease-in-out border ${
+          darkMode ? "border-gray-700" : "border-gray-200"
+        }`}
         onClick={toggleChatbot}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
@@ -205,6 +342,8 @@ const Chatbot = ({ isOpen, setIsOpen }) => {
           )}
         </AnimatePresence>
       </motion.button>
+
+      {/* Chat Window */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -212,20 +351,67 @@ const Chatbot = ({ isOpen, setIsOpen }) => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 20 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed bottom-20 right-4 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden"
+            className={`fixed bottom-20 right-4 w-96 rounded-xl shadow-2xl overflow-hidden border ${
+              darkMode
+                ? "bg-gray-900 border-gray-700"
+                : "bg-white border-gray-200"
+            }`}
           >
-            <div className="bg-blue-500 dark:bg-blue-600 p-4 flex justify-between items-center">
-              <h2 className="text-white font-bold">Contact & Support</h2>
-              <motion.button
-                onClick={toggleDarkMode}
-                className="text-white hover:text-yellow-200 transition-colors duration-200"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-              </motion.button>
+            {/* Header */}
+            <div
+              className={`p-4 flex justify-between items-center ${
+                darkMode ? "bg-gray-800" : "bg-gray-100"
+              }`}
+            >
+              <div className="flex items-center space-x-3">
+                <div
+                  className={`w-3 h-3 rounded-full ${
+                    darkMode ? "bg-green-400" : "bg-green-500"
+                  }`}
+                ></div>
+                <h2
+                  className={`font-bold ${
+                    darkMode ? "text-white" : "text-gray-800"
+                  }`}
+                >
+                  Game Store Assistant
+                </h2>
+              </div>
+              <div className="flex space-x-2">
+                <motion.button
+                  onClick={toggleDarkMode}
+                  className={`p-1 rounded-full ${
+                    darkMode
+                      ? "text-yellow-300 hover:bg-gray-700"
+                      : "text-gray-600 hover:bg-gray-200"
+                  } transition-colors duration-200`}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+                </motion.button>
+                <motion.button
+                  onClick={toggleChatbot}
+                  className={`p-1 rounded-full ${
+                    darkMode
+                      ? "text-gray-300 hover:bg-gray-700"
+                      : "text-gray-500 hover:bg-gray-200"
+                  } transition-colors duration-200`}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <X size={18} />
+                </motion.button>
+              </div>
             </div>
-            <ul ref={chatboxRef} className="h-80 overflow-y-auto p-4 space-y-4">
+
+            {/* Chat Messages */}
+            <ul
+              ref={chatboxRef}
+              className={`h-96 overflow-y-auto p-4 space-y-3 ${
+                darkMode ? "bg-gray-900" : "bg-white"
+              }`}
+            >
               {messages.map((msg, index) => (
                 <motion.li
                   key={index}
@@ -237,36 +423,86 @@ const Chatbot = ({ isOpen, setIsOpen }) => {
                   }`}
                 >
                   <div
-                    className={`max-w-xs px-4 py-2 rounded-lg ${
+                    className={`max-w-xs px-4 py-3 rounded-2xl ${
                       msg.type === "incoming"
-                        ? "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white"
+                        ? darkMode
+                          ? "bg-gray-800 text-gray-100"
+                          : "bg-gray-100 text-gray-800"
+                        : darkMode
+                        ? "bg-blue-600 text-white"
                         : "bg-blue-500 text-white"
+                    } ${
+                      msg.type === "incoming"
+                        ? "rounded-tl-none"
+                        : "rounded-tr-none"
                     }`}
                   >
-                    <p>{msg.text}</p>
+                    <p className="text-sm">{msg.text}</p>
+                    <div
+                      className={`text-xs mt-1 text-right ${
+                        msg.type === "incoming"
+                          ? darkMode
+                            ? "text-gray-400"
+                            : "text-gray-500"
+                          : "text-blue-100"
+                      }`}
+                    >
+                      {new Date().toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </div>
                   </div>
                 </motion.li>
               ))}
             </ul>
-            <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex items-center">
+
+            {/* Input Area */}
+            <div
+              className={`p-4 border-t ${
+                darkMode
+                  ? "border-gray-800 bg-gray-900"
+                  : "border-gray-200 bg-white"
+              }`}
+            >
+              <div className="flex items-center space-x-2">
                 <input
                   type="text"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Ask about contact or support..."
-                  className="flex-grow px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white rounded-l-lg focus:outline-none"
+                  placeholder="Ask about games..."
+                  className={`flex-grow px-4 py-3 rounded-xl text-sm focus:outline-none ${
+                    darkMode
+                      ? "bg-gray-800 text-white placeholder-gray-400"
+                      : "bg-gray-100 text-gray-800 placeholder-gray-500"
+                  }`}
                   onKeyPress={(e) => e.key === "Enter" && handleSend()}
                 />
                 <motion.button
                   onClick={handleSend}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-r-lg transition-colors duration-200"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  disabled={!message.trim()}
+                  className={`p-3 rounded-xl ${
+                    message.trim()
+                      ? darkMode
+                        ? "bg-blue-600 hover:bg-blue-700"
+                        : "bg-blue-500 hover:bg-blue-600"
+                      : darkMode
+                      ? "bg-gray-700 text-gray-500"
+                      : "bg-gray-200 text-gray-400"
+                  } text-white transition-colors duration-200`}
+                  whileHover={{ scale: message.trim() ? 1.05 : 1 }}
+                  whileTap={{ scale: message.trim() ? 0.95 : 1 }}
                 >
-                  <Send size={20} />
+                  <Send size={18} />
                 </motion.button>
               </div>
+              <p
+                className={`text-xs mt-2 text-center ${
+                  darkMode ? "text-gray-500" : "text-gray-400"
+                }`}
+              >
+                Powered by Gemini AI
+              </p>
             </div>
           </motion.div>
         )}

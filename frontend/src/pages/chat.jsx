@@ -4,8 +4,7 @@ import { io } from "socket.io-client";
 import { getToken } from "../utils/getToken";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import Header from "../components/header";
-import { User, Input, Button, Card, Spacer, Badge } from "@nextui-org/react";
-import { BackgroundBeams } from "../components/ui/BackgroundBeams";
+import { Input, Button, Card } from "@nextui-org/react";
 import useAuthCheck from "../utils/authCheck";
 
 const SendIcon = (props) => (
@@ -451,7 +450,6 @@ const Chat = () => {
   return (
     <div className="dark text-white">
       <Header />
-      <BackgroundBeams />
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-5xl font-bold text-black bg-clip-text bg-no-repeat text-transparent bg-gradient-to-r py-4 from-blue-500 via-orange-500 to-orange-500 [text-shadow:0_0_rgba(0,0,0,0.1)]">
           Messaging Center
