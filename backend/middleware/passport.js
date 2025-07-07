@@ -7,6 +7,11 @@ import jwt from "jsonwebtoken";
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 
+const callbackURL =
+  process.env.NODE_ENV === "production"
+    ? process.env.GOOGLE_CALLBACK_URL_PROD
+    : process.env.GOOGLE_CALLBACK_URL_DEV;
+
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser(async (id, done) => {
   try {
@@ -22,7 +27,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: process.env.GOOGLE_CALLBACK_URL,
+      callbackURL: callbackURL,
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
