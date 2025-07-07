@@ -12,11 +12,12 @@ import {
   Select,
   SelectItem,
   Avatar,
-  Chip
+  Chip,
 } from "@nextui-org/react";
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 const AssignCourier = ({
   AssigningOrder,
@@ -36,7 +37,7 @@ const AssignCourier = ({
     const fetchCouriers = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8098/users/couriers/${ReleventRegion}`
+          `${API_BASE_URL}/users/couriers/${ReleventRegion}`
         );
         setCouriers(response.data.couriers);
       } catch (error) {
@@ -54,7 +55,7 @@ const AssignCourier = ({
   const handleAssignCourier = async () => {
     try {
       const assignStatus = await axios.put(
-        `http://localhost:8098/orders/assignCourier/${AssigningOrder._id}`,
+        `${API_BASE_URL}/orders/assignCourier/${AssigningOrder._id}`,
         {
           courierId: selectedCourier,
         }
@@ -137,15 +138,17 @@ const AssignCourier = ({
                         size="sm"
                         src={courier.profilePic}
                       />
-                      
+
                       <div className="flex flex-col">
                         <span className="text-small">{courier.username}</span>
-                        
+
                         <span className="text-tiny text-default-400">
                           {courier.email}
                         </span>
                       </div>
-                      <Chip color="success" variant="dot">Available</Chip>
+                      <Chip color="success" variant="dot">
+                        Available
+                      </Chip>
                     </div>
                   </SelectItem>
                 ))}

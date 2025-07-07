@@ -19,6 +19,7 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "../src/assets/icons/SearchIcon";
 import { DeleteIcon } from "../src/assets/icons/DeleteIcon";
+import { API_BASE_URL } from "./../src/utils/getAPI";
 
 const RentedGamesSection = () => {
   const [rentedGames, setRentedGames] = useState([]);
@@ -37,9 +38,7 @@ const RentedGamesSection = () => {
   const fetchRentedGames = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get(
-        `http://localhost:8098/Rentals/getAllRentals`
-      );
+      const response = await axios.get(`${API_BASE_URL}/Rentals/getAllRentals`);
       console.log("API response:", response.data);
       setRentedGames(response.data || []);
       setError("");
@@ -60,9 +59,7 @@ const RentedGamesSection = () => {
     if (window.confirm("Are you sure you want to delete this rented game?")) {
       setIsLoading(true);
       try {
-        await axios.delete(
-          `http://localhost:8098/Rentals/deleteRentalByID/${id}`
-        );
+        await axios.delete(`${API_BASE_URL}/Rentals/deleteRentalByID/${id}`);
         await fetchRentedGames();
         toast.success("Rented game deleted successfully", {
           theme: "dark",
@@ -87,7 +84,7 @@ const RentedGamesSection = () => {
     const hrs = Math.floor(seconds / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
-    
+
     let timeString = "";
     if (hrs > 0) {
       timeString += `${hrs}h `;
@@ -96,7 +93,7 @@ const RentedGamesSection = () => {
       timeString += `${mins}m `;
     }
     timeString += `${secs}s`;
-    
+
     return timeString.trim();
   };
 

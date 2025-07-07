@@ -3,6 +3,7 @@ import axios from "axios";
 import { getToken } from "../utils/getToken";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { MdError, MdCheckCircle } from "react-icons/md"; // Import the necessary icons
+import { API_BASE_URL } from "../utils/getAPI";
 
 const Notification = () => {
   const [notifications, setNotifications] = useState([]);
@@ -26,7 +27,7 @@ const Notification = () => {
 
     try {
       const response = await axios.get(
-        `http://localhost:8098/notifications/getNotification/${userId}`,
+        `${API_BASE_URL}/notifications/getNotification/${userId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -65,7 +66,7 @@ const Notification = () => {
     try {
       const token = getToken();
       await axios.put(
-        `http://localhost:8098/notifications/markAsRead/${id}`,
+        `${API_BASE_URL}/notifications/markAsRead/${id}`,
         {},
         {
           headers: {

@@ -2,10 +2,18 @@ import React, { useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate, useLocation } from "react-router-dom";
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode } from "jwt-decode";
 
 // Next UI
-import { Input, Button, Tabs, Tab, Link, Card, CardBody } from "@nextui-org/react";
+import {
+  Input,
+  Button,
+  Tabs,
+  Tab,
+  Link,
+  Card,
+  CardBody,
+} from "@nextui-org/react";
 
 // Components
 import Header from "../components/header";
@@ -13,6 +21,7 @@ import Footer from "../components/footer";
 
 // Utils
 import { getUserRoleFromToken } from "../utils/user_role_decoder"; // Role decoder
+import { API_BASE_URL } from "../utils/getAPI";
 
 const DeveloperLogin = () => {
   const [selectedTab, setSelectedTab] = useState("login");
@@ -39,9 +48,10 @@ const DeveloperLogin = () => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
       ...prevFormData,
-      [name]: name === "firstName" || name === "lastName"
-        ? filterLettersOnly(value)
-        : value,
+      [name]:
+        name === "firstName" || name === "lastName"
+          ? filterLettersOnly(value)
+          : value,
     }));
   };
 
@@ -50,7 +60,9 @@ const DeveloperLogin = () => {
   const validateLastName = (lastName) => /^[a-zA-Z]+$/.test(lastName);
   const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
   const validatePassword = (password) =>
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password);
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+      password
+    );
 
   const validateForm = () => {
     const errors = {};
@@ -77,24 +89,26 @@ const DeveloperLogin = () => {
   const handleLogin = async () => {
     try {
       const { username, password } = formData;
-      const response = await axios.post("http://localhost:8098/developers/login", {
+      const response = await axios.post(`${API_BASE_URL}/developers/login`, {
         username,
         password,
       });
-  
+
       const token = response.data.token;
-  
+
       if (token) {
         console.log("Login successful, token received");
         Cookies.set("token", token, { expires: 1 });
-  
+
         // Decode the token to get user information
         const decodedToken = jwtDecode(token);
         console.log("Decoded token:", decodedToken);
-  
+
         // Check if the user is a developer
         if (decodedToken.role === "Developer") {
-          console.log("User is a developer, navigating to game developer dashboard");
+          console.log(
+            "User is a developer, navigating to game developer dashboard"
+          );
           navigate("/gamedeveloperdashboard");
         } else {
           console.log("User is not a developer, role:", decodedToken.role);
@@ -103,11 +117,15 @@ const DeveloperLogin = () => {
         }
       } else {
         console.log("No token received in response");
-        setAlertMessage(response.data.message || "Login failed. Please try again.");
+        setAlertMessage(
+          response.data.message || "Login failed. Please try again."
+        );
       }
     } catch (error) {
       console.error("Login error:", error);
-      setAlertMessage("Login failed. Please check your credentials and try again.");
+      setAlertMessage(
+        "Login failed. Please check your credentials and try again."
+      );
     } finally {
       setFormData({ ...formData, password: "" });
     }
@@ -119,15 +137,16 @@ const DeveloperLogin = () => {
     }
 
     try {
-      const { firstName, lastName, username, email, password, portfolioLinks } = formData;
+      const { firstName, lastName, username, email, password, portfolioLinks } =
+        formData;
 
-      const response = await axios.post("http://localhost:8098/developers/register", {
+      const response = await axios.post(`${API_BASE_URL}/developers/register`, {
         firstName,
         lastName,
         username,
         email,
         password,
-        portfolioLinks: portfolioLinks.split(',').map(link => link.trim()),
+        portfolioLinks: portfolioLinks.split(",").map((link) => link.trim()),
       });
 
       if (response.data.success) {
@@ -144,7 +163,6 @@ const DeveloperLogin = () => {
 
   return (
     <div>
-      
       <div className="flex items-center justify-center min-h-screen bg-gray-20">
         <Card className="w-[340px] h-[650px]">
           <CardBody className="overflow-hidden">
@@ -206,7 +224,9 @@ const DeveloperLogin = () => {
                     color={validationErrors.firstName ? "error" : "default"}
                   />
                   {validationErrors.firstName && (
-                    <div className="text-red-500">{validationErrors.firstName}</div>
+                    <div className="text-red-500">
+                      {validationErrors.firstName}
+                    </div>
                   )}
                   <Input
                     isRequired
@@ -219,7 +239,9 @@ const DeveloperLogin = () => {
                     color={validationErrors.lastName ? "error" : "default"}
                   />
                   {validationErrors.lastName && (
-                    <div className="text-red-500">{validationErrors.lastName}</div>
+                    <div className="text-red-500">
+                      {validationErrors.lastName}
+                    </div>
                   )}
                   <Input
                     isRequired
@@ -254,7 +276,9 @@ const DeveloperLogin = () => {
                     color={validationErrors.password ? "error" : "default"}
                   />
                   {validationErrors.password && (
-                    <div className="text-red-500">{validationErrors.password}</div>
+                    <div className="text-red-500">
+                      {validationErrors.password}
+                    </div>
                   )}
                   <Input
                     label="Portfolio Links"

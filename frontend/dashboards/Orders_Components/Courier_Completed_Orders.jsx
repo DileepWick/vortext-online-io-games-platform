@@ -19,6 +19,7 @@ import { EyeIcon } from "../../src/assets/icons/EyeIcon";
 import { getUserIdFromToken } from "../../src/utils/user_id_decoder";
 import { getToken } from "../../src/utils/getToken";
 import ViewDetails from "./View_Address_Button";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 const CourierCompletedOrdersTable = () => {
   const [tableData, setTableData] = useState([]);
@@ -32,7 +33,7 @@ const CourierCompletedOrdersTable = () => {
       const token = getToken();
       const userId = getUserIdFromToken(token);
       const response = await axios.get(
-        `http://localhost:8098/orders/courier/CompletedOrders/${userId}`
+        `${API_BASE_URL}/orders/courier/CompletedOrders/${userId}`
       );
       if (response.data.assignedOrders) {
         setTableData(response.data.assignedOrders);

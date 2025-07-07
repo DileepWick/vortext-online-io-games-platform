@@ -19,6 +19,7 @@ import { motion } from "framer-motion";
 import useAuthCheck from "../utils/authCheck";
 import Header from "../components/header";
 import Footer from "../components/footer";
+import { API_BASE_URL } from "../utils/getAPI";
 
 const UserMessages = () => {
   useAuthCheck();
@@ -62,7 +63,7 @@ const UserMessages = () => {
         setLoading(true);
         setError(null);
         const response = await axios.get(
-          `http://localhost:8098/contacts/fetchContactByUserId/${userId}`,
+          `${API_BASE_URL}/contacts/fetchContactByUserId/${userId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -112,7 +113,7 @@ const UserMessages = () => {
     try {
       // Mark the messages as read in the backend
       await axios.put(
-        `http://localhost:8098/contacts/markMessagesAsRead/${ticket._id}`,
+        `${API_BASE_URL}/contacts/markMessagesAsRead/${ticket._id}`,
 
         {},
         {
@@ -147,7 +148,7 @@ const UserMessages = () => {
 
     try {
       const response = await axios.post(
-        `http://localhost:8098/contacts/replyToAgent/${selectedTicket._id}`,
+        `${API_BASE_URL}/contacts/replyToAgent/${selectedTicket._id}`,
         {
           message: replyMessage,
           sender: "user",

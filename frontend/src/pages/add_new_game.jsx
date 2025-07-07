@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
 import Header from "../components/header";
-import Footer from "../components/footer"
+import Footer from "../components/footer";
+import { API_BASE_URL } from "../utils/getAPI";
 
 const GameForm = () => {
-
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
   const [image, setImage] = useState(null);
@@ -21,7 +21,7 @@ const GameForm = () => {
       formData.append("image", image);
 
       const response = await axios.post(
-        "http://localhost:8098/games/uploadGame",
+        `${API_BASE_URL}/games/uploadGame`,
         formData,
         {
           headers: {
@@ -97,7 +97,7 @@ const GameForm = () => {
           </button>
         </form>
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
 };

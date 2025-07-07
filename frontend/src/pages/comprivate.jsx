@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
 import { User } from "@nextui-org/react";
 import { Input } from "@nextui-org/input";
 import { Button } from "@nextui-org/button";
 import { FaPaperPlane } from "react-icons/fa";
 import { getToken } from "../utils/getToken";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
+import { API_BASE_URL } from "../utils/getAPI";
 
 const CompPrivate = () => {
   const [users, setUsers] = useState([]);
@@ -37,7 +38,7 @@ const CompPrivate = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get("http://localhost:8098/api/users/allusers");
+      const response = await axios.get(`${API_BASE_URL}/api/users/allusers`);
       setUsers(response.data.allUsers || []);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -46,7 +47,9 @@ const CompPrivate = () => {
 
   const fetchCurrentUser = async () => {
     try {
-      const response = await axios.get(`http://localhost:8098/users/profile/${userId}`);
+      const response = await axios.get(
+        `${API_BASE_URL}/users/profile/${userId}`
+      );
       setCurrentUser(response.data.profile);
     } catch (error) {
       console.error("Error fetching current user:", error);
@@ -55,7 +58,9 @@ const CompPrivate = () => {
 
   const fetchMessages = async () => {
     try {
-      const response = await axios.get(`http://localhost:8098/api/messages/${currentUser._id}/${selectedUser._id}`);
+      const response = await axios.get(
+        `${API_BASE_URL}/api/messages/${currentUser._id}/${selectedUser._id}`
+      );
       setMessages(response.data.messages || []);
     } catch (error) {
       console.error("Error fetching messages:", error);
@@ -66,7 +71,7 @@ const CompPrivate = () => {
     if (!newMessage.trim() || !selectedUser || !currentUser) return;
 
     try {
-      await axios.post("http://localhost:8098/api/messages/send", {
+      await axios.post(`${API_BASE_URL}/api/messages/send`, {
         senderId: currentUser._id,
         recipientId: selectedUser._id,
         content: newMessage,
@@ -84,7 +89,9 @@ const CompPrivate = () => {
 
   return (
     <div className="bg-customDark p-6 rounded-lg">
-      <h2 className="text-2xl font-bold mb-4 text-white">User Messaging System</h2>
+      <h2 className="text-2xl font-bold mb-4 text-white">
+        User Messaging System
+      </h2>
       <div className="flex">
         <div className="w-1/3 pr-4">
           <h3 className="text-xl font-semibold mb-2 text-white">Users</h3>
@@ -94,7 +101,9 @@ const CompPrivate = () => {
                 <div
                   key={user._id}
                   className={`p-2 rounded cursor-pointer ${
-                    selectedUser && selectedUser._id === user._id ? "bg-blue-600" : "bg-gray-700"
+                    selectedUser && selectedUser._id === user._id
+                      ? "bg-blue-600"
+                      : "bg-gray-700"
                   }`}
                   onClick={() => setSelectedUser(user)}
                 >
@@ -123,12 +132,16 @@ const CompPrivate = () => {
                   <div
                     key={index}
                     className={`mb-2 ${
-                      message.sender === currentUser._id ? "text-right" : "text-left"
+                      message.sender === currentUser._id
+                        ? "text-right"
+                        : "text-left"
                     }`}
                   >
                     <span
                       className={`inline-block p-2 rounded-lg ${
-                        message.sender === currentUser._id ? "bg-blue-600" : "bg-gray-700"
+                        message.sender === currentUser._id
+                          ? "bg-blue-600"
+                          : "bg-gray-700"
                       }`}
                     >
                       {message.content}
@@ -142,7 +155,7 @@ const CompPrivate = () => {
                   placeholder="Type your message..."
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
                   className="flex-grow mr-2"
                 />
                 <Button color="primary" onClick={handleSendMessage}>

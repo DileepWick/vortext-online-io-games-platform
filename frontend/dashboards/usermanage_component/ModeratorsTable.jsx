@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Table,
   TableHeader,
   TableColumn,
   TableBody,
   TableRow,
-  TableCell
+  TableCell,
 } from "@nextui-org/react";
-
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 const ModeratorsTable = () => {
   const [moderators, setModerators] = useState([]);
@@ -18,11 +18,11 @@ const ModeratorsTable = () => {
   useEffect(() => {
     const fetchModerators = async () => {
       try {
-        const response = await axios.get('http://localhost:8098/users/moderators');
+        const response = await axios.get(`${API_BASE_URL}/users/moderators`);
         setModerators(response.data);
         setIsLoading(false);
       } catch (err) {
-        setError('Failed to fetch moderators');
+        setError("Failed to fetch moderators");
         setIsLoading(false);
       }
     };
@@ -34,8 +34,10 @@ const ModeratorsTable = () => {
   if (error) return <div>{error}</div>;
 
   return (
-    
-    <Table aria-label="Moderators table" className="text-black font-primaryRegular">
+    <Table
+      aria-label="Moderators table"
+      className="text-black font-primaryRegular"
+    >
       <TableHeader className="font-primaryRegular">
         <TableColumn>USERNAME</TableColumn>
         <TableColumn>EMAIL</TableColumn>

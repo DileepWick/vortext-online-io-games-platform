@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Button, Modal, Input } from "@nextui-org/react";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 const UpdateUser = ({ user, refreshUsers }) => {
   const [visible, setVisible] = useState(false);
@@ -10,7 +11,7 @@ const UpdateUser = ({ user, refreshUsers }) => {
 
   const handleUpdate = async () => {
     try {
-      await axios.put(`http://localhost:8098/users/${user.id}`, {
+      await axios.put(`${API_BASE_URL}/users/${user.id}`, {
         username,
         email,
         age,

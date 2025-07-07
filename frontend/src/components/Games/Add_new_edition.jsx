@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../../utils/getAPI";
 import {
   Button,
   Input,
@@ -53,7 +54,7 @@ export const AddNewEdition = ({ callBackFunction }) => {
 
     try {
       const response = await axios.post(
-        `http://localhost:8098/spookeyEditons/addNewEdition`,
+        `${API_BASE_URL}/spookeyEditons/addNewEdition`,
         newEdition
       );
 
@@ -113,7 +114,9 @@ export const AddNewEdition = ({ callBackFunction }) => {
         }}
       >
         <ModalContent className="font-primaryRegular p-4">
-          <ModalHeader className="text-3xl font-primaryRegular text-black">Custom Edition</ModalHeader>
+          <ModalHeader className="text-3xl font-primaryRegular text-black">
+            Custom Edition
+          </ModalHeader>
           <ModalBody>
             <form onSubmit={saveNewEdition}>
               <Input
@@ -125,7 +128,9 @@ export const AddNewEdition = ({ callBackFunction }) => {
               <ScrollShadow className="w-[450px] h-[400px]">
                 {questions.map((question, index) => (
                   <div key={index} className="mt-8">
-                    <h3 className="text-lg font-primaryRegular text-black">Question {index + 1}</h3>
+                    <h3 className="text-lg font-primaryRegular text-black">
+                      Question {index + 1}
+                    </h3>
                     <Input
                       label="Question"
                       type="text"
@@ -166,7 +171,12 @@ export const AddNewEdition = ({ callBackFunction }) => {
               >
                 Add Another Question
               </Button>
-              <Button type="submit" color="danger" className="mt-4 ml-4" size="sm">
+              <Button
+                type="submit"
+                color="danger"
+                className="mt-4 ml-4"
+                size="sm"
+              >
                 Save Edition
               </Button>
             </form>

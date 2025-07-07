@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import RatingSystem from "../components/RatingSystem";
+import { API_BASE_URL } from "../utils/getAPI";
 
 // NextUI
 import { Button, Chip } from "@nextui-org/react";
@@ -44,7 +45,7 @@ const GameDetails = () => {
     const fetchUser = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8098/users/profile/${userId}`
+          `${API_BASE_URL}/users/profile/${userId}`
         );
         setUser(response.data.profile);
       } catch (error) {
@@ -75,13 +76,13 @@ const GameDetails = () => {
     const fetchGameDetails = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8098/gameStocks/GetStockById/${id}`
+          `${API_BASE_URL}/gameStocks/GetStockById/${id}`
         );
         const currentGameStock = response.data;
         setGameStock(currentGameStock);
 
         const relatedResponse = await axios.get(
-          `http://localhost:8098/gameStocks/getGameStockDetails/${currentGameStock.AssignedGame._id}`
+          `${API_BASE_URL}/gameStocks/getGameStockDetails/${currentGameStock.AssignedGame._id}`
         );
 
         const filteredRelatedStocks = relatedResponse.data.filter(
@@ -98,9 +99,7 @@ const GameDetails = () => {
 
     const fetchRatings = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8098/ratings/game/${id}`
-        );
+        const response = await axios.get(`${API_BASE_URL}/ratings/game/${id}`);
         setRatings(response.data);
         console.log("id", id);
         const avg =
@@ -119,7 +118,7 @@ const GameDetails = () => {
         const token = getToken();
         const userId = getUserIdFromToken(token);
         const response = await axios.get(
-          `http://localhost:8098/cart/getCartByUserId/${userId}`
+          `${API_BASE_URL}/cart/getCartByUserId/${userId}`
         );
         setCartId(response.data._id);
       } catch (error) {
@@ -132,7 +131,7 @@ const GameDetails = () => {
         const token = getToken();
         const userId = getUserIdFromToken(token);
         const checkStatus = await axios.get(
-          `http://localhost:8098/orderItems/checkItem/${id}/${userId}/`
+          `${API_BASE_URL}/orderItems/checkItem/${id}/${userId}/`
         );
 
         if (checkStatus.status == 200) {
@@ -168,7 +167,7 @@ const GameDetails = () => {
         }
 
         const response = await axios.post(
-          `http://localhost:8098/cartItems/createCartItem`,
+          `${API_BASE_URL}/cartItems/createCartItem`,
           {
             cartid: cartId,
             stockid: stockId,
@@ -221,7 +220,7 @@ const GameDetails = () => {
         comment,
       });
 
-      const response = await axios.post(`http://localhost:8098/ratings`, {
+      const response = await axios.post(`${API_BASE_URL}/ratings`, {
         user: userId,
         game: id,
         rating,
@@ -244,7 +243,7 @@ const GameDetails = () => {
           style: { fontFamily: "Rubik" },
         });
         const updatedRatings = await axios.get(
-          `http://localhost:8098/ratings/game/${id}`
+          `${API_BASE_URL}/ratings/game/${id}`
         );
         console.log("Updated ratings:", updatedRatings.data);
         setRatings(updatedRatings.data);
@@ -303,7 +302,7 @@ const GameDetails = () => {
   const handleRateUpdate = async (ratingId, rating, comment) => {
     try {
       const response = await axios.put(
-        `http://localhost:8098/ratings/game/${ratingId}`,
+        `${API_BASE_URL}/ratings/game/${ratingId}`,
         {
           rating,
           comment,
@@ -324,7 +323,7 @@ const GameDetails = () => {
           style: { fontFamily: "Rubik" },
         });
         const updatedRatings = await axios.get(
-          `http://localhost:8098/ratings/game/${id}`
+          `${API_BASE_URL}/ratings/game/${id}`
         );
         console.log("Updated ratings:", updatedRatings.data);
         setRatings(updatedRatings.data);
@@ -369,12 +368,11 @@ const GameDetails = () => {
   return (
     <div className="bg-white text-white min-h-screen font-sans">
       <Header />
-      
+
       {/* Main Game Details Section */}
       <div className="container mx-auto px-4 py-8">
         <div className="bg-white  rounded-lg shadow-2xl overflow-hidden">
           <div className="flex flex-col lg:flex-row gap-8 p-6 lg:p-8">
-            
             {/* Left Column - Video and Description */}
             <div className="flex-1">
               <VideoPlayer
@@ -384,12 +382,12 @@ const GameDetails = () => {
                 muted
                 className="w-full h-64 sm:h-80 lg:h-96 object-cover mb-6 rounded-lg shadow-lg border border-gray-700"
               />
-              
+
               <div className="space-y-6">
                 <h1 className="text-xl sm:text-4xl lg:text-5xl font-primaryRegular text-black mt-8">
                   About the Game
                 </h1>
-                
+
                 <div className="bg-white rounded-lg p-4 ">
                   <ScrollShadow
                     hideScrollBar
@@ -410,12 +408,12 @@ const GameDetails = () => {
                   className="w-full h-64 sm:h-80 lg:h-96 object-cover"
                   src={gameStock.AssignedGame.coverPhoto}
                 />
-                
+
                 <CardBody className="p-6 space-y-4">
                   <h2 className="text-xl sm:text-2xl font-primaryRegular text-black">
                     {gameStock.AssignedGame.title}
                   </h2>
-                  
+
                   {gameStock.discount > 0 && (
                     <div className="space-y-3">
                       <Chip
@@ -435,14 +433,14 @@ const GameDetails = () => {
                       </div>
                     </div>
                   )}
-                  
+
                   {!gameStock.discount && (
                     <div className="text-white font-bold text-xl">
                       LKR {originalPrice.toFixed(2)}
                     </div>
                   )}
                 </CardBody>
-                
+
                 <CardFooter className="p-6 pt-0">
                   <div className="w-full space-y-3">
                     <Button

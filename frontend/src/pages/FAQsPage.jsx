@@ -13,7 +13,8 @@ import {
   Textarea,
   ScrollShadow,
 } from "@nextui-org/react";
-import Chatbot from "../components/Chatbot";
+// import Chatbot from "../components/Chatbot";
+import { API_BASE_URL } from "../utils/getAPI";
 
 const FAQsPage = () => {
   const [faqs, setFaqs] = useState([]);
@@ -25,7 +26,7 @@ const FAQsPage = () => {
   useEffect(() => {
     const fetchFAQs = async () => {
       try {
-        const response = await axios.get("http://localhost:8098/faq/fetchFAQ");
+        const response = await axios.get(`${API_BASE_URL}/faq/fetchFAQ`);
         setFaqs(response.data.allFAQs);
       } catch (err) {
         setError("Failed to fetch FAQs");
@@ -71,7 +72,7 @@ const FAQsPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8098/faq/deleteFAQ/${id}`);
+      await axios.delete(`${API_BASE_URL}/faq/deleteFAQ/${id}`);
       setFaqs(faqs.filter((faq) => faq._id !== id));
       notifySuccess("FAQ deleted successfully!");
     } catch (err) {
@@ -83,7 +84,7 @@ const FAQsPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8098/faq/createFAQ", {
+      const response = await axios.post(`${API_BASE_URL}/faq/createFAQ`, {
         question: newQuestion,
         answer: newAnswer,
       });
@@ -105,7 +106,7 @@ const FAQsPage = () => {
       <ToastContainer /> {/* Toast Container */}
       <ScrollShadow hideScrollBar>
         <Header />
-        <Chatbot />
+        {/* <Chatbot /> */}
         <div className="container mx-auto px-4 py-16">
           <h1 className="text-4xl text-center text-white mb-8 font-primaryRegular">
             Customer Support

@@ -12,6 +12,7 @@ import {
 
 import React, { useState } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 export const update_stock = ({ updatingStock, callBackFunction }) => {
   // State variables
@@ -51,7 +52,7 @@ export const update_stock = ({ updatingStock, callBackFunction }) => {
 
     try {
       const response = await axios.put(
-        `http://localhost:8098/gameStocks/updateGameStock/${updatingStock._id}`,
+        `${API_BASE_URL}/gameStocks/updateGameStock/${updatingStock._id}`,
         newPricing
       );
 

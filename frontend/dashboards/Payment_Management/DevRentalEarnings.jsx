@@ -16,8 +16,8 @@ import { SearchIcon } from "../../src/assets/icons/SearchIcon";
 import { toast } from "react-toastify";
 import { getToken } from "../../src/utils/getToken";
 import { getUserIdFromToken } from "../../src/utils/user_id_decoder";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
-const API_BASE_URL = "http://localhost:8098";
 const DEVELOPER_SHARE_PERCENTAGE = 0.7; // 70% share for the developer
 
 const DevRentalEarnings = () => {
@@ -49,7 +49,9 @@ const DevRentalEarnings = () => {
 
   const fetchDistributedPayments = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/distributed-payments/all`);
+      const response = await axios.get(
+        `${API_BASE_URL}/api/distributed-payments/all`
+      );
       const distributedPayments = response.data.reduce((acc, payment) => {
         acc[payment.paymentId] = payment.amount;
         return acc;
@@ -62,9 +64,10 @@ const DevRentalEarnings = () => {
   };
 
   const filteredItems = useMemo(() => {
-    return rentalPayments.filter((item) =>
-      item.game?.title?.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      item.game?.developer?._id === userId
+    return rentalPayments.filter(
+      (item) =>
+        item.game?.title?.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        item.game?.developer?._id === userId
     );
   }, [rentalPayments, searchQuery, userId]);
 
@@ -129,9 +132,7 @@ const DevRentalEarnings = () => {
               <TableCell>{item.game?.title || "N/A"}</TableCell>
               <TableCell>Rs.{item.amount?.toFixed(2) || "N/A"}</TableCell>
               <TableCell>
-                {item.date
-                  ? new Date(item.date).toLocaleDateString()
-                  : "N/A"}
+                {item.date ? new Date(item.date).toLocaleDateString() : "N/A"}
               </TableCell>
               <TableCell>
                 <User
@@ -143,10 +144,13 @@ const DevRentalEarnings = () => {
                 />
               </TableCell>
               <TableCell>
-                {distributedPayments[item._id] 
-                  ? <span style={{ color: '#00008B' }}>Rs.{distributedPayments[item._id].toFixed(2)}</span>
-                  : <span style={{ color: 'red' }}>Not paid yet</span>
-                }
+                {distributedPayments[item._id] ? (
+                  <span style={{ color: "#00008B" }}>
+                    Rs.{distributedPayments[item._id].toFixed(2)}
+                  </span>
+                ) : (
+                  <span style={{ color: "red" }}>Not paid yet</span>
+                )}
               </TableCell>
             </TableRow>
           ))}

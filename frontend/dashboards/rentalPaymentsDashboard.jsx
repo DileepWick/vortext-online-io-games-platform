@@ -22,8 +22,7 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "../src/assets/icons/SearchIcon";
 import { toast } from "react-toastify";
-
-const API_BASE_URL = "http://localhost:8098";
+import { API_BASE_URL } from "../src/utils/getAPI";
 const DEVELOPER_SHARE_PERCENTAGE = 0.7; // 70% share for the developer
 
 const RentalPaymentsDash = () => {
@@ -56,7 +55,9 @@ const RentalPaymentsDash = () => {
 
   const fetchDistributedPayments = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/distributed-payments/all`);
+      const response = await axios.get(
+        `${API_BASE_URL}/api/distributed-payments/all`
+      );
       const distributedPayments = response.data.reduce((acc, payment) => {
         acc[payment.paymentId] = payment.amount;
         return acc;
@@ -110,11 +111,14 @@ const RentalPaymentsDash = () => {
 
   const saveDistributedPayment = async (paymentId, developerId, amount) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/distributed-payments/save`, {
-        paymentId,
-        developerId,
-        amount,
-      });
+      const response = await axios.post(
+        `${API_BASE_URL}/api/distributed-payments/save`,
+        {
+          paymentId,
+          developerId,
+          amount,
+        }
+      );
       return response.data;
     } catch (error) {
       console.error("Error saving distributed payment:", error);
@@ -209,9 +213,7 @@ const RentalPaymentsDash = () => {
               </TableCell>
               <TableCell>Rs.{item.amount?.toFixed(2) || "N/A"}</TableCell>
               <TableCell>
-                {item.date
-                  ? new Date(item.date).toLocaleDateString()
-                  : "N/A"}
+                {item.date ? new Date(item.date).toLocaleDateString() : "N/A"}
               </TableCell>
               <TableCell>
                 <User
@@ -223,19 +225,28 @@ const RentalPaymentsDash = () => {
                 />
               </TableCell>
               <TableCell>
-                {distributedPayments[item._id] 
-                  ? <span style={{ color: '#00008B' }}>Rs.{distributedPayments[item._id].toFixed(2)}</span>
-                  : <span style={{ color: 'red' }}>Not Paid Yet</span>
-                }
+                {distributedPayments[item._id] ? (
+                  <span style={{ color: "#00008B" }}>
+                    Rs.{distributedPayments[item._id].toFixed(2)}
+                  </span>
+                ) : (
+                  <span style={{ color: "red" }}>Not Paid Yet</span>
+                )}
               </TableCell>
               <TableCell>
-                <Chip color={item.rental?._id ? "success" : "warning"} variant="flat">
-                  {item.rental?._id ? 'Active' : 'Expired'}
+                <Chip
+                  color={item.rental?._id ? "success" : "warning"}
+                  variant="flat"
+                >
+                  {item.rental?._id ? "Active" : "Expired"}
                 </Chip>
               </TableCell>
               <TableCell>
                 {distributedPayments[item._id] ? (
-                  <Tooltip content="Payment already distributed" className="text-yellow-500">
+                  <Tooltip
+                    content="Payment already distributed"
+                    className="text-yellow-500"
+                  >
                     <span className="text-green-500">Done</span>
                   </Tooltip>
                 ) : (
@@ -270,8 +281,10 @@ const RentalPaymentsDash = () => {
                   <div>
                     <p>
                       You are about to distribute payment of Rs.
-                      {(selectedItem.amount * DEVELOPER_SHARE_PERCENTAGE).toFixed(2)} to{" "}
-                      {selectedItem.game?.developer?.username}
+                      {(
+                        selectedItem.amount * DEVELOPER_SHARE_PERCENTAGE
+                      ).toFixed(2)}{" "}
+                      to {selectedItem.game?.developer?.username}
                     </p>
                   </div>
                 )}

@@ -18,6 +18,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 // Utils
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { getToken } from "../utils/getToken";
+import { API_BASE_URL } from "../utils/getAPI";
 
 export default function DeveloperHeader() {
   const [developer, setDeveloper] = useState(null);
@@ -30,7 +31,7 @@ export default function DeveloperHeader() {
     const fetchDeveloper = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8098/developers/profile/${userId}`
+          `${API_BASE_URL}/developers/profile/${userId}`
         );
         setDeveloper(response.data);
       } catch (error) {
@@ -72,7 +73,9 @@ export default function DeveloperHeader() {
           </NavbarItem>
           <NavbarItem>
             <Link
-              color={location.pathname === "/TailoredGames" ? "primary" : "white"}
+              color={
+                location.pathname === "/TailoredGames" ? "primary" : "white"
+              }
               href="/TailoredGames"
               className={`${
                 location.pathname === "/TailoredGames" ? "underline" : ""

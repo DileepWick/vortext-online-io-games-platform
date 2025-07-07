@@ -13,6 +13,7 @@ import {
 
 import React from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 const delete_stock = ({ deletingStock, callBackFunction }) => {
   //Delete Stock
@@ -26,7 +27,7 @@ const delete_stock = ({ deletingStock, callBackFunction }) => {
   const deleteStock = async (req, res) => {
     try {
       const DeletionStatus = await axios.delete(
-        `http://localhost:8098/gameStocks/deleteGameStock/${deletingStock._id}`
+        `${API_BASE_URL}/gameStocks/deleteGameStock/${deletingStock._id}`
       );
 
       if (DeletionStatus.data) {

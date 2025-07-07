@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../../utils/getAPI";
 import { Button } from "@nextui-org/react"; // Import Button component from NextUI or use a standard button
 import { PlayIcon } from "../../assets/icons/playIcon";
 import AddNewEdition from "../Games/Add_new_edition";
@@ -12,9 +13,7 @@ const EditionSelector = ({ onSelectEdition }) => {
   useEffect(() => {
     const fetchEditions = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8098/spookeyEditons/"
-        );
+        const response = await axios.get(`${API_BASE_URL}/spookeyEditons/`);
         setEditions(response.data);
         setLoading(false);
       } catch (err) {
@@ -41,7 +40,7 @@ const EditionSelector = ({ onSelectEdition }) => {
   return (
     <div className="edition-selector">
       <h2 className="text-xl mb-4 mt-4 text-black">Available Editions</h2>
-      <AddNewEdition/>
+      <AddNewEdition />
       <div className="edition-buttons-container grid grid-cols-4 gap-4 mt-4">
         {editions.map((edition) => (
           <Button

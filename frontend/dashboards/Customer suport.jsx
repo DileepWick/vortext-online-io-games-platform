@@ -50,6 +50,7 @@ import "react-toastify/dist/ReactToastify.css";
 // Document Head Management
 import { Helmet } from "react-helmet-async";
 import ScrollToTop from "../src/components/ScrollToTop";
+import { API_BASE_URL } from "../src/utils/getAPI";
 
 const ContactDash = () => {
   useAuthCheck("Support Agent");
@@ -160,8 +161,8 @@ const ContactDash = () => {
       try {
         // Make concurrent API calls to fetch FAQs and contact messages
         const [faqResponse, contactResponse] = await Promise.all([
-          axios.get("http://localhost:8098/faq/fetchFAQ"),
-          axios.get("http://localhost:8098/contacts/fetchContacts"),
+          axios.get(`${API_BASE_URL}/faq/fetchFAQ`),
+          axios.get(`${API_BASE_URL}/contacts/fetchContacts`),
         ]);
 
         // Check if FAQ response contains data and update state
@@ -197,7 +198,7 @@ const ContactDash = () => {
       // Make a GET request to the backend API to generate the report
       const timestamp = new Date().getTime(); // Get current timestamp for cache-busting
       const response = await axios.get(
-        `http://localhost:8098/contacts/generateReport?t=${timestamp}`,
+        `${API_BASE_URL}/contacts/generateReport?t=${timestamp}`,
         {
           responseType: "blob", // Specify that we expect a binary response
         }
@@ -236,7 +237,7 @@ const ContactDash = () => {
 
     try {
       // Make a POST request to add the new FAQ
-      const response = await axios.post("http://localhost:8098/faq/createFAQ", {
+      const response = await axios.post(`${API_BASE_URL}/faq/createFAQ`, {
         question: newFAQQuestion,
         answer: newFAQAnswer,
       });
@@ -304,7 +305,7 @@ const ContactDash = () => {
     try {
       // Make a PUT request to update the FAQ by its ID
       const response = await axios.put(
-        `http://localhost:8098/faq/updateFAQ/${editingFAQ._id}`,
+        `${API_BASE_URL}/faq/updateFAQ/${editingFAQ._id}`,
         {
           question: editFAQQuestion,
           answer: editFAQAnswer,
@@ -357,7 +358,7 @@ const ContactDash = () => {
 
       // Make a PUT request to update the status of the contact by its ID
       const response = await axios.put(
-        `http://localhost:8098/contacts/setStatus/${contactId}`,
+        `${API_BASE_URL}/contacts/setStatus/${contactId}`,
         { status: "closed" }
       );
 
@@ -398,7 +399,7 @@ const ContactDash = () => {
   const handleDeleteFAQ = async (faqId) => {
     try {
       // Make a DELETE request to the backend to delete the FAQ by its ID
-      await axios.delete(`http://localhost:8098/faq/deleteFAQ/${faqId}`);
+      await axios.delete(`${API_BASE_URL}/faq/deleteFAQ/${faqId}`);
 
       // Filter the FAQs and remove the deleted FAQ from the state
       setFaqs(faqs.filter((faq) => faq._id !== faqId));
@@ -443,9 +444,7 @@ const ContactDash = () => {
       }
 
       // If the ticket is not open, proceed with deletion
-      await axios.delete(
-        `http://localhost:8098/contacts/deleteContact/${messageId}`
-      );
+      await axios.delete(`${API_BASE_URL}/contacts/deleteContact/${messageId}`);
 
       // Remove the deleted contact message from the state
       setContactMessages(

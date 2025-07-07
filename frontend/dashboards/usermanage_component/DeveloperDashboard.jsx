@@ -19,6 +19,7 @@ import {
   ModalFooter,
 } from "@nextui-org/react";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 const DeveloperDashboard = () => {
   const [developers, setDevelopers] = useState([]);
@@ -32,7 +33,7 @@ const DeveloperDashboard = () => {
   useEffect(() => {
     const fetchDevelopers = async () => {
       try {
-        const response = await axios.get("http://localhost:8098/users/allDevelopers");
+        const response = await axios.get(`${API_BASE_URL}/users/allDevelopers`);
         if (response.data.allUsers && Array.isArray(response.data.allUsers)) {
           setDevelopers(response.data.allUsers);
         } else {
@@ -52,15 +53,16 @@ const DeveloperDashboard = () => {
     const sortedDevelopers = [...developers].sort((a, b) => {
       const aStatus = a.developerAttributes?.status || "unknown";
       const bStatus = b.developerAttributes?.status || "unknown";
-      
+
       if (aStatus === "pending" && bStatus !== "pending") return -1;
       if (aStatus !== "pending" && bStatus === "pending") return 1;
       return 0;
     });
 
-    return sortedDevelopers.filter((developer) =>
-      developer.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      developer.email.toLowerCase().includes(searchQuery.toLowerCase())
+    return sortedDevelopers.filter(
+      (developer) =>
+        developer.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        developer.email.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [developers, searchQuery]);
 
@@ -87,12 +89,22 @@ const DeveloperDashboard = () => {
 
   const handleApprove = async () => {
     try {
-      await axios.put(`http://localhost:8098/users/developers/approve/${selectedDeveloper._id}`);
+      await axios.put(
+        `${API_BASE_URL}/users/developers/approve/${selectedDeveloper._id}`
+      );
       toast.success("Developer approved!");
 
       setDevelopers((prevDevelopers) =>
         prevDevelopers.map((developer) =>
-          developer._id === selectedDeveloper._id ? { ...developer, developerAttributes: { ...developer.developerAttributes, status: "approved" }} : developer
+          developer._id === selectedDeveloper._id
+            ? {
+                ...developer,
+                developerAttributes: {
+                  ...developer.developerAttributes,
+                  status: "approved",
+                },
+              }
+            : developer
         )
       );
       setApproveModalOpen(false);
@@ -104,12 +116,22 @@ const DeveloperDashboard = () => {
 
   const handleReject = async () => {
     try {
-      await axios.put(`http://localhost:8098/users/developers/reject/${selectedDeveloper._id}`);
+      await axios.put(
+        `${API_BASE_URL}/users/developers/reject/${selectedDeveloper._id}`
+      );
       toast.success("Developer rejected.");
 
       setDevelopers((prevDevelopers) =>
         prevDevelopers.map((developer) =>
-          developer._id === selectedDeveloper._id ? { ...developer, developerAttributes: { ...developer.developerAttributes, status: "rejected" }} : developer
+          developer._id === selectedDeveloper._id
+            ? {
+                ...developer,
+                developerAttributes: {
+                  ...developer.developerAttributes,
+                  status: "rejected",
+                },
+              }
+            : developer
         )
       );
       setRejectModalOpen(false);
@@ -121,18 +143,18 @@ const DeveloperDashboard = () => {
 
   return (
     <div>
-      <div className="flex items-center mb-4" >
-      <Input
-        className="ml-2 font-primaryRegular w-full" // Use w-full to make it full width
-        placeholder="Search by Developer..."
-        startContent={<SearchIcon />}
-        value={searchQuery}
-        onChange={handleSearchChange}
-        onClear={() => handleSearchChange({ target: { value: "" } })}
-        style={{ maxWidth: "600px" }} // Optional: Set a maximum width
-      />
+      <div className="flex items-center mb-4">
+        <Input
+          className="ml-2 font-primaryRegular w-full" // Use w-full to make it full width
+          placeholder="Search by Developer..."
+          startContent={<SearchIcon />}
+          value={searchQuery}
+          onChange={handleSearchChange}
+          onClear={() => handleSearchChange({ target: { value: "" } })}
+          style={{ maxWidth: "600px" }} // Optional: Set a maximum width
+        />
       </div>
-      
+
       <Table
         className="text-black font-primaryRegular"
         isHeaderSticky
@@ -163,16 +185,22 @@ const DeveloperDashboard = () => {
 
         <TableBody className="font-primaryRegular">
           {paginatedItems.map((developer) => (
-            <TableRow  key={developer._id}>
-              <TableCell >{developer.firstname + " " + developer.lastname}</TableCell>
+            <TableRow key={developer._id}>
+              <TableCell>
+                {developer.firstname + " " + developer.lastname}
+              </TableCell>
               <TableCell>{developer.username}</TableCell>
               <TableCell>
                 <a
-                  href={developer.portfolioLink || `www.linkedin.com/${developer.username}`}
+                  href={
+                    developer.portfolioLink ||
+                    `www.linkedin.com/${developer.username}`
+                  }
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {developer.portfolioLink || `www.linkedin.com/${developer.username}`}
+                  {developer.portfolioLink ||
+                    `www.linkedin.com/${developer.username}`}
                 </a>
               </TableCell>
               <TableCell>{developer.email}</TableCell>
@@ -193,16 +221,23 @@ const DeveloperDashboard = () => {
               <TableCell>
                 {developer.developerAttributes?.status === "pending" && (
                   <>
-                    <Button onClick={() => openApproveModal(developer)} color="success">
+                    <Button
+                      onClick={() => openApproveModal(developer)}
+                      color="success"
+                    >
                       Approve
                     </Button>
-                    <Button onClick={() => openRejectModal(developer)} variant="ghost" color="danger">
+                    <Button
+                      onClick={() => openRejectModal(developer)}
+                      variant="ghost"
+                      color="danger"
+                    >
                       Reject
                     </Button>
                   </>
                 )}
-                 </TableCell>
-              </TableRow>
+              </TableCell>
+            </TableRow>
           ))}
         </TableBody>
       </Table>

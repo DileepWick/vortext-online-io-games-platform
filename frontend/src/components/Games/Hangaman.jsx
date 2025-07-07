@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@nextui-org/react";
 import axios from "axios";
+import { API_BASE_URL } from "../../utils/getAPI";
 
 // Import your images for each stage
 import stage0 from "../../assets/icons/st1.gif";
@@ -102,7 +103,7 @@ const Hangman = () => {
       const fetchQuestions = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8098/spookeyEditons/${selectedEditionId}`
+            `${API_BASE_URL}/spookeyEditons/${selectedEditionId}`
           );
 
           if (response.data && response.data.length > 0) {
@@ -200,7 +201,8 @@ const Hangman = () => {
 
   //Render Warning
   const renderWarning = () => (
-    <p style={{color:'red'}}
+    <p
+      style={{ color: "red" }}
       className={`font-primaryRegular  text-xl mb-6 transition-opacity duration-500 ease-in-out ${
         warning ? "opacity-100" : "opacity-0"
       }`}
@@ -212,8 +214,11 @@ const Hangman = () => {
   //Show correct answer if round lost
   const renderCorrectAnswer = () => (
     <>
-      <p className="font-primaryRegular text-red text-5xl mb-4 " style={{textAlign:'center' ,color:'red'}}>
-      Game Over... Bats Have Summoned . . .
+      <p
+        className="font-primaryRegular text-red text-5xl mb-4 "
+        style={{ textAlign: "center", color: "red" }}
+      >
+        Game Over... Bats Have Summoned . . .
       </p>
       <p className="text-black font-primaryRegular text-xl">
         The correct answer was: <strong>{word}</strong>
@@ -224,8 +229,12 @@ const Hangman = () => {
   //Show happy message
   const renderWinMessage = () => (
     <>
-      <p className="font-primaryRegular text-5xl mb-4 text-black" style={{textAlign:'center'}}>
-      Great job! You're one step closer to defeating the witches. Get ready for the next question!
+      <p
+        className="font-primaryRegular text-5xl mb-4 text-black"
+        style={{ textAlign: "center" }}
+      >
+        Great job! You're one step closer to defeating the witches. Get ready
+        for the next question!
       </p>
     </>
   );
@@ -250,7 +259,7 @@ const Hangman = () => {
       const fetchTitle = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8098/spookeyEditons/getEditionTitle/${selectedEditionId}`
+            `${API_BASE_URL}/spookeyEditons/getEditionTitle/${selectedEditionId}`
           );
 
           if (response.data) {
@@ -314,95 +323,112 @@ const Hangman = () => {
 
   return (
     <div className="bg-customDark">
-    <Header/>
-    <div
-      style={{ backgroundImage: `url(${loadingGif})` }}
-      className="w-[1500px] h-[800px] mx-auto mt-12 p-8 border-2 border-gray-300 shadow-lg rounded-lg flex bg-conatin bg-center"
-    >
-      {/* Render happy image if game win*/}
-      <div className="w-[1200px] h-[200px]">
-        {isGameWon ? renderHappyImage() : renderHangmanImage()}
-      </div>
+      <Header />
+      <div
+        style={{ backgroundImage: `url(${loadingGif})` }}
+        className="w-[1500px] h-[800px] mx-auto mt-12 p-8 border-2 border-gray-300 shadow-lg rounded-lg flex bg-conatin bg-center"
+      >
+        {/* Render happy image if game win*/}
+        <div className="w-[1200px] h-[200px]">
+          {isGameWon ? renderHappyImage() : renderHangmanImage()}
+        </div>
 
-      {/* Render next question button after round win or loose*/}
-      <div className="w-full flex flex-col items-center justify-center ml-8">
-        {gameStarted ? (
-          <>
-            {isGameWon || isGameOver ? (
-              <>
-                {isGameWon && renderWinMessage()}
-                {isGameOver && !isGameWon && renderCorrectAnswer()}
+        {/* Render next question button after round win or loose*/}
+        <div className="w-full flex flex-col items-center justify-center ml-8">
+          {gameStarted ? (
+            <>
+              {isGameWon || isGameOver ? (
+                <>
+                  {isGameWon && renderWinMessage()}
+                  {isGameOver && !isGameWon && renderCorrectAnswer()}
 
-                <Button
-                  size="lg"
-                  variant="ghost"
-                  color="danger"
-                  className="w-[300px] mt-4 text-xl "
-                  onClick={handleNextQuestion}
-                >
-                  Next Question
-                </Button>
-              </>
-            ) : (
-              <>
-                {/* Display selected edition name */}
-                <p className="text-5xl font-primaryRegular mb-8 " style={{color:'red'}}>
-                  {selectedEditionName || "Demo Edition"}
-                </p>
-                {renderQuestionAndHint()} {/* Display the question and hint */}
-                <div className="mb-4">{renderWord()}</div>
-                {renderWarning()}
-                <div className="grid grid-cols-8 gap-2">{renderAlphabet()}</div>
-                <p className="text-2xl font-primaryRegular mb-4" style={{color:'red'}}>
-                  Wrong guesses: {wrongGuesses} / {maxWrongGuesses}
-                </p>
-              </>
-            )}
-          </>
-        ) : (
-          <>
-            <h1 className=" text-5xl font-primaryRegular mb-8" style={{color:'red'}}>
-            The Witch's Enigma
-            </h1>
-            <p className="mb-8 text-2xl text-black">
-            Stop the witches from summoning evil bats by guessing the right answers to their tricky questions. Time is running out, and every wrong guess brings the bats closer to chaos. Can you solve the riddles and save the day?
-            </p>
-            <Button
-              className="bg-black text-white font-primaryRegular w-[400px] h-[100px] text-5xl mb-8"
-              onClick={() => handleStartGame()}
-            >
-              Play Demo
-            </Button>
-            {/* Edition selction*/}
-            <EditionSelector onSelectEdition={handleStartGame}/>
-          </>
-        )}
-        {showAlert && (
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-            onClick={() => setShowAlert(false)}
-          >
-            <div
-              className="bg-white p-8 rounded shadow-lg"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h2 className="text-xl font-primaryRegular mb-4 text-black">All Questions Done</h2>
-              <p className="mb-4 text-black">
-                You answered {correctAnswersCount} questions correctly.
+                  <Button
+                    size="lg"
+                    variant="ghost"
+                    color="danger"
+                    className="w-[300px] mt-4 text-xl "
+                    onClick={handleNextQuestion}
+                  >
+                    Next Question
+                  </Button>
+                </>
+              ) : (
+                <>
+                  {/* Display selected edition name */}
+                  <p
+                    className="text-5xl font-primaryRegular mb-8 "
+                    style={{ color: "red" }}
+                  >
+                    {selectedEditionName || "Demo Edition"}
+                  </p>
+                  {renderQuestionAndHint()}{" "}
+                  {/* Display the question and hint */}
+                  <div className="mb-4">{renderWord()}</div>
+                  {renderWarning()}
+                  <div className="grid grid-cols-8 gap-2">
+                    {renderAlphabet()}
+                  </div>
+                  <p
+                    className="text-2xl font-primaryRegular mb-4"
+                    style={{ color: "red" }}
+                  >
+                    Wrong guesses: {wrongGuesses} / {maxWrongGuesses}
+                  </p>
+                </>
+              )}
+            </>
+          ) : (
+            <>
+              <h1
+                className=" text-5xl font-primaryRegular mb-8"
+                style={{ color: "red" }}
+              >
+                The Witch's Enigma
+              </h1>
+              <p className="mb-8 text-2xl text-black">
+                Stop the witches from summoning evil bats by guessing the right
+                answers to their tricky questions. Time is running out, and
+                every wrong guess brings the bats closer to chaos. Can you solve
+                the riddles and save the day?
               </p>
               <Button
-                onClick={handleAlertClose}
-                className="text-xl"
-                color="danger"
+                className="bg-black text-white font-primaryRegular w-[400px] h-[100px] text-5xl mb-8"
+                onClick={() => handleStartGame()}
               >
-                OK
+                Play Demo
               </Button>
+              {/* Edition selction*/}
+              <EditionSelector onSelectEdition={handleStartGame} />
+            </>
+          )}
+          {showAlert && (
+            <div
+              className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+              onClick={() => setShowAlert(false)}
+            >
+              <div
+                className="bg-white p-8 rounded shadow-lg"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h2 className="text-xl font-primaryRegular mb-4 text-black">
+                  All Questions Done
+                </h2>
+                <p className="mb-4 text-black">
+                  You answered {correctAnswersCount} questions correctly.
+                </p>
+                <Button
+                  onClick={handleAlertClose}
+                  className="text-xl"
+                  color="danger"
+                >
+                  OK
+                </Button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
-    <Footer/>
+      <Footer />
     </div>
   );
 };

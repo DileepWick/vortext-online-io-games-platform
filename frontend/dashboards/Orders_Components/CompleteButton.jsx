@@ -12,6 +12,7 @@ import {
 
 import React, { useState } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 const CompleteOrderButton = ({ order, callBackFunction }) => {
   // State variable for order token
@@ -34,7 +35,7 @@ const CompleteOrderButton = ({ order, callBackFunction }) => {
 
     try {
       const response = await axios.put(
-        `http://localhost:8098/orders/completeOrder/${order._id}`,
+        `${API_BASE_URL}/orders/completeOrder/${order._id}`,
         completeOrderBody
       );
 
@@ -47,7 +48,6 @@ const CompleteOrderButton = ({ order, callBackFunction }) => {
 
         onCompleteOrderModalClose();
         callBackFunction();
-
       } else if (response.status === 400 || response.status === 404) {
         toast.error(response.data.message, {
           theme: "light",
@@ -83,7 +83,12 @@ const CompleteOrderButton = ({ order, callBackFunction }) => {
 
   return (
     <div>
-      <Button variant="ghost" size="sm" color="primary" onClick={handleCompleteOrder}>
+      <Button
+        variant="ghost"
+        size="sm"
+        color="primary"
+        onClick={handleCompleteOrder}
+      >
         Complete Order
       </Button>
 
@@ -107,7 +112,9 @@ const CompleteOrderButton = ({ order, callBackFunction }) => {
                 type="text"
               />
               <br />
-              <Button type="submit" color="primary">Complete</Button>
+              <Button type="submit" color="primary">
+                Complete
+              </Button>
             </form>
           </ModalBody>
         </ModalContent>

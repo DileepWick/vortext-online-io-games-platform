@@ -39,6 +39,7 @@ import {
 import { SearchIcon } from "lucide-react";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 const Analytics = () => {
   const [stocks, setStocks] = useState([]);
@@ -54,7 +55,7 @@ const Analytics = () => {
   const getAllStocks = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8098/gameStocks/allGameStock"
+        `${API_BASE_URL}/gameStocks/allGameStock`
       );
       if (response.data.allGameStocks) {
         setStocks(response.data.allGameStocks);
@@ -66,7 +67,7 @@ const Analytics = () => {
 
   const getAllSales = async () => {
     try {
-      const response = await axios.get("http://localhost:8098/orderItems");
+      const response = await axios.get(`${API_BASE_URL}/orderItems`);
       if (response.data.orderHistory) {
         setSales(response.data.orderHistory);
       }
@@ -106,11 +107,21 @@ const Analytics = () => {
     else priceRanges[3].count++;
   });
 
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8" ,"#955538" ,"#b0390a"];
+  const COLORS = [
+    "#0088FE",
+    "#00C49F",
+    "#FFBB28",
+    "#FF8042",
+    "#8884D8",
+    "#955538",
+    "#b0390a",
+  ];
 
   // Sales Analytics
   const salesByGame = sales.reduce((acc, sale) => {
-    const gameTitle = sale.stockid.AssignedGame?.title ? sale.stockid.AssignedGame.title : "NA";
+    const gameTitle = sale.stockid.AssignedGame?.title
+      ? sale.stockid.AssignedGame.title
+      : "NA";
 
     acc[gameTitle] = (acc[gameTitle] || 0) + sale.price;
     return acc;
@@ -274,7 +285,6 @@ const Analytics = () => {
 
   return (
     <div className="p-8">
-
       <div className="flex flex-row mt-8 mb-8">
         <Card className="py-4" style={{ marginRight: "50px" }}>
           <CardHeader
@@ -372,9 +382,15 @@ const Analytics = () => {
       </div>
       <div className="grid grid-cols-2 gap-8">
         <div>
-          <Chip variant="dot" size="lg" style={{fontSize:'20px'}} className="mt-8">Genre Distribution</Chip>
-            
-          
+          <Chip
+            variant="dot"
+            size="lg"
+            style={{ fontSize: "20px" }}
+            className="mt-8"
+          >
+            Genre Distribution
+          </Chip>
+
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -400,7 +416,14 @@ const Analytics = () => {
           </ResponsiveContainer>
         </div>
         <div>
-        <Chip variant="dot" size="lg" style={{fontSize:'20px'}} className="mt-8 mb-8">Price Range Distribution</Chip>
+          <Chip
+            variant="dot"
+            size="lg"
+            style={{ fontSize: "20px" }}
+            className="mt-8 mb-8"
+          >
+            Price Range Distribution
+          </Chip>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={priceRanges}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -414,7 +437,14 @@ const Analytics = () => {
         </div>
       </div>
       <div className="mt-8">
-      <Chip variant="dot" size="lg" style={{fontSize:'20px'}} className="mt-8 mb-8">Game Prices And Discounts</Chip>
+        <Chip
+          variant="dot"
+          size="lg"
+          style={{ fontSize: "20px" }}
+          className="mt-8 mb-8"
+        >
+          Game Prices And Discounts
+        </Chip>
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={filteredStocks}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -434,7 +464,14 @@ const Analytics = () => {
         </ResponsiveContainer>
       </div>
       <div className="mt-8">
-      <Chip variant="dot" size="lg" style={{fontSize:'20px'}} className="mt-8 mb-8">Sales By Game</Chip>
+        <Chip
+          variant="dot"
+          size="lg"
+          style={{ fontSize: "20px" }}
+          className="mt-8 mb-8"
+        >
+          Sales By Game
+        </Chip>
         <ResponsiveContainer width="100%" height={400}>
           <AreaChart data={salesChartData}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -459,7 +496,14 @@ const Analytics = () => {
         </ResponsiveContainer>
       </div>
       <div className="mt-8">
-      <Chip variant="dot" size="lg" style={{fontSize:'20px'}} className="mt-8 mb-8">Sales Over Time</Chip>
+        <Chip
+          variant="dot"
+          size="lg"
+          style={{ fontSize: "20px" }}
+          className="mt-8 mb-8"
+        >
+          Sales Over Time
+        </Chip>
         <ResponsiveContainer width="100%" height={400}>
           <LineChart data={salesTimeChartData}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -483,7 +527,14 @@ const Analytics = () => {
         </ResponsiveContainer>
       </div>
       <div className="mt-8">
-      <Chip variant="dot" size="lg" style={{fontSize:'20px'}} className="mt-8 mb-8">Game Selling Performance</Chip>
+        <Chip
+          variant="dot"
+          size="lg"
+          style={{ fontSize: "20px" }}
+          className="mt-8 mb-8"
+        >
+          Game Selling Performance
+        </Chip>
         <ResponsiveContainer width="100%" height={400}>
           <RadarChart outerRadius={150} data={genrePerformanceData}>
             <PolarGrid />
@@ -509,7 +560,14 @@ const Analytics = () => {
         </ResponsiveContainer>
       </div>
       <div className="mt-8">
-      <Chip variant="dot" size="lg" style={{fontSize:'20px'}} className="mt-8 mb-8">Prices vs Sales</Chip>
+        <Chip
+          variant="dot"
+          size="lg"
+          style={{ fontSize: "20px" }}
+          className="mt-8 mb-8"
+        >
+          Prices vs Sales
+        </Chip>
         <ResponsiveContainer width="100%" height={400}>
           <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
             <CartesianGrid />

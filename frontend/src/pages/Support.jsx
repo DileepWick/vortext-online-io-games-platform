@@ -12,7 +12,7 @@ import {
   Input,
   Textarea,
 } from "@nextui-org/react";
-import Chatbot from "../components/Chatbot";
+// import Chatbot from "../components/Chatbot";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import Loader from "../components/Loader/loader";
@@ -99,7 +99,7 @@ const Support = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8098/directContactUs/submitDirectMessage",
+        `${API_BASE_URL}/directContactUs/submitDirectMessage`,
         { email, message }
       );
       CustomToast({
@@ -154,7 +154,7 @@ const Support = () => {
   useEffect(() => {
     const fetchFAQs = async () => {
       try {
-        const response = await axios.get("http://localhost:8098/faq/fetchFAQ");
+        const response = await axios.get(`${API_BASE_URL}/faq/fetchFAQ`);
         setFaqs(response.data.allFAQs);
       } catch (err) {
         setError("Failed to fetch FAQs. Please try again later.");
@@ -608,7 +608,7 @@ const Support = () => {
         </div>
       </section>
 
-      <Chatbot isOpen={isChatbotOpen} setIsOpen={setIsChatbotOpen} />
+      {/* <Chatbot isOpen={isChatbotOpen} setIsOpen={setIsChatbotOpen} /> */}
       <Footer />
     </div>
   );

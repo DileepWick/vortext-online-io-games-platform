@@ -14,6 +14,7 @@ import { CheckboxGroup, Checkbox } from "@nextui-org/checkbox";
 import useAuthCheck from "../../src/utils/authCheck";
 import { getUserIdFromToken } from "../../src/utils/user_id_decoder";
 import { getToken } from "../../src/utils/getToken";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 const UploadGame = ({ FunctionToCallAfterUpload }) => {
   // Authenticate user
@@ -71,11 +72,11 @@ const UploadGame = ({ FunctionToCallAfterUpload }) => {
     formData.append("Genre", selectedCategories);
     formData.append("AgeGroup", ageGroup);
     formData.append("PlayLink", playLink);
-    formData.append("developer",userId);
+    formData.append("developer", userId);
 
     try {
       const response = await axios.post(
-        "http://localhost:8098/games/uploadGame",
+        `${API_BASE_URL}/games/uploadGame`,
         formData,
         {
           headers: {

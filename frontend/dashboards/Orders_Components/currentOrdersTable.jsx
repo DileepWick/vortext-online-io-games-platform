@@ -17,6 +17,7 @@ import {
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
 import { EyeIcon } from "../../src/assets/icons/EyeIcon";
 import ViewDetails from "./View_Address_Button";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 // Order Components
 import ApproveOrder from "./approveOrder";
@@ -31,7 +32,7 @@ const CurrentOrdersTable = () => {
   // Get All Orders
   const getTableData = async () => {
     try {
-      const response = await axios.get("http://localhost:8098/orders/all");
+      const response = await axios.get(`${API_BASE_URL}/orders/all`);
       if (response.data.allOrders) {
         setTableData(response.data.allOrders);
       }

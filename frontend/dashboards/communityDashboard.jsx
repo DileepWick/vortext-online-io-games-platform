@@ -5,8 +5,9 @@ import Footer from "../src/components/footer";
 import { toast, Flip } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BackgroundBeams } from "../src/components/ui/BackgroundBeams";
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import { API_BASE_URL } from "../src/utils/getAPI";
 import {
   Table,
   TableHeader,
@@ -27,17 +28,17 @@ import {
 import { SearchIcon } from "../src/assets/icons/SearchIcon";
 import { DeleteIcon } from "../src/assets/icons/DeleteIcon";
 import { Download } from "lucide-react";
-import { Bar } from 'react-chartjs-2';
+import { Bar } from "react-chartjs-2";
 import useAuthCheck from "../src/utils/authCheck";
-import { 
-  Chart as ChartJS, 
-  CategoryScale, 
-  LinearScale, 
-  BarElement, 
-  Title, 
-  Tooltip as ChartTooltip, 
-  Legend 
-} from 'chart.js';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip as ChartTooltip,
+  Legend,
+} from "chart.js";
 
 ChartJS.register(
   CategoryScale,
@@ -54,17 +55,17 @@ const CommunityPostsChart = ({ data, chartRef }) => {
   }
 
   const chartData = {
-    labels: data.map(item => item.heading || 'Untitled Post'),
+    labels: data.map((item) => item.heading || "Untitled Post"),
     datasets: [
       {
-        label: 'Likes',
-        data: data.map(item => item.likes || 0),
-        backgroundColor: 'rgba(53, 162, 235, 0.5)',
+        label: "Likes",
+        data: data.map((item) => item.likes || 0),
+        backgroundColor: "rgba(53, 162, 235, 0.5)",
       },
       {
-        label: 'Reports',
-        data: data.map(item => item.reportedBy?.length || 0),
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+        label: "Reports",
+        data: data.map((item) => item.reportedBy?.length || 0),
+        backgroundColor: "rgba(255, 99, 132, 0.5)",
       },
     ],
   };
@@ -74,11 +75,11 @@ const CommunityPostsChart = ({ data, chartRef }) => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'top',
+        position: "top",
       },
       title: {
         display: true,
-        text: 'Community Posts: Likes vs Reports',
+        text: "Community Posts: Likes vs Reports",
       },
     },
     scales: {
@@ -86,13 +87,20 @@ const CommunityPostsChart = ({ data, chartRef }) => {
         beginAtZero: true,
         title: {
           display: true,
-          text: 'Count',
+          text: "Count",
         },
       },
     },
   };
 
-  return <Bar ref={chartRef} data={chartData} options={options} style={{ height: '400px' }} />;
+  return (
+    <Bar
+      ref={chartRef}
+      data={chartData}
+      options={options}
+      style={{ height: "400px" }}
+    />
+  );
 };
 const AnalyticsTable = ({ data }) => {
   return (
@@ -138,7 +146,9 @@ const CommunityDashboard = () => {
   const fetchAllArticles = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get("http://localhost:8098/articles/getAllArticles");
+      const response = await axios.get(
+        `${API_BASE_URL}/articles/getAllArticles`
+      );
       setArticles(response.data.articles || []);
       setError("");
     } catch (error) {
@@ -157,7 +167,7 @@ const CommunityDashboard = () => {
   const fetchReportedArticles = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get("http://localhost:8098/articles/reported");
+      const response = await axios.get(`${API_BASE_URL}/articles/reported`);
       setReportedArticles(response.data.reportedArticles || []);
       setError("");
     } catch (error) {
@@ -176,7 +186,9 @@ const CommunityDashboard = () => {
   const handleDeleteArticle = async (articleId) => {
     if (window.confirm("Are you sure you want to delete this article?")) {
       try {
-        await axios.delete(`http://localhost:8098/articles/deleteArticle/${articleId}`);
+        await axios.delete(
+          `${API_BASE_URL}/articles/deleteArticle/${articleId}`
+        );
         toast.success("Article deleted successfully", {
           theme: "dark",
           transition: Flip,
@@ -197,7 +209,7 @@ const CommunityDashboard = () => {
 
   const handleDismissReport = async (articleId) => {
     try {
-      await axios.post(`http://localhost:8098/articles/dismissReport/${articleId}`);
+      await axios.post(`${API_BASE_URL}/articles/dismissReport/${articleId}`);
       toast.success("Report dismissed successfully", {
         theme: "dark",
         transition: Flip,
@@ -216,12 +228,12 @@ const CommunityDashboard = () => {
 
   const downloadPDF = () => {
     const doc = new jsPDF();
-    
+
     // Add title and header
     doc.setFontSize(20);
     doc.setTextColor(44, 62, 80); // Dark blue color
-    doc.text('Community Analytics Report', 15, 20);
-    
+    doc.text("Community Analytics Report", 15, 20);
+
     // Add timestamp
     doc.setFontSize(10);
     doc.setTextColor(127, 140, 141); // Gray color
@@ -234,18 +246,18 @@ const CommunityDashboard = () => {
     doc.text(`Total Reported Posts: ${reportedArticles.length}`, 15, 55);
 
     // Add analytics table
-    const tableData = articles.map(article => [
+    const tableData = articles.map((article) => [
       article.heading,
       article.likes || 0,
       article.comments?.length || 0,
-      article.reportedBy?.length || 0
+      article.reportedBy?.length || 0,
     ]);
 
     doc.autoTable({
       startY: 70,
-      head: [['Post Title', 'Likes', 'Comments', 'Reports']],
+      head: [["Post Title", "Likes", "Comments", "Reports"]],
       body: tableData,
-      theme: 'grid',
+      theme: "grid",
       headStyles: { fillColor: [41, 128, 185], textColor: 255 }, // Blue header
       alternateRowStyles: { fillColor: [241, 245, 249] }, // Light blue alternate rows
     });
@@ -253,15 +265,15 @@ const CommunityDashboard = () => {
     // Add chart on new page
     if (chartRef.current) {
       const chartCanvas = chartRef.current.canvas;
-      const chartImage = chartCanvas.toDataURL('image/png');
+      const chartImage = chartCanvas.toDataURL("image/png");
       doc.addPage();
-      doc.text('Analytics Visualization', 15, 20);
-      doc.addImage(chartImage, 'PNG', 15, 30, 180, 100);
+      doc.text("Analytics Visualization", 15, 20);
+      doc.addImage(chartImage, "PNG", 15, 30, 180, 100);
     }
 
     // Save the PDF
-    doc.save('community-analytics.pdf');
-    
+    doc.save("community-analytics.pdf");
+
     toast.success("PDF downloaded successfully!", {
       theme: "dark",
       transition: Flip,
@@ -270,7 +282,8 @@ const CommunityDashboard = () => {
   };
 
   const filteredItems = useMemo(() => {
-    const currentArticles = activeTab === "allArticles" ? articles : reportedArticles;
+    const currentArticles =
+      activeTab === "allArticles" ? articles : reportedArticles;
     return currentArticles.filter((article) =>
       article.heading.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -292,23 +305,31 @@ const CommunityDashboard = () => {
     setPage(1);
   };
 
-  const columns = useMemo(() => [
-    { key: "title", label: "TITLE" },
-    ...(activeTab === "allArticles" ? [{ key: "author", label: "AUTHOR" }] : []),
-    { key: "likes", label: "LIKES" },
-    { key: "comments", label: "COMMENTS" },
-    ...(activeTab === "reportedArticles" ? [{ key: "reports", label: "REPORTS" }] : []),
-    { key: "actions", label: "ACTIONS" },
-  ], [activeTab]);
+  const columns = useMemo(
+    () => [
+      { key: "title", label: "TITLE" },
+      ...(activeTab === "allArticles"
+        ? [{ key: "author", label: "AUTHOR" }]
+        : []),
+      { key: "likes", label: "LIKES" },
+      { key: "comments", label: "COMMENTS" },
+      ...(activeTab === "reportedArticles"
+        ? [{ key: "reports", label: "REPORTS" }]
+        : []),
+      { key: "actions", label: "ACTIONS" },
+    ],
+    [activeTab]
+  );
 
   return (
     <div className="flex flex-col min-h-screen bg-black">
-      
       <BackgroundBeams />
       <Header />
-      
+
       <main className="flex-grow p-4">
-      <h1 className="text-5xl font-bold text-black bg-clip-text bg-no-repeat text-transparent bg-gradient-to-r py-4 from-blue-500 via-orange-500 to-orange-500 [text-shadow:0_0_rgba(0,0,0,0.1)]">Community Dashboard</h1>
+        <h1 className="text-5xl font-bold text-black bg-clip-text bg-no-repeat text-transparent bg-gradient-to-r py-4 from-blue-500 via-orange-500 to-orange-500 [text-shadow:0_0_rgba(0,0,0,0.1)]">
+          Community Dashboard
+        </h1>
         <div className="flex w-full flex-col">
           <div className="flex items-center p-4 font-primaryRegular">
             <Tabs
@@ -395,7 +416,9 @@ const CommunityDashboard = () => {
                       {(columnKey) => (
                         <TableCell>
                           {columnKey === "title" && item.heading}
-                          {columnKey === "author" && activeTab === "allArticles" && (item.uploader?.name || item.uploader?.username)}
+                          {columnKey === "author" &&
+                            activeTab === "allArticles" &&
+                            (item.uploader?.name || item.uploader?.username)}
                           {columnKey === "likes" && item.likes}
                           {columnKey === "comments" && item.comments.length}
                           {columnKey === "reports" && (

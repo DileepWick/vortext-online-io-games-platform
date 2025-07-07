@@ -18,6 +18,7 @@ import {
   Chip,
 } from "@nextui-org/react";
 import { SearchIcon } from "lucide-react";
+import { API_BASE_URL } from "../utils/getAPI";
 
 const RentalHistory = () => {
   useAuthCheck();
@@ -45,7 +46,7 @@ const RentalHistory = () => {
       }
 
       const response = await axios.get(
-        `http://localhost:8098/rentalPayments/user/${userId}`,
+        `${API_BASE_URL}/rentalPayments/user/${userId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -117,9 +118,7 @@ const RentalHistory = () => {
     <div className="bg-customDark min-h-screen font-sans text-white">
       <Header />
       <main className="container mx-auto p-6">
-        <h1 className="text-2xl font-primaryRegular mb-6">
-          RENTAL HISTORY
-        </h1>
+        <h1 className="text-2xl font-primaryRegular mb-6">RENTAL HISTORY</h1>
         <div className="flex justify-between items-center mb-4">
           <Input
             className="w-64"

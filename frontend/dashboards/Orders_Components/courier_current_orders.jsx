@@ -33,7 +33,9 @@ const CourierCurrentOrdersTable = () => {
     try {
       const token = getToken();
       const userId = getUserIdFromToken(token);
-      const response = await axios.get(`http://localhost:8098/orders/courier/currentOrders/${userId}`);
+      const response = await axios.get(
+        `${API_BASE_URL}/orders/courier/currentOrders/${userId}`
+      );
       if (response.data.assignedOrders) {
         setTableData(response.data.assignedOrders);
       }
@@ -124,10 +126,13 @@ const CourierCurrentOrdersTable = () => {
                 </Chip>
               </TableCell>
               <TableCell>
-                <ViewDetails order={order}/>
+                <ViewDetails order={order} />
               </TableCell>
               <TableCell>
-                <CompleteOrderButton order={order} callBackFunction={getTableData}/>
+                <CompleteOrderButton
+                  order={order}
+                  callBackFunction={getTableData}
+                />
               </TableCell>
             </TableRow>
           ))}

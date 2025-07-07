@@ -15,8 +15,9 @@ import { SearchIcon } from "../../src/assets/icons/SearchIcon";
 import { toast } from "react-toastify";
 import { getToken } from "../../src/utils/getToken";
 import { getUserIdFromToken } from "../../src/utils/user_id_decoder";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
-const API_BASE_URL = "http://localhost:8098";
+
 
 const DevEarningsOfPurchased = () => {
   const [tableData, setTableData] = useState([]);
@@ -30,7 +31,9 @@ const DevEarningsOfPurchased = () => {
 
   const fetchDistributedPayments = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/distributed-payments/all`);
+      const response = await axios.get(
+        `${API_BASE_URL}/api/distributed-payments/all`
+      );
       const distributedPayments = response.data.reduce((acc, payment) => {
         acc[payment.paymentId] = payment.amount;
         return acc;
@@ -60,11 +63,12 @@ const DevEarningsOfPurchased = () => {
   }, []);
 
   const filteredItems = useMemo(() => {
-    return tableData.filter((item) =>
-      item.stockid?.AssignedGame?.title
-        ?.toLowerCase()
-        .includes(searchQuery.toLowerCase()) &&
-      item.stockid?.AssignedGame?.developer?._id === userId
+    return tableData.filter(
+      (item) =>
+        item.stockid?.AssignedGame?.title
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase()) &&
+        item.stockid?.AssignedGame?.developer?._id === userId
     );
   }, [tableData, searchQuery, userId]);
 
@@ -125,11 +129,11 @@ const DevEarningsOfPurchased = () => {
         <TableBody className="text-black">
           {paginatedItems.map((item) => (
             <TableRow key={item._id} className="text-black">
-              <TableCell>{item.stockid?.AssignedGame?.title || "N/A"}</TableCell>
               <TableCell>
-                {item.date
-                  ? new Date(item.date).toLocaleDateString()
-                  : "N/A"}
+                {item.stockid?.AssignedGame?.title || "N/A"}
+              </TableCell>
+              <TableCell>
+                {item.date ? new Date(item.date).toLocaleDateString() : "N/A"}
               </TableCell>
               <TableCell>
                 <User
@@ -147,10 +151,13 @@ const DevEarningsOfPurchased = () => {
                 />
               </TableCell>
               <TableCell>
-                {distributedPayments[item._id] 
-                  ? <span style={{ color: '#00008B' }}>Rs.{distributedPayments[item._id].toFixed(2)}</span>
-                  : <span style={{ color: 'red' }}>Not paid yet</span>
-                }
+                {distributedPayments[item._id] ? (
+                  <span style={{ color: "#00008B" }}>
+                    Rs.{distributedPayments[item._id].toFixed(2)}
+                  </span>
+                ) : (
+                  <span style={{ color: "red" }}>Not paid yet</span>
+                )}
               </TableCell>
             </TableRow>
           ))}

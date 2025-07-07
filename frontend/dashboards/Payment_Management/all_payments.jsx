@@ -21,8 +21,7 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
 import { toast } from "react-toastify";
-
-const API_BASE_URL = "http://localhost:8098";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 const AllPayments = () => {
   const [tableData, setTableData] = useState([]);
@@ -37,7 +36,9 @@ const AllPayments = () => {
 
   const fetchDistributedPayments = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/distributed-payments/all`);
+      const response = await axios.get(
+        `${API_BASE_URL}/api/distributed-payments/all`
+      );
       const distributedPayments = response.data.reduce((acc, payment) => {
         acc[payment.paymentId] = payment.amount;
         return acc;
@@ -110,11 +111,14 @@ const AllPayments = () => {
 
   const saveDistributedPayment = async (paymentId, developerId, amount) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/distributed-payments/save`, {
-        paymentId,
-        developerId,
-        amount,
-      });
+      const response = await axios.post(
+        `${API_BASE_URL}/api/distributed-payments/save`,
+        {
+          paymentId,
+          developerId,
+          amount,
+        }
+      );
       return response.data;
     } catch (error) {
       console.error("Error saving distributed payment:", error);
@@ -198,7 +202,9 @@ const AllPayments = () => {
         <TableBody className="text-black">
           {paginatedItems.map((item) => (
             <TableRow key={item._id} className="text-black">
-              <TableCell>{item.stockid?.AssignedGame?.title || "N/A"}</TableCell>
+              <TableCell>
+                {item.stockid?.AssignedGame?.title || "N/A"}
+              </TableCell>
               <TableCell>
                 <User
                   name={item.order?.user?.username || "N/A"}
@@ -212,9 +218,7 @@ const AllPayments = () => {
               <TableCell>{item.stockid?.discount || "N/A"} %</TableCell>
               <TableCell>Rs.{item.order?.paymentAmount || "N/A"}</TableCell>
               <TableCell>
-                {item.date
-                  ? new Date(item.date).toLocaleDateString()
-                  : "N/A"}
+                {item.date ? new Date(item.date).toLocaleDateString() : "N/A"}
               </TableCell>
               <TableCell>
                 <User
@@ -232,14 +236,20 @@ const AllPayments = () => {
                 />
               </TableCell>
               <TableCell>
-                {distributedPayments[item._id] 
-                  ? <span style={{ color: '#00008B' }}>Rs.{distributedPayments[item._id].toFixed(2)}</span>
-                  : <span style={{ color: 'red' }}>Not Paid Yet</span>
-                }
+                {distributedPayments[item._id] ? (
+                  <span style={{ color: "#00008B" }}>
+                    Rs.{distributedPayments[item._id].toFixed(2)}
+                  </span>
+                ) : (
+                  <span style={{ color: "red" }}>Not Paid Yet</span>
+                )}
               </TableCell>
               <TableCell>
                 {distributedPayments[item._id] ? (
-                  <Tooltip content="Payment already distributed" className="text-yellow-500">
+                  <Tooltip
+                    content="Payment already distributed"
+                    className="text-yellow-500"
+                  >
                     <span className="text-green-500">Done</span>
                   </Tooltip>
                 ) : (
@@ -274,7 +284,9 @@ const AllPayments = () => {
                   <div>
                     <p>
                       You are about to distribute payment of Rs.
-                      {(selectedItem.order?.paymentAmount * 0.7).toFixed(2)} to{" "}
+                      {(selectedItem.order?.paymentAmount * 0.7).toFixed(
+                        2
+                      )} to{" "}
                       {selectedItem.stockid?.AssignedGame?.developer?.username}
                     </p>
                   </div>
