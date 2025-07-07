@@ -61,7 +61,7 @@ Vortex is a dynamic, full-stack web platform designed to be a central hub for in
   - **File Storage:** Cloudinary for media uploads
 
 - **Deployment:**
-  - Vercel for both frontend and backend hosting.
+  - Vercel and railway for  frontend and backend hosting.
 
 ---
 
