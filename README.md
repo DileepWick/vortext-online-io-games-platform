@@ -10,7 +10,6 @@ Vortex is a dynamic, full-stack web platform designed to be a central hub for in
 
 ### 📖 Table of Contents
 - [🌟 Key Features](#-key-features)
-- [📸 Screenshots](#-screenshots)
 - [🛠️ Tech Stack](#-tech-stack)
 - [🚀 Getting Started](#-getting-started)
   - [Prerequisites](#prerequisites)
@@ -27,8 +26,9 @@ Vortex is a dynamic, full-stack web platform designed to be a central hub for in
 **For Players:**
 - **Instant Play:** Instantly play a wide variety of .io games directly in the browser.
 - **Game Marketplace:** Browse, search, and purchase games.
+- **Social Hub:** Create posts, and comment on or react to posts from other users.
+- **Real-time Chat:** Chat with other players in real-time.
 - **User Accounts:** Register and log in to manage your profile and purchased games.
-- **Community Interaction:** Engage with developers and other players through ratings and community posts.
 
 **For Developers:**
 - **Game Upload & Management:** A dedicated dashboard to upload new games and manage existing ones.
@@ -40,17 +40,7 @@ Vortex is a dynamic, full-stack web platform designed to be a central hub for in
 - **Comprehensive Dashboards:** Multiple dashboards for managing users, orders, products, payments, and site content.
 - **User Management:** Tools to manage all user roles (players, developers, staff).
 - **Order Fulfillment:** A complete system for tracking and processing game sales and rentals.
-- **Content Moderation:** Review and manage community-generated content.
-
----
-
-### 📸 Screenshots
-
-*It's highly recommended to replace these placeholders with actual screenshots of your application.*
-
-| Login Page | Game Library | Developer Dashboard |
-| :---: | :---: | :---: |
-| *[Insert Screenshot]* | *[Insert Screenshot]* | *[Insert Screenshot]* |
+- **Content Moderation:** Review and manage community-generated content and chats.
 
 ---
 
@@ -68,9 +58,11 @@ Vortex is a dynamic, full-stack web platform designed to be a central hub for in
   - **Database:** MongoDB (inferred from typical MERN stack patterns)
   - **Authentication:** Passport.js for JWT authentication
   - **File Storage:** Cloudinary for media uploads
+  - **Real-time Communication:** Socket.IO (inferred from chat feature)
 
 - **Deployment:**
-  - Vercel for both frontend and backend hosting.
+  - **Frontend:** Vercel
+  - **Backend:** Railway, Vercel
 
 ---
 
