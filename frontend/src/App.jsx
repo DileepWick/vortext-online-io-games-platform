@@ -67,7 +67,8 @@ import Unauthorized from "./pages/Unauthorized";
 import Hangman from "./components/Games/Hangaman";
 import RockPaperScissors from "./components/Games/RockPaperScissors";
 import { BackgroundBeamsWithCollision } from "./components/ui/BackgroundBeamsWithCollision";
-
+import AboutUs from "./components/AboutUs";
+import Page from "./pages/Page";
 const App = () => {
   return (
     <Routes>
@@ -75,6 +76,7 @@ const App = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/adminAddNewGame" element={<AddGameForm />} />
+      <Route path="/privacy-policy" element={<Page />} />
       <Route path="/Shop" element={<Shop />} />
       <Route path="/game/:id" element={<GameDetails />} />
       <Route path="/cartItems" element={<CartPage />} />
@@ -119,6 +121,7 @@ const App = () => {
         path="/GameDeveloperDashboard"
         element={<GameDeveloperDashboard />}
       />
+      <Route path="/about" element={<AboutUs />} />
       <Route path="/RentedGamesSection" element={<RentedGamesSection />} />
       <Route path="/Transaction" element={<TransactionHistory />} />
       <Route path="/Snakegame" element={<Snake />} />

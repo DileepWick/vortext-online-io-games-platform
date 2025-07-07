@@ -13,8 +13,14 @@ import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { getToken } from "../utils/getToken";
 import useAuthCheck from "../utils/authCheck";
 import CustomToast from "../components/CustomToast";
-import { AlertCircle } from "lucide-react";
-import { Upload } from "lucide-react";
+import {
+  AlertCircle,
+  Upload,
+  X,
+  CheckCircle,
+  MessageSquare,
+} from "lucide-react";
+
 const Contact = () => {
   useAuthCheck();
   const navigate = useNavigate();
@@ -31,7 +37,8 @@ const Contact = () => {
   const [priority, setPriority] = useState("medium");
   const [category, setCategory] = useState("");
   const [image, setImage] = useState(null);
-  const [isDragging, setIsDragging] = useState(false); // For drag-over state
+  const [isDragging, setIsDragging] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -77,9 +84,9 @@ const Contact = () => {
   }, [userId, token]);
 
   const handleImageUpload = (e) => {
-    const selectedFile = e.target.files[0]; // Get the selected file
-    const maxFileSizeMB = 10; // Set the maximum file size
-    const maxFileSizeBytes = maxFileSizeMB * 1024 * 1024; // Convert MB to bytes
+    const selectedFile = e.target.files[0];
+    const maxFileSizeMB = 10;
+    const maxFileSizeBytes = maxFileSizeMB * 1024 * 1024;
 
     if (selectedFile) {
       const validImageTypes = [
@@ -89,7 +96,6 @@ const Contact = () => {
         "image/svg+xml",
       ];
 
-      // Validate file type
       if (!validImageTypes.includes(selectedFile.type)) {
         CustomToast({
           message:
@@ -99,7 +105,6 @@ const Contact = () => {
         return;
       }
 
-      // Validate file size
       if (selectedFile.size > maxFileSizeBytes) {
         CustomToast({
           message: `File size exceeds the limit of ${maxFileSizeMB} MB. Please upload a smaller file.`,
@@ -108,14 +113,14 @@ const Contact = () => {
         return;
       }
 
-      setImage(selectedFile); // Store the file in the state if it's valid
+      setImage(selectedFile);
     }
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
-    setIsDragging(false); // Reset dragging state
-    const selectedFile = e.dataTransfer.files[0]; // Get the dropped file
+    setIsDragging(false);
+    const selectedFile = e.dataTransfer.files[0];
     if (selectedFile) {
       const validImageTypes = [
         "image/jpeg",
@@ -124,7 +129,7 @@ const Contact = () => {
         "image/svg+xml",
       ];
       if (validImageTypes.includes(selectedFile.type)) {
-        setImage(selectedFile); // Store the file in the state
+        setImage(selectedFile);
       } else {
         CustomToast({
           message:
@@ -134,17 +139,19 @@ const Contact = () => {
       }
     }
   };
+
   const handleDragOver = (e) => {
-    e.preventDefault(); // Necessary to allow dropping
-    setIsDragging(true); // Set dragging state
+    e.preventDefault();
+    setIsDragging(true);
   };
 
   const handleDragLeave = () => {
-    setIsDragging(false); // Reset dragging state
+    setIsDragging(false);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     const token = getToken();
     const userId = getUserIdFromToken(token);
@@ -154,10 +161,10 @@ const Contact = () => {
         message: "Unable to retrieve user ID. Please login.",
         type: "error",
       });
+      setIsSubmitting(false);
       return;
     }
 
-    // Create FormData and append necessary fields
     const formData = new FormData();
     formData.append("username", userData.username);
     formData.append("email", userData.email);
@@ -165,8 +172,8 @@ const Contact = () => {
     formData.append("userId", userId);
 
     if (image) {
-      formData.append("image", image); // Append the image file to FormData
-      console.log("Appended image:", image); // Log the image file
+      formData.append("image", image);
+      console.log("Appended image:", image);
     } else {
       console.log("No image selected.");
     }
@@ -176,7 +183,6 @@ const Contact = () => {
         "Content-Type": "multipart/form-data",
       };
 
-      // Send the request to the server
       const response = await axios.post(
         "http://localhost:8098/contacts/submitContactForm",
         formData,
@@ -188,7 +194,6 @@ const Contact = () => {
           message: "Message sent successfully",
           type: "success",
         });
-        // Reset the form
         setMessage("");
         setImage(null);
         setHasOpenTicket(true);
@@ -199,6 +204,8 @@ const Contact = () => {
         message: "Failed to send message",
         type: "error",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -206,200 +213,289 @@ const Contact = () => {
     <>
       <Header />
       <ScrollToTop />
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="raise-ticket-container font-primaryRegular bg-gray-900 min-h-screen flex items-center justify-center p-4"
-      >
-        <motion.div
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          className="bg-gray-800 rounded-lg shadow-xl p-8 w-full max-w-2xl"
+      <div className="min-h-screen bg-white">
+        {/* Hero Section */}
+        <motion.section
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          className="bg-black text-white py-20 px-4"
         >
-          <h1 className="text-3xl font-bold text-white mb-6">Raise a Ticket</h1>
-
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-            className="bg-gray-700 p-4 rounded-md mb-6"
-          >
-            <h2 className="text-xl font-semibold text-white mb-2 flex items-center">
-              <AlertCircle className="mr-2" size={20} />
-              Before You Submit
-            </h2>
-            <ul className="list-disc list-inside text-gray-300 space-y-1">
-              <li>
-                Check our FAQ section for quick answers to common questions.
-              </li>
-              <li>Provide as much detail as possible about your issue.</li>
-              <li>Include any error messages or screenshots if applicable.</li>
-              <li>
-                Select the appropriate category and priority for faster
-                resolution.
-              </li>
-            </ul>
-          </motion.div>
-
-          {hasOpenTicket ? (
+          <div className="max-w-4xl mx-auto text-center">
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.3 }}
-              className="text-center"
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="flex items-center justify-center mb-6"
             >
-              <div className="bg-yellow-900 border-l-4 border-yellow-500 text-yellow-200 p-4 mb-4 rounded">
-                <p className="font-medium text-lg">
-                  You have an open ticket. Please wait for a response or check
-                  your existing ticket.
-                </p>
-              </div>
-              <Button
-                className="mx-auto block"
-                onClick={() => navigate("/UserMessage")}
-                color="primary"
-              >
-                View Existing Ticket
-              </Button>
+              <MessageSquare className="w-8 h-8 mr-3" />
+              <h1 className="text-4xl md:text-5xl font-light tracking-wide">
+                Get in Touch
+              </h1>
             </motion.div>
-          ) : (
-            <motion.form
+            <motion.p
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-              className="w-full space-y-4"
-              onSubmit={handleSubmit}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed"
             >
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1, duration: 0.4 }}
-              >
-                <Input
-                  label="Your Name"
-                  size="lg"
-                  type="text"
-                  labelPlacement="inside"
-                  value={userData.username}
-                  readOnly
-                  className="text-white"
-                />
-              </motion.div>
+              Have a question or need assistance? We're here to help you with
+              any issues or inquiries.
+            </motion.p>
+          </div>
+        </motion.section>
 
+        {/* Main Content */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.8 }}
+          className="py-20 px-4"
+        >
+          <div className="max-w-4xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-12">
+              {/* Info Section */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.4 }}
+                initial={{ x: -30, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.8, duration: 0.6 }}
+                className="space-y-8"
               >
-                <Input
-                  label="Your Email"
-                  size="lg"
-                  type="email"
-                  labelPlacement="inside"
-                  value={userData.email}
-                  readOnly
-                  className="text-white"
-                />
-              </motion.div>
+                <div className="bg-gray-50 p-8 rounded-lg">
+                  <h2 className="text-2xl font-light text-black mb-6 flex items-center">
+                    <AlertCircle className="w-6 h-6 mr-3 text-gray-600" />
+                    Before You Submit
+                  </h2>
+                  <div className="space-y-4 text-gray-700">
+                    <div className="flex items-start">
+                      <div className="w-2 h-2 bg-black rounded-full mt-3 mr-4 flex-shrink-0"></div>
+                      <p>
+                        Check our FAQ section for quick answers to common
+                        questions.
+                      </p>
+                    </div>
+                    <div className="flex items-start">
+                      <div className="w-2 h-2 bg-black rounded-full mt-3 mr-4 flex-shrink-0"></div>
+                      <p>
+                        Provide as much detail as possible about your issue.
+                      </p>
+                    </div>
+                    <div className="flex items-start">
+                      <div className="w-2 h-2 bg-black rounded-full mt-3 mr-4 flex-shrink-0"></div>
+                      <p>
+                        Include any error messages or screenshots if applicable.
+                      </p>
+                    </div>
+                    <div className="flex items-start">
+                      <div className="w-2 h-2 bg-black rounded-full mt-3 mr-4 flex-shrink-0"></div>
+                      <p>
+                        Select the appropriate category and priority for faster
+                        resolution.
+                      </p>
+                    </div>
+                  </div>
+                </div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.4 }}
-              >
-                <Textarea
-                  label="Describe your issue"
-                  labelPlacement="inside"
-                  size="lg"
-                  value={message}
-                  isRequired={true}
-                  onChange={(e) => {
-                    if (e.target.value.length <= 500) {
-                      // Limit to 300 characters
-                      setMessage(e.target.value);
-                    }
-                  }}
-                  className="text-white"
-                  minRows={4}
-                />
-                <div className="text-right text-sm text-gray-400 mt-1">
-                  {message.length}/500 characters
+                {/* Contact Stats */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-6 bg-black text-white rounded-lg">
+                    <div className="text-2xl font-light mb-2">24/7</div>
+                    <div className="text-sm text-gray-300">Support</div>
+                  </div>
+                  <div className="text-center p-6 bg-gray-900 text-white rounded-lg">
+                    <div className="text-2xl font-light mb-2">&lt;2h</div>
+                    <div className="text-sm text-gray-300">Response Time</div>
+                  </div>
                 </div>
               </motion.div>
 
-              {/* Add image upload input field */}
+              {/* Form Section */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.4 }}
-                className="bg-gray-800 p-6 rounded-lg shadow-md"
+                initial={{ x: 30, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 1, duration: 0.6 }}
+                className="bg-white border border-gray-200 rounded-lg p-8 shadow-sm"
               >
-                <label
-                  htmlFor="image-upload"
-                  className={`flex flex-col items-center justify-center w-full h-32 border-2 ${
-                    isDragging
-                      ? "border-blue-500 bg-gray-600"
-                      : "border-gray-300 bg-gray-700"
-                  } border-dashed rounded-lg cursor-pointer transition-colors duration-300`}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                >
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <Upload className="w-10 h-10 mb-3 text-gray-400" />
-                    <p className="mb-2 text-sm text-gray-400">
-                      <span className="font-semibold">Click to upload</span> or
-                      drag and drop
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      SVG, PNG, JPG or GIF (MAX 10MB)
-                    </p>
-                  </div>
-                  <input
-                    id="image-upload"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
-                </label>
-
-                {/* Feedback section: display selected image file with remove option */}
-                {image && (
-                  <div className="mt-4 text-gray-300 flex items-center justify-between">
-                    <p>
-                      Selected file:{" "}
-                      <span className="font-semibold">{image.name}</span>
-                    </p>
-                    <button
-                      onClick={() => setImage(null)}
-                      className="ml-4 bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-lg transition-colors duration-300"
+                {hasOpenTicket ? (
+                  <motion.div
+                    initial={{ scale: 0.95, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.2, duration: 0.4 }}
+                    className="text-center space-y-6"
+                  >
+                    <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto">
+                      <AlertCircle className="w-8 h-8 text-yellow-600" />
+                    </div>
+                    <div className="space-y-4">
+                      <h3 className="text-xl font-light text-black">
+                        Ticket Active
+                      </h3>
+                      <p className="text-gray-600 leading-relaxed">
+                        You have an open ticket. Please wait for a response or
+                        check your existing ticket.
+                      </p>
+                    </div>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => navigate("/UserMessage")}
+                      className="w-full bg-black text-white py-3 px-6 rounded-lg font-medium transition-all duration-300 hover:bg-gray-800"
                     >
-                      Remove
-                    </button>
-                  </div>
+                      View Existing Ticket
+                    </motion.button>
+                  </motion.div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="space-y-4">
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2, duration: 0.4 }}
+                      >
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Your Name
+                        </label>
+                        <input
+                          type="text"
+                          value={userData.username}
+                          readOnly
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 focus:outline-none"
+                        />
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3, duration: 0.4 }}
+                      >
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Your Email
+                        </label>
+                        <input
+                          type="email"
+                          value={userData.email}
+                          readOnly
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 focus:outline-none"
+                        />
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4, duration: 0.4 }}
+                      >
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Describe your issue *
+                        </label>
+                        <textarea
+                          value={message}
+                          onChange={(e) => {
+                            if (e.target.value.length <= 500) {
+                              setMessage(e.target.value);
+                            }
+                          }}
+                          required
+                          rows={4}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-300 resize-none"
+                          placeholder="Please describe your issue in detail..."
+                        />
+                        <div className="text-right text-sm text-gray-500 mt-2">
+                          {message.length}/500 characters
+                        </div>
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5, duration: 0.4 }}
+                      >
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Attach Screenshot (Optional)
+                        </label>
+                        <div
+                          className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
+                            isDragging
+                              ? "border-black bg-gray-50"
+                              : "border-gray-300 hover:border-gray-400"
+                          }`}
+                          onDragOver={handleDragOver}
+                          onDragLeave={handleDragLeave}
+                          onDrop={handleDrop}
+                        >
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          />
+                          <div className="space-y-3">
+                            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
+                              <Upload className="w-6 h-6 text-gray-400" />
+                            </div>
+                            <div>
+                              <p className="text-gray-600 font-medium">
+                                Click to upload or drag and drop
+                              </p>
+                              <p className="text-sm text-gray-500 mt-1">
+                                PNG, JPG, GIF up to 10MB
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {image && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.3 }}
+                            className="mt-4 flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                <CheckCircle className="w-5 h-5 text-green-600" />
+                              </div>
+                              <span className="text-sm text-gray-700 font-medium">
+                                {image.name}
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setImage(null)}
+                              className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors duration-200"
+                            >
+                              <X className="w-4 h-4 text-gray-600" />
+                            </button>
+                          </motion.div>
+                        )}
+                      </motion.div>
+                    </div>
+
+                    <motion.button
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.6, duration: 0.4 }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full bg-black text-white py-4 px-6 rounded-lg font-medium transition-all duration-300 hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                      {isSubmitting ? (
+                        <div className="flex items-center justify-center">
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                          Submitting...
+                        </div>
+                      ) : (
+                        "Submit Ticket"
+                      )}
+                    </motion.button>
+                  </form>
                 )}
               </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6, duration: 0.6 }}
-              >
-                <Button
-                  type="submit"
-                  size="lg"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300"
-                >
-                  Submit Ticket
-                </Button>
-              </motion.div>
-            </motion.form>
-          )}
-        </motion.div>
-      </motion.div>
+            </div>
+          </div>
+        </motion.section>
+      </div>
       <Footer />
     </>
   );

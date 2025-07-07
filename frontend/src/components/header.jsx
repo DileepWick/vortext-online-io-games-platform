@@ -15,10 +15,10 @@ import {
   User,
   Button,
 } from "@nextui-org/react";
+import { useMediaQuery } from "react-responsive";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { useNavigate, useLocation } from "react-router-dom";
-import { NotificationIcon } from "../assets/icons/NotificationIcon.jsx";
+import { useNavigate } from "react-router-dom";
 
 // Utils
 import { getUserIdFromToken } from "../utils/user_id_decoder";
@@ -30,9 +30,7 @@ const Header = forwardRef((props, ref) => {
   const token = getToken();
   const userId = getUserIdFromToken(token);
   const navigate = useNavigate();
-  const location = useLocation();
-
-  const variants = ["solid", "underlined", "bordered", "light"];
+  const isDesktop = useMediaQuery({ query: "(min-width: 768px)" });
 
   // Navigation items for mobile menu
   const menuItems = [
@@ -45,7 +43,7 @@ const Header = forwardRef((props, ref) => {
   const supportItems = [
     { name: "Vortex Support", path: "/support" },
     { name: "Contact Us", path: "/support#contactForm" },
-    { name: "Privacy Policy", path: "/privacyPolicy" },
+    { name: "Privacy Policy", path: "/privacy-policy" },
     { name: "About Vortex", path: "/about" },
   ];
 
@@ -201,43 +199,31 @@ const Header = forwardRef((props, ref) => {
             </Link>
           </NavbarItem>
 
-          <Dropdown placement="bottom-start" className="dark text-white">
+          <Dropdown placement="bottom-start">
             <DropdownTrigger>
-              <NavbarItem className="cursor-pointer text-black">
-                Support
-              </NavbarItem>
+              <NavbarItem className="cursor-pointer">Support</NavbarItem>
             </DropdownTrigger>
             <DropdownMenu
               aria-label="Support Actions"
               variant="flat"
-              className="font-primaryRegular "
+              className="font-primaryRegular"
             >
-              <DropdownItem
-                key="support"
-                onClick={() => navigate("/support")}
-                className="text-white "
-              >
+              <DropdownItem key="support" onClick={() => navigate("/support")}>
                 Vortex Support
               </DropdownItem>
               <DropdownItem
                 key="contactus"
                 onClick={() => navigate("/support#contactForm")}
-                className="text-white"
               >
                 Contact Us
               </DropdownItem>
               <DropdownItem
                 key="privacy"
-                onClick={() => navigate("/privacyPolicy")}
-                className="text-white"
+                onClick={() => navigate("/privacy-policy")}
               >
                 Privacy Policy
               </DropdownItem>
-              <DropdownItem
-                key="about"
-                onClick={() => navigate("/about")}
-                className="text-white"
-              >
+              <DropdownItem key="about" onClick={() => navigate("/about")}>
                 About Vortex
               </DropdownItem>
             </DropdownMenu>
@@ -247,17 +233,28 @@ const Header = forwardRef((props, ref) => {
         {/* User Profile or Login */}
         <NavbarContent as="div" justify="end">
           {token && user ? (
-            <Dropdown placement="bottom-end" className="dark text-white">
-              <DropdownTrigger>
+            <Dropdown placement="bottom-end" className=" text-black">
+              {isDesktop ? (
+                <DropdownTrigger>
+                  <User
+                    className="cursor-pointer hover:opacity-80 transition-opacity"
+                    name={`${user.firstname} ${user.lastname}`}
+                    description={user.role}
+                    avatarProps={{
+                      src: user.profilePic,
+                    }}
+                  />
+                </DropdownTrigger>
+              ) : (
                 <User
-                  className="cursor-pointer"
-                  name={user.firstname + " " + user.lastname}
+                  name={`${user.firstname} ${user.lastname}`}
                   description={user.role}
+                  onClick={() => setIsMenuOpen((prev) => !prev)}
                   avatarProps={{
                     src: user.profilePic,
                   }}
                 />
-              </DropdownTrigger>
+              )}
               <DropdownMenu
                 aria-label="Profile Actions"
                 className="font-primaryRegular"
@@ -265,35 +262,27 @@ const Header = forwardRef((props, ref) => {
                 <DropdownItem
                   key="settings"
                   onClick={() => navigate("/profile")}
-                  className="text-white hover:bg-gray-800"
                 >
                   My Settings
                 </DropdownItem>
                 <DropdownItem
                   key="orders"
                   onClick={() => navigate("/mylibrary")}
-                  className="text-white hover:bg-gray-800"
                 >
                   My Library
                 </DropdownItem>
                 <DropdownItem
                   key="rentals"
                   onClick={() => navigate("/GamingSessions")}
-                  className="text-white hover:bg-gray-800"
                 >
                   Rentals
                 </DropdownItem>
-                <DropdownItem
-                  key="cart"
-                  onClick={() => navigate("/cartItems")}
-                  className="text-white hover:bg-gray-800"
-                >
+                <DropdownItem key="cart" onClick={() => navigate("/cartItems")}>
                   My Cart
                 </DropdownItem>
                 <DropdownItem
                   key="transactions"
                   onClick={() => navigate("/Transaction")}
-                  className="text-white hover:bg-gray-800"
                 >
                   Transaction History
                 </DropdownItem>
@@ -303,7 +292,6 @@ const Header = forwardRef((props, ref) => {
                   <DropdownItem
                     key="developer-panel"
                     onClick={() => navigate("/GamedeveloperDashboard")}
-                    className="text-white hover:bg-gray-800"
                   >
                     Developer Dashboard
                   </DropdownItem>
@@ -312,7 +300,6 @@ const Header = forwardRef((props, ref) => {
                   <DropdownItem
                     key="admin-panel"
                     onClick={() => navigate("/productDashboard")}
-                    className="text-white hover:bg-gray-800"
                   >
                     Products Dashboard
                   </DropdownItem>
@@ -321,7 +308,6 @@ const Header = forwardRef((props, ref) => {
                   <DropdownItem
                     key="Admin-panel"
                     onClick={() => navigate("/UserManagementDashboard")}
-                    className="text-white hover:bg-gray-800"
                   >
                     User Management
                   </DropdownItem>
@@ -330,7 +316,6 @@ const Header = forwardRef((props, ref) => {
                   <DropdownItem
                     key="orders-panel"
                     onClick={() => navigate("/ordersDashboard")}
-                    className="text-white hover:bg-gray-800"
                   >
                     Order Management
                   </DropdownItem>
@@ -339,7 +324,6 @@ const Header = forwardRef((props, ref) => {
                   <DropdownItem
                     key="blogger-panel"
                     onClick={() => navigate("/bloggerDashboard")}
-                    className="text-white hover:bg-gray-800"
                   >
                     Blogger Dashboard
                   </DropdownItem>
@@ -348,7 +332,6 @@ const Header = forwardRef((props, ref) => {
                   <DropdownItem
                     key="session-panel"
                     onClick={() => navigate("/sessionDashboard")}
-                    className="text-white hover:bg-gray-800"
                   >
                     Session Dashboard
                   </DropdownItem>
@@ -357,7 +340,6 @@ const Header = forwardRef((props, ref) => {
                   <DropdownItem
                     key="community-panel"
                     onClick={() => navigate("/CommunityDashBoard")}
-                    className="text-white hover:bg-gray-800"
                   >
                     Community Dashboard
                   </DropdownItem>
@@ -366,7 +348,6 @@ const Header = forwardRef((props, ref) => {
                   <DropdownItem
                     key="Review-panel"
                     onClick={() => navigate("/review_dashboard")}
-                    className="text-white hover:bg-gray-800"
                   >
                     Review Dashboard
                   </DropdownItem>
@@ -375,7 +356,6 @@ const Header = forwardRef((props, ref) => {
                   <DropdownItem
                     key="support-panel"
                     onClick={() => navigate("/ContactDash")}
-                    className="text-white hover:bg-gray-800"
                   >
                     Customer Support Panel
                   </DropdownItem>
@@ -384,7 +364,6 @@ const Header = forwardRef((props, ref) => {
                   <DropdownItem
                     key="manage-staff"
                     onClick={() => navigate("/staffManager")}
-                    className="text-white hover:bg-gray-800"
                   >
                     Manage Staff
                   </DropdownItem>
@@ -393,17 +372,12 @@ const Header = forwardRef((props, ref) => {
                   <DropdownItem
                     key="manage-payment"
                     onClick={() => navigate("/Payment_manager_dashboard")}
-                    className="text-white hover:bg-gray-800"
                   >
                     Payment Management Dashboard
                   </DropdownItem>
                 )}
 
-                <DropdownItem
-                  className="text-white hover:bg-gray-800"
-                  color="danger"
-                  onClick={handleLogout}
-                >
+                <DropdownItem color="danger" onClick={handleLogout}>
                   Log Out
                 </DropdownItem>
               </DropdownMenu>

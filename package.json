@@ -2,6 +2,7 @@
   "dependencies": {
     "@cloudinary/react": "^1.13.0",
     "@cloudinary/url-gen": "^1.19.0",
+    "@google/generative-ai": "^0.24.1",
     "@mantine/carousel": "^7.10.2",
     "@mantine/charts": "^7.10.2",
     "@mantine/code-highlight": "^7.10.2",
