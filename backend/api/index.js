@@ -1,16 +1,10 @@
 import express, { request, response } from "express";
-import { PORT } from "../config.js";
-import { mongoDBURL } from "../config.js";
 import mongoose from "mongoose";
 import cors from "cors";
-import { createServer } from "http";
-import { Server } from "socket.io";
-
 import GPTRouter from "../routes/gpt_route.js";
 import session from "express-session";
 import passport from "passport";
 import "../middleware/passport.js"; // Import passport middleware
-import serverless from "serverless-http"; // Import serverless for Vercel compatibility
 
 //Route files
 import userRouter from "../routes/userAuthenticationRoutes.js";
@@ -41,6 +35,9 @@ import rockPaperScissorsRouter from "../routes/rock_paper_scissors_routes.js";
 import dotenv from "dotenv";
 
 dotenv.config();
+
+const PORT = process.env.PORT || 8098;
+const mongoDBURL = process.env.MONGO_URI;
 //Create the app
 const app = express();
 

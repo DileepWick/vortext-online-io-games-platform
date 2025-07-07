@@ -4,7 +4,8 @@ import { User } from "../models/user.js";
 import dotenv from "dotenv";
 import { Cart } from "../models/cart.js";
 import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "../config.js";
+dotenv.config();
+const JWT_SECRET = process.env.JWT_SECRET;
 
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser(async (id, done) => {
@@ -15,8 +16,6 @@ passport.deserializeUser(async (id, done) => {
     done(err, null);
   }
 });
-
-dotenv.config();
 
 passport.use(
   new GoogleStategy(

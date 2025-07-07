@@ -1,6 +1,6 @@
 import { Notification } from "../models/notification_model.js";
 import mongoose from "mongoose";
-import { JWT_SECRET } from "../config.js";
+
 export const getNotifications = async (req, res) => {
   try {
     const { userId } = req.params; // Capture userId from the request URL

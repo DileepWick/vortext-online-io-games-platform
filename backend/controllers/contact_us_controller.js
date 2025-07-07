@@ -2,7 +2,6 @@ import { ContactUsSchema } from "../models/contact_us_model.js";
 import { Notification } from "../models/notification_model.js";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "../config.js";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import fs from "fs";
@@ -11,6 +10,10 @@ import { fileURLToPath } from "url";
 import PDFDocument from "pdfkit";
 import cloudinary from "../utils/cloudinary.js";
 import multer from "multer";
+import dotenv from "dotenv";
+dotenv.config();
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export const submitContactForm = async (req, res) => {
   try {

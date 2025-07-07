@@ -3,12 +3,15 @@ import express from "express";
 import { User } from "../models/user.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "../config.js";
 import { Cart } from "../models/cart.js";
 import fs from "fs";
 import cloudinary from "../utils/cloudinary.js";
 import upload from "../middleware/multer.js";
 import passport from "passport";
+import dotenv from "dotenv";
+dotenv.config();
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // Router
 const userRouter = express.Router();
