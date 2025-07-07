@@ -44,15 +44,6 @@ Vortex is a dynamic, full-stack web platform designed to be a central hub for in
 
 ---
 
-### 📸 Screenshots
-
-*It's highly recommended to replace these placeholders with actual screenshots of your application.*
-
-| Login Page | Game Library | Developer Dashboard |
-| :---: | :---: | :---: |
-| *[Insert Screenshot]* | *[Insert Screenshot]* | *[Insert Screenshot]* |
-
----
 
 ### 🛠️ Tech Stack
 
@@ -60,7 +51,7 @@ Vortex is a dynamic, full-stack web platform designed to be a central hub for in
   - **Framework:** React.js
   - **Build Tool:** Vite
   - **Styling:** Tailwind CSS
-  - **UI Components:** Shadcn UI (based on `components.json`)
+  - **UI Components:** Hero UI (based on `components.json`)
 
 - **Backend:**
   - **Runtime:** Node.js
