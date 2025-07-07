@@ -40,9 +40,16 @@ Vortex is a dynamic, full-stack web platform designed to be a central hub for in
 - **Comprehensive Dashboards:** Multiple dashboards for managing users, orders, products, payments, and site content.
 - **User Management:** Tools to manage all user roles (players, developers, staff).
 - **Order Fulfillment:** A complete system for tracking and processing game sales and rentals.
+
 - **Content Moderation:** Review and manage community-generated content and chats.
 
 ---
+
+- **Content Moderation:** Review and manage community-generated content.
+
+---
+
+
 
 ### 🛠️ Tech Stack
 
@@ -50,7 +57,7 @@ Vortex is a dynamic, full-stack web platform designed to be a central hub for in
   - **Framework:** React.js
   - **Build Tool:** Vite
   - **Styling:** Tailwind CSS
-  - **UI Components:** Shadcn UI (based on `components.json`)
+  - **UI Components:** Hero UI (based on `components.json`)
 
 - **Backend:**
   - **Runtime:** Node.js
@@ -61,8 +68,12 @@ Vortex is a dynamic, full-stack web platform designed to be a central hub for in
   - **Real-time Communication:** Socket.IO (inferred from chat feature)
 
 - **Deployment:**
+
   - **Frontend:** Vercel
   - **Backend:** Railway, Vercel
+
+  - Vercel and railway for  frontend and backend hosting.
+
 
 ---
 
