@@ -11,7 +11,7 @@ import VideoPlayer from "../src/components/videoPlayer";
 
 //Stock Components
 import StockTable from "./Stock_Components/stock_table";
-
+import { API_BASE_URL } from "../src/utils/getAPI";
 //Analytics
 import Analytics from "./Stock_Components/analytics";
 
@@ -104,7 +104,7 @@ const Blogger = () => {
 
   const getAllGames = async () => {
     try {
-      const response = await axios.get(`http://localhost:8098/games/allGames`);
+      const response = await axios.get(`${API_BASE_URL}/games/allGames`);
       if (response.data.allGames) {
         setGames(response.data.allGames);
       }
@@ -154,7 +154,7 @@ const Blogger = () => {
   const deleteSelectedGame = async () => {
     try {
       const response = await axios.delete(
-        `http://localhost:8098/games/deleteGame/${selectedGame._id}`
+        `${API_BASE_URL}/games/deleteGame/${selectedGame._id}`
       );
       if (response.data.message) {
         setGames(games.filter((game) => game.id !== selectedGame.id));
@@ -220,7 +220,6 @@ const Blogger = () => {
                 onChange={handleSearchChange}
                 onClear={handleClearSearch}
               />
-
             </div>
             {/*Product Table*/}
             <Table

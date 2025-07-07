@@ -9,6 +9,7 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import { Card, CardBody, Chip, Input } from "@nextui-org/react";
 import GameStartIcon from "../assets/icons/Game_Start";
+import { API_BASE_URL } from "../utils/getAPI";
 
 const OrderHistory = () => {
   useAuthCheck();
@@ -25,7 +26,7 @@ const OrderHistory = () => {
         const token = getToken();
         const userId = getUserIdFromToken(token);
         const response = await axios.get(
-          `http://localhost:8098/orderItems/useOrders/${userId}`
+          `${API_BASE_URL}/orderItems/useOrders/${userId}`
         );
         setOrderItems(response.data);
         setLoading(false);
@@ -56,8 +57,18 @@ const OrderHistory = () => {
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center p-8">
             <div className="mb-6">
-              <svg className="mx-auto h-24 w-24 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              <svg
+                className="mx-auto h-24 w-24 text-gray-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                />
               </svg>
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
@@ -93,7 +104,7 @@ const OrderHistory = () => {
   return (
     <div className="bg-white text-black min-h-screen font-sans">
       <Header />
-      
+
       <div className="container mx-auto px-4 py-8">
         {/* Header Section */}
         <div className="mb-8 text-center">
@@ -101,7 +112,8 @@ const OrderHistory = () => {
             My Library
           </h1>
           <p className="text-gray-400 text-lg">
-            {filteredOrderItems.length} game{filteredOrderItems.length !== 1 ? 's' : ''} in your collection
+            {filteredOrderItems.length} game
+            {filteredOrderItems.length !== 1 ? "s" : ""} in your collection
           </p>
         </div>
 
@@ -145,21 +157,23 @@ const OrderHistory = () => {
                             className="w-full h-48 sm:h-56 md:h-64 lg:h-72 object-cover transition-transform duration-300 group-hover:scale-110"
                             src={game.coverPhoto || "default-image-url"}
                           />
-                          
+
                           {/* Overlay on hover */}
                           <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             <div className="text-center">
                               <GameStartIcon className="text-white w-12 h-12 mx-auto mb-2" />
-                              <p className="text-white font-bold text-lg">Play Game</p>
+                              <p className="text-white font-bold text-lg">
+                                Play Game
+                              </p>
                             </div>
                           </div>
                         </div>
-                        
+
                         <CardBody className="p-4 bg-black text-white">
                           <h3 className="text-white text-lg mb-2 line-clamp-2  transition-colors">
                             {game.title || "N/A"}
                           </h3>
-                          
+
                           {/* Genre chips */}
                           {game.Genre && game.Genre.length > 0 && (
                             <div className="flex flex-wrap gap-1 mt-2">
@@ -188,8 +202,18 @@ const OrderHistory = () => {
                     ) : (
                       <CardBody className="p-6 text-center bg-gray-900 border border-gray-800">
                         <div className="text-gray-500">
-                          <svg className="mx-auto h-16 w-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                          <svg
+                            className="mx-auto h-16 w-16 mb-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M6 18L18 6M6 6l12 12"
+                            />
                           </svg>
                           <p className="text-lg font-medium">
                             This game has been removed
@@ -205,18 +229,27 @@ const OrderHistory = () => {
         ) : (
           <div className="text-center py-16">
             <div className="mb-8">
-              <svg className="mx-auto h-24 w-24 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <svg
+                className="mx-auto h-24 w-24 text-gray-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
               </svg>
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-white">
               No Games Found
             </h2>
             <p className="text-gray-400 text-lg mb-6">
-              {searchQuery 
+              {searchQuery
                 ? `No games match your search "${searchQuery}"`
-                : "Your game library is empty"
-              }
+                : "Your game library is empty"}
             </p>
             {searchQuery && (
               <button

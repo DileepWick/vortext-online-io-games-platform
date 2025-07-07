@@ -3,7 +3,6 @@ import { FaTrophy } from "react-icons/fa"; // Ensure the import is correct
 import { useNavigate } from "react-router-dom"; // Import useHistory for navigation
 import axios from "axios";
 import { Loader, Target } from "lucide-react";
-import { MathzBlasterScore } from "../../../../backend/models/MathzBlasterScore";
 import { BackgroundBeamsWithCollision } from "../ui/BackgroundBeamsWithCollision";
 import Header from "../header";
 import Footer from "../footer";
@@ -11,6 +10,7 @@ import { TextGenerateEffect } from "../ui/TextGenerateEffect";
 import ScrollToTop from "../ScrollToTop";
 import { getToken } from "../../utils/getToken";
 import { getUserIdFromToken } from "../../utils/user_id_decoder";
+import { API_BASE_URL } from "../../utils/getAPI";
 import { Button } from "@nextui-org/react";
 import useAuthCheck from "../../utils/authCheck";
 import usePreventNavigation from "../PreventNavigation";
@@ -82,14 +82,11 @@ const PuzzlePlatformGame = () => {
         const token = getToken();
         const userId = getUserIdFromToken(token);
         console.log("User ID:", userId);
-        const response = await axios.get(
-          "http://localhost:8098/users/allusers",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get(`${API_BASE_URL}/users/allusers`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         console.log("User profile fetched:", response.data);
         setUserData({
           userId: response.data._id,
@@ -110,7 +107,7 @@ const PuzzlePlatformGame = () => {
       const userId = getUserIdFromToken(token);
 
       const response = await axios.post(
-        "http://localhost:8098/mathzblaster/save",
+        `${API_BASE_URL}/mathzblaster/save`,
         { userId, score, playtime, level, difficulty },
         {
           headers: {

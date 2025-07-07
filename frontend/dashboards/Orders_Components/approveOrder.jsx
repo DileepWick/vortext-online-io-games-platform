@@ -10,6 +10,7 @@ import {
 } from "@nextui-org/react";
 import axios from "axios"; // Import axios
 import React from "react";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 const ApproveOrder = ({ approvingOrder, callBackFunction }) => {
   // Approve Modal
@@ -19,7 +20,7 @@ const ApproveOrder = ({ approvingOrder, callBackFunction }) => {
   const approveOrder = async () => {
     try {
       const response = await axios.put(
-        `http://localhost:8098/orders/approveOrder/${approvingOrder._id}`
+        `${API_BASE_URL}/orders/approveOrder/${approvingOrder._id}`
       );
 
       if (response.status === 200) {
@@ -60,7 +61,14 @@ const ApproveOrder = ({ approvingOrder, callBackFunction }) => {
 
   return (
     <div>
-      <Button onClick={handleApprove} size="sm" color="success" variant="bordered">Approve</Button>
+      <Button
+        onClick={handleApprove}
+        size="sm"
+        color="success"
+        variant="bordered"
+      >
+        Approve
+      </Button>
 
       {/* Modal  */}
       <Modal

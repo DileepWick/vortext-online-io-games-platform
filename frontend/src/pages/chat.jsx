@@ -6,6 +6,7 @@ import { getUserIdFromToken } from "../utils/user_id_decoder";
 import Header from "../components/header";
 import { Input, Button, Card } from "@nextui-org/react";
 import useAuthCheck from "../utils/authCheck";
+import { API_BASE_URL } from "../utils/getAPI";
 
 const SendIcon = (props) => (
   <svg
@@ -95,7 +96,7 @@ const Chat = () => {
 
   // Initialize socket connection
   useEffect(() => {
-    socketRef.current = io("http://localhost:8098", {
+    socketRef.current = io(`${API_BASE_URL}`, {
       withCredentials: true,
       transports: ["websocket", "polling"],
     });
@@ -217,7 +218,7 @@ const Chat = () => {
 
   const fetchUsers = useCallback(async () => {
     try {
-      const response = await axios.get("http://localhost:8098/users/allusers", {
+      const response = await axios.get(`${API_BASE_URL}/users/allusers`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (
@@ -245,7 +246,7 @@ const Chat = () => {
   const fetchUnreadMessageCounts = useCallback(async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8098/api/messages/unread/${currentUserId}`,
+        `${API_BASE_URL}/api/messages/unread/${currentUserId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -285,7 +286,7 @@ const Chat = () => {
     // Mark messages as read
     try {
       await axios.post(
-        "http://localhost:8098/api/messages/mark-read",
+        `${API_BASE_URL}/api/messages/mark-read`,
         {
           senderId: user._id,
         },
@@ -304,7 +305,7 @@ const Chat = () => {
     try {
       console.log("Fetching messages for recipient:", recipientId);
       const response = await axios.get(
-        `http://localhost:8098/api/messages/${recipientId}`,
+        `${API_BASE_URL}/api/messages/${recipientId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
           params: { currentUserId },
@@ -371,7 +372,7 @@ const Chat = () => {
     try {
       // Send via HTTP API
       const response = await axios.post(
-        "http://localhost:8098/api/messages",
+        `${API_BASE_URL}/api/messages`,
         messageData,
         {
           headers: { Authorization: `Bearer ${token}` },

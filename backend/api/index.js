@@ -50,7 +50,10 @@ app.use(express.json());
 //Middleware for handling CORS Policy
 app.use(
   cors({
-    origin: ["http://127.0.0.1:5000", "http://localhost:3001"],
+    origin: [
+      "http://127.0.0.1:5000",
+      "https://vortex-frontend-jet.vercel.app/",
+    ],
     credentials: true,
   })
 );

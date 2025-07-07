@@ -15,6 +15,7 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
 import UpdateStock from "./update_stock";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 //Stock Components
 import DeleteStock from "./delete_stock";
@@ -29,7 +30,7 @@ const StockTable = () => {
   const getAllStocks = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8098/gameStocks/allGameStock"
+        `${API_BASE_URL}/gameStocks/allGameStock`
       );
       if (response.data.allGameStocks) {
         setStocks(response.data.allGameStocks);

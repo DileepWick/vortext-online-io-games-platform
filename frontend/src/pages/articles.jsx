@@ -21,6 +21,7 @@ import "react-toastify/dist/ReactToastify.css";
 import useAuthCheck from "../utils/authCheck";
 import { cn } from "../libs/util";
 import { Input } from "../components/ui/Input";
+import { API_BASE_URL } from "../utils/getAPI";
 
 const LabelInputContainer = ({ children, className }) => {
   return (
@@ -202,7 +203,7 @@ const Articles = () => {
     const fetchUser = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8098/users/profile/${userId}`
+          `${API_BASE_URL}/users/profile/${userId}`
         );
         setUser(response.data.profile);
       } catch (error) {
@@ -218,7 +219,7 @@ const Articles = () => {
   const fetchArticles = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8098/articles/getAllArticles"
+        `${API_BASE_URL}/articles/getAllArticles`
       );
       const fetchedArticles = response.data.articles;
       setArticles(fetchedArticles);
@@ -259,7 +260,7 @@ const Articles = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8098/articles/createNewArticle",
+        `${API_BASE_URL}/articles/createNewArticle`,
         formData,
         {
           headers: {
@@ -289,7 +290,7 @@ const Articles = () => {
   const handleLikeToggle = async (articleId) => {
     try {
       const response = await axios.put(
-        `http://localhost:8098/articles/toggleLike/${articleId}`,
+        `${API_BASE_URL}/articles/toggleLike/${articleId}`,
         { userId }
       );
       const updatedArticle = response.data;
@@ -328,7 +329,7 @@ const Articles = () => {
       }
 
       const response = await axios.post(
-        `http://localhost:8098/articles/${articleId}/comments`,
+        `${API_BASE_URL}/articles/${articleId}/comments`,
         {
           userId,
           text: commentText,
@@ -371,7 +372,7 @@ const Articles = () => {
       setDeletingCommentId(commentId);
 
       const response = await axios.delete(
-        `http://localhost:8098/articles/deleteComment/${articleId}/${commentId}`
+        `${API_BASE_URL}/articles/deleteComment/${articleId}/${commentId}`
       );
 
       if (response.status === 200) {
@@ -402,7 +403,7 @@ const Articles = () => {
     try {
       setDeletingArticleId(articleId);
       await axios.delete(
-        `http://localhost:8098/articles/deleteArticle/${articleId}`,
+        `${API_BASE_URL}/articles/deleteArticle/${articleId}`,
         {
           data: { userId },
         }
@@ -422,7 +423,7 @@ const Articles = () => {
   const handleReportArticle = async (articleId) => {
     try {
       setReportingArticleId(articleId);
-      await axios.post(`http://localhost:8098/articles/report/${articleId}`, {
+      await axios.post(`${API_BASE_URL}/articles/report/${articleId}`, {
         userId,
       });
       alert("Article reported successfully");
@@ -437,7 +438,7 @@ const Articles = () => {
   const handleEditComment = async (articleId, commentId, newText) => {
     try {
       const response = await axios.put(
-        `http://localhost:8098/articles/editComment/${articleId}/${commentId}`,
+        `${API_BASE_URL}/articles/editComment/${articleId}/${commentId}`,
         {
           userId,
           text: newText,

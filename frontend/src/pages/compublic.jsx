@@ -5,6 +5,7 @@ import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { User } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
 import { FaHeart, FaRegHeart, FaTrash, FaComments } from "react-icons/fa";
+import { API_BASE_URL } from "../utils/getAPI";
 
 const ComPublic = () => {
   const [articles, setArticles] = useState([]);
@@ -22,7 +23,9 @@ const ComPublic = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get(`http://localhost:8098/users/profile/${userId}`);
+        const response = await axios.get(
+          `${API_BASE_URL}/users/profile/${userId}`
+        );
         setUser(response.data.profile);
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -36,12 +39,14 @@ const ComPublic = () => {
 
   const fetchArticles = async () => {
     try {
-      const response = await axios.get("http://localhost:8098/articles/getAllArticles");
+      const response = await axios.get(
+        `${API_BASE_URL}/articles/getAllArticles`
+      );
       const fetchedArticles = response.data.articles;
       setArticles(fetchedArticles);
 
       const likedArticlesObj = {};
-      fetchedArticles.forEach(article => {
+      fetchedArticles.forEach((article) => {
         if (article.likedBy.includes(userId)) {
           likedArticlesObj[article._id] = true;
         }
@@ -61,17 +66,22 @@ const ComPublic = () => {
 
   const handleLikeToggle = async (articleId) => {
     try {
-      const response = await axios.put(`http://localhost:8098/articles/toggleLike/${articleId}`, { userId });
+      const response = await axios.put(
+        `${API_BASE_URL}/articles/toggleLike/${articleId}`,
+        { userId }
+      );
       const updatedArticle = response.data;
 
-      setLikedArticles(prevLikedArticles => ({
+      setLikedArticles((prevLikedArticles) => ({
         ...prevLikedArticles,
         [articleId]: !prevLikedArticles[articleId],
       }));
 
-      setArticles(prevArticles =>
-        prevArticles.map(article =>
-          article._id === articleId ? { ...article, likes: updatedArticle.likes } : article
+      setArticles((prevArticles) =>
+        prevArticles.map((article) =>
+          article._id === articleId
+            ? { ...article, likes: updatedArticle.likes }
+            : article
         )
       );
     } catch (err) {
@@ -80,29 +90,32 @@ const ComPublic = () => {
   };
 
   const handleCommentChange = (articleId, text) => {
-    setCommentTexts(prevTexts => ({
+    setCommentTexts((prevTexts) => ({
       ...prevTexts,
-      [articleId]: text
+      [articleId]: text,
     }));
   };
 
   const handleCommentSubmit = async (articleId) => {
     try {
-      const commentText = commentTexts[articleId] || '';
-      
-      if (commentText.trim() === '') {
+      const commentText = commentTexts[articleId] || "";
+
+      if (commentText.trim() === "") {
         alert("Please enter a comment before submitting.");
         return;
       }
 
-      const response = await axios.post(`http://localhost:8098/articles/${articleId}/comments`, {
-        userId,
-        text: commentText
-      });
+      const response = await axios.post(
+        `${API_BASE_URL}/articles/${articleId}/comments`,
+        {
+          userId,
+          text: commentText,
+        }
+      );
 
       if (response.status === 201) {
-        setArticles(prevArticles =>
-          prevArticles.map(article =>
+        setArticles((prevArticles) =>
+          prevArticles.map((article) =>
             article._id === articleId
               ? {
                   ...article,
@@ -110,16 +123,16 @@ const ComPublic = () => {
                     ...article.comments,
                     {
                       ...response.data.comment,
-                      user: { _id: userId, name: user.name }
-                    }
-                  ]
+                      user: { _id: userId, name: user.name },
+                    },
+                  ],
                 }
               : article
           )
         );
-        setCommentTexts(prevTexts => ({
+        setCommentTexts((prevTexts) => ({
           ...prevTexts,
-          [articleId]: ''
+          [articleId]: "",
         }));
       }
     } catch (err) {
@@ -130,20 +143,27 @@ const ComPublic = () => {
   const handleDeleteComment = async (articleId, commentId) => {
     try {
       setDeletingCommentId(commentId);
-      
-      const response = await axios.delete(`http://localhost:8098/articles/deleteComment/${articleId}/${commentId}`);
+
+      const response = await axios.delete(
+        `${API_BASE_URL}/articles/deleteComment/${articleId}/${commentId}`
+      );
 
       if (response.status === 200) {
-        setArticles(prevArticles =>
-          prevArticles.map(article =>
+        setArticles((prevArticles) =>
+          prevArticles.map((article) =>
             article._id === articleId
-              ? { ...article, comments: article.comments.filter(comment => comment._id !== commentId) }
+              ? {
+                  ...article,
+                  comments: article.comments.filter(
+                    (comment) => comment._id !== commentId
+                  ),
+                }
               : article
           )
         );
         setDeletingCommentId(null);
       } else {
-        throw new Error('Failed to delete comment');
+        throw new Error("Failed to delete comment");
       }
     } catch (err) {
       setDeletingCommentId(null);
@@ -155,11 +175,16 @@ const ComPublic = () => {
   const handleDeleteArticle = async (articleId) => {
     try {
       setDeletingArticleId(articleId);
-      await axios.delete(`http://localhost:8098/articles/deleteArticle/${articleId}`, {
-        data: { userId }
-      });
+      await axios.delete(
+        `${API_BASE_URL}/articles/deleteArticle/${articleId}`,
+        {
+          data: { userId },
+        }
+      );
 
-      setArticles(prevArticles => prevArticles.filter(article => article._id !== articleId));
+      setArticles((prevArticles) =>
+        prevArticles.filter((article) => article._id !== articleId)
+      );
       setDeletingArticleId(null);
     } catch (err) {
       setDeletingArticleId(null);
@@ -169,9 +194,9 @@ const ComPublic = () => {
   };
 
   const toggleComments = (articleId) => {
-    setExpandedComments(prev => ({
+    setExpandedComments((prev) => ({
       ...prev,
-      [articleId]: !prev[articleId]
+      [articleId]: !prev[articleId],
     }));
   };
 
@@ -182,15 +207,21 @@ const ComPublic = () => {
   return (
     <div className="font-primaryRegular bg-customDark text-white">
       <h2 className="text-3xl font-bold mb-6">Public Community</h2>
-      <p className="mb-6">Welcome to the public community area. Everyone can access and view this content.</p>
-      
+      <p className="mb-6">
+        Welcome to the public community area. Everyone can access and view this
+        content.
+      </p>
+
       <h3 className="text-2xl font-bold mb-4">Public Posts</h3>
       {articles.length === 0 ? (
         <div className="text-center mt-10">No articles found.</div>
       ) : (
         <div className="space-y-6">
           {articles.map((article) => (
-            <div key={article._id} className="bg-gray-800 rounded-lg shadow-md p-4 relative">
+            <div
+              key={article._id}
+              className="bg-gray-800 rounded-lg shadow-md p-4 relative"
+            >
               {article.uploader._id === userId && (
                 <button
                   className="absolute top-2 right-2 text-red-500 hover:text-red-400"
@@ -214,7 +245,9 @@ const ComPublic = () => {
                   />
                 </div>
                 <div className="flex-grow">
-                  <h3 className="text-xl font-semibold mb-2">{article.heading}</h3>
+                  <h3 className="text-xl font-semibold mb-2">
+                    {article.heading}
+                  </h3>
                   <p className="text-gray-400">{article.articleBody}</p>
                   <p className="text-sm text-gray-500 mt-2">
                     Posted by: {article.uploader.name}
@@ -233,7 +266,7 @@ const ComPublic = () => {
                   </button>
                   <span>{article.likes} likes</span>
                 </div>
-                <button 
+                <button
                   onClick={() => toggleComments(article._id)}
                   className="flex items-center text-gray-400 hover:text-white"
                 >
@@ -244,10 +277,17 @@ const ComPublic = () => {
 
               {expandedComments[article._id] && (
                 <div className="mt-4">
-                  <form onSubmit={(e) => { e.preventDefault(); handleCommentSubmit(article._id); }}>
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      handleCommentSubmit(article._id);
+                    }}
+                  >
                     <textarea
-                      value={commentTexts[article._id] || ''}
-                      onChange={(e) => handleCommentChange(article._id, e.target.value)}
+                      value={commentTexts[article._id] || ""}
+                      onChange={(e) =>
+                        handleCommentChange(article._id, e.target.value)
+                      }
                       placeholder="Add a comment..."
                       className="w-full border-none bg-gray-700 text-white rounded-lg p-2"
                       rows="2"
@@ -255,7 +295,10 @@ const ComPublic = () => {
                     <button
                       type="submit"
                       className="mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded"
-                      disabled={!commentTexts[article._id] || commentTexts[article._id].trim() === ''}
+                      disabled={
+                        !commentTexts[article._id] ||
+                        commentTexts[article._id].trim() === ""
+                      }
                     >
                       Comment
                     </button>
@@ -263,7 +306,10 @@ const ComPublic = () => {
 
                   <div className="mt-4">
                     {article.comments.map((comment) => (
-                      <div key={comment._id} className="bg-gray-900 p-2 rounded-lg mb-2 flex justify-between items-start">
+                      <div
+                        key={comment._id}
+                        className="bg-gray-900 p-2 rounded-lg mb-2 flex justify-between items-start"
+                      >
                         <div>
                           <div className="flex items-center mb-1">
                             {comment.user && (
@@ -285,10 +331,16 @@ const ComPublic = () => {
                         {comment.user && comment.user._id === userId && (
                           <button
                             className="text-red-600 hover:text-red-400 text-xs ml-2"
-                            onClick={() => handleDeleteComment(article._id, comment._id)}
+                            onClick={() =>
+                              handleDeleteComment(article._id, comment._id)
+                            }
                             disabled={deletingCommentId === comment._id}
                           >
-                            {deletingCommentId === comment._id ? 'Deleting...' : <FaTrash />}
+                            {deletingCommentId === comment._id ? (
+                              "Deleting..."
+                            ) : (
+                              <FaTrash />
+                            )}
                           </button>
                         )}
                       </div>

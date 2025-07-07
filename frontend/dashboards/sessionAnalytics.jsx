@@ -26,6 +26,7 @@ import {
 } from "@nextui-org/react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { API_BASE_URL } from "../src/utils/getAPI";
 
 // Register Chart.js components
 ChartJS.register(
@@ -55,7 +56,7 @@ const SessionAnalytics = () => {
     const fetchRentals = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8098/Rentals/getAllRentals"
+          `${API_BASE_URL}/Rentals/getAllRentals`
         );
         setRentals(response.data);
         setIsLoading(false);
@@ -335,10 +336,10 @@ const SessionAnalytics = () => {
           display: "flex",
           flexWrap: "wrap",
           marginTop: "20px",
-          margin:'30px'
+          margin: "30px",
         }}
       >
-        <Card  style={{marginRight:'30px' ,width:'650px' }}>
+        <Card style={{ marginRight: "30px", width: "650px" }}>
           <CardBody>
             <Bar
               data={createChartData(
@@ -350,7 +351,7 @@ const SessionAnalytics = () => {
             />
           </CardBody>
         </Card>
-        <Card style={{width:'720px'}}>
+        <Card style={{ width: "720px" }}>
           <CardBody>
             <Line
               data={createChartData("Total Time", "totalTime", colorPalette)}
@@ -358,7 +359,9 @@ const SessionAnalytics = () => {
             />
           </CardBody>
         </Card>
-        <Card style={{marginRight:'30px' ,width:'650px',marginTop:'20px'}}>
+        <Card
+          style={{ marginRight: "30px", width: "650px", marginTop: "20px" }}
+        >
           <CardBody>
             <Pie
               data={revenueData}
@@ -366,7 +369,7 @@ const SessionAnalytics = () => {
             />
           </CardBody>
         </Card>
-        <Card style={{width:'720px',marginTop:'20px'}}>
+        <Card style={{ width: "720px", marginTop: "20px" }}>
           <CardBody>
             <Doughnut
               data={totalTimeData}
@@ -378,9 +381,13 @@ const SessionAnalytics = () => {
             />
           </CardBody>
         </Card>
-        <Card style={{ marginTop: "20px" ,width:'1400px' }} className="font-primaryRegular">
+        <Card
+          style={{ marginTop: "20px", width: "1400px" }}
+          className="font-primaryRegular"
+        >
           <CardBody>
-            <Radar className="font-primaryRegular"
+            <Radar
+              className="font-primaryRegular"
               data={createChartData("User Count", "userCount", colorPalette)}
               options={chartOptions("User Count Analysis", "User Count")}
             />

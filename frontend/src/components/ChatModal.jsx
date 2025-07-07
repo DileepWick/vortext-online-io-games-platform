@@ -10,6 +10,7 @@ import {
   Divider,
 } from "@nextui-org/react";
 import axios from "axios";
+import { API_BASE_URL } from "../utils/getAPI";
 
 const ChatModal = ({ isOpen, onOpenChange, contactId }) => {
   const [messages, setMessages] = useState([]);
@@ -50,7 +51,7 @@ const ChatModal = ({ isOpen, onOpenChange, contactId }) => {
   const fetchMessages = async (userId) => {
     try {
       const response = await fetch(
-        `http://localhost:8098/contacts/fetchContactById/${userId}`
+        `${API_BASE_URL}/contacts/fetchContactById/${userId}`
       );
       const data = await response.json();
       const formattedMessages = data.contact.messages.map((msg) => ({
@@ -76,7 +77,7 @@ const ChatModal = ({ isOpen, onOpenChange, contactId }) => {
 
     try {
       const response = await axios.post(
-        `http://localhost:8098/contacts/reply/${contactId}`,
+        `${API_BASE_URL}/contacts/reply/${contactId}`,
         { message: replyMessage }
       );
 

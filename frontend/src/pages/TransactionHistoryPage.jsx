@@ -6,9 +6,23 @@ import useAuthCheck from "../utils/authCheck";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { useNavigate } from "react-router-dom";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, Input, Tabs, Tab, Card, CardBody } from "@nextui-org/react";
+import {
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Pagination,
+  Input,
+  Tabs,
+  Tab,
+  Card,
+  CardBody,
+} from "@nextui-org/react";
 import { SearchIcon, CreditCard, Clock } from "lucide-react";
 import RentalTableHistory from "./RentalTableHistory";
+import { API_BASE_URL } from "../utils/getAPI";
 
 const TransactionHistory = () => {
   useAuthCheck();
@@ -30,7 +44,7 @@ const TransactionHistory = () => {
         const id = getUserIdFromToken(token);
         setUserId(id);
         const response = await axios.get(
-          `http://localhost:8098/orderItems/useOrders/${id}`
+          `${API_BASE_URL}/orderItems/useOrders/${id}`
         );
         setOrderItems(response.data);
         setLoading(false);
@@ -45,7 +59,9 @@ const TransactionHistory = () => {
 
   const filteredItems = useMemo(() => {
     return orderItems.filter((item) =>
-      item.stockid.AssignedGame.title.toLowerCase().includes(searchQuery.toLowerCase())
+      item.stockid.AssignedGame.title
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase())
     );
   }, [orderItems, searchQuery]);
 
@@ -75,7 +91,9 @@ const TransactionHistory = () => {
         <div className="flex-grow flex justify-center items-center p-4">
           <Card className="bg-gray-900 border-gray-700 text-white p-4 rounded-lg shadow-lg max-w-md w-full">
             <CardBody>
-              <p className="text-center font-primaryRegular text-lg md:text-2xl">{error}</p>
+              <p className="text-center font-primaryRegular text-lg md:text-2xl">
+                {error}
+              </p>
             </CardBody>
           </Card>
         </div>
@@ -89,8 +107,8 @@ const TransactionHistory = () => {
     <Card className="bg-white mb-4 shadow-md">
       <CardBody className="p-4">
         <div className="flex items-start gap-4">
-          <img 
-            src={transaction.stockid.AssignedGame.coverPhoto} 
+          <img
+            src={transaction.stockid.AssignedGame.coverPhoto}
             alt={transaction.stockid.AssignedGame.title}
             className="w-16 h-16 object-cover rounded-lg shadow-sm flex-shrink-0"
           />
@@ -130,8 +148,8 @@ const TransactionHistory = () => {
         <p className="mb-6 md:mb-8 text-center text-sm md:text-lg text-gray-300 px-4">
           Your account payment details, transactions, and earned Vortex Rewards.
         </p>
-       
-        <Tabs 
+
+        <Tabs
           aria-label="Transaction Tabs"
           selectedKey={activeTab}
           onSelectionChange={setActiveTab}
@@ -139,8 +157,8 @@ const TransactionHistory = () => {
           color="default"
           variant="bordered"
         >
-          <Tab 
-            key="purchase" 
+          <Tab
+            key="purchase"
             title={
               <div className="flex items-center space-x-2">
                 <CreditCard size={16} />
@@ -148,8 +166,8 @@ const TransactionHistory = () => {
               </div>
             }
           />
-          <Tab 
-            key="rentals" 
+          <Tab
+            key="rentals"
             title={
               <div className="flex items-center space-x-2">
                 <Clock size={16} />
@@ -170,16 +188,19 @@ const TransactionHistory = () => {
               size="lg"
               classNames={{
                 input: "text-black",
-                inputWrapper: "bg-white"
+                inputWrapper: "bg-white",
               }}
             />
-            
+
             {/* Mobile View - Cards */}
             <div className="block md:hidden">
               {items.length > 0 ? (
                 <>
                   {items.map((transaction) => (
-                    <MobileTransactionCard key={transaction.id} transaction={transaction} />
+                    <MobileTransactionCard
+                      key={transaction.id}
+                      transaction={transaction}
+                    />
                   ))}
                   <div className="flex justify-center mt-6">
                     <Pagination
@@ -193,7 +214,7 @@ const TransactionHistory = () => {
                       classNames={{
                         wrapper: "gap-0 overflow-visible h-8",
                         item: "w-8 h-8 text-small rounded-none bg-white text-black border-gray-300",
-                        cursor: "bg-black text-white border-black"
+                        cursor: "bg-black text-white border-black",
                       }}
                     />
                   </div>
@@ -225,7 +246,7 @@ const TransactionHistory = () => {
                         classNames={{
                           wrapper: "gap-0 overflow-visible h-8",
                           item: "w-8 h-8 text-small rounded-none bg-white text-black",
-                          cursor: "bg-black text-white  font-primaryRegular"
+                          cursor: "bg-black text-white  font-primaryRegular",
                         }}
                       />
                     </div>
@@ -241,23 +262,32 @@ const TransactionHistory = () => {
                   </TableHeader>
                   <TableBody>
                     {items.map((transaction) => (
-                      <TableRow key={transaction.id} className="hover:bg-gray-50 transition-colors font-primaryRegular">
+                      <TableRow
+                        key={transaction.id}
+                        className="hover:bg-gray-50 transition-colors font-primaryRegular"
+                      >
                         <TableCell>
-                          <img 
-                            src={transaction.stockid.AssignedGame.coverPhoto} 
+                          <img
+                            src={transaction.stockid.AssignedGame.coverPhoto}
                             alt={transaction.stockid.AssignedGame.title}
                             className="w-16 h-16 object-cover rounded-lg shadow-md hover:scale-110 transition-transform duration-200"
                           />
                         </TableCell>
-                        <TableCell>{new Date(transaction.date).toLocaleDateString()}</TableCell>
-                        <TableCell className="font-semibold">{transaction.stockid.AssignedGame.title}</TableCell>
+                        <TableCell>
+                          {new Date(transaction.date).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell className="font-semibold">
+                          {transaction.stockid.AssignedGame.title}
+                        </TableCell>
                         <TableCell>Rs.{transaction.price}</TableCell>
                         <TableCell>
                           <span className="bg-black text-white px-2 py-1 rounded-full text-xs">
                             {transaction.stockid.discount}% OFF
                           </span>
                         </TableCell>
-                        <TableCell className="font-bold">Rs.{transaction.order.paymentAmount}</TableCell>
+                        <TableCell className="font-bold">
+                          Rs.{transaction.order.paymentAmount}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

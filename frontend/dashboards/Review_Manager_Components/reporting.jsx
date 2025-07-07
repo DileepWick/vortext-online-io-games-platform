@@ -11,6 +11,7 @@ import {
   Legend,
 } from "chart.js";
 import "../../src/style/print.css";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 ChartJS.register(
   CategoryScale,
@@ -33,8 +34,6 @@ const Reporting = ({ data }) => {
   const sortedData = [...data]
     .sort((a, b) => parseFloat(b.averageRating) - parseFloat(a.averageRating))
     .slice(0, 5);
-
- 
 
   const chartData = {
     labels: sortedData.map((item) => item?.title || "N/A"),
@@ -83,10 +82,10 @@ const Reporting = ({ data }) => {
   const getGameDetailsById = async (id) => {
     try {
       const response = await axios.get(
-        `http://localhost:8098/games/getgamebyassignedgameid/${id}`
+        `${API_BASE_URL}/games/getgamebyassignedgameid/${id}`
       );
       const game = response.data;
-      
+
       return game;
     } catch (error) {
       console.error("Error fetching game details:", error);
@@ -95,13 +94,13 @@ const Reporting = ({ data }) => {
 
   useEffect(() => {
     setSortedGameDetails([]);
-    
-    data.forEach((item) => { 
+
+    data.forEach((item) => {
       getGameDetailsById(item?.id).then((gameDetails) => {
         console.log("Game Details:", gameDetails);
         setSortedGameDetails((prevData) => [
-          ...prevData, 
-          { ...gameDetails, averageRating: item.averageRating }
+          ...prevData,
+          { ...gameDetails, averageRating: item.averageRating },
         ]);
       });
     });
@@ -111,11 +110,9 @@ const Reporting = ({ data }) => {
     .sort((a, b) => parseFloat(b.averageRating) - parseFloat(a.averageRating))
     .slice(0, 5);
 
-
   useEffect(() => {
     console.log("Sorted Game Details:", sortedGameDetails);
-  }
-  , [sortedGameDetails]);
+  }, [sortedGameDetails]);
 
   const handlePrint = () => {
     window.print();
@@ -180,7 +177,9 @@ const Reporting = ({ data }) => {
             </tbody>
           </table>
           <div className="Genre ">
-            <h1 className="text-2xl font-bold text-center mt-4 text-black">Top Genres</h1>
+            <h1 className="text-2xl font-bold text-center mt-4 text-black">
+              Top Genres
+            </h1>
             {sortedGameDetail.map((item, index) => {
               return (
                 <div
@@ -190,40 +189,41 @@ const Reporting = ({ data }) => {
                   <span className="text-lg text-black">
                     {item?.genre?.map((genre, index) => (
                       <span key={index}>
-                      {(() => {
-                                const genreName =
-                                  genre.trim().charAt(0).toUpperCase() +
-                                  genre.trim().slice(1);
-                                if (genreName === "Action") return `Action ⚔️`;
-                                if (genreName === "Adventure")
-                                  return `Adventure 🐾`;
-                                if (genreName === "Racing") return `Racing 🏎️`;
-                                if (genreName === "Puzzle") return `Puzzle 🧩`;
-                                if (genreName === "Fighting")
-                                  return `Fighting 🥷🏻`;
-                                if (genreName === "Strategy")
-                                  return `Strategy 🙄`;
-                                if (genreName === "Sport") return `Sport 🏅`;
-                                return genreName; // Fallback in case no match is found
-                              })()}
+                        {(() => {
+                          const genreName =
+                            genre.trim().charAt(0).toUpperCase() +
+                            genre.trim().slice(1);
+                          if (genreName === "Action") return `Action ⚔️`;
+                          if (genreName === "Adventure") return `Adventure 🐾`;
+                          if (genreName === "Racing") return `Racing 🏎️`;
+                          if (genreName === "Puzzle") return `Puzzle 🧩`;
+                          if (genreName === "Fighting") return `Fighting 🥷🏻`;
+                          if (genreName === "Strategy") return `Strategy 🙄`;
+                          if (genreName === "Sport") return `Sport 🏅`;
+                          return genreName; // Fallback in case no match is found
+                        })()}
                         {index < item.genre.length - 1 && ",\u00A0"}
                       </span>
                     ))}
                   </span>
                   <span className="text-lg text-black">
-                  <div className="flex justify-center">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <svg
-                            key={star}
-                            className={`w-6 h-6 ${sortedData[index]?.averageRating >= star ? 'text-yellow-400' : 'text-gray-500'}`}
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                        ))}
-                      </div>
+                    <div className="flex justify-center">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <svg
+                          key={star}
+                          className={`w-6 h-6 ${
+                            sortedData[index]?.averageRating >= star
+                              ? "text-yellow-400"
+                              : "text-gray-500"
+                          }`}
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      ))}
+                    </div>
                   </span>
                 </div>
               );
@@ -233,7 +233,7 @@ const Reporting = ({ data }) => {
       </div>
       <button
         onClick={handlePrint}
-        style={{ backgroundColor: "#17181c"  }}
+        style={{ backgroundColor: "#17181c" }}
         className="printBtn mt-4  text-white px-6 py-3 rounded-full "
       >
         Print Report

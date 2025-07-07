@@ -16,6 +16,7 @@ import {
 } from "@nextui-org/react";
 import { getToken } from "../utils/getToken";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
+import { API_BASE_URL } from "../utils/getAPI";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { BackgroundBeamsWithCollision } from "../components/ui/BackgroundBeamsWithCollision";
@@ -36,7 +37,7 @@ const Leaderboard = () => {
     const fetchLeaderboards = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8098/mathzblaster/leaderboard"
+          `${API_BASE_URL}/mathzblaster/leaderboard`
         );
         // Limit to top 100 players for each difficulty
         const limitedLeaderboards = Object.fromEntries(
@@ -62,14 +63,11 @@ const Leaderboard = () => {
         const token = getToken();
         const userId = getUserIdFromToken(token);
 
-        const response = await axios.get(
-          "http://localhost:8098/users/allusers",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get(`${API_BASE_URL}/users/allusers`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         const users = response.data.allUsers;
         console.log(response.data);

@@ -24,6 +24,7 @@ import {
   ModalFooter,
 } from "@nextui-org/react";
 import { toast, Flip } from "react-toastify";
+import { API_BASE_URL } from "../utils/getAPI";
 
 const Renttable = () => {
   useAuthCheck();
@@ -42,10 +43,15 @@ const Renttable = () => {
     try {
       const token = getToken();
       const userId = getUserIdFromToken(token);
-      const response = await axios.get(`http://localhost:8098/Rentals/getRentalsByUser/${userId}`);
+      const response = await axios.get(
+        `${API_BASE_URL}/Rentals/getRentalsByUser/${userId}`
+      );
       setRentals(response.data);
     } catch (err) {
-      console.error("Error fetching rentals:", err.response ? err.response.data : err.message);
+      console.error(
+        "Error fetching rentals:",
+        err.response ? err.response.data : err.message
+      );
       setError(err.response ? err.response.data.message : err.message);
     } finally {
       setLoading(false);
@@ -98,15 +104,17 @@ const Renttable = () => {
       <Header />
       <div className="relative">
         <div className="container mx-auto p-6">
-          <div className="text-2xl font-primaryRegular mb-6">MY RENTED GAMES</div>
-          
+          <div className="text-2xl font-primaryRegular mb-6">
+            MY RENTED GAMES
+          </div>
+
           <Input
             className="ml-2 font-primaryRegular w-48 sm:w-64 mb-4"
             placeholder="Search by GAME . . ."
             value={searchQuery}
             onChange={handleSearchChange}
           />
-          
+
           <Table
             isHeaderSticky
             aria-label="Rented Games Table"
@@ -153,12 +161,17 @@ const Renttable = () => {
             {(onClose) => (
               <>
                 <ModalHeader className="flex flex-col gap-1">
-                  <span style={{ color: '#0072F5', fontWeight: 'bold' }}>Start Session</span>
+                  <span style={{ color: "#0072F5", fontWeight: "bold" }}>
+                    Start Session
+                  </span>
                 </ModalHeader>
                 <ModalBody>
                   {currentGame ? (
-                    <span style={{ color: '#0072F5' }}>
-                      <p>Are you sure you want to start a session for {currentGame.game.title}?</p>
+                    <span style={{ color: "#0072F5" }}>
+                      <p>
+                        Are you sure you want to start a session for{" "}
+                        {currentGame.game.title}?
+                      </p>
                       <p>Rental Time: {currentGame.time}</p>
                     </span>
                   ) : (
@@ -177,7 +190,7 @@ const Renttable = () => {
             )}
           </ModalContent>
         </Modal>
-        
+
         {/* Footer remains unchanged */}
       </div>
       <Footer />

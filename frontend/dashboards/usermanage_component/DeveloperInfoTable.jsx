@@ -18,6 +18,7 @@ import {
   Input,
 } from "@nextui-org/react";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon"; // Assuming you have the icon
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 const DeveloperInfoTable = () => {
   const [approvedDevelopers, setApprovedDevelopers] = useState([]);
@@ -35,7 +36,7 @@ const DeveloperInfoTable = () => {
   const fetchApprovedDevelopers = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8098/users/approvedDevelopers"
+        `${API_BASE_URL}/users/approvedDevelopers`
       );
       setApprovedDevelopers(response.data.approvedDevelopers);
     } catch (error) {
@@ -47,10 +48,11 @@ const DeveloperInfoTable = () => {
   };
 
   // Filter developers by search query (username, firstname, or lastname)
-  const filteredDevelopers = approvedDevelopers.filter((developer) =>
-    developer.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    developer.firstname.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    developer.lastname.toLowerCase().includes(searchQuery.toLowerCase()) // Filter by lastname as well
+  const filteredDevelopers = approvedDevelopers.filter(
+    (developer) =>
+      developer.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      developer.firstname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      developer.lastname.toLowerCase().includes(searchQuery.toLowerCase()) // Filter by lastname as well
   );
 
   const paginatedItems = filteredDevelopers.slice(
@@ -66,7 +68,7 @@ const DeveloperInfoTable = () => {
   const handleUpdate = async () => {
     try {
       await axios.put(
-        `http://localhost:8098/users/developers/update/${selectedDeveloper._id}`,
+        `${API_BASE_URL}/users/developers/update/${selectedDeveloper._id}`,
         selectedDeveloper
       );
       setEditModalOpen(false);
@@ -86,7 +88,7 @@ const DeveloperInfoTable = () => {
   const handleDelete = async () => {
     try {
       await axios.delete(
-        `http://localhost:8098/users/developers/delete/${selectedDeveloper._id}`
+        `${API_BASE_URL}/users/developers/delete/${selectedDeveloper._id}`
       );
       setDeleteModalOpen(false);
       setApprovedDevelopers((prevDevelopers) =>
@@ -108,16 +110,16 @@ const DeveloperInfoTable = () => {
     <div>
       {/* Search Bar */}
       <div className="flex items-center mb-4">
-  <Input
-    className="ml-2 font-primaryRegular w-full" // Use w-full to make it full width
-    placeholder="Search by Developer (username, firstname, or lastname)..."
-    startContent={<SearchIcon />}
-    value={searchQuery}
-    onChange={handleSearchChange}
-    onClear={() => handleSearchChange({ target: { value: "" } })}
-    style={{ maxWidth: "600px" }} // Optional: Set a maximum width
-  />
-</div>
+        <Input
+          className="ml-2 font-primaryRegular w-full" // Use w-full to make it full width
+          placeholder="Search by Developer (username, firstname, or lastname)..."
+          startContent={<SearchIcon />}
+          value={searchQuery}
+          onChange={handleSearchChange}
+          onClear={() => handleSearchChange({ target: { value: "" } })}
+          style={{ maxWidth: "600px" }} // Optional: Set a maximum width
+        />
+      </div>
 
       <Table
         aria-label="Approved Developers Table"
@@ -148,11 +150,21 @@ const DeveloperInfoTable = () => {
 
         <TableBody className="text-black font-primaryRegular">
           {paginatedItems.map((developer) => (
-            <TableRow key={developer._id} className="text-black font-primaryRegular">
-              <TableCell>{`${developer.firstname || ''} ${developer.lastname || ''}`}</TableCell>
+            <TableRow
+              key={developer._id}
+              className="text-black font-primaryRegular"
+            >
+              <TableCell>{`${developer.firstname || ""} ${
+                developer.lastname || ""
+              }`}</TableCell>
               <TableCell>{developer.username}</TableCell>
               <TableCell>
-                <img src={developer.profilePic} alt="Profile" width="50" height="50" />
+                <img
+                  src={developer.profilePic}
+                  alt="Profile"
+                  width="50"
+                  height="50"
+                />
               </TableCell>
               <TableCell>
                 {new Date(developer.birthday).toLocaleDateString()}

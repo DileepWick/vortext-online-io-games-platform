@@ -1,7 +1,8 @@
-import React, { useState, useEffect ,useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 import {
   Table,
   TableHeader,
@@ -14,13 +15,12 @@ import {
 } from "@nextui-org/react";
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:8098"; // Define your API base URL
+
 
 const ReviewTable = () => {
   const [tableData, setTableData] = useState([]);
   // const [gameNames, setGameNames] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
-  
 
   const getTableData = async () => {
     try {
@@ -33,8 +33,7 @@ const ReviewTable = () => {
     }
   };
 
-
- useEffect(() => {
+  useEffect(() => {
     getTableData();
   }, []);
 
@@ -50,10 +49,9 @@ const ReviewTable = () => {
       toast.error("Error deleting rating");
     }
   };
-  
 
   // const getGameNameById =async (gameId) =>{
-    
+
   //   try{
   //     const gameName = await axios.get(`${API_BASE_URL}/games/getgamebyid/${gameId}`);
   //     console.log(gameName.data.title);
@@ -61,17 +59,15 @@ const ReviewTable = () => {
   //   }catch(error){
   //     console.error("Error fetching data:", error);
   //   }
-    
-  // }
 
- 
+  // }
 
   // useEffect(() => {
   //   const fetchGameNames = async () => {
   //     const names = {};
   //     for (const item of tableData) {
   //       if (item.game && !gameNames[item.game]) {
-  //         const name = await getGameNameById(item.game); 
+  //         const name = await getGameNameById(item.game);
   //         names[item.game] = name;
   //       }
   //     }
@@ -94,23 +90,20 @@ const ReviewTable = () => {
     );
   }, [tableData, searchQuery]);
 
-
-
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
   const handleClearSearch = () => {
     setSearchQuery("");
-    
   };
- 
-  useEffect(()=>{
-   console.log('Table Data...',tableData);
-  },[tableData])
+
+  useEffect(() => {
+    console.log("Table Data...", tableData);
+  }, [tableData]);
 
   return (
-    <div  >
-    <Input
+    <div>
+      <Input
         className="ml-2 font-primaryRegular w-48 sm:w-64"
         placeholder="Search by GAME . . ."
         startContent={<SearchIcon />}
@@ -129,10 +122,7 @@ const ReviewTable = () => {
         }
         classNames={{
           wrapper: "min-h-[222px]",
-          
         }}
-
-        
       >
         <TableHeader>
           <TableColumn key="GAME">GAME</TableColumn>
@@ -145,28 +135,32 @@ const ReviewTable = () => {
         </TableHeader>
         <TableBody>
           {filteredItems.map((item) => (
-            <TableRow key={item._id}  style={{ color: 'black' }}>
+            <TableRow key={item._id} style={{ color: "black" }}>
               <TableCell>{item?.game?.AssignedGame?.title || "N/A"}</TableCell>
-              <TableCell>
-  {item?.user.username || "N/A"}
-</TableCell>
+              <TableCell>{item?.user.username || "N/A"}</TableCell>
 
               <TableCell>{item?.user.email || "N/A"}</TableCell>
               <TableCell>{item?.rating || "N/A"}</TableCell>
               <TableCell>
-                {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "N/A"}
+                {item.createdAt
+                  ? new Date(item.createdAt).toLocaleDateString()
+                  : "N/A"}
               </TableCell>
               <TableCell>
-           <Link to={`/game/${item?.game?._id}`}  >    
-
-             <Button variant="ghost" color="primary">
-                  View 
-                </Button> 
+                <Link to={`/game/${item?.game?._id}`}>
+                  <Button variant="ghost" color="primary">
+                    View
+                  </Button>
                 </Link>
-               
               </TableCell>
               <TableCell>
-                <Button variant="ghost" color="danger" onClick={()=>{deleteRating(item?._id)}}>
+                <Button
+                  variant="ghost"
+                  color="danger"
+                  onClick={() => {
+                    deleteRating(item?._id);
+                  }}
+                >
                   Delete
                 </Button>
               </TableCell>

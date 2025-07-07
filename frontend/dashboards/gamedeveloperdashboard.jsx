@@ -4,7 +4,6 @@ import axios from "axios";
 // Components
 import Header from "../src/components/header";
 
-
 import UploadGame from "./Games_Components/add_new_game";
 import UpdateGame from "./Games_Components/update_game";
 import AddNewStock from "./Games_Components/add_new_stock";
@@ -12,10 +11,9 @@ import AddNewStock from "./Games_Components/add_new_stock";
 import Footer from "../src/components/footer";
 import VideoPlayer from "../src/components/videoPlayer";
 
-import DevEarningsOfPurchased from './Payment_Management/DevEarningsOfPurchased';
-import DevRentalEarnings from './Payment_Management/DevRentalEarnings';
-import DeveloperEarningsAnalysis from './Payment_Management/DeveloperEarningsAnalysis';
-
+import DevEarningsOfPurchased from "./Payment_Management/DevEarningsOfPurchased";
+import DevRentalEarnings from "./Payment_Management/DevRentalEarnings";
+import DeveloperEarningsAnalysis from "./Payment_Management/DeveloperEarningsAnalysis";
 
 //Stock Components
 import StockTable from "./Stock_Components/stock_table";
@@ -49,17 +47,15 @@ import { getToken } from "../src/utils/getToken";
 import { getUserIdFromToken } from "../src/utils/user_id_decoder";
 import useAuthCheck from "../src/utils/authCheck";
 import DeveloperIncomeTable from "../src/pages/DeveloperEarningTable";
+import { API_BASE_URL } from "../src/utils/getAPI";
 
-const GameDeveloperDashboard= () => {
+const GameDeveloperDashboard = () => {
+  // Authenticate user
+  useAuthCheck();
 
-    // Authenticate user
-    useAuthCheck();
-
-    //Get the logged in developer
-    const token = getToken();
-    const developerId = getUserIdFromToken(token);
-
-
+  //Get the logged in developer
+  const token = getToken();
+  const developerId = getUserIdFromToken(token);
 
   //Add New Game Modal
   const {
@@ -124,7 +120,9 @@ const GameDeveloperDashboard= () => {
   //Get all games for developer function
   const getAllGames = async () => {
     try {
-      const response = await axios.get(`http://localhost:8098/games/getGamesByDeveloper/${developerId}`);
+      const response = await axios.get(
+        `${API_BASE_URL}/games/getGamesByDeveloper/${developerId}`
+      );
       if (response.data.allGames) {
         setGames(response.data.allGames);
       }
@@ -174,7 +172,7 @@ const GameDeveloperDashboard= () => {
   const deleteSelectedGame = async () => {
     try {
       const response = await axios.delete(
-        `http://localhost:8098/games/deleteGame/${selectedGame._id}`
+        `${API_BASE_URL}/games/deleteGame/${selectedGame._id}`
       );
       if (response.data.message) {
         setGames(games.filter((game) => game.id !== selectedGame.id));
@@ -208,8 +206,6 @@ const GameDeveloperDashboard= () => {
     getAllGames();
   };
 
-  
-
   return (
     <div className="flex w-full flex-col text-black bg-white">
       <div className="relative">
@@ -232,7 +228,7 @@ const GameDeveloperDashboard= () => {
         </Tabs>
       </div>
       <div className="p-4">
-      {activeTab === "analytics" && <DeveloperEarningsAnalysis />}
+        {activeTab === "analytics" && <DeveloperEarningsAnalysis />}
         {activeTab === "purchasedEarnings" && <DevEarningsOfPurchased />}
         {activeTab === "DevRentalEarnings" && <DevRentalEarnings />}
 

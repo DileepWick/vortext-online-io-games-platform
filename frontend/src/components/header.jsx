@@ -23,6 +23,7 @@ import { useNavigate } from "react-router-dom";
 // Utils
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { getToken } from "../utils/getToken";
+import { API_BASE_URL } from "../utils/getAPI";
 
 const Header = forwardRef((props, ref) => {
   const [user, setUser] = useState(null);
@@ -51,7 +52,7 @@ const Header = forwardRef((props, ref) => {
     const fetchUser = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8098/users/profile/${userId}`
+          `${API_BASE_URL}/users/profile/${userId}`
         );
         setUser(response.data.profile);
       } catch (error) {

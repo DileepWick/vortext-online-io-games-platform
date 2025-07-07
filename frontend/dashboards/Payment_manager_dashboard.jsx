@@ -8,11 +8,9 @@ import AllPayments from "../dashboards/Payment_Management/all_payments";
 import Chart from "./Payment_Management/chart";
 import GamesSortChart from "./Payment_Management/Games_Sort";
 import RentalPaymentsDash from "./rentalPaymentsDashboard";
-import MostRentedGamesChart from './Payment_Management/MostRentedGamesChart';
-import IncomeExpenseAnalysis from './Payment_Management/IncomeExpenseAnalysis';
-
-const API_BASE_URL = "http://localhost:8098";
-
+import MostRentedGamesChart from "./Payment_Management/MostRentedGamesChart";
+import IncomeExpenseAnalysis from "./Payment_Management/IncomeExpenseAnalysis";
+import { API_BASE_URL } from "../src/utils/getAPI";
 const Payment_Manager = () => {
   useAuthCheck();
   const [activeTab, setActiveTab] = useState("tab1");
@@ -59,7 +57,9 @@ const Payment_Manager = () => {
   }, []);
 
   return (
-    <div className="bg-white min-h-screen"> {/* Added bg-white and min-h-screen classes */}
+    <div className="bg-white min-h-screen">
+      {" "}
+      {/* Added bg-white and min-h-screen classes */}
       <Header />
       <div className="flex w-full flex-col">
         <div className="flex items-center p-4 font-primaryRegular">

@@ -17,6 +17,7 @@ import { SearchIcon } from "../../src/assets/icons/SearchIcon";
 import { EyeIcon } from "../../src/assets/icons/EyeIcon";
 import ViewDetails from "./View_Address_Button";
 import ViewReason from "./View_Reason_Button";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 const CanceledOrdersTable = () => {
   const [tableData, setTableData] = useState([]);
@@ -28,7 +29,7 @@ const CanceledOrdersTable = () => {
   const getTableData = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8098/orders/allCanceledOrders"
+        `${API_BASE_URL}/orders/allCanceledOrders`
       );
       if (response.data.allOrders) {
         setTableData(response.data.allOrders);

@@ -20,6 +20,7 @@ import {
   CheckCircle,
   MessageSquare,
 } from "lucide-react";
+import { API_BASE_URL } from "../utils/getAPI";
 
 const Contact = () => {
   useAuthCheck();
@@ -44,7 +45,7 @@ const Contact = () => {
     const fetchUserData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8098/users/profile/${userId}`,
+          `${API_BASE_URL}/users/profile/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -58,7 +59,7 @@ const Contact = () => {
 
         // Check if user has any tickets and if there is an open ticket
         const ticketResponse = await axios.get(
-          `http://localhost:8098/contacts/fetchContactByUserId/${userId}`,
+          `${API_BASE_URL}/contacts/fetchContactByUserId/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -184,7 +185,7 @@ const Contact = () => {
       };
 
       const response = await axios.post(
-        "http://localhost:8098/contacts/submitContactForm",
+        `${API_BASE_URL}/contacts/submitContactForm`,
         formData,
         { headers }
       );

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Button, Modal, Input } from "@nextui-org/react";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 const UpdateUser = ({ user, onUpdate }) => {
   const [visible, setVisible] = useState(false);
@@ -20,7 +21,10 @@ const UpdateUser = ({ user, onUpdate }) => {
 
   const handleUpdate = async () => {
     try {
-      const response = await axios.put(`http://localhost:8098/users/${user.id}`, updatedUser);
+      const response = await axios.put(
+        `${API_BASE_URL}/users/${user.id}`,
+        updatedUser
+      );
       if (response.status === 200) {
         onUpdate();
         closeModal();

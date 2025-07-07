@@ -6,6 +6,7 @@ import { MessageCircle, X } from "lucide-react";
 // Utils
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { getToken } from "../utils/getToken";
+import { API_BASE_URL } from "../utils/getAPI";
 
 const ChatComponent = ({ game }) => {
   const token = getToken();
@@ -21,12 +22,12 @@ const ChatComponent = ({ game }) => {
   const fetchInitialMessage = async () => {
     try {
       const userResponse = await axios.get(
-        `http://localhost:8098/users/profile/${userId}`
+        `${API_BASE_URL}/users/profile/${userId}`
       );
       const { username, age } = userResponse.data.profile;
       const promptWithGame = `Greet "${username}". You are an expert on the game "${game}". Introduce yourself shortly and ask if the user has any questions about the game. You only talk about "${game}" nothing more. If the user asks about other stuff, be funny and mock them politely. Act Like a cute gamer girl. Your name is Gwen. Give very short and simple answers and use emojis`;
 
-      const chatResponse = await axios.post("http://localhost:8098/api/chat", {
+      const chatResponse = await axios.post(`${API_BASE_URL}/api/chat`, {
         sessionId,
         prompt: promptWithGame,
       });
@@ -67,7 +68,7 @@ const ChatComponent = ({ game }) => {
       try {
         const promptWithGame = `You are an expert on the game "${game}". ${input}`;
 
-        const response = await axios.post("http://localhost:8098/api/chat", {
+        const response = await axios.post(`${API_BASE_URL}/api/chat`, {
           sessionId,
           prompt: promptWithGame,
         });
@@ -100,8 +101,12 @@ const ChatComponent = ({ game }) => {
   return (
     <>
       {!isChatOpen && (
-        <Tooltip showArrow={true} content="Wanna Help With The Game ? Just Ask Me " className="text-black"
-        placement="top">
+        <Tooltip
+          showArrow={true}
+          content="Wanna Help With The Game ? Just Ask Me "
+          className="text-black"
+          placement="top"
+        >
           <button
             onClick={toggleChat}
             className="fixed bottom-4 right-4 w-[120px] h-[120px] rounded-full p-0    z-50 "

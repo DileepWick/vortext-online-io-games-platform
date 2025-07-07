@@ -15,6 +15,7 @@ import {
   User,
 } from "@nextui-org/react";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 // Order Components
 import CancelOrder from "./CancelOrder";
@@ -30,9 +31,7 @@ const ApprovedOrdersTable = () => {
   // Get All Orders
   const getTableData = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:8098/orders/approvedOrders"
-      );
+      const response = await axios.get(`${API_BASE_URL}/orders/approvedOrders`);
       if (response.data.allOrders) {
         setTableData(response.data.allOrders);
       }

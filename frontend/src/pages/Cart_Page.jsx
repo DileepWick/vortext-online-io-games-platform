@@ -9,6 +9,7 @@ import { DeleteIcon } from "../assets/icons/DeleteIcon";
 import { ScrollShadow } from "@nextui-org/react";
 import { toast, Flip } from "react-toastify";
 import { Helmet } from "react-helmet-async";
+import { API_BASE_URL } from "../utils/getAPI";
 import {
   Modal,
   ModalContent,
@@ -21,11 +22,21 @@ import {
   Chip,
   Input,
   Radio,
-  RadioGroup
+  RadioGroup,
 } from "@nextui-org/react";
 
 const CreditCardIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
     <line x1="1" y1="10" x2="23" y2="10"></line>
   </svg>
@@ -74,10 +85,10 @@ const CartPage = () => {
   const [totalDiscountedTotal, setTotalDiscountedTotal] = useState(0);
 
   // Checkout state
-  const [paymentMethod, setPaymentMethod] = useState('creditCard');
-  const [cardNumber, setCardNumber] = useState('');
-  const [expirationDate, setExpirationDate] = useState('');
-  const [cvv, setCvv] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState("creditCard");
+  const [cardNumber, setCardNumber] = useState("");
+  const [expirationDate, setExpirationDate] = useState("");
+  const [cvv, setCvv] = useState("");
 
   useEffect(() => {
     const fetchCartItems = async () => {
@@ -85,7 +96,7 @@ const CartPage = () => {
         const token = getToken();
         const userId = getUserIdFromToken(token);
         const response = await axios.get(
-          `http://localhost:8098/cartItems/getCartItemsByUserId/${userId}`
+          `${API_BASE_URL}/cartItems/getCartItemsByUserId/${userId}`
         );
         setCartItems(response.data.cartItems);
         calculateTotal(response.data.cartItems);
@@ -123,7 +134,7 @@ const CartPage = () => {
   const handleRemoveItem = async (stockid) => {
     try {
       const response = await axios.delete(
-        `http://localhost:8098/cartItems/deleteCartItem/${stockid}`
+        `${API_BASE_URL}/cartItems/deleteCartItem/${stockid}`
       );
 
       if (response.status === 200) {
@@ -139,20 +150,20 @@ const CartPage = () => {
   };
 
   const handleCardNumberChange = (e) => {
-    const value = e.target.value.replace(/\D/g, '');
-    const formattedValue = value.replace(/(\d{4})(?=\d)/g, '$1-');
+    const value = e.target.value.replace(/\D/g, "");
+    const formattedValue = value.replace(/(\d{4})(?=\d)/g, "$1-");
     setCardNumber(formattedValue.slice(0, 19));
   };
 
   const handleExpirationDateChange = (e) => {
-    const value = e.target.value.replace(/\D/g, '');
+    const value = e.target.value.replace(/\D/g, "");
     if (value.length <= 2) {
       setExpirationDate(value);
     } else {
       const month = value.slice(0, 2);
       const year = value.slice(2, 4);
       if (parseInt(month) > 12) {
-        setExpirationDate('12/' + year);
+        setExpirationDate("12/" + year);
       } else {
         setExpirationDate(`${month}/${year}`);
       }
@@ -160,13 +171,13 @@ const CartPage = () => {
   };
 
   const handleCvvChange = (e) => {
-    const value = e.target.value.replace(/\D/g, '');
+    const value = e.target.value.replace(/\D/g, "");
     setCvv(value.slice(0, 3));
   };
 
   const validateForm = () => {
-    if (paymentMethod === 'creditCard') {
-      if (cardNumber.replace(/-/g, '').length !== 16) {
+    if (paymentMethod === "creditCard") {
+      if (cardNumber.replace(/-/g, "").length !== 16) {
         toast.error("Invalid card number");
         return false;
       }
@@ -174,7 +185,7 @@ const CartPage = () => {
         toast.error("Invalid expiration date");
         return false;
       }
-      const [month, year] = expirationDate.split('/');
+      const [month, year] = expirationDate.split("/");
       if (parseInt(month) < 1 || parseInt(month) > 12) {
         toast.error("Invalid month in expiration date");
         return false;
@@ -183,7 +194,10 @@ const CartPage = () => {
       const currentDate = new Date();
       const currentYear = currentDate.getFullYear() % 100;
       const currentMonth = currentDate.getMonth() + 1;
-      if (parseInt(year) < currentYear || (parseInt(year) === currentYear && parseInt(month) < currentMonth)) {
+      if (
+        parseInt(year) < currentYear ||
+        (parseInt(year) === currentYear && parseInt(month) < currentMonth)
+      ) {
         toast.error("Card has expired");
         return false;
       }
@@ -198,19 +212,25 @@ const CartPage = () => {
 
   const handlePlaceOrder = async () => {
     if (!validateForm()) return;
-    if (paymentMethod === 'creditCard' && (!cardNumber || !expirationDate || !cvv)) {
-      toast.error("Please fill in your payment details before placing the order.", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-        transition: Flip,
-        style: { fontFamily: "Rubik" },
-      });
+    if (
+      paymentMethod === "creditCard" &&
+      (!cardNumber || !expirationDate || !cvv)
+    ) {
+      toast.error(
+        "Please fill in your payment details before placing the order.",
+        {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Flip,
+          style: { fontFamily: "Rubik" },
+        }
+      );
       return;
     }
 
@@ -221,23 +241,24 @@ const CartPage = () => {
         userId,
         paymentAmount: totalDiscountedTotal,
         paymentMethod: paymentMethod,
-        paymentDetails: paymentMethod === 'creditCard' 
-          ? { cardNumber, expirationDate, cvv }
-          : {},
-        items: cartItems.map(item => ({
+        paymentDetails:
+          paymentMethod === "creditCard"
+            ? { cardNumber, expirationDate, cvv }
+            : {},
+        items: cartItems.map((item) => ({
           gameId: item.stockid.AssignedGame._id,
           quantity: 1,
-          price: item.stockid.UnitPrice
-        }))
+          price: item.stockid.UnitPrice,
+        })),
       };
 
       const response = await axios.post(
-        `http://localhost:8098/orders/create/${userId}`,
+        `${API_BASE_URL}/orders/create/${userId}`,
         orderData,
         {
           headers: {
-            'Authorization': `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
@@ -250,9 +271,7 @@ const CartPage = () => {
             stockid: item.stockid._id,
             price: item.stockid.UnitPrice,
           };
-          return axios.post(`http://localhost:8098/orderItems/`,
-            orderItemData
-          );
+          return axios.post(`${API_BASE_URL}/orderItems/`, orderItemData);
         })
       );
 
@@ -316,7 +335,9 @@ const CartPage = () => {
       </Helmet>
       <Header />
       <div className="container mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold mb-4 text-center text-white">My Cart</h1>
+        <h1 className="text-4xl font-bold mb-4 text-center text-white">
+          My Cart
+        </h1>
         <div className="bg-gray-800 rounded-lg shadow-2xl p-8 flex flex-col lg:flex-row gap-8">
           <ScrollShadow hideScrollBar className="w-full lg:w-2/3 h-[600px]">
             <div className="space-y-6">
@@ -408,7 +429,7 @@ const CartPage = () => {
         </div>
       </div>
       <Footer />
-      
+
       <Modal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
@@ -425,21 +446,30 @@ const CartPage = () => {
         >
           {(onClose) => (
             <>
-              <ModalHeader className="font-bold text-2xl text-gray-900">Checkout</ModalHeader>
+              <ModalHeader className="font-bold text-2xl text-gray-900">
+                Checkout
+              </ModalHeader>
               <ModalBody>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* PAYMENT METHOD SECTION */}
                   <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h2 className="text-lg font-semibold mb-4 text-gray-800">Payment Method</h2>
-                    <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+                    <h2 className="text-lg font-semibold mb-4 text-gray-800">
+                      Payment Method
+                    </h2>
+                    <RadioGroup
+                      value={paymentMethod}
+                      onValueChange={setPaymentMethod}
+                    >
                       <div className="border border-gray-300 p-5 rounded-lg mb-4">
                         <Radio value="creditCard">
                           <div className="flex items-center">
                             <CreditCardIcon />
-                            <span className="text-gray-700 ml-2 mr-4">Credit Card</span>
+                            <span className="text-gray-700 ml-2 mr-4">
+                              Credit Card
+                            </span>
                           </div>
                         </Radio>
-                        {paymentMethod === 'creditCard' && (
+                        {paymentMethod === "creditCard" && (
                           <div className="mt-4">
                             <Input
                               label="Card Number"
@@ -486,7 +516,9 @@ const CartPage = () => {
 
                   {/* ORDER SUMMARY SECTION */}
                   <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h2 className="text-lg font-semibold mb-4 text-blue-900">Order Summary</h2>
+                    <h2 className="text-lg font-semibold mb-4 text-blue-900">
+                      Order Summary
+                    </h2>
                     {cartItems.map((item) => (
                       <div
                         key={item._id}
@@ -498,8 +530,12 @@ const CartPage = () => {
                           className="w-16 h-20 object-cover mr-4 rounded-lg"
                         />
                         <div>
-                          <h3 className="font-semibold text-blue-700">{item.stockid.AssignedGame.title}</h3>
-                          <p className="text-gray-700">Rs.{item.stockid.UnitPrice.toFixed(2)}</p>
+                          <h3 className="font-semibold text-blue-700">
+                            {item.stockid.AssignedGame.title}
+                          </h3>
+                          <p className="text-gray-700">
+                            Rs.{item.stockid.UnitPrice.toFixed(2)}
+                          </p>
                         </div>
                       </div>
                     ))}

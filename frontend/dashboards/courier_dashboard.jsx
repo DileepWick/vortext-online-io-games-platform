@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { getToken } from "../src/utils/getToken";
 import { getUserIdFromToken } from "../src/utils/user_id_decoder";
+import { API_BASE_URL } from "../src/utils/getAPI";
 
 // Components
 import Header from "../src/components/header";
@@ -36,7 +37,7 @@ const CourierDashBoard = () => {
       if (userId) {
         try {
           const response = await axios.get(
-            `http://localhost:8098/users/profile/${userId}`
+            `${API_BASE_URL}/users/profile/${userId}`
           );
           setUser(response.data.profile);
           setSelectedStatus(response.data.profile.status);
@@ -55,7 +56,7 @@ const CourierDashBoard = () => {
     const userId = getUserIdFromToken(token);
 
     try {
-      await axios.put(`http://localhost:8098/users/changeStatus/${userId}`, {
+      await axios.put(`${API_BASE_URL}/users/changeStatus/${userId}`, {
         newStatus,
       });
       setUser((prevUser) => ({ ...prevUser, status: newStatus }));

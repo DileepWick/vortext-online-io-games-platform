@@ -11,6 +11,7 @@ import {
 
 import React, { useState } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 const CancelOrder = ({ orderForCancellation, callBackFunction }) => {
   // State variables
@@ -33,7 +34,7 @@ const CancelOrder = ({ orderForCancellation, callBackFunction }) => {
 
     try {
       const response = await axios.put(
-        `http://localhost:8098/orders/cancelOrder/${orderForCancellation._id}`,
+        `${API_BASE_URL}/orders/cancelOrder/${orderForCancellation._id}`,
         cancellationBody
       );
 
@@ -46,7 +47,6 @@ const CancelOrder = ({ orderForCancellation, callBackFunction }) => {
 
         onCancellationModalClose();
         callBackFunction();
-
       } else if (response.status === 404 || response.status === 500) {
         toast.error(response.data.message, {
           theme: "dark",
@@ -104,7 +104,9 @@ const CancelOrder = ({ orderForCancellation, callBackFunction }) => {
                 required
               />
               <br />
-              <Button type="submit" color="primary">Cancel Order</Button>
+              <Button type="submit" color="primary">
+                Cancel Order
+              </Button>
             </form>
           </ModalBody>
         </ModalContent>

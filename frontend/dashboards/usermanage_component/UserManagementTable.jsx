@@ -25,6 +25,7 @@ import {
   DropdownItem,
 } from "@nextui-org/react";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 const UserManagementTable = ({ users, setUsers }) => {
   const [page, setPage] = useState(1);
@@ -40,7 +41,8 @@ const UserManagementTable = ({ users, setUsers }) => {
       .filter(
         (user) =>
           user.username.toLowerCase().includes(searchQuery.toLowerCase()) &&
-          (selectedPlayerType === "All" || user.playerType === selectedPlayerType)
+          (selectedPlayerType === "All" ||
+            user.playerType === selectedPlayerType)
       )
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sorting by latest created date
   }, [users, searchQuery, selectedPlayerType]);
@@ -74,7 +76,7 @@ const UserManagementTable = ({ users, setUsers }) => {
   const handleUpdate = async () => {
     try {
       const response = await axios.put(
-        `http://localhost:8098/users/profile/update/${selectedUser._id}`,
+        `${API_BASE_URL}/users/profile/update/${selectedUser._id}`,
         selectedUser
       );
       setUsers((prevUsers) =>
@@ -101,9 +103,7 @@ const UserManagementTable = ({ users, setUsers }) => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(
-        `http://localhost:8098/users/delete/${selectedUser._id}`
-      );
+      await axios.delete(`${API_BASE_URL}/users/delete/${selectedUser._id}`);
       setUsers((prevUsers) =>
         prevUsers.filter((user) => user._id !== selectedUser._id)
       );
@@ -121,7 +121,7 @@ const UserManagementTable = ({ users, setUsers }) => {
 
   return (
     <div>
-      <div  className="flex items-center mb-4">
+      <div className="flex items-center mb-4">
         <Input
           className="ml-2 font-primaryRegular w-48 sm:w-64"
           placeholder="Search by username..."
@@ -138,7 +138,8 @@ const UserManagementTable = ({ users, setUsers }) => {
                 : selectedPlayerType}
             </Button>
           </DropdownTrigger>
-          <DropdownMenu className="text-black"
+          <DropdownMenu
+            className="text-black"
             aria-label="Player Type Selection"
             onAction={(key) => handlePlayerTypeSelect(key)}
           >
@@ -215,7 +216,11 @@ const UserManagementTable = ({ users, setUsers }) => {
       </Table>
 
       {/* Edit Modal */}
-      <Modal isOpen={isEditModalOpen} onClose={() => setEditModalOpen(false)} className="text-black">
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        className="text-black"
+      >
         <ModalContent>
           <ModalHeader>Edit User</ModalHeader>
           <ModalBody>
@@ -267,9 +272,9 @@ const UserManagementTable = ({ users, setUsers }) => {
       <Modal
         isOpen={isDeleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
-        className="text-black"	
+        className="text-black"
       >
-        <ModalContent >
+        <ModalContent>
           <ModalHeader>Delete User</ModalHeader>
           <ModalBody>
             Are you sure you want to delete {selectedUser?.username}?

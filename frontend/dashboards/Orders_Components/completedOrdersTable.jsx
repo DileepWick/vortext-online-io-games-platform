@@ -16,6 +16,7 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "../../src/assets/icons/SearchIcon";
 import ViewDetails from "./View_Address_Button";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 const CompletedOrdersTable = () => {
   const [tableData, setTableData] = useState([]);
@@ -27,7 +28,7 @@ const CompletedOrdersTable = () => {
   const getTableData = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8098/orders/AllCompletedOrders`
+        `${API_BASE_URL}/orders/AllCompletedOrders`
       );
       if (response.data.allOrders) {
         setTableData(response.data.allOrders);

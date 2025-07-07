@@ -3,6 +3,7 @@ import axios from "axios";
 import { toast, Flip } from "react-toastify";
 import { Input, Button, Chip } from "@nextui-org/react";
 import { Image } from "@nextui-org/react";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 const AddNewStock = ({ gameForTheStock, callBackFunction }) => {
   // State Variables
@@ -11,7 +12,7 @@ const AddNewStock = ({ gameForTheStock, callBackFunction }) => {
   const [cover] = useState(gameForTheStock.coverPhoto);
   const [price, setPrice] = useState(0.1); // Initial price set to 0.1
   const [discount, setDiscount] = useState(0); // Initial discount set to 0
-  
+
   // Ensure the price is always >= 0.1
   const handlePriceInput = (e) => {
     const inputValue = Number(e.target.value);
@@ -23,7 +24,7 @@ const AddNewStock = ({ gameForTheStock, callBackFunction }) => {
   // Ensure the discount is always between 0 and 100
   const handleDiscountInput = (e) => {
     const inputValue = Number(e.target.value);
-    if (inputValue >= 0 && inputValue <= 100 || e.target.value === "") {
+    if ((inputValue >= 0 && inputValue <= 100) || e.target.value === "") {
       setDiscount(inputValue);
     }
   };
@@ -39,7 +40,7 @@ const AddNewStock = ({ gameForTheStock, callBackFunction }) => {
       };
 
       const response = await axios.post(
-        `http://localhost:8098/gameStocks/createGameStock`,
+        `${API_BASE_URL}/gameStocks/createGameStock`,
         newStock
       );
 

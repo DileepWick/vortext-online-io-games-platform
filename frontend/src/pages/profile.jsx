@@ -7,6 +7,7 @@ import Footer from "../components/footer";
 import { getUserIdFromToken } from "../utils/user_id_decoder";
 import { getToken } from "../utils/getToken";
 import { User, Lock, Upload, Trash2, Edit3, Check, X } from "lucide-react";
+import { API_BASE_URL } from "../utils/getAPI";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -35,7 +36,7 @@ const Profile = () => {
         const userId = getUserIdFromToken(token);
 
         const response = await axios.get(
-          `http://localhost:8098/users/profile/${userId}`
+          `${API_BASE_URL}/users/profile/${userId}`
         );
         const { profile } = response.data;
         setUser(profile);
@@ -70,7 +71,7 @@ const Profile = () => {
         formData.append("image", profilePic);
       }
       const response = await axios.put(
-        `http://localhost:8098/users/profile/update/${userId}`,
+        `${API_BASE_URL}/users/profile/update/${userId}`,
         formData,
         {
           headers: {
@@ -128,7 +129,7 @@ const Profile = () => {
       const userId = getUserIdFromToken(token);
 
       const response = await axios.put(
-        `http://localhost:8098/users/profile/change-password/${userId}`,
+        `${API_BASE_URL}/users/profile/change-password/${userId}`,
         { currentPassword, newPassword },
         {
           headers: {
@@ -172,7 +173,7 @@ const Profile = () => {
       }
       const userId = getUserIdFromToken(token);
 
-      await axios.delete(`http://localhost:8098/users/delete/${userId}`, {
+      await axios.delete(`${API_BASE_URL}/users/delete/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

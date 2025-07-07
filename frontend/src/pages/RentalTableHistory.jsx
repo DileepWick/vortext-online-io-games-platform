@@ -10,9 +10,10 @@ import {
   Pagination,
   Input,
   Card,
-  CardBody
+  CardBody,
 } from "@nextui-org/react";
 import { SearchIcon } from "lucide-react";
+import { API_BASE_URL } from "../utils/getAPI";
 
 const RentalTableHistory = ({ userId }) => {
   const [rentals, setRentals] = useState([]);
@@ -22,7 +23,9 @@ const RentalTableHistory = ({ userId }) => {
 
   const getRentals = async () => {
     try {
-      const response = await axios.get(`http://localhost:8098/Rentals/getRentalsByUser/${userId}`);
+      const response = await axios.get(
+        `${API_BASE_URL}/Rentals/getRentalsByUser/${userId}`
+      );
       if (response.data) {
         setRentals(response.data);
       }
@@ -87,13 +90,13 @@ const RentalTableHistory = ({ userId }) => {
             }
             classNames={{
               wrapper: "min-h-[222px]",
-              th: "text-black font-primaryRegular",  
+              th: "text-black font-primaryRegular",
               td: "text-black",
             }}
           >
             <TableHeader>
               <TableColumn key="COVER">COVER</TableColumn>
-              <TableColumn key="GAME">GAME</TableColumn>         
+              <TableColumn key="GAME">GAME</TableColumn>
               <TableColumn key="TIME">TIME (Seconds)</TableColumn>
               <TableColumn key="PRICE">PRICE</TableColumn>
               <TableColumn key="DATE">RENTAL DATE</TableColumn>
@@ -102,16 +105,22 @@ const RentalTableHistory = ({ userId }) => {
               {items.map((rental) => (
                 <TableRow key={rental._id}>
                   <TableCell>
-                    <img 
-                      src={rental.game.coverPhoto} 
+                    <img
+                      src={rental.game.coverPhoto}
                       alt={rental.game.title}
                       className="w-16 h-16 object-cover rounded-lg shadow-md hover:scale-110 transition-transform duration-200"
                     />
                   </TableCell>
-                  <TableCell className="font-semibold">{rental.game.title}</TableCell>
+                  <TableCell className="font-semibold">
+                    {rental.game.title}
+                  </TableCell>
                   <TableCell>{rental.time}</TableCell>
-                  <TableCell className="text-red-500 font-bold">Rs.{rental.price}</TableCell>
-                  <TableCell>{new Date(rental.insertDate).toLocaleDateString()}</TableCell>
+                  <TableCell className="text-red-500 font-bold">
+                    Rs.{rental.price}
+                  </TableCell>
+                  <TableCell>
+                    {new Date(rental.insertDate).toLocaleDateString()}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

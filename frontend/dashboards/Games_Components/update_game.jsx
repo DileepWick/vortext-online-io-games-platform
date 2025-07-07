@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { Progress, Input, Button, Textarea, Chip } from "@nextui-org/react";
 import { CheckboxGroup, Checkbox } from "@nextui-org/checkbox";
 import { ScrollShadow } from "@nextui-org/react";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 const UpdateGame = ({ updatingGame, callBackFunction1, callBackFunction2 }) => {
   if (!updatingGame) {
@@ -60,7 +61,7 @@ const UpdateGame = ({ updatingGame, callBackFunction1, callBackFunction2 }) => {
       if (trailerVideo) formData.append("video", trailerVideo);
 
       const response = await axios.put(
-        `http://localhost:8098/games//updateGame/${game._id}`,
+        `${API_BASE_URL}/games/updateGame/${game._id}`,
         formData
       );
 
@@ -82,7 +83,7 @@ const UpdateGame = ({ updatingGame, callBackFunction1, callBackFunction2 }) => {
 
   // Separate selected and other categories
   const selectedCategoriesDisplay = selectedCategories.map((cat) => (
-    <Chip color ="danger"    defaultSelected key={cat}>
+    <Chip color="danger" defaultSelected key={cat}>
       {cat}
     </Chip>
   ));
@@ -111,8 +112,10 @@ const UpdateGame = ({ updatingGame, callBackFunction1, callBackFunction2 }) => {
           />
         </div>
       ) : (
-        <ScrollShadow className="w-[700px] h-[400px]" >
-          <Chip color="primary" className="ml-4">{title}</Chip>
+        <ScrollShadow className="w-[700px] h-[400px]">
+          <Chip color="primary" className="ml-4">
+            {title}
+          </Chip>
           <form
             onSubmit={handleUpdate}
             className="space-y-6 p-6 bg-white rounded-lg shadow-lg"
@@ -178,7 +181,6 @@ const UpdateGame = ({ updatingGame, callBackFunction1, callBackFunction2 }) => {
               </h4>
               <div className="flex flex-wrap gap-2">
                 {selectedCategoriesDisplay}
-                
               </div>
             </div>
 

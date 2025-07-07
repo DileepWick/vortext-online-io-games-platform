@@ -14,6 +14,7 @@ import { ScrollShadow } from "@nextui-org/react";
 import { Image } from "@nextui-org/react";
 import { EyeIcon } from "../../assets/icons/EyeIcon";
 import { Card, CardBody, Chip } from "@nextui-org/react";
+import { API_BASE_URL } from "../../utils/getAPI";
 
 const View_Products = ({ orderObject }) => {
   const {
@@ -31,7 +32,7 @@ const View_Products = ({ orderObject }) => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `http://localhost:8098/orderItems/order/${orderId}`
+        `${API_BASE_URL}/orderItems/order/${orderId}`
       );
       setOrderItems(response.data);
       setFilteredItems(response.data);
@@ -72,7 +73,6 @@ const View_Products = ({ orderObject }) => {
         variant="flat"
         color="default"
         size="lg"
-        
       >
         View Products <EyeIcon />
       </Button>

@@ -20,6 +20,7 @@ import { SearchIcon } from "../../src/assets/icons/SearchIcon";
 // Order Components
 import CancelOrder from "./CancelOrder";
 import ViewDetails from "./View_Address_Button";
+import { API_BASE_URL } from "../../src/utils/getAPI";
 
 const OnDeliveryOrdersTable = () => {
   const [tableData, setTableData] = useState([]);
@@ -31,7 +32,7 @@ const OnDeliveryOrdersTable = () => {
   const getTableData = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8098/orders//onDeliveryOrders"
+        `${API_BASE_URL}/orders/onDeliveryOrders`
       );
       if (response.data.allOrders) {
         setTableData(response.data.allOrders);
@@ -156,7 +157,7 @@ const OnDeliveryOrdersTable = () => {
                 </Chip>
               </TableCell>
               <TableCell>
-                <ViewDetails order={order}/>
+                <ViewDetails order={order} />
               </TableCell>
               <TableCell>
                 <CancelOrder

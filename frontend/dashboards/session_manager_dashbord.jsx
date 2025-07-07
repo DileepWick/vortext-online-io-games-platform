@@ -34,6 +34,7 @@ import { PlusIcon } from "../src/assets/icons/PlusIcon";
 import RentedGamesSection from "./rentedGamesDash";
 import SessionAnalytics from "./sessionAnalytics";
 import useAuthCheck from "../src/utils/authCheck";
+import { API_BASE_URL } from "../src/utils/getAPI";
 
 const SessionManagerDash = () => {
   useAuthCheck("Session_Manager");
@@ -65,7 +66,7 @@ const SessionManagerDash = () => {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        `http://localhost:8098/rentalDurations/getalltimes`
+        `${API_BASE_URL}/rentalDurations/getalltimes`
       );
       setRentalTimes(response.data.rentalTimes || []);
       setError("");
@@ -84,7 +85,7 @@ const SessionManagerDash = () => {
 
   const fetchGames = async () => {
     try {
-      const response = await axios.get("http://localhost:8098/games/allGames");
+      const response = await axios.get(`${API_BASE_URL}/games/allGames`);
       if (response.data && Array.isArray(response.data.allGames)) {
         setGames(response.data.allGames);
       } else {
@@ -153,7 +154,8 @@ const SessionManagerDash = () => {
 
       const existingRentalTime = rentalTimes.find(
         (rt) =>
-          rt.game && rt.game._id === formData.gameId &&
+          rt.game &&
+          rt.game._id === formData.gameId &&
           rt.duration === parseInt(formData.duration, 10) * 60 // Compare in seconds
       );
 
@@ -176,7 +178,7 @@ const SessionManagerDash = () => {
       let response;
       if (editingId) {
         response = await axios.put(
-          `http://localhost:8098/rentalDurations/update/${editingId}`,
+          `${API_BASE_URL}/rentalDurations/update/${editingId}`,
           dataToSend
         );
         toast.success("Rental time updated successfully", {
@@ -186,7 +188,7 @@ const SessionManagerDash = () => {
         });
       } else {
         response = await axios.post(
-          "http://localhost:8098/rentalDurations/create",
+          `${API_BASE_URL}/rentalDurations/create`,
           dataToSend
         );
         toast.success("New rental time added successfully", {
@@ -229,9 +231,7 @@ const SessionManagerDash = () => {
     if (window.confirm("Are you sure you want to delete this rental time?")) {
       setIsLoading(true);
       try {
-        await axios.delete(
-          `http://localhost:8098/rentalDurations/delete/${id}`
-        );
+        await axios.delete(`${API_BASE_URL}/rentalDurations/delete/${id}`);
         await fetchRentalTimes();
         toast.success("Rental time deleted successfully", {
           theme: "dark",
@@ -255,7 +255,9 @@ const SessionManagerDash = () => {
   const filteredItems = useMemo(() => {
     return rentalTimes.filter((rentalTime) => {
       if (rentalTime && rentalTime.game && rentalTime.game.title) {
-        return rentalTime.game.title.toLowerCase().includes(searchQuery.toLowerCase());
+        return rentalTime.game.title
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase());
       }
       return false;
     });
@@ -276,7 +278,6 @@ const SessionManagerDash = () => {
     setSearchQuery("");
     setPage(1);
   };
-
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -368,7 +369,7 @@ const SessionManagerDash = () => {
                     <TableRow key={rentalTime._id}>
                       <TableCell>
                         <span className="text-primary font-medium">
-                          {rentalTime.game?.title || 'Unknown game'}
+                          {rentalTime.game?.title || "Unknown game"}
                         </span>
                       </TableCell>
                       <TableCell>
@@ -417,7 +418,6 @@ const SessionManagerDash = () => {
           )}
           {activeTab === "rentedGames" && <RentedGamesSection />}
           {activeTab === "analytics" && <SessionAnalytics />}
-          
         </div>
       </main>
       <Footer />

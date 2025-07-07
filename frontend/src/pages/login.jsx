@@ -24,6 +24,7 @@ import Footer from "../components/footer";
 
 // Utils
 import { getUserRoleFromToken } from "../utils/user_role_decoder";
+import { API_BASE_URL } from "../utils/getAPI";
 
 const Login = () => {
   const [selectedTab, setSelectedTab] = useState("login");
@@ -69,14 +70,14 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:8098/auth/google";
+    window.location.href = `${API_BASE_URL}/auth/google`;
   };
 
   // Handle login submission
   const handleLogin = async () => {
     try {
       const { username, password } = formData;
-      const response = await axios.post("http://localhost:8098/users/login", {
+      const response = await axios.post(`${API_BASE_URL}/users/login`, {
         username,
         password,
       });
@@ -154,10 +155,7 @@ const Login = () => {
         role: "User",
       };
 
-      const response = await axios.post(
-        "http://localhost:8098/users/register",
-        data
-      );
+      const response = await axios.post(`${API_BASE_URL}/users/register`, data);
 
       if (response.data.message) {
         setAlertMessage("Registration successful! Please log in.");

@@ -27,6 +27,7 @@ import {
   Checkbox,
 } from "@nextui-org/react";
 import { CreditCardIcon } from "lucide-react";
+import { API_BASE_URL } from "../utils/getAPI";
 
 const HandleRentals = () => {
   useAuthCheck();
@@ -39,10 +40,10 @@ const HandleRentals = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [rentalOptions, setRentalOptions] = useState([]);
 
-  const [paymentMethod, setPaymentMethod] = useState('creditCard');
-  const [cardNumber, setCardNumber] = useState('');
-  const [expirationDate, setExpirationDate] = useState('');
-  const [cvv, setCvv] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState("creditCard");
+  const [cardNumber, setCardNumber] = useState("");
+  const [expirationDate, setExpirationDate] = useState("");
+  const [cvv, setCvv] = useState("");
   const [agreeToShare, setAgreeToShare] = useState(false);
 
   const termsAndConditions = [
@@ -56,20 +57,20 @@ const HandleRentals = () => {
   ];
 
   const handleCardNumberChange = (e) => {
-    const value = e.target.value.replace(/\D/g, '');
-    const formattedValue = value.replace(/(\d{4})(?=\d)/g, '$1-');
+    const value = e.target.value.replace(/\D/g, "");
+    const formattedValue = value.replace(/(\d{4})(?=\d)/g, "$1-");
     setCardNumber(formattedValue.slice(0, 19));
   };
 
   const handleExpirationDateChange = (e) => {
-    const value = e.target.value.replace(/\D/g, '');
+    const value = e.target.value.replace(/\D/g, "");
     if (value.length <= 2) {
       setExpirationDate(value);
     } else {
       const month = value.slice(0, 2);
       const year = value.slice(2, 4);
       if (parseInt(month) > 12) {
-        setExpirationDate('12/${year}' + year);
+        setExpirationDate(`12/${year}`);
       } else {
         setExpirationDate(`${month}/${year}`);
       }
@@ -77,12 +78,12 @@ const HandleRentals = () => {
   };
 
   const handleCvvChange = (e) => {
-    const value = e.target.value.replace(/\D/g, '');
+    const value = e.target.value.replace(/\D/g, "");
     setCvv(value.slice(0, 3));
   };
 
   const validateCardDetails = () => {
-    if (cardNumber.replace(/-/g, '').length !== 16) {
+    if (cardNumber.replace(/-/g, "").length !== 16) {
       toast.error("Invalid card number");
       return false;
     }
@@ -90,7 +91,7 @@ const HandleRentals = () => {
       toast.error("Invalid expiration date");
       return false;
     }
-    const [month, year] = expirationDate.split('/');
+    const [month, year] = expirationDate.split("/");
     if (parseInt(month) < 1 || parseInt(month) > 12) {
       toast.error("Invalid month in expiration date");
       return false;
@@ -99,7 +100,10 @@ const HandleRentals = () => {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear() % 100;
     const currentMonth = currentDate.getMonth() + 1;
-    if (parseInt(year) < currentYear || (parseInt(year) === currentYear && parseInt(month) < currentMonth)) {
+    if (
+      parseInt(year) < currentYear ||
+      (parseInt(year) === currentYear && parseInt(month) < currentMonth)
+    ) {
       toast.error("Card has expired");
       return false;
     }
@@ -113,7 +117,7 @@ const HandleRentals = () => {
   const fetchRentalTimes = async (gameId) => {
     try {
       const response = await axios.get(
-        `http://localhost:8098/rentalDurations/game/${gameId}`
+        `${API_BASE_URL}/rentalDurations/game/${gameId}`
       );
       setRentalOptions(
         response.data.map((option) => ({
@@ -132,7 +136,7 @@ const HandleRentals = () => {
     const fetchGameDetails = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8098/games/fetchGame/${id}`
+          `${API_BASE_URL}/games/fetchGame/${id}`
         );
         setGame(response.data);
         await fetchRentalTimes(id);
@@ -163,7 +167,7 @@ const HandleRentals = () => {
         }
 
         const checkResponse = await axios.get(
-          `http://localhost:8098/Rentals/checkExistingRental/${userId}/${id}`,
+          `${API_BASE_URL}/Rentals/checkExistingRental/${userId}/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -172,18 +176,21 @@ const HandleRentals = () => {
         );
 
         if (checkResponse.data.hasExistingRental) {
-          toast.warning(`You already have an existing rental for ${game.title}.`, {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "dark",
-            transition: Flip,
-            style: { fontFamily: "Rubik" },
-          });
+          toast.warning(
+            `You already have an existing rental for ${game.title}.`,
+            {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "dark",
+              transition: Flip,
+              style: { fontFamily: "Rubik" },
+            }
+          );
         } else {
           onOpen();
         }
@@ -224,11 +231,11 @@ const HandleRentals = () => {
         user: userId,
         game: id,
         time: parseInt(selectedRental.time),
-        price: parseFloat(selectedRental.price)
+        price: parseFloat(selectedRental.price),
       };
 
       const rentalResponse = await axios.post(
-        "http://localhost:8098/Rentals/createRental",
+        `${API_BASE_URL}/Rentals/createRental`,
         rentalData,
         {
           headers: {
@@ -242,7 +249,7 @@ const HandleRentals = () => {
       }
 
       const latestRentalResponse = await axios.get(
-        `http://localhost:8098/Rentals/getLatestRental/${userId}/${id}`,
+        `${API_BASE_URL}/Rentals/getLatestRental/${userId}/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -250,7 +257,10 @@ const HandleRentals = () => {
         }
       );
 
-      if (latestRentalResponse.status !== 200 || !latestRentalResponse.data._id) {
+      if (
+        latestRentalResponse.status !== 200 ||
+        !latestRentalResponse.data._id
+      ) {
         throw new Error("Failed to fetch the latest rental ID");
       }
 
@@ -260,11 +270,11 @@ const HandleRentals = () => {
         user: userId,
         game: id,
         rental: rentalId,
-        amount: parseFloat(selectedRental.price)
+        amount: parseFloat(selectedRental.price),
       };
 
       const paymentResponse = await axios.post(
-        "http://localhost:8098/rentalPayments/create",
+        `${API_BASE_URL}/rentalPayments/create`,
         paymentData,
         {
           headers: {
@@ -282,19 +292,22 @@ const HandleRentals = () => {
       }
     } catch (error) {
       console.error("Error processing payment:", error);
-      toast.error(error.response?.data?.message || "Payment failed. Please try again.");
+      toast.error(
+        error.response?.data?.message || "Payment failed. Please try again."
+      );
       onClose();
     }
   };
 
   if (loading) return <div className="text-center py-8">Loading...</div>;
-  if (error) return <div className="text-center py-8 text-red-500">Error: {error}</div>;
+  if (error)
+    return <div className="text-center py-8 text-red-500">Error: {error}</div>;
   if (!game) return <div className="text-center py-8">Game not found</div>;
 
   return (
     <div className="bg-white text-white min-h-screen font-primaryRegular">
       <Header />
-      
+
       {/* Game Title Section */}
       <div className="bg-white py-4">
         <div className="container mx-auto px-4">
@@ -307,22 +320,22 @@ const HandleRentals = () => {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-lg p-8">
-          
           {/* Game Cover and Description Section */}
           <div className="flex flex-col lg:flex-row gap-8 mb-8">
             {/* Game Cover Image */}
-            
-              <Image
-                alt={game.title}
-                className="w-[300px] h-[400px] object-cover rounded-lg shadow-md"
-                src={game.coverPhoto}
-              />
-            
-            
+
+            <Image
+              alt={game.title}
+              className="w-[300px] h-[400px] object-cover rounded-lg shadow-md"
+              src={game.coverPhoto}
+            />
+
             {/* Game Description */}
             <div className="flex-1">
               <div className="mb-1">
-                <h2 className="text-3xl text-editionColor mb-4">About the game</h2>
+                <h2 className="text-3xl text-editionColor mb-4">
+                  About the game
+                </h2>
                 <ScrollShadow hideScrollBar className="h-[150px]">
                   <p className="text-lg text-black">{game.Description}</p>
                 </ScrollShadow>
@@ -351,7 +364,7 @@ const HandleRentals = () => {
             <h3 className="text-2xl font-primaryRegular mb-4">
               Select Rental Duration
             </h3>
-            
+
             {rentalOptions.length > 0 ? (
               <>
                 {/* Rental Options Grid */}
@@ -380,8 +393,12 @@ const HandleRentals = () => {
                           }`}
                         >
                           {parseInt(option.time) >= 3600
-                            ? `${Math.floor(parseInt(option.time) / 3600)} hour${
-                                Math.floor(parseInt(option.time) / 3600) > 1 ? "s" : ""
+                            ? `${Math.floor(
+                                parseInt(option.time) / 3600
+                              )} hour${
+                                Math.floor(parseInt(option.time) / 3600) > 1
+                                  ? "s"
+                                  : ""
                               }`
                             : parseInt(option.time) >= 60
                             ? `${Math.floor(parseInt(option.time) / 60)} min`
@@ -400,7 +417,7 @@ const HandleRentals = () => {
                     </Card>
                   ))}
                 </div>
-                
+
                 {/* Rent Button */}
                 <Button
                   color="black"
@@ -418,14 +435,15 @@ const HandleRentals = () => {
                   This game is not available for rent at the moment.
                 </p>
                 <p className="text-sm text-gray-400 mt-2">
-                  Please check back later or contact support for more information.
+                  Please check back later or contact support for more
+                  information.
                 </p>
               </div>
             )}
           </div>
         </div>
       </div>
-      
+
       {/* Checkout Modal */}
       <Modal
         isOpen={isOpen}
@@ -446,24 +464,28 @@ const HandleRentals = () => {
               <ModalHeader className="font-bold text-2xl text-black">
                 Checkout
               </ModalHeader>
-              
+
               <ModalBody>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  
                   {/* Payment Method Section */}
                   <div className="bg-customCardDark p-6 rounded-lg shadow-md">
                     <h2 className="text-lg font-semibold mb-4 text-black">
                       Payment Method
                     </h2>
-                    <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+                    <RadioGroup
+                      value={paymentMethod}
+                      onValueChange={setPaymentMethod}
+                    >
                       <div className="border border-gray-900 p-5 rounded-lg mb-4">
                         <Radio value="creditCard">
                           <div className="flex items-center">
                             <CreditCardIcon />
-                            <span className="text-black ml-2 mr-4">Credit Card</span>
+                            <span className="text-black ml-2 mr-4">
+                              Credit Card
+                            </span>
                           </div>
                         </Radio>
-                        {paymentMethod === 'creditCard' && (
+                        {paymentMethod === "creditCard" && (
                           <div className="mt-4">
                             <Input
                               label="Card Number"
@@ -499,14 +521,16 @@ const HandleRentals = () => {
                       Order Summary
                     </h2>
                     <div className="flex mb-4">
-                      <img 
-                        src={game?.coverPhoto} 
-                        alt={game?.title} 
-                        className="w-16 h-20 object-cover mr-4 rounded-lg" 
+                      <img
+                        src={game?.coverPhoto}
+                        alt={game?.title}
+                        className="w-16 h-20 object-cover mr-4 rounded-lg"
                       />
                       <div>
                         <h3 className="font text-blue-900">{game?.title}</h3>
-                        <p className="text-black">Rs.{selectedRental?.price.toFixed(2)}</p>
+                        <p className="text-black">
+                          Rs.{selectedRental?.price.toFixed(2)}
+                        </p>
                       </div>
                     </div>
                     <div className="border-t border-gray-700 pt-4 mt-4">
@@ -518,18 +542,18 @@ const HandleRentals = () => {
                   </div>
                 </div>
               </ModalBody>
-              
+
               <ModalFooter>
-                <Button 
-                  color="danger" 
-                  variant="light" 
+                <Button
+                  color="danger"
+                  variant="light"
                   onPress={onClose}
                   className="bg-white text-black border border-gray-300"
                 >
                   Cancel
                 </Button>
-                <Button 
-                  color="primary" 
+                <Button
+                  color="primary"
                   onPress={handlePlaceOrder}
                   className="bg-black text-white"
                 >
