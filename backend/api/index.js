@@ -44,10 +44,6 @@ dotenv.config();
 //Create the app
 const app = express();
 
-
-app.use(passport.initialize());
-app.use(passport.session());
-
 //Middleware for parsing request body
 app.use(express.json());
 
@@ -58,6 +54,20 @@ app.use(
     credentials: true,
   })
 );
+
+// Session middleware
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false },
+  })
+);
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 //Connect DB
 mongoose
@@ -96,7 +106,6 @@ app.use("/api/messages", messageRoutes);
 app.use("/notifications", NotificationRouter);
 app.use("/api/distributed-payments", distributedPaymentRoutes);
 app.use("/api/rock-paper-scissors", rockPaperScissorsRouter);
-
 
 // Set up session management
 app.use("/auth", userRouter);
