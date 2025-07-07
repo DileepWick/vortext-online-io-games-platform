@@ -6,10 +6,7 @@ import Message from "./models/message.js"; // Adjust path as needed
 export const setupSocket = (server, app) => {
   const io = new Server(server, {
     cors: {
-      origin: [
-        "http://127.0.0.1:5000",
-        "https://vortex-frontend-jet.vercel.app/",
-      ],
+      origin: ["http://127.0.0.1:5000", "https://vortexiogaming.vercel.app"],
       methods: ["GET", "POST"],
       credentials: true,
     },
