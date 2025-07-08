@@ -54,7 +54,6 @@ const RentalGamesEmbed = () => {
       await axios.delete(
         `${API_BASE_URL}/Rentals/deleteRentalByID/${rentalId}`
       );
-      console.log("Rental deleted successfully");
     } catch (error) {
       console.error("Error deleting rental:", error);
     }
@@ -65,15 +64,12 @@ const RentalGamesEmbed = () => {
       await axios.put(`${API_BASE_URL}/Rentals/updateRentalTime/${rentalId}`, {
         remainingTime: remainingTimeInSeconds,
       });
-      console.log("Rental time updated successfully");
     } catch (error) {
       console.error("Error updating rental time:", error);
     }
   };
 
   useEffect(() => {
-    console.log("Initial rental time (seconds):", initialTimeSeconds);
-
     // Countdown timer
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {

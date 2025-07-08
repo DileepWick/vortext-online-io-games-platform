@@ -156,7 +156,11 @@ const Header = forwardRef((props, ref) => {
             className="sm:hidden text-black"
           />
           <NavbarBrand>
-            <AcmeLogo />
+            <img
+              src="https://res.cloudinary.com/dxw700dpb/image/upload/v1751945446/photo_2025-07-08_08-48-23-removebg-preview_vlsju6.png"
+              alt="Vortex Logo"
+              className="h-8 ml-2"
+            />
             <p className="font-bold text-inherit text-black">VORTEX</p>
           </NavbarBrand>
         </NavbarContent>

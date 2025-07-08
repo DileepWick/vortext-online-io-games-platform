@@ -77,11 +77,6 @@ const UserMessages = () => {
               (message) => !message.read && message.sender !== "user" // Only count unread messages not sent by the user
             ).length;
 
-            // Log the unread message count for each ticket
-            console.log(
-              `Ticket ID: ${ticket._id}, Unread Messages: ${unreadMessagesCount}`
-            );
-
             // Attach unread count to each ticket
             return { ...ticket, unreadMessagesCount };
           });

@@ -70,7 +70,6 @@ const Leaderboard = () => {
         });
 
         const users = response.data.allUsers;
-        console.log(response.data);
         if (Array.isArray(users)) {
           const currentUserData = users.find((user) => user._id === userId);
 

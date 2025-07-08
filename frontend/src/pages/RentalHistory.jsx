@@ -52,8 +52,6 @@ const RentalHistory = () => {
         }
       );
 
-      console.log("API Response:", response.data);
-
       setRentalPayments(response.data.userPayments || []);
       setError("");
     } catch (error) {

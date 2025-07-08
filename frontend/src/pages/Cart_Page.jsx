@@ -75,6 +75,8 @@ const OrderSummary = ({ subtotal, totalDiscountedTotal, onCheckout }) => {
 };
 
 const CartPage = () => {
+  console.log("CartPage component is rendering"); // Add this at the very top
+
   useAuthCheck();
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -91,17 +93,76 @@ const CartPage = () => {
   const [cvv, setCvv] = useState("");
 
   useEffect(() => {
+    console.log("Fetching cart items...");
     const fetchCartItems = async () => {
       try {
         const token = getToken();
+        console.log("Token available:", !!token);
+
+        if (!token) {
+          setError("No authentication token found");
+          setLoading(false);
+          return;
+        }
+
         const userId = getUserIdFromToken(token);
+        console.log("Extracted User ID:", userId);
+
+        if (!userId) {
+          setError("Unable to extract user ID from token");
+          setLoading(false);
+          return;
+        }
+
         const response = await axios.get(
-          `${API_BASE_URL}/cartItems/getCartItemsByUserId/${userId}`
+          `${API_BASE_URL}/cartItems/getCartItemsByUserId/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
-        setCartItems(response.data.cartItems);
-        calculateTotal(response.data.cartItems);
+
+        console.log("API Response:", response.data);
+
+        // Handle different response structures
+        const cartItems = response.data.cartItems || response.data || [];
+
+        if (!Array.isArray(cartItems)) {
+          console.error("Cart items is not an array:", cartItems);
+          setError("Invalid cart data format");
+          setLoading(false);
+          return;
+        }
+
+        setCartItems(cartItems);
+        calculateTotal(cartItems);
       } catch (err) {
-        setError("Error fetching cart items");
+        console.error("Cart fetch error:", err);
+
+        if (err.response) {
+          // Server responded with error status
+          const statusCode = err.response.status;
+          const errorData = err.response.data;
+
+          if (statusCode === 401) {
+            setError("Authentication failed. Please login again.");
+          } else if (statusCode === 403) {
+            setError("Access denied. Please check your permissions.");
+          } else if (statusCode === 404) {
+            setError("Cart not found or user does not exist.");
+          } else {
+            setError(errorData?.message || `Server error: ${statusCode}`);
+          }
+        } else if (err.request) {
+          // Request was made but no response received
+          setError(
+            "Unable to connect to server. Please check your internet connection."
+          );
+        } else {
+          // Something else happened
+          setError(err.message || "An unexpected error occurred");
+        }
       } finally {
         setLoading(false);
       }
@@ -145,6 +206,7 @@ const CartPage = () => {
         calculateTotal(updatedItems);
       }
     } catch (error) {
+      console.error("Error removing cart item:", error);
       setError("Error removing cart item");
     }
   };
@@ -308,11 +370,11 @@ const CartPage = () => {
     }
   };
 
-  if (loading) return <p className="text-center mt-8">Loading...</p>;
-  if (error) {
-    const errorMessage = error?.message || "Error occurred";
-    return <p className="text-center mt-8">Error: {errorMessage}</p>;
-  }
+  // if (loading) return <p className="text-center mt-8">Loading...</p>;
+  // if (error) {
+  //   const errorMessage = error?.message || "Error occurred";
+  //   return <p className="text-center mt-8">Error: {errorMessage}</p>;
+  // }
 
   if (cartItems.length === 0)
     return (
@@ -342,7 +404,7 @@ const CartPage = () => {
           <ScrollShadow hideScrollBar className="w-full lg:w-2/3 h-[600px]">
             <div className="space-y-6">
               {cartItems.map((item) => {
-                const game = item.stockid.AssignedGame;
+                const game = item.stockid?.AssignedGame;
                 const gameExists = game && game._id;
 
                 return (
@@ -519,26 +581,35 @@ const CartPage = () => {
                     <h2 className="text-lg font-semibold mb-4 text-blue-900">
                       Order Summary
                     </h2>
-                    {cartItems.map((item) => (
-                      <div
-                        key={item._id}
-                        className="flex items-center mb-4 bg-gray-50 p-4 rounded-lg shadow-sm"
-                      >
-                        <img
-                          src={item.stockid.AssignedGame.coverPhoto}
-                          alt={item.stockid.AssignedGame.title}
-                          className="w-16 h-20 object-cover mr-4 rounded-lg"
-                        />
-                        <div>
-                          <h3 className="font-semibold text-blue-700">
-                            {item.stockid.AssignedGame.title}
-                          </h3>
-                          <p className="text-gray-700">
-                            Rs.{item.stockid.UnitPrice.toFixed(2)}
-                          </p>
+                    {cartItems.map((item) => {
+                      const game = item.stockid?.AssignedGame;
+                      return (
+                        <div
+                          key={item._id}
+                          className="flex items-center mb-4 bg-gray-50 p-4 rounded-lg shadow-sm"
+                        >
+                          {game ? (
+                            <img
+                              src={game.coverPhoto}
+                              alt={game.title}
+                              className="w-16 h-20 object-cover mr-4 rounded-lg"
+                            />
+                          ) : (
+                            <div className="w-16 h-20 object-cover mr-4 rounded-lg bg-gray-200 flex items-center justify-center text-gray-500 text-xs text-center">
+                              No Image
+                            </div>
+                          )}
+                          <div>
+                            <h3 className="font-semibold text-blue-700">
+                              {game ? game.title : "Game Not Found"}
+                            </h3>
+                            <p className="text-gray-700">
+                              Rs.{item.stockid.UnitPrice.toFixed(2)}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                     <div className="border-t border-gray-200 pt-4 mt-4">
                       <div className="flex justify-between text-gray-900 font-semibold">
                         <span>Total</span>

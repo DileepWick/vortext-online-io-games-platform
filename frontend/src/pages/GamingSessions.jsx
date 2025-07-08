@@ -172,7 +172,6 @@ const GamingSessions = () => {
   }, [fetchRentals]);
 
   const openModal = useCallback((rental) => {
-    console.log("Opening modal for rental:", rental);
     setCurrentGame(rental);
     setIsModalVisible(true);
   }, []);
@@ -185,7 +184,6 @@ const GamingSessions = () => {
   const handleStartSession = useCallback(() => {
     if (currentGame) {
       const rentalTimeInSeconds = convertTimeToSeconds(currentGame.time);
-      console.log("Rental time in seconds:", rentalTimeInSeconds);
       navigate(
         `/RentalGamesEmbed/${encodeURIComponent(
           currentGame.game.PlayLink
@@ -217,29 +215,23 @@ const GamingSessions = () => {
   const convertTimeToSeconds = (timeString) => {
     if (!timeString) return 14400;
 
-    console.log("Original time string:", timeString);
-
     if (!isNaN(timeString)) {
       const seconds = parseInt(timeString, 10);
-      console.log("Parsed as seconds:", seconds);
       return seconds;
     }
 
     const [hours, minutes] = timeString.split(":").map(Number);
     if (!isNaN(hours) && !isNaN(minutes)) {
       const seconds = hours * 3600 + minutes * 60;
-      console.log("Parsed as HH:MM format:", seconds);
       return seconds;
     }
 
     const hourMatch = timeString.match(/(\d+)\s*hour/i);
     if (hourMatch) {
       const seconds = parseInt(hourMatch[1], 10) * 3600;
-      console.log("Parsed as 'X hours' format:", seconds);
       return seconds;
     }
 
-    console.log("Could not parse time, defaulting to 4 hours");
     return 14400;
   };
 
@@ -356,8 +348,6 @@ const GamingSessions = () => {
             : { paypalEmail: paypalEmail },
       };
 
-      console.log("Sending payment data:", paymentData);
-
       const paymentResponse = await axios.post(
         `${API_BASE_URL}/rentalPayments/create`,
         paymentData,
@@ -367,8 +357,6 @@ const GamingSessions = () => {
           },
         }
       );
-
-      console.log("Payment response:", paymentResponse);
 
       if (paymentResponse.status === 201) {
         // Extend rental time
