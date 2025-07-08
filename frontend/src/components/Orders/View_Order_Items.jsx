@@ -15,6 +15,7 @@ import { Image } from "@nextui-org/react";
 import { EyeIcon } from "../../assets/icons/EyeIcon";
 import { Card, CardBody, Chip } from "@nextui-org/react";
 import { API_BASE_URL } from "../../utils/getAPI";
+import LogoLoader from "../ui/Loader";
 
 const View_Products = ({ orderObject }) => {
   const {
@@ -93,7 +94,7 @@ const View_Products = ({ orderObject }) => {
           </ModalHeader>
           <ModalBody>
             {loading ? (
-              <p>Loading...</p>
+              <LogoLoader isLoading={loading} />
             ) : error ? (
               <p className="text-red-500">{error}</p>
             ) : (

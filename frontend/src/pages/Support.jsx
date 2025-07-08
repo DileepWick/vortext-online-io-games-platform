@@ -18,6 +18,7 @@ import { Helmet } from "react-helmet-async";
 import Loader from "../components/Loader/loader";
 import CustomToast from "../components/CustomToast";
 import useScrollDirection from "../components/hooks/useScrollDirection";
+import LogoLoader from "../components/ui/Loader";
 
 const Support = () => {
   const [faqs, setFaqs] = useState([]);
@@ -166,7 +167,7 @@ const Support = () => {
     fetchFAQs();
   }, []);
 
-  if (loading) return <Loader />;
+  if (loading) return <LogoLoader isLoading={loading} />;
   if (error)
     return (
       <div className="min-h-screen flex items-center justify-center">

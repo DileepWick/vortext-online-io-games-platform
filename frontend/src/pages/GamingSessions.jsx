@@ -23,6 +23,7 @@ import {
 } from "@nextui-org/react";
 import { toast, Flip } from "react-toastify";
 import { API_BASE_URL } from "../utils/getAPI";
+import LogoLoader from "../components/ui/Loader";
 
 const CreditCardIcon = () => (
   <svg
@@ -400,7 +401,7 @@ const GamingSessions = () => {
   };
 
   if (loading) {
-    return <div className="text-center mt-10">Loading...</div>;
+    return <LogoLoader isLoading={loading} />;
   }
 
   if (error) {

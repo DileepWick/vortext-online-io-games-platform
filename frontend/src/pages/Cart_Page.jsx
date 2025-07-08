@@ -24,6 +24,7 @@ import {
   Radio,
   RadioGroup,
 } from "@nextui-org/react";
+import LogoLoader from "../components/ui/Loader";
 
 const CreditCardIcon = () => (
   <svg
@@ -370,11 +371,11 @@ const CartPage = () => {
     }
   };
 
-  // if (loading) return <p className="text-center mt-8">Loading...</p>;
-  // if (error) {
-  //   const errorMessage = error?.message || "Error occurred";
-  //   return <p className="text-center mt-8">Error: {errorMessage}</p>;
-  // }
+  if (loading) return <LogoLoader isLoading={loading} />;
+  if (error) {
+    const errorMessage = error?.message || "Error occurred";
+    return <p className="text-center mt-8">Error: {errorMessage}</p>;
+  }
 
   if (cartItems.length === 0)
     return (

@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { API_BASE_URL } from "../utils/getAPI";
+import LogoLoader from "../components/ui/Loader";
 
 const MinimalistShop = () => {
   const [gameStocks, setGameStocks] = useState([]);
@@ -168,12 +169,7 @@ const MinimalistShop = () => {
     );
   };
 
-  if (loading)
-    return (
-      <div className="min-h-screen bg-white text-black flex items-center justify-center">
-        <LoadingSpinner />
-      </div>
-    );
+  if (loading) return <LogoLoader isLoading={loading} />;
 
   if (error)
     return (
@@ -247,7 +243,6 @@ const MinimalistShop = () => {
           )}
         </div>
       </section>
-
       <Footer />
     </div>
   );

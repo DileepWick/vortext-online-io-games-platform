@@ -23,6 +23,7 @@ import {
 import { SearchIcon, CreditCard, Clock } from "lucide-react";
 import RentalTableHistory from "./RentalTableHistory";
 import { API_BASE_URL } from "../utils/getAPI";
+import LogoLoader from "../components/ui/Loader";
 
 const TransactionHistory = () => {
   useAuthCheck();
@@ -77,11 +78,7 @@ const TransactionHistory = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen bg-black">
-        <div className="animate-spin rounded-full h-16 w-16 md:h-32 md:w-32 border-t-2 border-b-2 border-white"></div>
-      </div>
-    );
+    return <LogoLoader isLoading={loading} />;
   }
 
   if (error) {

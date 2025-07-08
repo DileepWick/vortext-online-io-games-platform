@@ -22,6 +22,7 @@ import useAuthCheck from "../utils/authCheck";
 import { cn } from "../libs/util";
 import { Input } from "../components/ui/Input";
 import { API_BASE_URL } from "../utils/getAPI";
+import LogoLoader from "./../components/ui/Loader";
 
 const LabelInputContainer = ({ children, className }) => {
   return (
@@ -488,7 +489,7 @@ const Articles = () => {
   console.log("Articles:", articles);
 
   if (loading) {
-    return <Loader />;
+    return <LogoLoader isLoading={loading} />;
   }
 
   if (error) {

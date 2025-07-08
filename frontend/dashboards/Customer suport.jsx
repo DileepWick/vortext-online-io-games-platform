@@ -5,11 +5,8 @@ import axios from "axios";
 import Header from "../src/components/header";
 import Footer from "../src/components/footer";
 import ChatModal from "../src/components/ChatModal";
-import Loader from "../src/components/Loader/loader";
 // Utilities
 import useAuthCheck from "../src/utils/authCheck";
-import { Link } from "react-router-dom";
-import jsPDF from "jspdf";
 
 // NextUI Components
 import {
@@ -39,11 +36,9 @@ import {
 } from "@nextui-org/react";
 
 // Icons
-import { PlusIcon } from "../src/assets/icons/PlusIcon";
 import DownloadIcon from "../src/assets/icons/DownloadIcon";
 
 // Notifications
-import { Flip, toast } from "react-toastify";
 import CustomToast from "../src/components/CustomToast";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -51,6 +46,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { Helmet } from "react-helmet-async";
 import ScrollToTop from "../src/components/ScrollToTop";
 import { API_BASE_URL } from "../src/utils/getAPI";
+import LogoLoader from "../src/components/ui/Loader";
 
 const ContactDash = () => {
   useAuthCheck("Support Agent");
@@ -648,7 +644,7 @@ const ContactDash = () => {
                 </ModalContent>
               </Modal>
               {loading ? (
-                <Loader />
+                <LogoLoader isLoading={loading} />
               ) : error ? (
                 <p className="text-red-500 text-center">Error: {error}</p>
               ) : faqs.length === 0 ? (
@@ -748,7 +744,7 @@ const ContactDash = () => {
                 </DropdownMenu>
               </Dropdown>
               {loading ? (
-                <Loader />
+                <LogoLoader isLoading={loading} />
               ) : error ? (
                 <p className="text-red-500 text-center">Error: {error}</p>
               ) : contactMessages.length === 0 ? (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import axios from "axios";
 
@@ -12,15 +12,13 @@ import VideoPlayer from "../components/videoPlayer";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
-import RatingSystem from "../components/RatingSystem";
 import { API_BASE_URL } from "../utils/getAPI";
 
 // NextUI
 import { Button, Chip } from "@nextui-org/react";
 import { Card, CardBody, CardFooter, Image, Textarea } from "@nextui-org/react";
 import { ScrollShadow } from "@nextui-org/react";
-import RatingSystemEditing from "../components/RatingSystemEditing";
-import Loader from "../components/Loader/loader";
+import LogoLoader from "./../components/ui/Loader";
 
 const GameDetails = () => {
   // Authenticate user
@@ -354,7 +352,7 @@ const GameDetails = () => {
     }
   };
 
-  if (loading) return <Loader />;
+  if (loading) return <LogoLoader isLoading={loading} />;
   if (error)
     return <p className="text-center mt-8 text-white">Error: {error}</p>;
   if (!gameStock)
