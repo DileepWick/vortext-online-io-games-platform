@@ -1,10 +1,6 @@
 # Vortex - Online IO Games Platform
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge)](https://vortexiogaming.vercel.app)
-
 Vortex is a dynamic, full-stack web platform designed to be a central hub for indie game developers and players. It allows developers to upload, manage, and monetize their games, while players can browse a diverse library, play instantly, and purchase their favorites.
-
-**Live Application:** [https://vortexiogaming.vercel.app](https://vortexiogaming.vercel.app)
 
 ---
 
