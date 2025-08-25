@@ -168,12 +168,7 @@ const Support = () => {
   }, []);
 
   if (loading) return <LogoLoader isLoading={loading} />;
-  if (error)
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-red-500">{error}</p>
-      </div>
-    );
+
 
   const displayedFAQs = showAllFAQs ? filteredFAQs : filteredFAQs.slice(0, 6);
 

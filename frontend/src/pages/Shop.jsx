@@ -171,15 +171,15 @@ const MinimalistShop = () => {
 
   if (loading) return <LogoLoader isLoading={loading} />;
 
-  if (error)
-    return (
-      <div className="min-h-screen bg-white text-black flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Error Loading Games</h2>
-          <p className="text-gray-600">{error}</p>
-        </div>
-      </div>
-    );
+  // if (error)
+  //   return (
+  //     <div className="min-h-screen bg-white text-black flex items-center justify-center">
+  //       <div className="text-center">
+  //         <h2 className="text-2xl font-bold mb-4">Error Loading Games</h2>
+  //         <p className="text-gray-600">{error}</p>
+  //       </div>
+  //     </div>
+  //   );
 
   return (
     <div className="min-h-screen dark text-black font-primaryRegular">
@@ -218,29 +218,45 @@ const MinimalistShop = () => {
             </p>
           </div>
 
-          {/* Games Grid */}
-          {filteredStocks.length === 0 ? (
-            <div className="text-center py-20 bg-white border-2 border-gray-200">
-              <h3 className="text-3xl font-bold mb-4 text-black">
-                No Games Found
-              </h3>
-              <p className="text-gray-600 mb-8 text-lg">
-                Try adjusting your search
-              </p>
-              <button
-                onClick={() => setSearchTerm("")}
-                className="bg-black text-white px-8 py-4 hover:bg-gray-800 transition-colors font-medium text-lg"
-              >
-                RESET SEARCH
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {filteredStocks.map((stock) => (
-                <GameCard key={stock._id} stock={stock} />
-              ))}
-            </div>
-          )}
+{error ? (
+  <div className="text-center py-20 bg-white border-2 border-red-300">
+    <h3 className="text-3xl font-bold mb-4 text-red-600">
+      Server Error
+    </h3>
+    <p className="text-gray-600 mb-8 text-lg">
+      Something went wrong on our end. Please try again later.
+    </p>
+    <button
+      onClick={() => window.location.reload()}
+      className="bg-red-600 text-white px-8 py-4 hover:bg-red-700 transition-colors font-medium text-lg"
+    >
+      RETRY
+    </button>
+  </div>
+) : filteredStocks.length === 0 ? (
+  <div className="text-center py-20 bg-white border-2 border-gray-200">
+    <h3 className="text-3xl font-bold mb-4 text-black">
+      No Games Found
+    </h3>
+    <p className="text-gray-600 mb-8 text-lg">
+      Try adjusting your search
+    </p>
+    <button
+      onClick={() => setSearchTerm("")}
+      className="bg-black text-white px-8 py-4 hover:bg-gray-800 transition-colors font-medium text-lg"
+    >
+      RESET SEARCH
+    </button>
+  </div>
+) : (
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+    {filteredStocks.map((stock) => (
+      <GameCard key={stock._id} stock={stock} />
+    ))}
+  </div>
+)}
+
+
         </div>
       </section>
       <Footer />
